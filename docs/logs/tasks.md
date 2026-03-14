@@ -74,9 +74,9 @@ This file tracks the overarching phases and microscopic tasks for project comple
 - [x] Payload CMS Auth integration (email + password backend wiring). `(Done: 2026-03-13)`
 - [x] Google OAuth setup. `(Done: 2026-07-15 16:30)`
 - [x] Resend Email Adapter. `(Done: 2026-07-15 16:30)`
-- [ ] Redirect persistence after login (return to original page).
+- [x] Redirect persistence after login (return to original page).
 
-## Phase 5: Dashboard Ecosystems (🟡 BACKEND WIRING IN PROGRESS)
+## Phase 5: Dashboard Ecosystems (✅ COMPLETE)
 
 ### User Dashboard
 - [x] Dashboard layout + routing structure.
@@ -86,14 +86,18 @@ This file tracks the overarching phases and microscopic tasks for project comple
 - [x] Profile Settings page (responsive, stacks on mobile).
 - [x] Mobile responsive (bottom nav on tablet/mobile).
 - [x] Floating "Back to Site" button.
-- [/] Connect to Payload CMS APIs (real data) — plan written `(Started: 2026-03-14 08:20)`
-  - [ ] Create `dashboard-api.ts` fetch helpers
-  - [ ] Wire DashboardLayout to `useAuth()` (replace MOCK_USER)
-  - [ ] Wire Overview page to real data
-  - [ ] Wire Bookings page to real data
-  - [ ] Wire Payments page to real data
-  - [ ] Wire Profile page to real data (save + password change)
+- [x] Connect to Payload CMS APIs (real data). `(Done: 2026-07-15 18:30)`
+  - [x] `dashboard-api.ts` fetch helpers
+  - [x] Wire DashboardLayout to `useAuth()` (replace MOCK_USER)
+  - [x] Wire Overview page to real data
+  - [x] Wire Bookings page to real data
+  - [x] Wire Payments page to real data
+  - [x] Wire Profile page to real data (save + password change)
 - [ ] Notifications page.
+
+## GitHub
+- [x] Create GitHub repo `next-academy-edu` on `nextacademyedu-lang`. `(Done: 2026-07-15 19:00)`
+- [x] Initial commit + push (274 files). `(Done: 2026-07-15 19:00)`
 
 ### Instructor Portal
 - [x] Instructor layout + navigation.

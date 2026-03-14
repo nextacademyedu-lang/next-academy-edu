@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file. Format ensu
 
 ## [Unreleased] - Updated as of 2026-07-15
 
+### [2026-07-15 19:00] - GitHub Repository Setup + Initial Push
+
+- الملفات اللي اتعدّلت:
+  - `.gitignore` — [NEW] أنشأنا `.gitignore` يستثني `node_modules/`, `.next/`, `.env*`, `*.tsbuildinfo`, `client_secret_*.json`
+- وصف مختصر: أنشأنا GitHub repo جديد `next-academy-edu` على أكونت `nextacademyedu-lang` (private). عملنا initial commit بـ 274 ملف وعملنا push على branch `main`. الـ repo متاح على: https://github.com/nextacademyedu-lang/next-academy-edu
+- **حالة:** ✅ Repo live على GitHub
+
 ### [2026-07-15 18:30] - Phase 5: Dashboard Backend Wiring — Complete
 
 - الملفات اللي اتعدّلت:
