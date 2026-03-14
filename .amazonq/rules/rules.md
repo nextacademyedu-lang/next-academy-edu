@@ -8,13 +8,38 @@ trigger: always_on
 
 ---
 
+## 🔴 Rule 00: Security First (HIGHEST PRIORITY)
+
+**الأمان فوق كل حاجة — قبل الـ UI، قبل الـ features، قبل الـ performance.**
+
+- كل collection لازم يكون عنده access control قبل ما تبدأ الـ UI
+- كل API route لازم يتحقق من الـ role server-side قبل أي عملية
+- كل input من اليوزر يتعامل معاه كـ untrusted حتى يتعمله validate وsanitize
+- مفيش feature بتعتبرها "done" لو الـ access control ناقص
+- لو في conflict بين UX وأمان — **الأمان يكسب دايماً**
+
+---
+
+## 🔵 Rule 00.5: Mobile-First Design (NON-NEGOTIABLE)
+
+**كل UI بيتبنى للموبايل الأول — الـ desktop هو الـ enhancement مش الأساس.**
+
+- ابدأ كل component وكل page بـ mobile layout (320px+)
+- استخدم `@media (min-width: ...)` فقط — ممنوع `max-width` media queries
+- اختبر كل صفحة على موبايل قبل ما تعتبرها خلصت
+- الـ touch targets لازم تكون minimum 44×44px
+- مفيش horizontal scroll على موبايل أبداً
+- الـ bottom nav للـ dashboards على موبايل/تابلت (مش sidebar)
+
+---
+
 ## ⚡ Rule 0: Build Discipline (THE MASTER RULE)
 
 **Before building ANY feature, you MUST run `/build-checklist` workflow.**
 
 This means:
 1. **READ** all relevant docs for the feature
-2. **THINK** through all scenarios (happy/error/edge cases), dependencies, and side effects
+2. **THINK** through all scenarios (happy/error/edge cases), dependencies, and side effects using sequential-thinking
 3. **LIST** anything you need from the user BEFORE starting
 4. **BUILD** in the correct order (schema → access → hooks → validation → API → UI → i18n)
 5. **VERIFY** (build passes, dev works, RTL works, mobile works, access control tested)
@@ -87,9 +112,11 @@ You MUST update logs **every 5-10 tool calls minimum.** Never let them go stale.
 
 | File | When to update | Format |
 |---|---|---|
-| `docs/logs/changelog.md` | After EVERY significant change | `### [YYYY-MM-DD HH:MM] - Title` + files + reason |
+| `docs/logs/changelog.md` | After EVERY significant change | `### [YYYY-MM-DD HH:MM] - Title` + files + reason | 
 | `docs/logs/tasks.md` | When starting `[/]` or finishing `[x]` a task | Mark the item |
 | `docs/logs/errors.md` | When encountering and solving an error | Timestamp + error + root cause + fix |
+| `docs/logs/plan.md` | When making a plan and tracking progress |
+| `docs/logs/sessions/` | After every chat session — full summary of what was done |
 
 ---
 

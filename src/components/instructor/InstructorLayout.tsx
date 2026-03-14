@@ -2,39 +2,53 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { Home, Video, Clock, Users, ArrowLeft, LogOut, Bell, Settings } from 'lucide-react';
+import { usePathname, useRouter } from 'next/navigation';
+import { useLocale } from 'next-intl';
+import { Home, Video, Clock, Users, ArrowLeft, LogOut, Bell, Settings, DollarSign } from 'lucide-react';
 import styles from './instructor.module.css';
-
-// Mocking user role for now until auth context is wired up
-const MOCK_USER = {
-  name: 'Dr. Sarah Chen',
-  role: 'Instructor',
-  avatar: 'S',
-  roleSlug: 'instructor'
-};
+import { useAuth } from '@/context/auth-context';
 
 const INSTRUCTOR_NAV_LINKS = [
-  { name: 'Overview', href: '/instructor', icon: Home },
-  { name: 'Sessions', href: '/instructor/sessions', icon: Video },
-  { name: 'Consultations', href: '/instructor/bookings', icon: Users },
-  { name: 'Services', href: '/instructor/consultation-types', icon: Settings },
-  { name: 'Availability', href: '/instructor/availability', icon: Clock },
+  { name: 'Overview',      href: '/instructor',                    icon: Home       },
+  { name: 'Sessions',      href: '/instructor/sessions',           icon: Video      },
+  { name: 'Consultations', href: '/instructor/bookings',           icon: Users      },
+  { name: 'Earnings',      href: '/instructor/earnings',           icon: DollarSign },
+  { name: 'Services',      href: '/instructor/consultation-types', icon: Settings   },
+  { name: 'Availability',  href: '/instructor/availability',       icon: Clock      },
 ];
 
 export function InstructorLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const router   = useRouter();
+  const locale   = useLocale();
+  const { user, isLoading, isAuthenticated, logout } = useAuth();
 
-  const isActive = (href: string) => {
-    return pathname.includes(href);
+  React.useEffect(() => {
+    if (!isLoading && !isAuthenticated) router.push(`/${locale}/login`);
+  }, [isLoading, isAuthenticated, router, locale]);
+
+  const displayName   = user ? `${user.firstName} ${user.lastName}`.trim() : '…';
+  const avatarInitial = user?.firstName?.[0]?.toUpperCase() ?? '?';
+
+  const handleLogout = async () => {
+    await logout();
+    router.push(`/${locale}/login`);
   };
+
+  const isActive = (href: string) => pathname.includes(href);
+
+  if (isLoading) return (
+    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg-primary)' }}>
+      <div style={{ color: 'var(--text-muted)', fontSize: '14px' }}>Loading…</div>
+    </div>
+  );
 
   return (
     <div className={styles.layoutContainer}>
       {/* Sidebar */}
       <aside className={styles.sidebar}>
         <div className={styles.sidebarHeader}>
-          <Link href="/" className={styles.logo}>
+          <Link href={`/${locale}`} className={styles.logo}>
             Next Academy
           </Link>
         </div>
@@ -47,9 +61,9 @@ export function InstructorLayout({ children }: { children: React.ReactNode }) {
             const activeClass = isDashboardRoot || isSubPage ? styles.navLinkActive : '';
 
             return (
-              <Link 
-                key={link.name} 
-                href={`/en${link.href}`}
+              <Link
+                key={link.name}
+                href={`/${locale}${link.href}`}
                 className={`${styles.navLink} ${activeClass}`}
               >
                 <Icon size={20} />
@@ -60,7 +74,11 @@ export function InstructorLayout({ children }: { children: React.ReactNode }) {
         </nav>
 
         <div className={styles.sidebarFooter}>
-          <button className={styles.navLink} style={{ width: '100%', border: 'none', background: 'transparent', cursor: 'pointer' }}>
+          <button
+            onClick={handleLogout}
+            className={styles.navLink}
+            style={{ width: '100%', border: 'none', background: 'transparent', cursor: 'pointer' }}
+          >
             <LogOut size={20} />
             Sign Out
           </button>
@@ -72,7 +90,7 @@ export function InstructorLayout({ children }: { children: React.ReactNode }) {
         {/* Topbar */}
         <header className={styles.topbar}>
           <div>
-            <Link href="/" className={styles.logo} style={{ display: 'block' }}>
+            <Link href={`/${locale}`} className={styles.logo} style={{ display: 'block' }}>
               <span className="hidden-desktop">Next Academy</span>
             </Link>
           </div>
@@ -84,12 +102,10 @@ export function InstructorLayout({ children }: { children: React.ReactNode }) {
 
             <div className={styles.userProfile}>
               <div className={styles.userInfo} style={{ textAlign: 'right' }}>
-                <span className={styles.userName}>{MOCK_USER.name}</span>
-                <span className={styles.userRole}>{MOCK_USER.role}</span>
+                <span className={styles.userName}>{displayName}</span>
+                <span className={styles.userRole}>Instructor</span>
               </div>
-              <div className={styles.avatar}>
-                {MOCK_USER.avatar}
-              </div>
+              <div className={styles.avatar}>{avatarInitial}</div>
             </div>
           </div>
         </header>
@@ -100,30 +116,30 @@ export function InstructorLayout({ children }: { children: React.ReactNode }) {
         </div>
       </main>
 
-      <Link href="/" className={styles.floatingBackBtn}>
+      <Link href={`/${locale}`} className={styles.floatingBackBtn}>
         <ArrowLeft size={16} />
         Back to Site
       </Link>
 
       {/* Mobile Bottom Bar (Hidden on Desktop via CSS) */}
       <nav className={styles.mobileBottomBar} style={{ display: 'none' }}>
-         {INSTRUCTOR_NAV_LINKS.map((link) => {
-            const Icon = link.icon;
-            const isDashboardRoot = link.href === '/instructor' && pathname.endsWith('/instructor');
-            const isSubPage = link.href !== '/instructor' && isActive(link.href);
-            const activeClass = isDashboardRoot || isSubPage ? styles.mobileNavLinkActive : '';
+        {INSTRUCTOR_NAV_LINKS.map((link) => {
+          const Icon = link.icon;
+          const isDashboardRoot = link.href === '/instructor' && pathname.endsWith('/instructor');
+          const isSubPage = link.href !== '/instructor' && isActive(link.href);
+          const activeClass = isDashboardRoot || isSubPage ? styles.mobileNavLinkActive : '';
 
-            return (
-              <Link 
-                key={link.name} 
-                href={`/en${link.href}`}
-                className={`${styles.mobileNavLink} ${activeClass}`}
-              >
-                <Icon size={24} />
-                <span style={{ fontSize: '10px' }}>{link.name}</span>
-              </Link>
-            );
-          })}
+          return (
+            <Link
+              key={link.name}
+              href={`/${locale}${link.href}`}
+              className={`${styles.mobileNavLink} ${activeClass}`}
+            >
+              <Icon size={24} />
+              <span style={{ fontSize: '10px' }}>{link.name}</span>
+            </Link>
+          );
+        })}
       </nav>
       <style dangerouslySetInnerHTML={{
         __html: `

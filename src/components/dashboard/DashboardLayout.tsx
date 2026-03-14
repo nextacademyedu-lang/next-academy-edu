@@ -107,10 +107,9 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
             </Link>
           </div>
           <div className={styles.topbarRight}>
-            <button className={styles.notificationBtn}>
+            <Link href={`/${locale}/dashboard/notifications`} className={styles.notificationBtn}>
               <Bell size={20} />
-              <span className={styles.badge}></span>
-            </button>
+            </Link>
 
             <div className={styles.userProfile}>
               <div className={styles.userInfo} style={{ textAlign: 'right' }}>

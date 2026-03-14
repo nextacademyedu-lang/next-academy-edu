@@ -1,10 +1,12 @@
 {
   "Nav": {
-    "workshops": "ورش العمل",
-    "courses": "الدورات",
+    "programs": "البرامج",
     "instructors": "المدربون",
+    "blog": "المدونة",
+    "about": "من نحن",
     "login": "تسجيل الدخول",
-    "register": "إنشاء حساب"
+    "register": "إنشاء حساب",
+    "logout": "تسجيل الخروج"
   },
   "Footer": {
     "pages": "الصفحات",

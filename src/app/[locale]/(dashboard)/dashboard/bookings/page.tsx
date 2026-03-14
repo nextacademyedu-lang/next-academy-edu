@@ -151,9 +151,11 @@ export default function BookingsPage() {
                     </a>
                   )}
                   {(booking.status === 'pending' || booking.status === 'reserved') && (
-                    <Button variant="outline" style={{ flex: 1, padding: '0 12px', borderColor: '#ffc107', color: '#ffc107' }}>
-                      Complete Payment
-                    </Button>
+                    <Link href={`/${locale}/checkout/${booking.id}`} style={{ flex: 1, textDecoration: 'none' }}>
+                      <Button variant="outline" fullWidth style={{ borderColor: '#ffc107', color: '#ffc107' }}>
+                        Complete Payment
+                      </Button>
+                    </Link>
                   )}
                   {booking.status === 'completed' && (
                     <Button variant="ghost" style={{ flex: 1, padding: '0 12px' }} disabled>

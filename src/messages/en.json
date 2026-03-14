@@ -1,10 +1,12 @@
 {
   "Nav": {
-    "workshops": "Workshops",
-    "courses": "Courses",
+    "programs": "Programs",
     "instructors": "Instructors",
+    "blog": "Blog",
+    "about": "About",
     "login": "Log In",
-    "register": "Sign Up"
+    "register": "Sign Up",
+    "logout": "Log Out"
   },
   "Footer": {
     "pages": "Pages",

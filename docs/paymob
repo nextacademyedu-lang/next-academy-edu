@@ -1,0 +1,107 @@
+Overview
+Who is this for - Product managers and developers who need a high-level overview to plan the payment feature for their app or website
+
+Outcome - Understand the overall payment flow and the available integration options
+Overview
+The figure below is a high-level view of the payments architecture, from user touchpoints to transaction execution, designed to guide decisions across wallets, cards, installments, and post-payment actions. This will help you map what you’re building, how you’re integrating, and which payment methods and flows you support.
+
+Phase 1: Define Your Product & Integration Method
+Start by defining what you are building and how you will connect to us.
+
+1
+What are you building?
+Website
+Mobile Application
+2
+How are you building it?
+Custom-built website or mobile application with our web UI (through a webview in case of mobile app)
+E-commerce platform
+SDK
+Phase 2: Choose Your Payment Options
+Select the payment methods and types that match your needs.
+
+1
+Which Payment method will you offer?
+Please check the supported Payment Methods section to get full guidance on each payment method and the integration ways that support it.
+
+2
+Which payment feature will you use?
+Normal 3D Secure (3DS): Please check the 3D Secure (3DS) explained in the Card payment method page to know more about it.
+Auth/Cap: Please check the Auth/Cap page to know more about it.
+Pay with saved tokens: Please check the Pay With Saved Cards section to know more about it and its types (MIT and CIT), and how to implement each of them.
+For the subscription module, which enables you to configure subscriptions that Paymob will use in the future to deduct an amount periodically without your intervention in the next billings, please check the Subscriptions section.
+
+Phase 3: The Payment Actions you can take
+Determine what payment actions you’ll perform.
+
+1. What are the payment actions you'll perform?
+
+Please check the Managing Payment Actions section to know more about the available payment actions and how to do each one through the Paymob dashboard or APIs.
+
+If you are still confused regarding the path you'll follow to implement your needed payment experience, please send an email to support@paymob.com, and we'll be glad to help you get the best payment experience for your business.
+
+Was this section helpful?
+Yes
+No
+
+
+
+## APIs
+
+Who is this for - Product managers and developers who need a high-level overview of how to integrate through APIs and our available checkout experiences
+
+Outcome - Understand the overall API payment flow, the available checkout options, and how payment results are securely communicated back to your system
+
+When should you use APIs?
+Use Paymob APIs if you are:
+
+Building a custom website without a CMS or ready-made plugin
+Using a platform that allows calling third-party APIs but has no direct Paymob integration
+Building a mobile app and choosing to use a web-based checkout in a WebView instead of a native SDK
+APIs give you flexibility while still relying on Paymob’s secure payment infrastructure.
+
+Integration flow
+1
+Create a payment intention
+Every payment starts by calling the Intention Creation API from your backend. You can check it in the Intention APIs section.
+
+This step initializes the payment by defining:
+
+Amount and currency
+Allowed payment methods
+Your internal order or reference ID
+The response includes a reference (client secret) that is used to launch the checkout experience.
+
+2
+Display a checkout experience to the customer
+Once the intention is created, you present one of Paymob’s checkout experiences:
+
+Unified Checkout (Redirect)
+
+Customer is redirected to a Paymob-hosted checkout page
+Fastest integration with minimal frontend effort
+Paymob handles UI, validation, and security
+Embedded Checkout (Pixel)
+
+Paymob checkout UI component (Pixel) is embedded inside your website or WebView
+More control over the checkout look and feel
+Sensitive payment data is still handled securely by Paymob
+3
+Customer completes or cancels the payment
+The customer enters their payment details and completes any required authentication (such as 3D Secure). Paymob processes the transaction and determines the final payment status.
+
+4
+Callbacks (Webhooks)
+After processing the payment, Paymob sends callbacks to your backend to notify you of the payment result and redirects the customer back to your website or app.
+
+Callbacks should be used to:
+
+Confirm the final payment status
+Update order records
+Trigger business actions (e.g., fulfillment, notifications)
+Redirects are mainly for user experience
+Callbacks are the source of truth for payment status
+5
+Callback security (HMAC)
+Each callback can be authenticated using HMAC verification to ensure it was sent by Paymob and was not altered. Always verify callbacks before trusting their data.
+

@@ -1,5 +1,9 @@
 import React from 'react';
 import Link from 'next/link';
+import { notFound } from 'next/navigation';
+import { getLocale } from 'next-intl/server';
+import { getPayload } from 'payload';
+import config from '@payload-config';
 import { Navbar } from '@/components/layout/navbar';
 import { Footer } from '@/components/layout/footer';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
@@ -7,91 +11,100 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import styles from './page.module.css';
 
-// Mock data (To be sourced via Payload CMS)
-const instructorData = {
-  name: 'Dr. Sarah Chen',
-  title: 'VP of Marketing @ TechCorp',
-  avatar: 'S',
-  bio: `Dr. Sarah Chen is a seasoned marketing executive with over 15 years of experience scaling B2B SaaS companies. She previously served as CMO at three unicorns and has a proven track record of growing ARR from $1M to $50M through highly engineered marketing funnels.`,
-  socials: ['LinkedIn', 'Twitter'],
-  activePrograms: [
-    { id: '1', title: 'Advanced Strategic Marketing', type: 'Workshop', date: 'Oct 15 - Oct 17' },
-    { id: '2', title: 'B2B Sales Masterclass', type: 'Course', date: 'Dec 01 - Dec 14' }
-  ],
-  consultations: [
-    { id: 'c1', type: '30min Strategy Call', price: '$150' },
-    { id: 'c2', type: '1-Hour Deep Dive', price: '$250' }
-  ]
-};
-
-export default function InstructorProfilePage({
-  params
+export default async function InstructorProfilePage({
+  params,
 }: {
-  params: Promise<{ slug: string }>
+  params: Promise<{ slug: string }>;
 }) {
+  const { slug } = await params;
+  const locale = await getLocale();
+  const payload = await getPayload({ config });
+
+  const { docs } = await payload.find({
+    collection: 'instructors',
+    where: { or: [{ slug: { equals: slug } }, { id: { equals: slug } }] },
+    depth: 2,
+    limit: 1,
+  });
+
+  const instructor = docs[0];
+  if (!instructor) notFound();
+
+  const user = typeof (instructor as any).user === 'object' ? (instructor as any).user : null;
+  const name = user
+    ? `${user.firstName} ${user.lastName}`.trim()
+    : (instructor as any).name || 'Instructor';
+  const initial = name[0]?.toUpperCase() ?? '?';
+  const bio = (instructor as any).bio || '';
+  const title = (instructor as any).title || '';
+  const consultationTypes: any[] = (instructor as any).consultationTypes?.docs ?? [];
+  const programs: any[] = (instructor as any).programs?.docs ?? [];
+
   return (
     <div className={styles.wrapper}>
       <Navbar />
-      
+
       <main className={styles.main}>
-        {/* Hero Section */}
+        {/* Hero */}
         <section className={styles.heroSection}>
           <div className={styles.heroCover}></div>
           <div className={styles.heroContent}>
-            <div className={styles.avatarMain}>
-              {instructorData.avatar}
-            </div>
-            <h1 className={styles.name}>{instructorData.name}</h1>
-            <p className={styles.title}>{instructorData.title}</p>
-            <div className={styles.socials}>
-              {instructorData.socials.map((social, i) => (
-                <Badge key={i} variant="outline" className={styles.socialBadge}>{social}</Badge>
-              ))}
-            </div>
+            <div className={styles.avatarMain}>{initial}</div>
+            <h1 className={styles.name}>{name}</h1>
+            {title && <p className={styles.title}>{title}</p>}
           </div>
         </section>
 
         <div className={styles.contentLayout}>
-          {/* Main Content Column */}
+          {/* Main */}
           <div className={styles.mainContent}>
-            <section className={styles.sectionBlock}>
-              <h2 className={styles.sectionTitle}>About {instructorData.name.split(' ')[0]}</h2>
-              <p className={styles.bioText}>{instructorData.bio}</p>
-            </section>
+            {bio && (
+              <section className={styles.sectionBlock}>
+                <h2 className={styles.sectionTitle}>About {name.split(' ')[0]}</h2>
+                <p className={styles.bioText}>{bio}</p>
+              </section>
+            )}
 
-            <section className={styles.sectionBlock}>
-              <h2 className={styles.sectionTitle}>Active Programs</h2>
-              <div className={styles.programsGrid}>
-                {instructorData.activePrograms.map(program => (
-                  <Card key={program.id} className={styles.programCard} interactive>
-                    <CardHeader>
-                      <Badge variant="default" className={styles.typeBadge}>{program.type}</Badge>
-                      <CardTitle className={styles.programTitle}>{program.title}</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <p className={styles.programDate}>🗓 Custom Schedule: {program.date}</p>
-                      <Link href={`/programs/${program.id}`}>
-                        <Button variant="outline" size="sm" className={styles.viewBtn}>View Program</Button>
-                      </Link>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            </section>
+            {programs.length > 0 && (
+              <section className={styles.sectionBlock}>
+                <h2 className={styles.sectionTitle}>Active Programs</h2>
+                <div className={styles.programsGrid}>
+                  {programs.map((program: any) => (
+                    <Card key={program.id} className={styles.programCard} interactive>
+                      <CardHeader>
+                        <Badge variant="default" className={styles.typeBadge}>{program.type}</Badge>
+                        <CardTitle className={styles.programTitle}>
+                          {program.titleEn || program.titleAr || 'Program'}
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <Link href={`/${locale}/programs/${program.slug || program.id}`}>
+                          <Button variant="outline" size="sm" className={styles.viewBtn}>View Program</Button>
+                        </Link>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </section>
+            )}
           </div>
 
-          {/* Sidebar / Consultations */}
+          {/* Sidebar */}
           <aside className={styles.sidebar}>
             <div className={styles.stickyBox}>
               <h3 className={styles.sidebarTitle}>1:1 Consultations</h3>
               <p className={styles.sidebarDesc}>Book a private session for tailored business advice.</p>
-              
               <div className={styles.consultationsList}>
-                {instructorData.consultations.map(consultation => (
-                  <Card key={consultation.id} className={styles.consultCard}>
+                {consultationTypes.length === 0 && (
+                  <p style={{ color: 'var(--text-muted)', fontSize: '14px' }}>No consultations available.</p>
+                )}
+                {consultationTypes.map((ct: any) => (
+                  <Card key={ct.id} className={styles.consultCard}>
                     <CardHeader className={styles.consultHeader}>
-                      <CardTitle className={styles.consultTitle}>{consultation.type}</CardTitle>
-                      <span className={styles.consultPrice}>{consultation.price}</span>
+                      <CardTitle className={styles.consultTitle}>{ct.title}</CardTitle>
+                      <span className={styles.consultPrice}>
+                        {ct.price?.toLocaleString()} EGP
+                      </span>
                     </CardHeader>
                     <CardContent className={styles.consultContent}>
                       <Button fullWidth variant="primary">Book Session</Button>

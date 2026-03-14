@@ -1,10 +1,11 @@
 import React from 'react';
 import Link from 'next/link';
-import { getTranslations } from 'next-intl/server';
+import { getTranslations, getLocale } from 'next-intl/server';
 import styles from './footer.module.css';
 
 export async function Footer() {
   const t = await getTranslations('Footer');
+  const locale = await getLocale();
 
   return (
     <footer className={styles.footer}>
@@ -27,11 +28,11 @@ export async function Footer() {
           <div className={styles.linksSection}>
             <div className={styles.column}>
               <h4 className={styles.heading}>{t('pages')}</h4>
-              <Link href="/programs" className={styles.link}>{t('programs')}</Link>
-              <Link href="/instructors" className={styles.link}>{t('instructors')}</Link>
-              <Link href="/about" className={styles.link}>{t('about')}</Link>
-              <Link href="/contact" className={styles.link}>{t('contact')}</Link>
-              <Link href="/blog" className={styles.link}>{t('blog')}</Link>
+              <Link href={`/${locale}/programs`}    className={styles.link}>{t('programs')}</Link>
+              <Link href={`/${locale}/instructors`} className={styles.link}>{t('instructors')}</Link>
+              <Link href={`/${locale}/about`}       className={styles.link}>{t('about')}</Link>
+              <Link href={`/${locale}/contact`}     className={styles.link}>{t('contact')}</Link>
+              <Link href={`/${locale}/blog`}        className={styles.link}>{t('blog')}</Link>
             </div>
             <div className={styles.column}>
               <h4 className={styles.heading}>{t('socials')}</h4>
@@ -42,15 +43,15 @@ export async function Footer() {
             </div>
             <div className={styles.column}>
               <h4 className={styles.heading}>{t('legal')}</h4>
-              <Link href="/privacy" className={styles.link}>{t('privacy')}</Link>
-              <Link href="/terms" className={styles.link}>{t('terms')}</Link>
-              <Link href="/refund-policy" className={styles.link}>{t('refund')}</Link>
+              <Link href={`/${locale}/privacy`}       className={styles.link}>{t('privacy')}</Link>
+              <Link href={`/${locale}/terms`}         className={styles.link}>{t('terms')}</Link>
+              <Link href={`/${locale}/refund-policy`} className={styles.link}>{t('refund')}</Link>
             </div>
             <div className={styles.column}>
               <h4 className={styles.heading}>{t('register')}</h4>
-              <Link href="/register" className={styles.link}>{t('signup')}</Link>
-              <Link href="/login" className={styles.link}>{t('login')}</Link>
-              <Link href="/forgot-password" className={styles.link}>{t('forgotPassword')}</Link>
+              <Link href={`/${locale}/register`}         className={styles.link}>{t('signup')}</Link>
+              <Link href={`/${locale}/login`}            className={styles.link}>{t('login')}</Link>
+              <Link href={`/${locale}/forgot-password`}  className={styles.link}>{t('forgotPassword')}</Link>
             </div>
           </div>
         </div>

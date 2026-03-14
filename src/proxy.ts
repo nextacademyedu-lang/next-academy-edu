@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { routing } from './i18n/routing';
 
 // Routes that require authentication
-const PROTECTED_PATTERNS = ['/dashboard', '/instructor', '/checkout'];
+const PROTECTED_PATTERNS = ['/dashboard', '/instructor', '/checkout', '/b2b-dashboard', '/onboarding'];
 
 // Routes that authenticated users should be redirected away from
 const AUTH_ROUTES = ['/login', '/register'];

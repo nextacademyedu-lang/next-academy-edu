@@ -37,6 +37,7 @@ export interface PayloadBooking {
   paidAmount: number;
   remainingAmount: number;
   finalAmount: number;
+  discountAmount: number;
   round: PayloadRound | string;
   paymentPlan?: { id: string; name: string } | string | null;
   createdAt: string;

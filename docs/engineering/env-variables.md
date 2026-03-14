@@ -37,11 +37,19 @@
 
 | Variable | Example | Required | Description |
 |---|---|---|---|
-| `PAYMOB_API_KEY` | `ZXlK...` | ✅ | Paymob API key |
-| `PAYMOB_INTEGRATION_ID` | `123456` | ✅ | Card payment integration ID |
-| `PAYMOB_IFRAME_ID` | `654321` | ✅ | Paymob iframe ID for card form |
+| `PAYMOB_API_KEY` | `ZXlK...` | ✅ | Paymob secret API key (server-only) |
+| `PAYMOB_PUBLIC_KEY` | `are_pk_...` | ✅ | Paymob public key for Unified Checkout URL |
+| `PAYMOB_INTEGRATION_ID` | `5466643` | ✅ | Card payment integration ID |
+| `PAYMOB_WALLET_INTEGRATION_ID` | `5465534` | ✅ | Mobile wallet integration ID |
+| `PAYMOB_IFRAME_ID` | `995831` | ✅ | Paymob iframe ID (legacy, keep for reference) |
 | `PAYMOB_HMAC_SECRET` | `abc123...` | ✅ | Webhook HMAC verification key |
-| `PAYMOB_WALLET_INTEGRATION_ID` | `789012` | ⬜ | Mobile wallet integration ID |
+
+### Payment — EasyKash
+
+| Variable | Example | Required | Description |
+|---|---|---|---|
+| `EASYKASH_API_TOKEN` | `5dgkx5gtt0xxcqy1` | ✅ | EasyKash Cash API key |
+| `EASYKASH_HMAC_SECRET` | `4767834c...` | ✅ | EasyKash webhook HMAC secret |
 
 ### Email — Resend
 

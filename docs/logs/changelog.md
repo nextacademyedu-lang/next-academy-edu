@@ -1,197 +1,271 @@
-# Next Academy — Project Changelog
+# 📋 Next Academy — Changelog
 
-All notable changes to this project will be documented in this file. Format ensures accountability by requiring exact timestamps (YYYY-MM-DD HH:MM).
+> كل التغييرات المهمة بتتسجل هنا. الفورمات: `### [YYYY-MM-DD HH:MM] - العنوان`
 
-## [Unreleased] - Updated as of 2026-07-15
+---
 
-### [2026-07-15 19:00] - GitHub Repository Setup + Initial Push
+## 🚧 [Unreleased] — آخر تحديث: 2026-07-16
 
-- الملفات اللي اتعدّلت:
-  - `.gitignore` — [NEW] أنشأنا `.gitignore` يستثني `node_modules/`, `.next/`, `.env*`, `*.tsbuildinfo`, `client_secret_*.json`
-- وصف مختصر: أنشأنا GitHub repo جديد `next-academy-edu` على أكونت `nextacademyedu-lang` (private). عملنا initial commit بـ 274 ملف وعملنا push على branch `main`. الـ repo متاح على: https://github.com/nextacademyedu-lang/next-academy-edu
-- **حالة:** ✅ Repo live على GitHub
+---
 
-### [2026-07-15 18:30] - Phase 5: Dashboard Backend Wiring — Complete
+### ✅ [2026-07-16 17:00] — Security Hardening + VPS Docker Setup
 
-- الملفات اللي اتعدّلت:
-  - `src/lib/dashboard-api.ts` — [NEW] Typed fetch helpers for Overview, Bookings, Payments, Profile (GET + PATCH)
-  - `src/app/[locale]/(dashboard)/dashboard/layout.tsx` — ربط `useAuth()` بدل `MOCK_USER`؛ avatar initials + logout
-  - `src/app/[locale]/(dashboard)/dashboard/page.tsx` — Overview بيجيب stats + next sessions + حضور من API
-  - `src/app/[locale]/(dashboard)/dashboard/bookings/page.tsx` — Bookings grid بيجيب البوكينجز الحقيقية مع progress bars و next session
-  - `src/app/[locale]/(dashboard)/dashboard/payments/page.tsx` — Payments page بـ tabs: Active Installments + Payment History
-  - `src/app/[locale]/(dashboard)/dashboard/profile/page.tsx` — Profile بيجيب بيانات اليوزر ويحدثها + change password عبر API
-- وصف مختصر: ربطنا كل صفحات الـ dashboard بـ Payload CMS APIs الحقيقية عبر API helper layer (`dashboard-api.ts`). الـ DashboardLayout بيستخدم `useAuth()` بدل MOCK_USER. كل الصفحات الأربعة بتجيب بياناتها live من `/api/...` endpoints. TypeScript build يعدي بـ exit code 0 بدون أخطاء.
-- **حالة:** ✅ Phase 5 مكتملة — كل الـ dashboard wired للـ backend
+| الملف | التغيير |
+|---|---|
+| `next.config.ts` | 🔧 HSTS + CSP headers + `output: standalone` |
+| `src/proxy.ts` | 🔧 حماية `/b2b-dashboard` + `/onboarding` |
+| `src/lib/rate-limit.ts` | 🆕 ioredis sliding window rate limiter + in-memory fallback |
+| `src/app/api/users/login/route.ts` | 🆕 Rate-limited login (10 req/min per IP) |
+| `src/app/api/discount-codes/validate/route.ts` | 🆕 Server-side discount validation |
+| `src/components/layout/Navbar.tsx` | 🔧 Auth-aware — show/hide login buttons |
+| `Dockerfile` | 🆕 Multi-stage production build |
+| `docker-compose.yml` | 🔧 كامل: postgres + redis + app + nginx + certbot |
+| `nginx/nginx.conf` | 🆕 Reverse proxy + SSL termination |
+| `.env.production.template` | 🆕 Production env template |
 
-### [2026-07-15 17:30] - Fix: Normalize access-control imports across all collections
+---
 
-- الملفات اللي اتعدّلت:
-  - `src/collections/Waitlist.ts` — `@/lib/access-control` → `../lib/access-control.ts`
-  - `src/collections/Reviews.ts` — same fix
-  - `src/collections/PaymentLinks.ts` — same fix
-  - `src/collections/InstructorBlockedDates.ts` — same fix
-  - `src/collections/Certificates.ts` — same fix
-- وصف مختصر: 5 collections were using `@/lib/access-control` alias without `.ts` extension while 22 used `../lib/access-control.ts`. Normalized all to relative path with `.ts` extension to prevent future importMap regeneration failures.
+### ✅ [2026-07-16 15:00] — Payment Gateway Testing & Bug Fixes
 
-### [2026-07-15 17:00] - Fix: Payload Build Errors (importMap + serverFunction)
+| الملف | التغيير |
+|---|---|
+| `src/app/.../checkout/[bookingId]/page.tsx` | 🔧 Fix booking ID type mismatch (number vs string) |
+| `src/lib/dashboard-api.ts` | 🔧 إضافة `discountAmount` لـ `PayloadBooking` type |
+| `src/lib/payment-api.ts` | 🔧 تغيير `Authorization: Token` → `Bearer` للـ Paymob key الجديد |
+| `src/app/api/checkout/paymob/route.ts` | 🔧 إرجاع actual error message بدل generic message |
+| `scripts/seed-test-payment.sql` | 🆕 SQL seed script لبيانات الاختبار |
+| `.env` | 🔧 تصحيح `PAYMOB_API_KEY` + تصحيح integration IDs + تحديث ngrok URL |
 
-- الملفات اللي اتعدّلت:
-  - `src/app/importMap.js` — renamed from `.ts` → `.js` (empty file, no TS needed)
-  - `src/payload-types.ts` — regenerated via `npx payload generate:types`
-  - 13 collection files in `src/collections/` — added `.ts` extension to `access-control` imports
-  - `src/app/(payload)/layout.tsx` — added `serverFunction` prop with `'use server'` wrapper
-- وصف مختصر: حل خطأين في الـ build:
-  1. **importMap error**: الملف كان فاضي وبدون exports. حل: إعادة توليد الأنواع + تسمية الملف `.js` + إضافة `.ts` extension لكل imports من `access-control` في 13 collection
-  2. **serverFunction error**: Payload 3.79.0 يحتاج `serverFunction` prop جديد على `RootLayout`. حل: إنشاء server action wrapper مع `handleServerFunctions` + `config` + `importMap`
-- **حالة:** Build ناجح ✅ (exit code 0, 32 routes generated)
+**نتيجة الاختبار:**
+- Paymob card payment → 3DS → Approved ✅
+- EasyKash Fawry voucher → pending page ✅
+- HMAC verification على الـ webhooks ✅
 
-### [2026-03-14 08:20] - Phase 5: Dashboard Backend Wiring — Planning
+---
 
-- الملفات اللي اتعدّلت:
-  - `docs/logs/tasks.md` — Updated Phase 4 as COMPLETE, marked Phase 5 backend wiring as IN PROGRESS with sub-tasks
-  - `docs/logs/changelog.md` — Added this entry
-  - Implementation plan written (artifact) for 6 files: 1 new (`dashboard-api.ts`) + 5 modifications (DashboardLayout + 4 dashboard pages)
-- وصف مختصر: بدأنا Phase 5 — تحليل الكود بيز (collections, auth context, dashboard pages, proxy) وكتبنا implementation plan لربط الـ 4 صفحات dashboard بـ Payload CMS APIs الحقيقية. الخطة تشمل: إنشاء `dashboard-api.ts` fetch helpers، ربط DashboardLayout بـ `useAuth()` بدل MOCK_USER، وتحديث Overview, Bookings, Payments, Profile pages.
-- **حالة:** خطة مكتوبة — في انتظار التنفيذ
+### ✅ [2026-07-16 02:00] — Payment Gateway Integration (Paymob + EasyKash)
 
-### [2026-07-15 16:30] - Phase 4: Resend Email Adapter + Google OAuth
+| الملف | التغيير |
+|---|---|
+| `src/lib/payment-api.ts` | 🆕 Shared types + Paymob Intention API + EasyKash Cash API + HMAC verification |
+| `src/app/api/checkout/paymob/route.ts` | 🆕 POST — ينشئ Paymob Intention → يرجع redirect URL |
+| `src/app/api/checkout/easykash/route.ts` | 🆕 POST — ينشئ EasyKash Cash voucher (Fawry/Aman) |
+| `src/app/api/webhooks/paymob/route.ts` | 🆕 POST — HMAC verify → amount check → confirm booking |
+| `src/app/api/webhooks/paymob/redirect/route.ts` | 🆕 GET — Paymob redirect handler → success/pending/failed |
+| `src/app/api/webhooks/easykash/route.ts` | 🆕 POST — HMAC verify → amount check → confirm booking |
+| `src/app/.../checkout/[bookingId]/page.tsx` | 🔄 Wired لـ real APIs — بيجيب بيانات الحجز الحقيقية |
+| `src/app/.../checkout/success/page.tsx` | 🆕 Success page بعد كارت/محفظة |
+| `src/app/.../checkout/pending/page.tsx` | 🆕 Pending page — voucher + copy button + خطوات فوري/أمان |
+| `src/app/.../checkout/failed/page.tsx` | 🆕 Failed page — retry + واتساب |
+| `docs/engineering/env-variables.md` | 🔄 إضافة `PAYMOB_PUBLIC_KEY` + `EASYKASH_API_TOKEN` + `EASYKASH_HMAC_SECRET` |
 
-- الملفات اللي اتعدّلت:
-  - `src/lib/resend-adapter.ts` — [NEW] Resend email adapter implementing Payload's EmailTransportAdapter
-  - `src/payload.config.ts` — Wired `resendAdapter` into Payload `email` config
-  - `src/app/api/auth/google/route.ts` — [NEW] Google OAuth entry point (redirects to Google consent screen)
-  - `src/app/api/auth/google/callback/route.ts` — [NEW] Google OAuth callback (token exchange, user find-or-create, JWT)
-  - `src/collections/Users.ts` — Added `googleId` text field
-  - `src/lib/auth-api.ts` — Added `redirectToGoogle()` convenience helper
-  - `src/app/[locale]/(auth)/login/page.tsx` — Wired Google social button onClick
-  - `src/app/[locale]/(auth)/register/page.tsx` — Wired Google social button onClick
-- وصف مختصر: Task 1: أنشأنا Resend adapter بيستخدم REST API مع type safety كامل. Task 2: أنشأنا Google OAuth flow كامل — entry route بيعمل redirect لـ Google consent screen، والـ callback بيعمل token exchange وبيعمل find-or-create للـ user وبيولد JWT باستخدام Node.js crypto (بدون أي deps جديدة). الـ Google buttons اتربطت في login و register pages.
-- **Env vars مطلوبة:** `RESEND_API_KEY`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`
+**الـ Flow:**
+- كارت/محفظة → Paymob Intention API → Unified Checkout → webhook → confirmed
+- فوري/أمان → EasyKash Cash API → voucher page → يدفع في الفرع → webhook → confirmed
 
-### [2026-03-14 05:05] - Fix: OTP Double-Submit Race Condition
+**Testing:**
+- ngrok tunnel: `https://97f9-41-36-59-214.ngrok-free.app`
+- Webhooks tested locally — HMAC rejection ✅
+- Paymob + EasyKash callbacks updated in dashboards ✅
 
-- الملفات اللي اتعدّلت:
-  - `src/app/[locale]/(auth)/verify-email/page.tsx` — أضفنا `verifyingRef` (ref-based lock) لمنع الـ handleVerify من الاستدعاء المزدوج
-- وصف مختصر: الـ auto-submit كان بينادي `handleVerify` لما كل الأرقام تتملي، وبعدين لو اليوزر دوس الزر handleVerify بتتنادي تاني. المرة الأولى بتنجح وبتعمل mark used للكود، والمرة التانية بتلاقي الكود مستخدم فبتقول "الرمز غلط". الحل: ref-based lock بيمنع الاستدعاء المتزامن.
+---
 
-### [2026-07-15 14:30] - Fix: Signup redirects to /ar/dashboard instead of register page
+---
 
-- الملفات اللي اتعدّلت:
-  - `src/proxy.ts` — شيلنا الـ blind redirect من auth routes عشان الـ middleware كان بيوثق بـ stale cookies
-  - `src/app/[locale]/(auth)/login/page.tsx` — أضفنا client-side auth check وصلحنا type error في `result.user`
-- وصف مختصر: الـ middleware كان بيشوف `payload-token` cookie وبيعمل redirect لـ `/dashboard` حتى لو الـ user اتمسح من الداتابيز. الحل: شيلنا الـ server-side redirect من auth routes وخلينا الـ pages تتعامل مع الحالة دي client-side عن طريق الـ auth context.
+### ✅ [2026-07-15 21:00] — B2B Manager Dashboard
 
-### [2026-03-13 18:45] - Fix: Middleware/Proxy Conflict (Next.js 16)
-- الملفات اللي اتعدّلت:
-  - `src/proxy.ts` — دمج كل لوجيك auth + i18n من middleware.ts
-  - `src/middleware.ts` — [DELETED] ملغي عشان Next.js 16 بيرفض وجود الاتنين
-- وصف مختصر: Next.js 16 عمل deprecate لـ middleware.ts وبيطلب proxy.ts بس. تم نقل كل اللوجيك (route protection, auth redirects, i18n) لـ proxy.ts وحذف middleware.ts. السيرفر شغال تمام.
+| الملف | التغيير |
+|---|---|
+| `src/lib/b2b-api.ts` | 🆕 Typed fetch helpers للـ B2B dashboard |
+| `src/components/b2b/B2BLayout.tsx` | 🆕 Sidebar layout مع nav + logout |
+| `src/app/.../b2b-dashboard/page.tsx` | 🆕 Overview — stats + team + recent bookings |
+| `src/app/.../b2b-dashboard/team/page.tsx` | 🆕 Team members table + search |
+| `src/app/.../b2b-dashboard/bookings/page.tsx` | 🆕 Bookings + filter (all/upcoming/completed) |
+| `src/app/../(b2b)/layout.tsx` | 🆕 Route group layout |
+| `src/app/../(b2b)/loading.tsx` + `error.tsx` | 🆕 Loading + error boundaries |
 
-### [2026-07-15 14:00] - Sprint 4: Onboarding i18n + Premium CSS Redesign
-- الملفات اللي اتعدّلت:
-  - `src/app/[locale]/(auth)/onboarding/page.tsx` — Rewrote with `useTranslations('Auth')`, all hardcoded English replaced with i18n keys
-  - `src/app/[locale]/(auth)/onboarding/onboarding.module.css` — [DELETED] Duplicate removed; importing from component-level module
-  - `src/components/onboarding/step-1.tsx` — Added `useTranslations('Auth')` for all labels/placeholders/options
-  - `src/components/onboarding/step-2.tsx` — Added `useTranslations('Auth')` for all labels/placeholders/options
-  - `src/components/onboarding/step-3.tsx` — Added `useTranslations('Auth')` for all labels/placeholders/options
-  - `src/components/onboarding/onboarding.module.css` — Premium CSS overhaul: radial gradient backgrounds, glowing stepper dots, glassmorphism card, animated tag chips, micro-interactions
-- وصف مختصر: تحويل كامل للـ onboarding: i18n عربي/إنجليزي بدون أي نص hardcoded، حذف CSS مكرر، تصميم premium dark بتأثيرات glass و glow و animations. صفر أخطاء TypeScript جديدة.
+---
 
-### [2026-07-15 11:30] - Sprint 4: Multi-Step Onboarding Wizard
-- الملفات اللي اتعدّلت:
-  - `src/app/[locale]/(auth)/onboarding/page.tsx` — [NEW] Main 3-step wizard orchestrator with framer-motion animations
-  - `src/app/[locale]/(auth)/onboarding/onboarding.module.css` — [NEW] Dark-themed stepper styles matching auth layout
-  - `src/components/onboarding/step-1.tsx` — [NEW] Professional Info (title, job, field, experience)
-  - `src/components/onboarding/step-2.tsx` — [NEW] Company & Location (company, size, type, country, city)
-  - `src/components/onboarding/step-3.tsx` — [NEW] Learning Goals (tag chips for interests, goals textarea, how-did-you-hear)
-- وصف مختصر: Onboarding wizard كامل 3 خطوات. Progress dots, animated transitions, tag chip selection للاهتمامات, skip functionality. الـ page بتعمل create/update لـ UserProfiles عبر Payload API مع onboardingCompleted=true. صفر أخطاء TypeScript جديدة.
+### ✅ [2026-07-15 20:00] — Notifications Page + Instructor Portal Backend Wiring
 
-### [2026-07-15 10:00] - Sprint 0: Access Control Fix for 5 Vulnerable Collections
-- الملفات اللي اتعدّلت:
-  - `src/collections/Reviews.ts` — added access: public read, auth create, owner/admin update, admin delete
-  - `src/collections/Certificates.ts` — added access: owner/admin read, admin create/update/delete
-  - `src/collections/InstructorBlockedDates.ts` — added access: instructor-owner + admin for all ops
-  - `src/collections/PaymentLinks.ts` — added access: admin-only for all CRUD
-  - `src/collections/Waitlist.ts` — added access: owner/admin read, auth create, admin update/delete
-- وصف مختصر: 5 collections كانوا بدون access control = security hole. تم إضافة access control باستخدام helpers من `src/lib/access-control.ts`. Build passes بدون أخطاء جديدة.
+| الملف | التغيير |
+|---|---|
+| `src/lib/instructor-api.ts` | 🆕 Typed fetch helpers للـ instructor portal |
+| `src/app/.../dashboard/notifications/page.tsx` | 🆕 Notifications page — real data + mark read + mark all read |
+| `src/app/.../instructor/page.tsx` | 🔄 Wire لـ real sessions + consultations بدل mock |
+| `src/app/.../instructor/sessions/page.tsx` | 🔄 Wire لـ real sessions + search |
+| `src/app/.../instructor/bookings/page.tsx` | 🔄 Wire لـ real consultation bookings + approve/decline |
+| `src/app/.../instructor/availability/page.tsx` | 🔄 Wire لـ real availability + blocked dates (add/delete) |
 
-### [2026-03-13 14:31] - 3-Phase: Organize Docs + Verify APIs + Code Audit
-- الملفات اللي اتعدّلت:
-  - **Phase 1:** نقل 28 docs file في 6 subdirectories: `architecture/`, `design/`, `features/`, `security/`, `engineering/`, `business/`. أنشأنا `docs/README.md` index. سمّينا `Design System.md` → `design-system.md`
-  - **Phase 2:** `docs/engineering/api-contracts.md` — أضفنا 8 sections جديدة (Reviews, Certificates, Blog, PaymentLinks, B2B, Onboarding, Instructors, Cron auth) + pagination spec + field name mapping appendix. 411 → 749 سطر
-  - **Phase 3:** `docs/engineering/code-audit.md` — تقرير audit شامل لـ 21 collection: access control, hooks, validation, missing fields, 5 collections ناقصة, config security issues, + roadmap
+---
 
+### ✅ [2026-07-15 19:00] — GitHub Repository Setup + Initial Push
 
-### Added
+| | |
+|---|---|
+| 📁 **ملف جديد** | `.gitignore` — يستثني `node_modules/`, `.next/`, `.env*`, `*.tsbuildinfo`, `client_secret_*.json` |
+| 🔗 **Repo** | https://github.com/nextacademyedu-lang/next-academy-edu (private) |
+| 📦 **Commit** | `feat: initial commit — Next Academy platform scaffold` (274 ملف) |
+| 🌿 **Branch** | `main` |
 
-### [2026-03-13 04:00] - Comprehensive Documentation Gap Fill (15 Files)
-- الملفات اللي اتعدّلت:
-  - **12 ملف جديد:** `docs/security.md`, `docs/payment-scenarios.md`, `docs/error-handling.md`, `docs/api-contracts.md`, `docs/rate-limiting.md`, `docs/testing-strategy.md`, `docs/env-variables.md`, `docs/deployment.md`, `docs/monitoring.md`, `docs/accessibility.md`, `docs/performance.md`, `docs/data-privacy.md`
-  - **3 ملفات اتوسّعت:** `docs/reviews.md` (32→170 سطر), `docs/i18n.md` (40→200 سطر), `docs/Design System.md` (167→577 سطر)
-- وصف مختصر: تم إنشاء كل الملفات الناقصة في التوثيق بناءً على تحليل شامل للمشروع. يغطي: الأمان، سيناريوهات الدفع، معالجة الأخطاء، عقود API، Rate Limiting، استراتيجية الاختبار، متغيرات البيئة، النشر، المراقبة، إمكانية الوصول، الأداء، وخصوصية البيانات.
+---
 
-### [2026-03-13 14:17] - Round 2: Email Templates, Cron Jobs, Video Protection + Sitemap Fix
-- الملفات اللي اتعدّلت:
-  - **3 ملفات جديدة:** `docs/email-templates.md` (31 email + 10 WhatsApp + 14 in-app), `docs/cron-jobs.md` (14 cron job), `docs/video-protection.md`
-  - **ملف اتحدّث:** `docs/sitemap.md` → أضفنا 9 صفحات ناقصة (consultations, certificates, B2B dashboard)
-- وصف مختصر: مراجعة نهائية كشفت عن 3 ملفات ناقصة و9 صفحات مش موجودة في الخريطة.
+### ✅ [2026-07-15 18:30] — Phase 5: Dashboard Backend Wiring
 
-- **[2026-03-05 01:48] Phase 3 Completed (Static Pages)**: Implemented Next.js routes and layout components for `/about`, `/contact`, `/blog`, `/privacy`, `/terms`, and `/refund-policy`. Adjusted `globals.css` to permanently mount the target brand colors (`#C51B1B`, `#020504`, etc).
+| الملف | التغيير |
+|---|---|
+| `src/lib/dashboard-api.ts` | 🆕 Typed fetch helpers للـ Overview, Bookings, Payments, Profile |
+| `src/components/dashboard/DashboardLayout.tsx` | 🔄 ربط `useAuth()` بدل `MOCK_USER` + avatar + logout |
+| `src/app/.../dashboard/page.tsx` | 🔄 Overview بيجيب stats + next sessions من API |
+| `src/app/.../dashboard/bookings/page.tsx` | 🔄 Bookings grid بالبيانات الحقيقية + progress bars |
+| `src/app/.../dashboard/payments/page.tsx` | 🔄 Payments بـ tabs: Active Installments + History |
+| `src/app/.../dashboard/profile/page.tsx` | 🔄 Profile بيجيب بيانات اليوزر + save + change password |
 
-- **[2026-03-05 01:30] Directory Architecture Standardized**: Moved all Next.js App Router files (`app/`, `i18n/`, `messages/`, and `proxy.ts` / `middleware.ts`) into `src/` to comply with project rules. Updated `tsconfig.json` path aliases (`@/*` to `./src/*`).
+**النتيجة:** TypeScript build ✅ exit code 0 — كل الـ dashboard wired للـ backend
 
-- **[2026-03-05 01:00] 5 Edge Case Fixes**: (1) Guest redirect persisted through onboarding steps. (2) Installment access blocking (overdue = no live/recordings) + admin override + auto-cancel installments on refund. (3) Waitlist cascade cron (24h expiry → next user auto-notified). (4) UTC timezone storage convention. (5) Quiz-based certificate eligibility (admin quiz builder in Payload CMS).
+---
 
-- **[2026-03-05 00:48] Platform Features Update**: Added 3 new critical sections to `platform-features.md`: In-App Live Streaming (Zoom Web SDK integration for PWA), Backup & Disaster Recovery Strategy (3-tier), and Guided Onboarding Tour (driver.js tooltips).
+### 🔧 [2026-07-15 17:30] — Fix: Normalize Access-Control Imports
 
-- **[2026-03-05 00:39] 10 Platform Features Batch**: Certificates (custom per program, 11 fields, QR verification), i18n (Arabic RTL + English), Admin Analytics (GA4 + 8 dashboard sections), Reviews & Ratings, Refund Flow (user request → admin approve/reject with reason), Global Search, PWA, Sales Attribution & Referral, 13 Email Templates, Error Pages (404/500/Maintenance).
-- **[2026-03-05 00:31] Labels & Broadcast System (`admin-labels-broadcasts.md`)**: User labeling/tagging system (6 auto + manual types) with targeted broadcast messaging across Email, WhatsApp, and In-App. 4-step broadcast composer with merge tags and scheduling.
+| | |
+|---|---|
+| 📁 **الملفات** | `Waitlist.ts`, `Reviews.ts`, `PaymentLinks.ts`, `InstructorBlockedDates.ts`, `Certificates.ts` |
+| ❌ **المشكلة** | 5 collections كانوا بيستخدموا `@/lib/access-control` بدون `.ts` |
+| ✅ **الحل** | Normalize لـ `../lib/access-control.ts` في كل الـ 27 collection |
 
-- **[2026-03-05 00:19] Protected Video Playback**: Documented secure content delivery system (Signed URLs + Dynamic Watermark + No Download) for session recordings across `data-flow.md`, `booking-details.md`, and `session-details.md`.
-- **[2026-03-05 00:15] Roles & Permissions (`docs/roles-permissions.md`)**: Full matrix documenting 4 user roles (`user`, `b2b_manager`, `instructor`, `admin`) with detailed capabilities, role assignment flow, and Employee Churn rules.
-- **[2026-03-05 00:10] B2B Advanced Scenarios**: Added Waitlists, Company-Specific Promo Codes, B2B HR Dashboard wireframe, and Employee Churn logic.
-- **[2026-03-05 00:06] Companies Collection**: Added `Companies` entity to `data-flow.md` with autocomplete search onboarding flow. Created `admin-companies.md` wireframe.
-- **[2026-03-04 23:55] Design System (`docs/Design System.md`)**: Fully rewritten to match "Corporate Dark Mode" Almentor reference styling utilizing specific semantic colors (`#020504` background, `#C51B1B` primary red, `#D6A32B` secondary gold, `#F1F6F1` text-primary, `#C5C5C5` text-secondary). Removed neon styling.
-- **[2026-03-04 23:45] Wireframes (`docs/wireframes/pages/`)**: Automatically generated 47 fully distinct markdown wireframe documents detailing the layout of every single page in the project grouped into functional directories.
-- **[2026-03-04 19:22] Sitemap (`docs/sitemap.md`)**: Comprehensive structure mapped with 47 functional pages across 10 sections.
-- **[2026-03-04 19:20] PRD (`docs/prd.md`)**: Complete product requirements defining the B2B tech stack (Next.js 15, Payload CMS, Twenty CRM, Resend, Paymob).
-- **[2026-03-04 19:21] Data Flow (`docs/data-flow.md`)**: Detailed entity definitions, states, and data flow map for system logic.
-- **[2026-03-04 19:24] Project Structure**: Initiated `create-next-app` to set up the foundational repository skeleton.
-- **[2026-03-04 23:25] MCP Configurations**: Added `html-to-design` to the AI's integrations list for Figma imports.
+---
 
-- **[2026-07-14] Foundation Fixes Batch**: (1) Renamed proxy.ts back to correct convention for Next.js 16 (v16 uses `proxy` not `middleware`). (2) Fixed instructor layout — removed duplicate NextIntlClientProvider and old Next.js 14 params syntax. (3) Added loading.tsx + error.tsx to all 5 route groups (locale root, dashboard, instructor, auth, checkout). (4) Fully populated ar.json + en.json with all UI string keys across Nav, Footer, Hero, Stats, Featured, WhyChooseUs, B2B, Instructors, Blogs, Dashboard, Instructor portal, Auth, Common namespaces. (5) Updated 7 components to use useTranslations/getTranslations — zero hardcoded strings remaining in layout and homepage sections. (6) Fixed duplicate `color` property TypeScript error in instructor sessions page. Build passes cleanly.
+### 🔧 [2026-07-15 17:00] — Fix: Payload Build Errors (importMap + serverFunction)
 
-- **[2026-03-04 23:51] Homepage UX**: Refined the homepage wireframe structure to include components specifically for Corporate Training (B2B Lead Gen), an Upcoming Events Carousel, and a Blog Insights section.
-- **[2026-03-04 23:33] MCP Syntax Fix**: Fixed MCP configuration regex parsing error preventing Figma server connection.
+| المشكلة | الحل |
+|---|---|
+| `importMap` error — ملف فاضي بدون exports | Rename `.ts` → `.js` + regenerate types + إضافة `.ts` extension لـ 13 collection |
+| `serverFunction` error — Payload 3.79.0 يحتاج prop جديد | إضافة `serverFunction` wrapper مع `'use server'` على `RootLayout` |
 
-### Planned
+**النتيجة:** Build ✅ — 32 routes generated
 
-- **Frontend Development:** Begin converting the layout structures into reusable React/Next.js UI components.
-- **Supabase/Postgres Configuration:** Setup actual database schemas aligned with the data flow documentation.
-- **Payload CMS Integration:** Build the Admin panel collections inside Payload mapped to our specific 15 Admin pages.
-- [x] Added Blogs Preview Section to Homepage
-- [x] Redesigned Footer to match DevStudio mockup with watermark
-- [x] Added Framer Motion lazy scroll and parallax animations to all Homepage sections
-- [x] Animated Stats section numbers from zero on scroll using Framer Motion
-- [x] Updated Why Choose Us section with strong copy and GSAP Text Reveal animation
-- [x] Fixed CSS variable scoping in Why Choose Us to allow cascading changes
-\n- [x] Converted Featured Programs, Meet Our Experts, Graduate Success Stories, and Latest Insights sections into interactive Carousels using Embla
-\n- [x] Moved Carousel controls to the side of elements and added Center Scaling to the active card.
-\n- [x] Fixed carousel configuration to support infinite loop and added vertical padding to prevent scaled active cards from clipping.
-\n- [x] Duplicated Carousel arrays and applied startIndex to prevent infinite loop rewinding and fix initial selected center positioning.
-\n- [x] Fixed carousel overlap by applying scale transforms selectively to inner cards and enforcing layout scale bounding via Embla padding strategy.
-\n- [x] Added  linear gradient to all carousels to create a smooth blurred fade effect on the left and right edges instead of a sharp cutoff.
-\n- [x] Refactored Why Choose Us section to use lucide-react vector icons absolutely positioned overlapping the cards instead of inline emojis.
-\n- [x] Refactored Why Choose Us section to feature a grid background + radial fade, with cards upgraded to use premium glassmorphism.
-\n- [x] Transferred grid+radial background and heavier liquid glass card styling to Marquee Testimonials section as requested.
-\n- [x] Redesigned Instructor styling in `instructors-preview` to be a minimal, borderless, photo-forward card.
-\n- [x] Fixed `/login` and `/register` routing 404s by correctly mapping Next-Intl middleware logic and updating route groups.
-\n- [x] Implemented Student Dashboard Layout and routing structure.\n- [x] Added User Dashboard Overview page.\n- [x] Added Bookings Page.\n- [x] Added Payments & Installments Tracker Page.\n- [x] Added Profile Settings Page.
-\n- [x] Fixed contrast ratio across the dashboard application by updating `--text-muted` from near-black to a legible gray and replacing dark overlay colors on cards with subtle white opacities.
-\n- [x] Designed and implemented the programmatic checkout flow mimicking the provided reference, supporting EasyKash / Paymob / digital wallets inside `/checkout/:id`.
-\n- [x] Refactored checkout UI to precisely match PRD specifications, including separate segments for Pay in Full (Card & Wallet via Paymob, Fawry & Aman via EasyKash) and Installments (valU & Next Academy Manual Installment).
-\n- [x] Converted User Dashboard UI to be mobile-responsive by replacing the side sidebar with a bottom navigation bar on tablet and mobile viewports.
-\n- [x] Refactored Profile Settings Page layout to use , converting it from a fixed grid into a responsive view that stacks perfectly on mobile.
-\n- [x] Added persistent floating 'Back to Site' button across the user dashboard.
-- [x] Inserted prominent 'Browse Courses' navigation button to the Bookings page header.
-\n## [Unreleased] - 2026-03-05\n- [x] Added complete Instructor Portal section under `/instructor` route group.\n- [x] Implemented `InstructorLayout` for portal navigation.\n- [x] Created `/instructor` overview page with stats, upcoming sessions, and recent consultations.\n- [x] Created `/instructor/sessions` for managing workshop and course rounds.\n- [x] Created `/instructor/availability` for setting weekly hours and date overrides.\n- [x] Created `/instructor/consultation-types` for managing offered 1-on-1 services.\n- [x] Created `/instructor/bookings` for reviewing and managing student consultation bookings.
+---
+
+### ✅ [2026-07-15 16:30] — Phase 4: Resend Email Adapter + Google OAuth
+
+| الملف | التغيير |
+|---|---|
+| `src/lib/resend-adapter.ts` | 🆕 Resend adapter بـ REST API + type safety |
+| `src/payload.config.ts` | 🔄 Wire `resendAdapter` في Payload email config |
+| `src/app/api/auth/google/route.ts` | 🆕 Google OAuth entry point |
+| `src/app/api/auth/google/callback/route.ts` | 🆕 Token exchange + find-or-create user + JWT |
+| `src/collections/Users.ts` | 🔄 إضافة `googleId` field |
+| `src/app/.../login/page.tsx` | 🔄 Wire Google button |
+| `src/app/.../register/page.tsx` | 🔄 Wire Google button |
+
+> ⚠️ **Env vars مطلوبة:** `RESEND_API_KEY`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`
+
+---
+
+### 🔧 [2026-03-14 05:05] — Fix: OTP Double-Submit Race Condition
+
+| | |
+|---|---|
+| 📁 **الملف** | `src/app/[locale]/(auth)/verify-email/page.tsx` |
+| ❌ **المشكلة** | `handleVerify` بتتنادي مرتين (auto-submit + manual) → الكود يتعمل mark used → "الرمز غلط" |
+| ✅ **الحل** | `verifyingRef` — ref-based lock يمنع الاستدعاء المتزامن |
+
+---
+
+### 🔧 [2026-07-15 14:30] — Fix: Signup Redirects to Dashboard Instead of Register
+
+| | |
+|---|---|
+| 📁 **الملفات** | `src/proxy.ts`, `src/app/.../login/page.tsx` |
+| ❌ **المشكلة** | Middleware كان بيشوف `payload-token` stale cookie ويعمل redirect لـ `/dashboard` |
+| ✅ **الحل** | شيل الـ server-side redirect من auth routes + client-side auth check في login page |
+
+---
+
+### 🔧 [2026-03-13 18:45] — Fix: Middleware/Proxy Conflict (Next.js 16)
+
+| | |
+|---|---|
+| 📁 **الملفات** | `src/proxy.ts` (دمج), `src/middleware.ts` (🗑️ محذوف) |
+| ❌ **المشكلة** | Next.js 16 بيرفض وجود `middleware.ts` و`proxy.ts` مع بعض |
+| ✅ **الحل** | نقل كل اللوجيك (auth + i18n + route protection) لـ `proxy.ts` وحذف `middleware.ts` |
+
+---
+
+### ✅ [2026-07-15 14:00] — Sprint 4: Onboarding i18n + Premium CSS Redesign
+
+| الملف | التغيير |
+|---|---|
+| `src/app/.../onboarding/page.tsx` | 🔄 `useTranslations('Auth')` — صفر hardcoded text |
+| `src/components/onboarding/step-1.tsx` | 🔄 i18n كامل |
+| `src/components/onboarding/step-2.tsx` | 🔄 i18n كامل |
+| `src/components/onboarding/step-3.tsx` | 🔄 i18n كامل |
+| `src/components/onboarding/onboarding.module.css` | 🔄 Premium CSS: radial gradient + glassmorphism + glow animations |
+| `src/app/.../onboarding/onboarding.module.css` | 🗑️ حذف duplicate |
+
+---
+
+### ✅ [2026-07-15 11:30] — Sprint 4: Multi-Step Onboarding Wizard
+
+| الملف | التغيير |
+|---|---|
+| `src/app/.../onboarding/page.tsx` | 🆕 3-step wizard orchestrator + framer-motion |
+| `src/components/onboarding/step-1.tsx` | 🆕 Professional Info |
+| `src/components/onboarding/step-2.tsx` | 🆕 Company & Location |
+| `src/components/onboarding/step-3.tsx` | 🆕 Learning Goals + tag chips |
+
+---
+
+### ✅ [2026-07-15 10:00] — Sprint 0: Access Control Fix (5 Collections)
+
+| Collection | Access Control المضاف |
+|---|---|
+| `Reviews.ts` | Public read, auth create, owner/admin update, admin delete |
+| `Certificates.ts` | Owner/admin read, admin create/update/delete |
+| `InstructorBlockedDates.ts` | Instructor-owner + admin لكل العمليات |
+| `PaymentLinks.ts` | Admin-only لكل CRUD |
+| `Waitlist.ts` | Owner/admin read, auth create, admin update/delete |
+
+---
+
+### 📁 [2026-03-13 14:31] — 3-Phase: Docs Organize + API Verify + Code Audit
+
+| Phase | التغيير |
+|---|---|
+| Phase 1 | نقل 28 ملف لـ 6 subdirectories + `docs/README.md` index |
+| Phase 2 | `api-contracts.md` — إضافة 8 sections جديدة (411 → 749 سطر) |
+| Phase 3 | `code-audit.md` — تقرير شامل لـ 21 collection |
+
+---
+
+### 📁 [2026-03-13 04:00] — Documentation Gap Fill (15 Files)
+
+> أنشأنا 12 ملف جديد + وسّعنا 3 ملفات موجودة
+
+| الملفات الجديدة |
+|---|
+| `security.md`, `payment-scenarios.md`, `error-handling.md`, `api-contracts.md` |
+| `rate-limiting.md`, `testing-strategy.md`, `env-variables.md`, `deployment.md` |
+| `monitoring.md`, `accessibility.md`, `performance.md`, `data-privacy.md` |
+
+---
+
+### ✅ [2026-07-15 14:00] — Sprint 4: Foundation Fixes Batch
+
+| Fix | التفاصيل |
+|---|---|
+| proxy.ts convention | Renamed لـ Next.js 16 convention |
+| Instructor layout | حذف duplicate `NextIntlClientProvider` + old params syntax |
+| loading/error pages | إضافة لكل 5 route groups |
+| ar.json + en.json | Populated بكل UI string keys |
+| useTranslations | Updated في 7 components — صفر hardcoded strings |
+| TypeScript fix | حذف duplicate `color` property في instructor sessions |
+
+---
+
+### ✅ [2026-03-05 01:00] — Phase 3: Static Pages
+
+> تم تنفيذ routes و layout components لـ `/about`, `/contact`, `/blog`, `/privacy`, `/terms`, `/refund-policy`
+> تثبيت brand colors في `globals.css` (`#C51B1B`, `#020504`)
+
+---

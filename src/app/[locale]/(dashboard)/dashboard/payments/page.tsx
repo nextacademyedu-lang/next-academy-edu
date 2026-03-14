@@ -2,6 +2,8 @@
 
 import React, { useEffect, useState } from 'react';
 import { CreditCard, Download, Calendar, CheckCircle2, AlertCircle } from 'lucide-react';
+import Link from 'next/link';
+import { useLocale } from 'next-intl';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import {
@@ -15,9 +17,11 @@ import {
 
 interface EnrichedPayment extends PayloadPayment {
   programTitle: string;
+  bookingId: string;
 }
 
 export default function PaymentsPage() {
+  const locale = useLocale();
   const [tab,        setTab]        = useState<'pending' | 'history'>('pending');
   const [payments,   setPayments]   = useState<EnrichedPayment[]>([]);
   const [loading,    setLoading]    = useState(true);
@@ -31,10 +35,11 @@ export default function PaymentsPage() {
         }
 
         const enriched: EnrichedPayment[] = pRes.data.docs.map(p => {
-          const bookingId = typeof p.booking === 'string' ? p.booking : p.booking?.id;
+          const bookingId = typeof p.booking === 'string' ? p.booking : p.booking?.id ?? '';
           const booking   = bookingId ? bookingsMap.get(bookingId) : undefined;
           return {
             ...p,
+            bookingId,
             programTitle: booking ? getProgramTitle(booking) : 'Program',
           };
         });
@@ -158,9 +163,11 @@ export default function PaymentsPage() {
                       </div>
                     </div>
                   </div>
-                  <Button variant="primary">
-                    <CreditCard size={16} style={{ marginRight: '8px' }} /> Pay Now
-                  </Button>
+                  <Link href={`/${locale}/checkout/${p.bookingId}`} style={{ textDecoration: 'none' }}>
+                    <Button variant="primary">
+                      <CreditCard size={16} style={{ marginRight: '8px' }} /> Pay Now
+                    </Button>
+                  </Link>
                 </div>
               </CardContent>
             </Card>

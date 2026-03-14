@@ -1,0 +1,14 @@
+.next
+node_modules
+.git
+.gitignore
+.env
+.env.*
+*.md
+docs/
+scripts/
+.agents/
+.amazonq/
+Dockerfile
+docker-compose*.yml
+nginx/
