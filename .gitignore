@@ -17,7 +17,7 @@ out/
 *.tsbuildinfo
 
 # Package manager
-pnpm-lock.yaml
+# pnpm-lock.yaml
 
 # Secrets
 *.json.secret
