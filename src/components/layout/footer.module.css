@@ -1,0 +1,140 @@
+.footer {
+  width: 100%;
+  background-color: var(--bg-main, #020504);
+  padding: 80px 0 0 0; /* Remove bottom padding so watermark hugs bottom */
+  margin-top: auto;
+  position: relative;
+  overflow: hidden;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 24px;
+  display: flex;
+  flex-direction: column;
+}
+
+.topSection {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 40px;
+  position: relative;
+  z-index: 10; /* Above watermark */
+}
+
+.brandColumn {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md, 16px);
+  max-width: 300px;
+}
+
+.logoRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logoIcon {
+  width: 32px;
+  height: 32px;
+  background-color: var(--text-primary);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--bg-main);
+}
+
+.logoIcon svg {
+  width: 16px;
+  height: 16px;
+  fill: currentColor;
+}
+
+.brandName {
+  color: var(--text-primary);
+  font-size: var(--text-h3, 20px);
+  font-weight: var(--font-bold, 800);
+  font-family: var(--font-heading-en), sans-serif;
+  letter-spacing: -0.5px;
+}
+
+.copyright {
+  color: var(--text-muted);
+  font-size: var(--text-small, 14px);
+  line-height: 1.6;
+}
+
+.linksSection {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-2xl, 64px);
+}
+
+.column {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.heading {
+  color: var(--text-primary);
+  font-weight: var(--font-bold, 700);
+  font-size: var(--text-body, 16px);
+  margin-bottom: 8px;
+}
+
+.link {
+  color: var(--text-secondary);
+  font-size: var(--text-small, 14px);
+  transition: color 0.2s ease;
+  text-decoration: none;
+}
+
+.link:hover {
+  color: var(--text-primary);
+}
+
+/* Watermark styles */
+.watermarkContainer {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  pointer-events: none;
+  user-select: none;
+  overflow: hidden;
+}
+
+.watermarkText {
+  font-family: var(--font-heading-en), sans-serif;
+  /* Make it scale with viewport width, 14vw looks massive on desktop */
+  font-size: 14vw; 
+  font-weight: 900;
+  line-height: 0.75; /* Tight line height so it cuts off nicely at the bottom */
+  color: rgba(255, 255, 255, 0.03); /* Extremely subtle */
+  text-transform: uppercase;
+  letter-spacing: -2px;
+  white-space: nowrap;
+}
+
+@media (max-width: 992px) {
+  .topSection {
+    flex-direction: column;
+    gap: 64px;
+  }
+}
+
+@media (max-width: 640px) {
+  .linksSection {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 40px 24px;
+  }
+  
+  .watermarkText {
+    font-size: 20vw;
+  }
+}

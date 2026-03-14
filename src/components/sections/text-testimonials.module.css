@@ -1,0 +1,143 @@
+.section {
+  width: 100%;
+  padding: 60px 0 100px;
+  background-color: var(--bg-main, #020504);
+  background-image: 
+    linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  background-size: 48px 48px;
+  position: relative;
+  overflow: hidden;
+}
+
+.section::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, transparent 0%, var(--bg-main, #020504) 100%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.marqueeContainer {
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  width: 100vw;
+  position: relative;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
+  mask-image: linear-gradient(
+    to right,
+    rgba(0, 0, 0, 0) 0%,
+    rgba(0, 0, 0, 1) 10%,
+    rgba(0, 0, 0, 1) 90%,
+    rgba(0, 0, 0, 0) 100%
+  );
+  -webkit-mask-image: linear-gradient(
+    to right,
+    rgba(0, 0, 0, 0) 0%,
+    rgba(0, 0, 0, 1) 10%,
+    rgba(0, 0, 0, 1) 90%,
+    rgba(0, 0, 0, 0) 100%
+  );
+}
+
+.marqueeRow {
+  width: 100%;
+  overflow: hidden;
+  display: flex;
+}
+
+.marqueeContent {
+  display: flex;
+  min-width: 200%;
+  animation: scrollMarquee 40s linear infinite;
+  gap: 24px;
+  padding: 10px 0;
+}
+
+.marqueeRow:hover .marqueeContent {
+  animation-play-state: paused;
+}
+
+.reviewCard {
+  flex-shrink: 0;
+  width: 400px;
+  background-color: rgba(26, 26, 26, 0.3);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08); /* Matches screenshot borders exactly */
+  box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+  border-radius: var(--radius-lg);
+}
+
+.reviewContent {
+  padding: 32px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.reviewText {
+  color: var(--text-primary);
+  font-size: var(--text-body, 16px);
+  line-height: 1.6;
+  margin-bottom: 32px;
+  flex-grow: 1;
+  font-weight: 500;
+}
+
+.reviewer {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: auto;
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent-primary) 0%, #a01515 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  color: white;
+  font-size: 14px;
+}
+
+.reviewerInfo {
+  display: flex;
+  flex-direction: column;
+}
+
+.reviewerName {
+  color: var(--text-primary);
+  font-size: var(--text-body, 16px);
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+.reviewerRole {
+  color: var(--text-secondary);
+  font-size: var(--text-small, 14px);
+}
+
+@keyframes scrollMarquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+@media (max-width: 768px) {
+  .reviewCard {
+    width: 320px;
+  }
+  .reviewContent {
+    padding: 24px;
+  }
+}

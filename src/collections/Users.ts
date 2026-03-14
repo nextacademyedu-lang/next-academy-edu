@@ -1,0 +1,57 @@
+import type { CollectionConfig } from 'payload';
+import { isAdmin, isAuthenticated } from '../lib/access-control.ts';
+
+export const Users: CollectionConfig = {
+  slug: 'users',
+  auth: { useAPIKey: true },
+  admin: { useAsTitle: 'email' },
+  access: {
+    read: isAuthenticated,
+    create: () => true,
+    update: isAuthenticated,
+    delete: isAdmin,
+  },
+  fields: [
+    { name: 'firstName', type: 'text', required: true },
+    { name: 'lastName', type: 'text', required: true },
+    { name: 'phone', type: 'text' },
+    { name: 'gender', type: 'select', options: ['male', 'female'] },
+    { name: 'picture', type: 'upload', relationTo: 'media' },
+    {
+      name: 'role',
+      type: 'select',
+      options: [
+        { label: 'User', value: 'user' },
+        { label: 'Admin', value: 'admin' },
+        { label: 'Instructor', value: 'instructor' },
+        { label: 'B2B Manager', value: 'b2b_manager' },
+      ],
+      defaultValue: 'user',
+      required: true,
+      access: {
+        update: ({ req: { user } }) => Boolean(user && user.role === 'admin'),
+      },
+    },
+    { name: 'instructorId', type: 'relationship', relationTo: 'instructors', hasMany: false },
+    { name: 'preferredLanguage', type: 'select', options: ['ar', 'en'], defaultValue: 'ar' },
+    { name: 'newsletterOptIn', type: 'checkbox', defaultValue: false },
+    { name: 'whatsappOptIn', type: 'checkbox', defaultValue: false },
+    {
+      name: 'lifecycleStage',
+      type: 'select',
+      options: ['lead', 'prospect', 'customer', 'repeat'],
+      defaultValue: 'lead',
+    },
+    {
+      name: 'contactSource',
+      type: 'select',
+      options: ['website', 'whatsapp', 'social', 'referral'],
+    },
+    { name: 'twentyCrmContactId', type: 'text', admin: { readOnly: true } },
+    { name: 'googleId', type: 'text', admin: { readOnly: true, description: 'Google OAuth sub ID' } },
+    { name: 'emailVerified', type: 'checkbox', defaultValue: false },
+    { name: 'lastLogin', type: 'date', admin: { readOnly: true } },
+    { name: 'loginAttempts', type: 'number', defaultValue: 0, admin: { readOnly: true } },
+    { name: 'lockedUntil', type: 'date', admin: { readOnly: true } },
+  ],
+};

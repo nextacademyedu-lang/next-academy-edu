@@ -1,0 +1,3 @@
+github= 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
+
+{"web":{"client_id":"68040306828-hjhrihhp3q6m91qs25o3rimknafhekms.apps.googleusercontent.com","project_id":"next-academy-edu","auth_uri":"https://accounts.google.com/o/oauth2/auth","token_uri":"https://oauth2.googleapis.com/token","auth_provider_x509_cert_url":"https://www.googleapis.com/oauth2/v1/certs","client_secret":"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","redirect_uris":["http://localhost:3000","https://vplsgfyzazyrakbolhgd.supabase.co/auth/v1/callback","http://localhost:3001"]}}

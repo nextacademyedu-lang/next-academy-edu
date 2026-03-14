@@ -1,0 +1,354 @@
+.container {
+  display: flex;
+  min-height: 100vh;
+  background-color: var(--bg-main, #020504);
+  justify-content: center;
+  align-items: center;
+  padding: 40px 20px;
+}
+
+.checkoutWrapper {
+  display: flex;
+  gap: 60px;
+  width: 100%;
+  max-width: 1100px;
+  align-items: flex-start;
+}
+
+/* Left Side: Payment Details */
+.paymentSection {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.header {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+
+.subHeader {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+
+.paymentOptions {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.paymentOption {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px;
+  background: rgba(255, 255, 255, 0.05); /* Match reference subtle dark grey */
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.paymentOption:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.paymentOption.selected {
+  border-color: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.radioGroup {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  color: var(--text-primary);
+  font-size: 15px;
+  font-weight: 500;
+}
+
+/* Custom Radio Button */
+.radioCustom {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.paymentOption.selected .radioCustom {
+  border-color: var(--text-primary);
+}
+
+.paymentOption.selected .radioCustom::after {
+  content: "";
+  width: 10px;
+  height: 10px;
+  background-color: var(--text-primary);
+  border-radius: 50%;
+  position: absolute;
+}
+
+.providerIcon {
+  height: 24px;
+  width: auto;
+  object-fit: contain;
+}
+
+/* Right Side: Order Summary Panel */
+.summarySection {
+  width: 400px;
+  background: rgba(255, 255, 255, 0.05); /* Glass surface */
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: var(--radius-lg);
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+/* Plan Card within Summary */
+.planCard {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: var(--radius-md);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.planHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.planTitle {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.changePlanBtn {
+  color: #1877F2;
+  font-size: 13px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.changePlanBtn:hover {
+  text-decoration: underline;
+}
+
+.planDesc {
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+/* Order Summary Details */
+.summaryTitle {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 16px;
+}
+
+.summaryRow {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  margin-bottom: 16px;
+}
+
+.summaryRow span:first-child {
+  color: var(--text-secondary);
+}
+
+.summaryRow span:last-child {
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.summaryRow.discount span {
+  color: #00e397;
+}
+
+.removeCoupon {
+  color: #1877F2;
+  font-size: 12px;
+  cursor: pointer;
+  display: block;
+  margin-top: 4px;
+  background: none;
+  border: none;
+}
+
+.removeCoupon:hover {
+  text-decoration: underline;
+}
+
+.divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.1);
+  margin: 8px 0;
+}
+
+.totalRow {
+  display: flex;
+  justify-content: space-between;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-top: 8px;
+}
+
+.renewalNotice {
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+.proceedBtn {
+  background-color: var(--accent-primary); /* Uses the red from your palette "#C51B1B" or the requested red */
+  color: white;
+  border: none;
+  border-radius: var(--radius-md);
+  padding: 16px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  width: 100%;
+  transition: opacity 0.2s;
+}
+
+.proceedBtn:hover {
+  opacity: 0.9;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .checkoutWrapper {
+    flex-direction: column;
+    gap: 40px;
+  }
+  
+  .paymentSection, .summarySection {
+    width: 100%;
+  }
+}
+
+.paymentTypeToggle {
+  display: flex;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: var(--radius-md);
+  padding: 4px;
+  margin-bottom: 24px;
+}
+
+.toggleOption {
+  flex: 1;
+  text-align: center;
+  padding: 12px;
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.toggleOption.active {
+  background: var(--bg-surface-hover);
+  color: var(--text-primary);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.installmentNotice {
+  margin-top: 16px;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: var(--radius-md);
+}
+
+.installmentNotice h4 {
+  font-size: 14px;
+  color: var(--text-primary);
+  margin-bottom: 12px;
+}
+
+.installmentNotice ul {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.installmentNotice li {
+  font-size: 13px;
+  color: var(--text-secondary);
+  display: flex;
+  justify-content: space-between;
+}
+
+.installmentNotice p {
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+.discountInputWrapper {
+  display: flex;
+  gap: 8px;
+  margin: 16px 0;
+}
+
+.discountInput {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 12px 16px;
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-size: 14px;
+}
+
+.applyBtn {
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  color: var(--text-primary);
+  padding: 0 16px;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  font-weight: 500;
+  transition: background 0.2s;
+}
+
+.applyBtn:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.securityBadge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 16px;
+  color: var(--text-muted);
+  font-size: 13px;
+}

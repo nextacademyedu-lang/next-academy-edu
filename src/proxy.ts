@@ -1,0 +1,79 @@
+import createMiddleware from 'next-intl/middleware';
+import { NextRequest, NextResponse } from 'next/server';
+import { routing } from './i18n/routing';
+
+// Routes that require authentication
+const PROTECTED_PATTERNS = ['/dashboard', '/instructor', '/checkout'];
+
+// Routes that authenticated users should be redirected away from
+const AUTH_ROUTES = ['/login', '/register'];
+
+const intlMiddleware = createMiddleware(routing);
+
+function getLocaleFromPath(pathname: string): string | null {
+  const locales = ['ar', 'en'];
+  const segments = pathname.split('/');
+  if (segments.length > 1 && locales.includes(segments[1])) {
+    return segments[1];
+  }
+  return null;
+}
+
+function stripLocale(pathname: string): string {
+  const locale = getLocaleFromPath(pathname);
+  if (locale) {
+    return pathname.replace(`/${locale}`, '') || '/';
+  }
+  return pathname;
+}
+
+export default function proxy(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+
+  // Skip API routes, admin, static assets
+  if (
+    pathname.startsWith('/api') ||
+    pathname.startsWith('/admin') ||
+    pathname.startsWith('/_next') ||
+    pathname.startsWith('/_vercel') ||
+    pathname.includes('.')
+  ) {
+    return NextResponse.next();
+  }
+
+  // Run next-intl middleware first for locale handling
+  const intlResponse = intlMiddleware(request);
+
+  const pathWithoutLocale = stripLocale(pathname);
+  const locale = getLocaleFromPath(pathname) || 'ar';
+  const token = request.cookies.get('payload-token')?.value;
+
+  // Check if path matches a protected pattern
+  const isProtected = PROTECTED_PATTERNS.some(
+    (pattern) => pathWithoutLocale === pattern || pathWithoutLocale.startsWith(`${pattern}/`)
+  );
+
+  // Check if path is an auth route
+  const isAuthRoute = AUTH_ROUTES.some(
+    (route) => pathWithoutLocale === route || pathWithoutLocale.startsWith(`${route}/`)
+  );
+
+  // Protected route, no token → redirect to login with redirect param
+  if (isProtected && !token) {
+    const loginUrl = new URL(`/${locale}/login`, request.url);
+    loginUrl.searchParams.set('redirect', pathname);
+    return NextResponse.redirect(loginUrl);
+  }
+
+  // NOTE: We do NOT redirect authenticated users away from auth routes
+  // in middleware because the token may be stale/invalid (e.g. user was
+  // deleted from DB but cookie remains). Instead, the login/register
+  // pages handle this client-side via the auth context.
+
+  return intlResponse;
+}
+
+export const config = {
+  // Match all paths except those starting with api, admin, _next, _vercel, or containing a dot
+  matcher: ['/((?!api|admin|_next|_vercel|.*\\..*).*)',],
+};

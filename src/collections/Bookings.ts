@@ -1,0 +1,50 @@
+import type { CollectionConfig } from 'payload';
+import { isAdmin, isAdminOrOwner, isAuthenticated } from '../lib/access-control.ts';
+
+export const Bookings: CollectionConfig = {
+  slug: 'bookings',
+  admin: { useAsTitle: 'bookingCode' },
+  access: {
+    read: isAdminOrOwner,
+    create: isAuthenticated,
+    update: isAdmin,
+    delete: isAdmin,
+  },
+  fields: [
+    { name: 'bookingCode', type: 'text', unique: true, admin: { readOnly: true } },
+    { name: 'user', type: 'relationship', relationTo: 'users', required: true },
+    { name: 'round', type: 'relationship', relationTo: 'rounds', required: true },
+    { name: 'paymentPlan', type: 'relationship', relationTo: 'payment-plans' },
+    { name: 'installmentRequest', type: 'relationship', relationTo: 'installment-requests' },
+    {
+      name: 'status',
+      type: 'select',
+      options: ['reserved', 'pending', 'confirmed', 'cancelled', 'completed', 'refunded', 'payment_failed', 'cancelled_overdue'],
+      defaultValue: 'pending',
+      required: true,
+    },
+    { name: 'totalAmount', type: 'number', required: true },
+    { name: 'paidAmount', type: 'number', defaultValue: 0 },
+    { name: 'remainingAmount', type: 'number', defaultValue: 0 },
+    { name: 'discountCode', type: 'text' },
+    { name: 'discountAmount', type: 'number', defaultValue: 0 },
+    { name: 'finalAmount', type: 'number', required: true },
+    { name: 'accessBlocked', type: 'checkbox', defaultValue: false },
+    {
+      name: 'bookingSource',
+      type: 'select',
+      options: ['website', 'whatsapp', 'admin', 'phone', 'payment_link'],
+      defaultValue: 'website',
+    },
+    { name: 'bookedByAdmin', type: 'relationship', relationTo: 'users' },
+    { name: 'notes', type: 'textarea' },
+    { name: 'internalNotes', type: 'textarea' },
+    { name: 'twentyCrmDealId', type: 'text', admin: { readOnly: true } },
+    { name: 'confirmationEmailSent', type: 'checkbox', defaultValue: false },
+    { name: 'reminderEmailSent', type: 'checkbox', defaultValue: false },
+    { name: 'cancelledAt', type: 'date' },
+    { name: 'cancellationReason', type: 'textarea' },
+    { name: 'refundAmount', type: 'number' },
+    { name: 'refundDate', type: 'date' },
+  ],
+};

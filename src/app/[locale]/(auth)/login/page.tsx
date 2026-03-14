@@ -1,0 +1,156 @@
+"use client";
+
+import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { motion } from 'framer-motion';
+import { useTranslations, useLocale } from 'next-intl';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Facebook, Apple, Loader2 } from 'lucide-react';
+import { useAuth } from '@/context/auth-context';
+import styles from './login.module.css';
+
+export default function LoginPage() {
+  const router = useRouter();
+  const { login, isAuthenticated, isLoading: authLoading } = useAuth();
+  const t = useTranslations('Auth');
+  const locale = useLocale();
+
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+
+  // If already authenticated, redirect to dashboard
+  useEffect(() => {
+    if (!authLoading && isAuthenticated) {
+      router.push(`/${locale}/dashboard`);
+    }
+  }, [isAuthenticated, authLoading, router, locale]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email || !password) {
+      setError(t('fillAllFields'));
+      return;
+    }
+
+    setIsLoading(true);
+    setError('');
+
+    try {
+      const result = await login(email, password);
+
+      if (result.success) {
+        router.push(`/${locale}/dashboard`);
+      } else if (result.error === 'EMAIL_NOT_VERIFIED') {
+        router.push(`/${locale}/verify-email?email=${encodeURIComponent(email)}`);
+      } else {
+        setError(t('invalidCredentials'));
+      }
+    } catch {
+      setError(t('invalidCredentials'));
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <motion.div 
+      initial={{ opacity: 0, x: 20 }}
+      animate={{ opacity: 1, x: 0 }}
+      exit={{ opacity: 0, x: -20 }}
+      transition={{ duration: 0.4 }}
+      className={styles.formContainer}
+    >
+      <div className={styles.header}>
+        <div className={styles.logoSquare}>
+          <div className={styles.square1}></div>
+          <div className={styles.square2}></div>
+        </div>
+        <h1 className={styles.title}>{t('loginTitle')}</h1>
+        <p className={styles.subtitle}>
+          {t('loginSubtitle')}
+        </p>
+      </div>
+
+      <form className={styles.form} onSubmit={handleSubmit}>
+        <div className={styles.inputGroup}>
+          <Label htmlFor="email" className={styles.label}>{t('email')}</Label>
+          <Input 
+            id="email" 
+            type="email" 
+            placeholder={t('emailPlaceholder')}
+            className={styles.input}
+            value={email}
+            onChange={(e) => { setEmail(e.target.value); setError(''); }}
+            disabled={isLoading}
+          />
+        </div>
+        
+        <div className={styles.inputGroup}>
+          <div className={styles.passwordHeader}>
+            <Label htmlFor="password" className={styles.label}>{t('password')}</Label>
+            <Link href={`/${locale}/forgot-password`} className={styles.forgotLink}>
+              {t('forgotPassword')}
+            </Link>
+          </div>
+          <Input 
+            id="password" 
+            type="password" 
+            placeholder={t('passwordPlaceholder')}
+            className={styles.input}
+            value={password}
+            onChange={(e) => { setPassword(e.target.value); setError(''); }}
+            disabled={isLoading}
+          />
+        </div>
+
+        {error && <p className={styles.errorMsg}>{error}</p>}
+
+        <Button
+          type="submit"
+          variant="primary"
+          fullWidth
+          className={styles.submitBtn}
+          disabled={isLoading}
+        >
+          {isLoading ? (
+            <>
+              <Loader2 size={18} className={styles.spinner} />
+              {t('signingIn')}
+            </>
+          ) : (
+            t('signIn')
+          )}
+        </Button>
+      </form>
+
+      <div className={styles.divider}>
+        <span className={styles.dividerText}>{t('or')}</span>
+      </div>
+
+      <div className={styles.socialAuth}>
+        <button
+          className={styles.socialBtn}
+          type="button"
+          onClick={() => { window.location.href = '/api/auth/google'; }}
+        >
+          <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" className={styles.socialIcon} />
+        </button>
+        <button className={styles.socialBtn} type="button">
+          <Facebook className={styles.socialIconWhite} size={20} fill="#1877F2" stroke="none" />
+        </button>
+        <button className={styles.socialBtn} type="button">
+          <Apple className={styles.socialIconWhite} size={20} fill="white" />
+        </button>
+      </div>
+
+      <p className={styles.footerText}>
+        {t('noAccount')} <Link href={`/${locale}/register`} className={styles.footerLink}>{t('register')}</Link>
+      </p>
+    </motion.div>
+  );
+}

@@ -1,0 +1,61 @@
+import type { CollectionConfig } from 'payload';
+import { isAdmin, isPublic } from '../lib/access-control.ts';
+
+export const Programs: CollectionConfig = {
+  slug: 'programs',
+  admin: { useAsTitle: 'titleAr' },
+  access: {
+    read: isPublic,
+    create: isAdmin,
+    update: isAdmin,
+    delete: isAdmin,
+  },
+  fields: [
+    {
+      name: 'type',
+      type: 'select',
+      options: [
+        { label: 'Workshop', value: 'workshop' },
+        { label: 'Course', value: 'course' },
+        { label: 'Webinar', value: 'webinar' },
+      ],
+      required: true,
+    },
+    { name: 'titleAr', type: 'text', required: true },
+    { name: 'titleEn', type: 'text' },
+    { name: 'slug', type: 'text', required: true, unique: true },
+    { name: 'descriptionAr', type: 'richText' },
+    { name: 'descriptionEn', type: 'richText' },
+    { name: 'shortDescriptionAr', type: 'textarea' },
+    { name: 'shortDescriptionEn', type: 'textarea' },
+    { name: 'category', type: 'relationship', relationTo: 'categories' },
+    { name: 'instructor', type: 'relationship', relationTo: 'instructors' },
+    { name: 'thumbnail', type: 'upload', relationTo: 'media' },
+    { name: 'coverImage', type: 'upload', relationTo: 'media' },
+    { name: 'durationHours', type: 'number' },
+    { name: 'sessionsCount', type: 'number' },
+    {
+      name: 'level',
+      type: 'select',
+      options: ['beginner', 'intermediate', 'advanced'],
+    },
+    {
+      name: 'language',
+      type: 'select',
+      options: ['ar', 'en', 'both'],
+      defaultValue: 'ar',
+    },
+    { name: 'objectives', type: 'array', fields: [{ name: 'item', type: 'text' }] },
+    { name: 'requirements', type: 'array', fields: [{ name: 'item', type: 'text' }] },
+    { name: 'targetAudience', type: 'array', fields: [{ name: 'item', type: 'text' }] },
+    { name: 'tags', type: 'relationship', relationTo: 'tags', hasMany: true },
+    { name: 'isFeatured', type: 'checkbox', defaultValue: false },
+    { name: 'isActive', type: 'checkbox', defaultValue: true },
+    { name: 'viewCount', type: 'number', defaultValue: 0, admin: { readOnly: true } },
+    { name: 'averageRating', type: 'number', defaultValue: 0, admin: { readOnly: true } },
+    { name: 'reviewCount', type: 'number', defaultValue: 0, admin: { readOnly: true } },
+    { name: 'seoTitle', type: 'text' },
+    { name: 'seoDescription', type: 'textarea' },
+    { name: 'seoKeywords', type: 'array', fields: [{ name: 'keyword', type: 'text' }] },
+  ],
+};
