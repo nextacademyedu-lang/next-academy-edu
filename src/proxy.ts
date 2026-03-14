@@ -5,9 +5,6 @@ import { routing } from './i18n/routing';
 // Routes that require authentication
 const PROTECTED_PATTERNS = ['/dashboard', '/instructor', '/checkout', '/b2b-dashboard', '/onboarding'];
 
-// Routes that authenticated users should be redirected away from
-const AUTH_ROUTES = ['/login', '/register'];
-
 const intlMiddleware = createMiddleware(routing);
 
 function getLocaleFromPath(pathname: string): string | null {
@@ -27,6 +24,22 @@ function stripLocale(pathname: string): string {
   return pathname;
 }
 
+/** Security headers applied to every page response */
+const SECURITY_HEADERS: Record<string, string> = {
+  'X-Content-Type-Options': 'nosniff',
+  'X-Frame-Options': 'DENY',
+  'Referrer-Policy': 'strict-origin-when-cross-origin',
+  'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
+  'X-DNS-Prefetch-Control': 'on',
+};
+
+function applySecurityHeaders(response: NextResponse): NextResponse {
+  for (const [key, value] of Object.entries(SECURITY_HEADERS)) {
+    response.headers.set(key, value);
+  }
+  return response;
+}
+
 export default function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
@@ -38,7 +51,7 @@ export default function proxy(request: NextRequest) {
     pathname.startsWith('/_vercel') ||
     pathname.includes('.')
   ) {
-    return NextResponse.next();
+    return applySecurityHeaders(NextResponse.next());
   }
 
   // Run next-intl middleware first for locale handling
@@ -53,11 +66,6 @@ export default function proxy(request: NextRequest) {
     (pattern) => pathWithoutLocale === pattern || pathWithoutLocale.startsWith(`${pattern}/`)
   );
 
-  // Check if path is an auth route
-  const isAuthRoute = AUTH_ROUTES.some(
-    (route) => pathWithoutLocale === route || pathWithoutLocale.startsWith(`${route}/`)
-  );
-
   // Protected route, no token → redirect to login with redirect param
   if (isProtected && !token) {
     const loginUrl = new URL(`/${locale}/login`, request.url);
@@ -70,7 +78,7 @@ export default function proxy(request: NextRequest) {
   // deleted from DB but cookie remains). Instead, the login/register
   // pages handle this client-side via the auth context.
 
-  return intlResponse;
+  return applySecurityHeaders(intlResponse);
 }
 
 export const config = {

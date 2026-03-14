@@ -4,7 +4,29 @@
 
 ---
 
-## 🚧 [Unreleased] — آخر تحديث: 2026-07-16
+## 🚧 [Unreleased] — آخر تحديث: 2026-07-17
+
+---
+
+### [2026-07-17 16:00] - Security Fixes: IDOR, Headers, Error Leak, Docker
+- الملفات اللي اتعدّلت: `Users.ts`, `nginx.conf`, `proxy.ts`, `checkout/paymob/route.ts`, `Dockerfile`
+- **Critical Fix**: Users collection `update` access changed from `isAuthenticated` → `isAdminOrSelf` (IDOR)
+- **High Fix**: Added 6 security headers to nginx (HSTS, X-Frame-Options, CSP, X-Content-Type-Options, Referrer-Policy, server_tokens off)
+- **High Fix**: Added security headers to `proxy.ts` (X-Content-Type-Options, X-Frame-Options, Referrer-Policy, Permissions-Policy) — deleted conflicting `middleware.ts`
+- **High Fix**: Paymob checkout error leak — now returns generic message, logs details server-side
+- **Low Fix**: Added `HEALTHCHECK` to Dockerfile for container health monitoring
+- **Verified OK**: docker-compose uses env vars (no hardcoded secrets), email.ts FROM address is display name not a secret
+
+---
+
+### [2026-07-17 14:00] - Deep Security & Code Audit
+- الملفات اللي اتراجعت: All 27 Payload collections, access-control.ts, auth-api.ts, payment-api.ts, rate-limit.ts, email.ts, resend-email-adapter.ts, checkout/paymob/route.ts, checkout/easykash/route.ts, cron/check-overdue/route.ts, cron/waitlist/route.ts, webhooks/paymob/route.ts, webhooks/easykash/route.ts, docker-compose.yml, nginx/nginx.conf
+- **Critical**: Users collection `update` access uses `isAuthenticated` — IDOR vulnerability (any user can update any other user)
+- **High**: Missing security headers in nginx (HSTS, CSP, X-Frame-Options, etc.)
+- **High**: No Next.js middleware.ts for route protection
+- **High**: Users `read` access exposes all user records to any authenticated user
+- **Medium**: PAYLOAD_SECRET in Docker build args, console.log in prod, no rate limiting on checkout, hardcoded phone fallback
+- Full report: [walkthrough.md](../../.gemini/antigravity/brain/7b117a1f-0242-44d1-bb95-f9a7350e9ce3/walkthrough.md)
 
 ---
 

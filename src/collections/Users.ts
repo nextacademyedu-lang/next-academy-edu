@@ -1,14 +1,14 @@
 import type { CollectionConfig } from 'payload';
-import { isAdmin, isAuthenticated } from '../lib/access-control.ts';
+import { isAdmin, isAdminOrSelf } from '../lib/access-control.ts';
 
 export const Users: CollectionConfig = {
   slug: 'users',
   auth: { useAPIKey: true },
   admin: { useAsTitle: 'email' },
   access: {
-    read: isAuthenticated,
+    read: isAdminOrSelf,
     create: () => true,
-    update: isAuthenticated,
+    update: isAdminOrSelf,
     delete: isAdmin,
   },
   fields: [

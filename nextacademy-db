@@ -1,0 +1,10 @@
+Name= nextacademy-db
+Username=postgres
+Password=ZygUSTDo88qki26h1ua8ohQSYzPvvWdls2dT4SAwwzUj6uUdMrcIgks4lEiTr250
+Image=postgres:17-alpine
+Postgres URL (internal)=postgres://postgres:ZygUSTDo88qki26h1ua8ohQSYzPvvWdls2dT4SAwwzUj6uUdMrcIgks4lEiTr250@g0wckcksgoo484okg4cg804s:5432/postgres
+Ports Mappings=
+SSL ConfigurationEnable SSL
+SSL Mode
+
+require (secure)
