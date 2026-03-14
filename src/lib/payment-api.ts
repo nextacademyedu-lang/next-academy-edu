@@ -4,6 +4,7 @@
  */
 
 import type { PayloadBooking, PayloadRound, PayloadProgram } from './dashboard-api';
+import crypto from 'crypto';
 
 // ─────────────────────────────────────────────
 // Types
@@ -146,7 +147,6 @@ export async function createEasyKashPayment(
 // ─────────────────────────────────────────────
 
 export function verifyEasyKashHmac(payload: Record<string, string>): boolean {
-  const crypto = require('crypto');
   const { ProductCode, Amount, ProductType, PaymentMethod, status, easykashRef, customerReference, signatureHash } = payload;
 
   const dataStr = [ProductCode, Amount, ProductType, PaymentMethod, status, easykashRef, customerReference].join('');
@@ -164,7 +164,6 @@ export function verifyEasyKashHmac(payload: Record<string, string>): boolean {
 // ─────────────────────────────────────────────
 
 export function verifyPaymobHmac(params: Record<string, string>, receivedHmac: string): boolean {
-  const crypto = require('crypto');
 
   // Paymob HMAC: sort keys alphabetically, concat values, SHA512
   const hmacKeys = [
