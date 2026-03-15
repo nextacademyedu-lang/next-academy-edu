@@ -8,6 +8,13 @@
 
 ---
 
+### [2025-07-18 23:45] - Fix docker-compose.yml healthcheck (still using wget)
+- **الملفات:** `docker-compose.yml`
+- **المشكلة:** Dockerfile healthcheck اتصلح قبل كده لـ `node -e`، لكن `docker-compose.yml` لسه بيستخدم `wget` اللي مش موجود في `node:22-alpine`. Coolify بيستخدم docker-compose.yml فبيعمل override.
+- **الحل:**
+  - استبدال `wget -qO-` بـ `node -e` inline HTTP GET (زي الـ Dockerfile)
+  - إضافة `start_period: 30s` عشان الـ container ياخد وقت يعمل boot
+
 ### [2025-07-18 23:30] - Fix Docker healthcheck failure (Coolify deployment)
 - **الملفات:** `Dockerfile`, `src/app/api/health/route.ts` [NEW]
 - **المشكلة:** Container healthcheck كان بيستخدم `wget` اللي مش موجود في `node:22-alpine`

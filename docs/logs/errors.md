@@ -47,3 +47,14 @@
 | 📝 **Note** | في Alpine images، دايماً استخدم `node -e` أو install `curl` صريح. لا تعتمد على `wget`. |
 
 ---
+
+## 🟢 [2025-07-18 23:45] — docker-compose.yml Healthcheck Still Using wget
+
+| | |
+| --- | --- |
+| ❌ **Error** | Coolify deployment healthcheck keeps failing with `connection refused` despite Dockerfile fix |
+| 🔍 **Root Cause** | `docker-compose.yml` line 55 still had `wget -qO-` — Coolify uses compose file which overrides the Dockerfile `HEALTHCHECK`. |
+| ✅ **Fix** | Replaced `wget` with `node -e` inline HTTP GET in `docker-compose.yml`. Added `start_period: 30s`. |
+| 📝 **Note** | عند إصلاح healthcheck، لازم تصلح **الاتنين**: `Dockerfile` و `docker-compose.yml`. Compose overrides Dockerfile HEALTHCHECK. |
+
+---
