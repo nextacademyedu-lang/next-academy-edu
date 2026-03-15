@@ -8,6 +8,12 @@
 
 ---
 
+### [2026-03-15 09:58] - Fix: Add /privacy-policy redirect for branding verification
+
+- الملفات اللي اتعدّلت: `next.config.ts`
+- **المشكلة:** Google branding verification بيفشل لأن `/privacy-policy` بيرجع 404 — الصفحة موجودة على `/privacy`
+- **الحل:** إضافة Next.js redirects في `next.config.ts`: `/privacy-policy` → `/en/privacy` و `/:locale/privacy-policy` → `/:locale/privacy`
+
 ### [2026-07-18 09:47] - Fix: Create BlogPosts Collection (Blog Page Server Error)
 - الملفات اللي اتعدّلت: `src/collections/BlogPosts.ts` (🆕), `src/payload.config.ts`, `src/payload-types.ts`
 - **المشكلة:** Blog pages (`/blog` + `/blog/[slug]`) كانوا بيعملوا server error لأن collection `blog-posts` مكانتش موجودة في Payload

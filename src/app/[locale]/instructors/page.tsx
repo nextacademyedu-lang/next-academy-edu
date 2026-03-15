@@ -9,16 +9,33 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import styles from './page.module.css';
 
+interface InstructorDoc {
+  id: string;
+  firstName?: string;
+  lastName?: string;
+  slug?: string;
+  jobTitle?: string;
+  isActive?: boolean;
+}
+
 export default async function InstructorsPage() {
   const locale = await getLocale();
-  const payload = await getPayload({ config });
 
-  const { docs: instructors } = await payload.find({
-    collection: 'instructors',
-    depth: 1,
-    limit: 24,
-    sort: '-createdAt',
-  });
+  let instructors: InstructorDoc[] = [];
+  try {
+    const payload = await getPayload({ config });
+    const result = await payload.find({
+      collection: 'instructors',
+      depth: 1,
+      limit: 24,
+      sort: '-createdAt',
+      where: { isActive: { equals: true } },
+    });
+    instructors = result.docs as unknown as InstructorDoc[];
+  } catch {
+    // Payload init may fail during build or if DB is unreachable
+    instructors = [];
+  }
 
   return (
     <div className={styles.wrapper}>
@@ -41,18 +58,19 @@ export default async function InstructorsPage() {
                 <p style={{ color: 'var(--text-muted)', gridColumn: '1/-1' }}>No instructors found.</p>
               )}
               {instructors.map(instructor => {
-                const user = typeof (instructor as any).user === 'object' ? (instructor as any).user : null;
-                const name = user ? `${user.firstName} ${user.lastName}`.trim() : (instructor as any).name || 'Instructor';
+                const firstName = instructor.firstName || '';
+                const lastName = instructor.lastName || '';
+                const name = `${firstName} ${lastName}`.trim() || 'Instructor';
                 const initial = name[0]?.toUpperCase() ?? '?';
-                const slug = (instructor as any).slug || instructor.id;
+                const slug = instructor.slug || instructor.id;
 
                 return (
                   <Card key={instructor.id} interactive className={styles.card}>
                     <CardContent className={styles.cardContent}>
                       <div className={styles.avatarPlaceholder}>{initial}</div>
                       <h3 className={styles.name}>{name}</h3>
-                      {(instructor as any).title && (
-                        <p className={styles.role}>{(instructor as any).title}</p>
+                      {instructor.jobTitle && (
+                        <p className={styles.role}>{instructor.jobTitle}</p>
                       )}
                       <div className={styles.cardActions}>
                         <Link href={`/${locale}/instructors/${slug}`} className={styles.linkWrapper}>
