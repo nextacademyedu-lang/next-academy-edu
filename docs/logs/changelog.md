@@ -8,6 +8,17 @@
 
 ---
 
+### [2026-07-18 11:30] - Fix: Production Server Component Render Errors (4 Public Pages)
+- الملفات اللي اتعدّلت: `src/app/[locale]/programs/page.tsx`, `src/app/[locale]/blog/page.tsx`, `src/app/[locale]/instructors/page.tsx`, `src/app/[locale]/about/page.tsx`
+- **المشكلة:** 4 صفحات عامة (programs, blog, instructors, about) كانوا بيعملوا server error في production لأن Next.js كان بيحاول يعمل static render وقت الـ build بس الـ Payload DB مش متاحة
+- **الحل:**
+  - إضافة `export const dynamic = 'force-dynamic'` لكل الـ 4 صفحات عشان تتعمل render وقت الـ request
+  - إضافة try-catch حول Payload queries في `programs` و `blog` (instructors كان عنده already)
+  - تصحيح CSS module import في `about` page (`about.module.css` → `page.module.css`)
+  - إضافة type annotations لـ TypeScript strict mode compliance
+
+---
+
 ### [2026-03-15 09:58] - Fix: Add /privacy-policy redirect for branding verification
 
 - الملفات اللي اتعدّلت: `next.config.ts`

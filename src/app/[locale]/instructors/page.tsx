@@ -9,6 +9,8 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import styles from './page.module.css';
 
+export const dynamic = 'force-dynamic';
+
 interface InstructorDoc {
   id: string;
   firstName?: string;

@@ -9,17 +9,26 @@ import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/componen
 import { Badge } from '@/components/ui/badge';
 import styles from './page.module.css';
 
+export const dynamic = 'force-dynamic';
+
 export default async function BlogPage() {
   const locale = await getLocale();
-  const payload = await getPayload({ config });
 
-  const { docs: posts } = await payload.find({
-    collection: 'blog-posts',
-    depth: 1,
-    limit: 12,
-    sort: '-publishedAt',
-    where: { status: { equals: 'published' } },
-  });
+  let posts: any[] = [];
+
+  try {
+    const payload = await getPayload({ config });
+    const result = await payload.find({
+      collection: 'blog-posts',
+      where: { status: { equals: 'published' } },
+      sort: '-publishedAt',
+      limit: 50,
+      depth: 2,
+    });
+    posts = result.docs;
+  } catch (error) {
+    console.error('[BlogPage] Failed to fetch blog posts:', error);
+  }
 
   const featured = posts[0];
   const rest = posts.slice(1);

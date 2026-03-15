@@ -4,7 +4,9 @@ import { Footer } from '@/components/layout/footer';
 import { Card, CardContent } from '@/components/ui/card';
 import styles from './page.module.css';
 
-export default function AboutPage() {
+export const dynamic = 'force-dynamic';
+
+export default async function AboutPage() {
   return (
     <div className={styles.wrapper}>
       <Navbar />

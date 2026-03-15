@@ -10,19 +10,28 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import styles from './page.module.css';
 
+export const dynamic = 'force-dynamic';
+
 const CATEGORIES = ['All', 'Marketing', 'Finance', 'Leadership', 'Sales', 'Technology', 'HR'];
 const TYPES = ['All', 'Workshop', 'Course', 'Webinar'];
 
 export default async function ProgramsPage() {
   const locale = await getLocale();
-  const payload = await getPayload({ config });
+  let programs: any[] = [];
 
-  const { docs: programs } = await payload.find({
-    collection: 'programs',
-    depth: 1,
-    limit: 24,
-    sort: '-createdAt',
-  });
+  try {
+    const payload = await getPayload({ config });
+    const { docs } = await payload.find({
+      collection: 'programs',
+      depth: 1,
+      limit: 24,
+      sort: '-createdAt',
+    });
+    programs = docs;
+  } catch (error) {
+    console.error('[ProgramsPage] Failed to fetch programs:', error);
+    // Graceful fallback: programs remains an empty array
+  }
 
   return (
     <div className={styles.wrapper}>
