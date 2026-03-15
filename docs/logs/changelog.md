@@ -4,7 +4,14 @@
 
 ---
 
-## 🚧 [Unreleased] — آخر تحديث: 2026-07-17
+## 🚧 [Unreleased] — آخر تحديث: 2026-07-18
+
+---
+
+### [2026-07-18 09:47] - Fix: Create BlogPosts Collection (Blog Page Server Error)
+- الملفات اللي اتعدّلت: `src/collections/BlogPosts.ts` (🆕), `src/payload.config.ts`, `src/payload-types.ts`
+- **المشكلة:** Blog pages (`/blog` + `/blog/[slug]`) كانوا بيعملوا server error لأن collection `blog-posts` مكانتش موجودة في Payload
+- **الحل:** إنشاء `BlogPosts` collection بـ fields: title, slug, excerpt, content (richText), category, featuredImage, author, tags, status, publishedAt + تسجيلها في `payload.config.ts` + regenerate types
 
 ---
 

@@ -36,6 +36,7 @@ import { Certificates } from './collections/Certificates.ts';
 import { PaymentLinks } from './collections/PaymentLinks.ts';
 import { InstructorBlockedDates } from './collections/InstructorBlockedDates.ts';
 import { VerificationCodes } from './collections/VerificationCodes.ts';
+import { BlogPosts } from './collections/BlogPosts.ts';
 
 if (!process.env.DATABASE_URI) {
   throw new Error('DATABASE_URI environment variable is required');
@@ -146,6 +147,7 @@ export default buildConfig({
     PaymentLinks,
     InstructorBlockedDates,
     VerificationCodes,
+    BlogPosts,
   ],
   editor: lexicalEditor({}),
   db: postgresAdapter({

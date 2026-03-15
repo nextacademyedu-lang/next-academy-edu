@@ -94,6 +94,7 @@ export interface Config {
     'payment-links': PaymentLink;
     'instructor-blocked-dates': InstructorBlockedDate;
     'verification-codes': VerificationCode;
+    'blog-posts': BlogPost;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -128,6 +129,7 @@ export interface Config {
     'payment-links': PaymentLinksSelect<false> | PaymentLinksSelect<true>;
     'instructor-blocked-dates': InstructorBlockedDatesSelect<false> | InstructorBlockedDatesSelect<true>;
     'verification-codes': VerificationCodesSelect<false> | VerificationCodesSelect<true>;
+    'blog-posts': BlogPostsSelect<false> | BlogPostsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -882,6 +884,45 @@ export interface VerificationCode {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "blog-posts".
+ */
+export interface BlogPost {
+  id: number;
+  title: string;
+  /**
+   * URL-friendly identifier (e.g. "how-to-grow-your-business")
+   */
+  slug: string;
+  /**
+   * Short summary shown on blog listing cards
+   */
+  excerpt?: string | null;
+  content?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  category?: ('strategy' | 'leadership' | 'marketing' | 'technology' | 'finance' | 'hr' | 'general') | null;
+  featuredImage?: (number | null) | Media;
+  author?: (number | null) | User;
+  tags?: (number | Tag)[] | null;
+  status: 'draft' | 'published' | 'archived';
+  publishedAt?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -1011,6 +1052,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'verification-codes';
         value: number | VerificationCode;
+      } | null)
+    | ({
+        relationTo: 'blog-posts';
+        value: number | BlogPost;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -1645,6 +1690,24 @@ export interface VerificationCodesSelect<T extends boolean = true> {
   expiresAt?: T;
   used?: T;
   type?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "blog-posts_select".
+ */
+export interface BlogPostsSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  excerpt?: T;
+  content?: T;
+  category?: T;
+  featuredImage?: T;
+  author?: T;
+  tags?: T;
+  status?: T;
+  publishedAt?: T;
   updatedAt?: T;
   createdAt?: T;
 }
