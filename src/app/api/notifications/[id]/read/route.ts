@@ -13,8 +13,8 @@ export async function PUT(
   const { id } = await params;
 
   const doc = await payload.findByID({ collection: 'notifications', id });
-  const notifUser = typeof doc.user === 'string' ? doc.user : doc.user?.id;
-  if (notifUser !== String(user.id)) {
+  const notifUser = typeof doc.user === 'object' ? doc.user?.id : doc.user;
+  if (String(notifUser) !== String(user.id)) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }
 

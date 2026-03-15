@@ -24,11 +24,11 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
-    const statusMap: Record<Action, string> = {
+    const statusMap = {
       approve: 'approved',
       flag: 'flagged',
       remove: 'removed',
-    };
+    } as const;
 
     await payload.update({
       collection: 'reviews',

@@ -64,7 +64,7 @@ export async function POST(req: NextRequest) {
       data: {
         paymentMethod: 'fawry',
         transactionId: cashResult.easykashRef,
-        paymentGatewayResponse: cashResult,
+        paymentGatewayResponse: cashResult as unknown as Record<string, unknown>,
         notes: `Voucher: ${cashResult.voucher} | Provider: ${cashResult.provider} | Expires: ${cashResult.expiryDate}`,
       },
     });

@@ -185,16 +185,18 @@ export async function GET(req: NextRequest) {
 
     const newUser = await payload.create({
       collection: 'users',
+      overrideAccess: true,
+      draft: false,
       data: {
         email: googleUser.email,
         firstName: googleUser.given_name || googleUser.name || '',
         lastName: googleUser.family_name || '',
         password: randomPwd,
-        role: 'user',
+        role: 'user' as const,
         emailVerified: true,
         googleId: googleUser.sub,
-        preferredLanguage: 'ar',
-      } as Record<string, unknown>,
+        preferredLanguage: 'ar' as const,
+      },
     });
 
     userId = String(newUser.id);

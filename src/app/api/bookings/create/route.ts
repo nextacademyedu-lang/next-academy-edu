@@ -25,10 +25,10 @@ export async function POST(req: NextRequest) {
     // ── Fetch round ───────────────────────────────────────────────────────
     const round = await payload.findByID({ collection: 'rounds', id: roundId, depth: 1 });
     if (!round) return NextResponse.json({ error: 'الراوند مش موجود' }, { status: 404 });
-    if (!['open', 'upcoming'].includes(round.status)) {
+    if (!['open', 'upcoming'].includes(round.status ?? '')) {
       return NextResponse.json({ error: 'الراوند مش متاح للحجز' }, { status: 400 });
     }
-    if (round.currentEnrollments >= round.maxCapacity) {
+    if ((round.currentEnrollments ?? 0) >= round.maxCapacity) {
       return NextResponse.json({ error: 'الراوند ممتلئ' }, { status: 400 });
     }
 
@@ -62,7 +62,7 @@ export async function POST(req: NextRequest) {
         limit: 1,
       });
       const discount = discountResult.docs[0];
-      if (discount && new Date(discount.validUntil) > new Date() && (!discount.maxUses || discount.currentUses < discount.maxUses)) {
+      if (discount && new Date(discount.validUntil) > new Date() && (!discount.maxUses || (discount.currentUses ?? 0) < discount.maxUses)) {
         discountAmount = discount.type === 'percentage'
           ? Math.round((basePrice * discount.value) / 100)
           : Math.min(discount.value, basePrice);
@@ -82,19 +82,20 @@ export async function POST(req: NextRequest) {
     // ── Create booking ────────────────────────────────────────────────────
     const booking = await payload.create({
       collection: 'bookings',
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       data: {
         bookingCode: generateCode('BK'),
         user: user.id,
-        round: roundId,
-        paymentPlan: paymentPlanId || null,
-        status: 'pending',
+        round: roundId as unknown as number,
+        paymentPlan: (paymentPlanId || null) as unknown as number | null,
+        status: 'pending' as const,
         totalAmount: basePrice,
         paidAmount: 0,
         remainingAmount: finalAmount,
         discountCode: appliedDiscountCode,
         discountAmount,
         finalAmount,
-        bookingSource: 'website',
+        bookingSource: 'website' as const,
       },
     });
 
@@ -141,8 +142,8 @@ export async function POST(req: NextRequest) {
       collection: 'rounds',
       id: roundId,
       data: {
-        currentEnrollments: round.currentEnrollments + 1,
-        status: round.currentEnrollments + 1 >= round.maxCapacity && round.autoCloseOnFull ? 'full' : round.status,
+        currentEnrollments: (round.currentEnrollments ?? 0) + 1,
+        status: (round.currentEnrollments ?? 0) + 1 >= round.maxCapacity && round.autoCloseOnFull ? 'full' : round.status,
       },
     });
 

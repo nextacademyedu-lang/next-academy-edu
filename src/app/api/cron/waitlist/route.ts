@@ -42,7 +42,7 @@ export async function GET(req: NextRequest) {
   });
 
   for (const round of rounds.docs) {
-    const hasSpot = round.currentEnrollments < round.maxCapacity;
+    const hasSpot = (round.currentEnrollments ?? 0) < round.maxCapacity;
     if (!hasSpot) continue;
 
     // Check if anyone already notified (don't double-notify)

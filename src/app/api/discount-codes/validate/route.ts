@@ -49,7 +49,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'كود الخصم منتهي الصلاحية' }, { status: 400 });
     }
 
-    if (discount.maxUses && discount.currentUses >= discount.maxUses) {
+    if (discount.maxUses && (discount.currentUses ?? 0) >= discount.maxUses) {
       return NextResponse.json({ error: 'كود الخصم وصل للحد الأقصى من الاستخدام' }, { status: 400 });
     }
 

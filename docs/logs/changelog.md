@@ -8,6 +8,20 @@
 
 ---
 
+### [2026-07-18 14:00] - Fix: TypeScript Strict Mode Build Errors (7 API Route Files)
+- الملفات اللي اتعدّلت:
+  - `src/app/api/auth/google/callback/route.ts` — nullable `externalId` field
+  - `src/app/api/bookings/create/route.ts` — nullable `currentEnrollments`, `currentUses` fields + `paymentGatewayResponse` JSON cast
+  - `src/app/api/checkout/easykash/route.ts` — `paymentGatewayResponse` typed as `Record<string, unknown>` instead of specific interface
+  - `src/app/api/cron/waitlist/route.ts` — nullable `currentEnrollments`, user relation narrowing from `number | User`
+  - `src/app/api/discount-codes/validate/route.ts` — nullable `currentUses` comparison
+  - `src/app/api/notifications/[id]/read/route.ts` — relation ID typed as `number | User` not `string | User`
+  - `src/app/api/reviews/moderate/route.ts` — statusMap values inferred as `string` instead of enum literals (fixed with `as const`)
+- **المشكلة:** الـ build كان فاشل بسبب TypeScript strict mode — nullable fields, relation type narrowing, and enum inference
+- **الحل:** إضافة nullish coalescing (`?? 0`), type casts, `as const` assertions, وتصحيح relation narrowing من `typeof === 'string'` لـ `typeof === 'object'`
+
+---
+
 ### [2026-07-18 11:30] - Fix: Production Server Component Render Errors (4 Public Pages)
 - الملفات اللي اتعدّلت: `src/app/[locale]/programs/page.tsx`, `src/app/[locale]/blog/page.tsx`, `src/app/[locale]/instructors/page.tsx`, `src/app/[locale]/about/page.tsx`
 - **المشكلة:** 4 صفحات عامة (programs, blog, instructors, about) كانوا بيعملوا server error في production لأن Next.js كان بيحاول يعمل static render وقت الـ build بس الـ Payload DB مش متاحة
