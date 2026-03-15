@@ -1,0 +1,1052 @@
+▲ Next.js 16.1.6
+- Local:         http://localhost:3001
+- Network:       http://0.0.0.0:3001
+
+✓ Starting...
+✓ Ready in 423ms
+Error: MISSING_MESSAGE: Footer.login (en)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (en)'
+}
+[ProgramsPage] Failed to fetch programs: Error: Failed query: select count(*) from "programs"
+params: 
+    at f.queryWithCache (.next/server/chunks/_33633eeb._.js:278:22870)
+    at async (.next/server/chunks/_33633eeb._.js:278:26432)
+    at async Object.i [as countDistinct] (.next/server/chunks/_33633eeb._.js:255:197)
+    at async l (.next/server/chunks/_33633eeb._.js:246:1939)
+    at async sQ (.next/server/chunks/_33633eeb._.js:129:72837)
+    at async p (.next/server/chunks/ssr/[root-of-the-server]__1ea47587._.js:1:21957) {
+  query: 'select count(*) from "programs"',
+  params: [],
+  [cause]: error: relation "programs" does not exist
+      at async (.next/server/chunks/_33633eeb._.js:278:26647)
+      at async f.queryWithCache (.next/server/chunks/_33633eeb._.js:278:22845)
+      at async (.next/server/chunks/_33633eeb._.js:278:26432)
+      at async Object.i [as countDistinct] (.next/server/chunks/_33633eeb._.js:255:197)
+      at async l (.next/server/chunks/_33633eeb._.js:246:1939)
+      at async sQ (.next/server/chunks/_33633eeb._.js:129:72837)
+      at async p (.next/server/chunks/ssr/[root-of-the-server]__1ea47587._.js:1:21957) {
+    length: 107,
+    severity: 'ERROR',
+    code: '42P01',
+    detail: undefined,
+    hint: undefined,
+    position: '22',
+    internalPosition: undefined,
+    internalQuery: undefined,
+    where: undefined,
+    schema: undefined,
+    table: undefined,
+    column: undefined,
+    dataType: undefined,
+    constraint: undefined,
+    file: 'parse_relation.c',
+    line: '1449',
+    routine: 'parserOpenTable'
+  }
+}
+Error: MISSING_MESSAGE: Footer.login (en)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (en)'
+}
+Error: MISSING_MESSAGE: Footer.login (en)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (en)'
+}
+[BlogPage] Failed to fetch blog posts: Error: Failed query: select count(*) from "blog_posts" where "blog_posts"."status" = $1
+params: published
+    at f.queryWithCache (.next/server/chunks/_33633eeb._.js:278:22870)
+    at async (.next/server/chunks/_33633eeb._.js:278:26432)
+    at async Object.i [as countDistinct] (.next/server/chunks/_33633eeb._.js:255:197)
+    at async l (.next/server/chunks/_33633eeb._.js:246:1939)
+    at async sQ (.next/server/chunks/_33633eeb._.js:129:72837)
+    at async o (.next/server/chunks/ssr/[root-of-the-server]__0d644958._.js:1:21277) {
+  query: 'select count(*) from "blog_posts" where "blog_posts"."status" = $1',
+  params: [Array],
+  [cause]: error: relation "blog_posts" does not exist
+      at async (.next/server/chunks/_33633eeb._.js:278:26647)
+      at async f.queryWithCache (.next/server/chunks/_33633eeb._.js:278:22845)
+      at async (.next/server/chunks/_33633eeb._.js:278:26432)
+      at async Object.i [as countDistinct] (.next/server/chunks/_33633eeb._.js:255:197)
+      at async l (.next/server/chunks/_33633eeb._.js:246:1939)
+      at async sQ (.next/server/chunks/_33633eeb._.js:129:72837)
+      at async o (.next/server/chunks/ssr/[root-of-the-server]__0d644958._.js:1:21277) {
+    length: 109,
+    severity: 'ERROR',
+    code: '42P01',
+    detail: undefined,
+    hint: undefined,
+    position: '22',
+    internalPosition: undefined,
+    internalQuery: undefined,
+    where: undefined,
+    schema: undefined,
+    table: undefined,
+    column: undefined,
+    dataType: undefined,
+    constraint: undefined,
+    file: 'parse_relation.c',
+    line: '1449',
+    routine: 'parserOpenTable'
+  }
+}
+Error: MISSING_MESSAGE: Footer.login (en)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (en)'
+}
+Error: MISSING_MESSAGE: Footer.login (en)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (en)'
+}
+[ProgramsPage] Failed to fetch programs: Error: Failed query: select count(*) from "programs"
+params: 
+    at f.queryWithCache (.next/server/chunks/_33633eeb._.js:278:22870)
+    at async (.next/server/chunks/_33633eeb._.js:278:26432)
+    at async Object.i [as countDistinct] (.next/server/chunks/_33633eeb._.js:255:197)
+    at async l (.next/server/chunks/_33633eeb._.js:246:1939)
+    at async sQ (.next/server/chunks/_33633eeb._.js:129:72837)
+    at async p (.next/server/chunks/ssr/[root-of-the-server]__1ea47587._.js:1:21957) {
+  query: 'select count(*) from "programs"',
+  params: [],
+  [cause]: error: relation "programs" does not exist
+      at async (.next/server/chunks/_33633eeb._.js:278:26647)
+      at async f.queryWithCache (.next/server/chunks/_33633eeb._.js:278:22845)
+      at async (.next/server/chunks/_33633eeb._.js:278:26432)
+      at async Object.i [as countDistinct] (.next/server/chunks/_33633eeb._.js:255:197)
+      at async l (.next/server/chunks/_33633eeb._.js:246:1939)
+      at async sQ (.next/server/chunks/_33633eeb._.js:129:72837)
+      at async p (.next/server/chunks/ssr/[root-of-the-server]__1ea47587._.js:1:21957) {
+    length: 107,
+    severity: 'ERROR',
+    code: '42P01',
+    detail: undefined,
+    hint: undefined,
+    position: '22',
+    internalPosition: undefined,
+    internalQuery: undefined,
+    where: undefined,
+    schema: undefined,
+    table: undefined,
+    column: undefined,
+    dataType: undefined,
+    constraint: undefined,
+    file: 'parse_relation.c',
+    line: '1449',
+    routine: 'parserOpenTable'
+  }
+}
+Error: MISSING_MESSAGE: Footer.login (en)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (en)'
+}
+Error: MISSING_MESSAGE: Footer.login (en)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (en)'
+}
+Error: MISSING_MESSAGE: Footer.login (en)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (en)'
+}
+Error: MISSING_MESSAGE: Footer.login (en)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (en)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (en)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (en)'
+}
+Error: MISSING_MESSAGE: Footer.login (en)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (en)'
+}
+Error: MISSING_MESSAGE: Footer.login (en)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (en)'
+}
+Error: MISSING_MESSAGE: Footer.login (en)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (en)'
+}
+Error: Failed to find Server Action "x". This request might be from an older or newer deployment.
+Read more: https://nextjs.org/docs/messages/failed-to-find-server-action
+    at ignore-listed frames
+Error: Failed to find Server Action "x". This request might be from an older or newer deployment.
+Read more: https://nextjs.org/docs/messages/failed-to-find-server-action
+    at ignore-listed frames
+Error: Failed to find Server Action "x". This request might be from an older or newer deployment.
+Read more: https://nextjs.org/docs/messages/failed-to-find-server-action
+    at ignore-listed frames
+Error: MISSING_MESSAGE: Footer.login (en)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (en)'
+}
+Error: MISSING_MESSAGE: Footer.login (en)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (en)'
+}
+Error: MISSING_MESSAGE: Footer.login (en)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (en)'
+}
+Error: MISSING_MESSAGE: Footer.login (en)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (en)'
+}
+Error: MISSING_MESSAGE: Footer.login (en)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (en)'
+}
+Error: MISSING_MESSAGE: Footer.login (en)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (en)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: Failed to find Server Action "x". This request might be from an older or newer deployment.
+Read more: https://nextjs.org/docs/messages/failed-to-find-server-action
+    at ignore-listed frames
+Error: Failed to find Server Action "x". This request might be from an older or newer deployment.
+Read more: https://nextjs.org/docs/messages/failed-to-find-server-action
+    at ignore-listed frames
+Error: Failed to find Server Action "x". This request might be from an older or newer deployment.
+Read more: https://nextjs.org/docs/messages/failed-to-find-server-action
+    at ignore-listed frames
+Error: MISSING_MESSAGE: Footer.login (en)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (en)'
+}
+Error: Failed to find Server Action "x". This request might be from an older or newer deployment.
+Read more: https://nextjs.org/docs/messages/failed-to-find-server-action
+    at ignore-listed frames
+Error: Failed to find Server Action "x". This request might be from an older or newer deployment.
+Read more: https://nextjs.org/docs/messages/failed-to-find-server-action
+    at ignore-listed frames
+Error: Failed to find Server Action "x". This request might be from an older or newer deployment.
+Read more: https://nextjs.org/docs/messages/failed-to-find-server-action
+    at ignore-listed frames
+Error: MISSING_MESSAGE: Footer.login (en)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (en)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (ar)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (ar)'
+}
+Error: MISSING_MESSAGE: Footer.login (en)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (en)'
+}
+⨯ Error: Failed query: select "users"."id", "users"."first_name", "users"."last_name", "users"."phone", "users"."gender", "users"."picture_id", "users"."role", "users"."instructor_id_id", "users"."preferred_language", "users"."newsletter_opt_in", "users"."whatsapp_opt_in", "users"."lifecycle_stage", "users"."contact_source", "users"."twenty_crm_contact_id", "users"."google_id", "users"."email_verified", "users"."last_login", "users"."locked_until", "users"."updated_at", "users"."created_at", "users"."enable_a_p_i_key", "users"."api_key", "users"."api_key_index", "users"."email", "users"."reset_password_token", "users"."reset_password_expiration", "users"."salt", "users"."hash", "users"."login_attempts", "users"."lock_until", "users_sessions"."data" as "sessions" from "users" "users" left join lateral (select coalesce(json_agg(json_build_array("users_sessions"."_order", "users_sessions"."id", "users_sessions"."created_at", "users_sessions"."expires_at") order by "users_sessions"."_order" asc), '[]'::json) as "data" from (select * from "users_sessions" "users_sessions" where "users_sessions"."_parent_id" = "users"."id" order by "users_sessions"."_order" asc) "users_sessions") "users_sessions" on true order by "users"."created_at" desc limit $1
+params: 1
+    at f.queryWithCache (.next/server/chunks/_33633eeb._.js:278:22870)
+    at async (.next/server/chunks/_33633eeb._.js:278:26432)
+    at async l (.next/server/chunks/_33633eeb._.js:246:2073)
+    at async Object.i [as findOne] (.next/server/chunks/_33633eeb._.js:246:9102)
+    at async aw (.next/server/chunks/ssr/_08c8b380._.js:1:43159) {
+  query: `select "users"."id", "users"."first_name", "users"."last_name", "users"."phone", "users"."gender", "users"."picture_id", "users"."role", "users"."instructor_id_id", "users"."preferred_language", "users"."newsletter_opt_in", "users"."whatsapp_opt_in", "users"."lifecycle_stage", "users"."contact_source", "users"."twenty_crm_contact_id", "users"."google_id", "users"."email_verified", "users"."last_login", "users"."locked_until", "users"."updated_at", "users"."created_at", "users"."enable_a_p_i_key", "users"."api_key", "users"."api_key_index", "users"."email", "users"."reset_password_token", "users"."reset_password_expiration", "users"."salt", "users"."hash", "users"."login_attempts", "users"."lock_until", "users_sessions"."data" as "sessions" from "users" "users" left join lateral (select coalesce(json_agg(json_build_array("users_sessions"."_order", "users_sessions"."id", "users_sessions"."created_at", "users_sessions"."expires_at") order by "users_sessions"."_order" asc), '[]'::json) as "data" from (select * from "users_sessions" "users_sessions" where "users_sessions"."_parent_id" = "users"."id" order by "users_sessions"."_order" asc) "users_sessions") "users_sessions" on true order by "users"."created_at" desc limit $1`,
+  params: [Array],
+  digest: '2414332012',
+  [cause]: error: relation "users" does not exist
+      at async (.next/server/chunks/_33633eeb._.js:278:26647)
+      at async f.queryWithCache (.next/server/chunks/_33633eeb._.js:278:22845)
+      at async (.next/server/chunks/_33633eeb._.js:278:26432)
+      at async l (.next/server/chunks/_33633eeb._.js:246:2073)
+      at async Object.i [as findOne] (.next/server/chunks/_33633eeb._.js:246:9102)
+      at async aw (.next/server/chunks/ssr/_08c8b380._.js:1:43159) {
+    length: 105,
+    severity: 'ERROR',
+    code: '42P01',
+    detail: undefined,
+    hint: undefined,
+    position: '756',
+    internalPosition: undefined,
+    internalQuery: undefined,
+    where: undefined,
+    schema: undefined,
+    table: undefined,
+    column: undefined,
+    dataType: undefined,
+    constraint: undefined,
+    file: 'parse_relation.c',
+    line: '1449',
+    routine: 'parserOpenTable'
+  }
+}
+⨯ Error: Failed query: select "users"."id", "users"."first_name", "users"."last_name", "users"."phone", "users"."gender", "users"."picture_id", "users"."role", "users"."instructor_id_id", "users"."preferred_language", "users"."newsletter_opt_in", "users"."whatsapp_opt_in", "users"."lifecycle_stage", "users"."contact_source", "users"."twenty_crm_contact_id", "users"."google_id", "users"."email_verified", "users"."last_login", "users"."locked_until", "users"."updated_at", "users"."created_at", "users"."enable_a_p_i_key", "users"."api_key", "users"."api_key_index", "users"."email", "users"."reset_password_token", "users"."reset_password_expiration", "users"."salt", "users"."hash", "users"."login_attempts", "users"."lock_until", "users_sessions"."data" as "sessions" from "users" "users" left join lateral (select coalesce(json_agg(json_build_array("users_sessions"."_order", "users_sessions"."id", "users_sessions"."created_at", "users_sessions"."expires_at") order by "users_sessions"."_order" asc), '[]'::json) as "data" from (select * from "users_sessions" "users_sessions" where "users_sessions"."_parent_id" = "users"."id" order by "users_sessions"."_order" asc) "users_sessions") "users_sessions" on true order by "users"."created_at" desc limit $1
+params: 1
+    at f.queryWithCache (.next/server/chunks/_33633eeb._.js:278:22870)
+    at async (.next/server/chunks/_33633eeb._.js:278:26432)
+    at async l (.next/server/chunks/_33633eeb._.js:246:2073)
+    at async Object.i [as findOne] (.next/server/chunks/_33633eeb._.js:246:9102)
+    at async aw (.next/server/chunks/ssr/_08c8b380._.js:1:43159) {
+  query: `select "users"."id", "users"."first_name", "users"."last_name", "users"."phone", "users"."gender", "users"."picture_id", "users"."role", "users"."instructor_id_id", "users"."preferred_language", "users"."newsletter_opt_in", "users"."whatsapp_opt_in", "users"."lifecycle_stage", "users"."contact_source", "users"."twenty_crm_contact_id", "users"."google_id", "users"."email_verified", "users"."last_login", "users"."locked_until", "users"."updated_at", "users"."created_at", "users"."enable_a_p_i_key", "users"."api_key", "users"."api_key_index", "users"."email", "users"."reset_password_token", "users"."reset_password_expiration", "users"."salt", "users"."hash", "users"."login_attempts", "users"."lock_until", "users_sessions"."data" as "sessions" from "users" "users" left join lateral (select coalesce(json_agg(json_build_array("users_sessions"."_order", "users_sessions"."id", "users_sessions"."created_at", "users_sessions"."expires_at") order by "users_sessions"."_order" asc), '[]'::json) as "data" from (select * from "users_sessions" "users_sessions" where "users_sessions"."_parent_id" = "users"."id" order by "users_sessions"."_order" asc) "users_sessions") "users_sessions" on true order by "users"."created_at" desc limit $1`,
+  params: [Array],
+  digest: '2414332012',
+  [cause]: error: relation "users" does not exist
+      at async (.next/server/chunks/_33633eeb._.js:278:26647)
+      at async f.queryWithCache (.next/server/chunks/_33633eeb._.js:278:22845)
+      at async (.next/server/chunks/_33633eeb._.js:278:26432)
+      at async l (.next/server/chunks/_33633eeb._.js:246:2073)
+      at async Object.i [as findOne] (.next/server/chunks/_33633eeb._.js:246:9102)
+      at async aw (.next/server/chunks/ssr/_08c8b380._.js:1:43159) {
+    length: 105,
+    severity: 'ERROR',
+    code: '42P01',
+    detail: undefined,
+    hint: undefined,
+    position: '756',
+    internalPosition: undefined,
+    internalQuery: undefined,
+    where: undefined,
+    schema: undefined,
+    table: undefined,
+    column: undefined,
+    dataType: undefined,
+    constraint: undefined,
+    file: 'parse_relation.c',
+    line: '1449',
+    routine: 'parserOpenTable'
+  }
+}
+⨯ Error: Failed query: select "users"."id", "users"."first_name", "users"."last_name", "users"."phone", "users"."gender", "users"."picture_id", "users"."role", "users"."instructor_id_id", "users"."preferred_language", "users"."newsletter_opt_in", "users"."whatsapp_opt_in", "users"."lifecycle_stage", "users"."contact_source", "users"."twenty_crm_contact_id", "users"."google_id", "users"."email_verified", "users"."last_login", "users"."locked_until", "users"."updated_at", "users"."created_at", "users"."enable_a_p_i_key", "users"."api_key", "users"."api_key_index", "users"."email", "users"."reset_password_token", "users"."reset_password_expiration", "users"."salt", "users"."hash", "users"."login_attempts", "users"."lock_until", "users_sessions"."data" as "sessions" from "users" "users" left join lateral (select coalesce(json_agg(json_build_array("users_sessions"."_order", "users_sessions"."id", "users_sessions"."created_at", "users_sessions"."expires_at") order by "users_sessions"."_order" asc), '[]'::json) as "data" from (select * from "users_sessions" "users_sessions" where "users_sessions"."_parent_id" = "users"."id" order by "users_sessions"."_order" asc) "users_sessions") "users_sessions" on true order by "users"."created_at" desc limit $1
+params: 1
+    at f.queryWithCache (.next/server/chunks/_33633eeb._.js:278:22870)
+    at async (.next/server/chunks/_33633eeb._.js:278:26432)
+    at async l (.next/server/chunks/_33633eeb._.js:246:2073)
+    at async Object.i [as findOne] (.next/server/chunks/_33633eeb._.js:246:9102)
+    at async aw (.next/server/chunks/ssr/_08c8b380._.js:1:43159) {
+  query: `select "users"."id", "users"."first_name", "users"."last_name", "users"."phone", "users"."gender", "users"."picture_id", "users"."role", "users"."instructor_id_id", "users"."preferred_language", "users"."newsletter_opt_in", "users"."whatsapp_opt_in", "users"."lifecycle_stage", "users"."contact_source", "users"."twenty_crm_contact_id", "users"."google_id", "users"."email_verified", "users"."last_login", "users"."locked_until", "users"."updated_at", "users"."created_at", "users"."enable_a_p_i_key", "users"."api_key", "users"."api_key_index", "users"."email", "users"."reset_password_token", "users"."reset_password_expiration", "users"."salt", "users"."hash", "users"."login_attempts", "users"."lock_until", "users_sessions"."data" as "sessions" from "users" "users" left join lateral (select coalesce(json_agg(json_build_array("users_sessions"."_order", "users_sessions"."id", "users_sessions"."created_at", "users_sessions"."expires_at") order by "users_sessions"."_order" asc), '[]'::json) as "data" from (select * from "users_sessions" "users_sessions" where "users_sessions"."_parent_id" = "users"."id" order by "users_sessions"."_order" asc) "users_sessions") "users_sessions" on true order by "users"."created_at" desc limit $1`,
+  params: [Array],
+  digest: '2414332012',
+  [cause]: error: relation "users" does not exist
+      at async (.next/server/chunks/_33633eeb._.js:278:26647)
+      at async f.queryWithCache (.next/server/chunks/_33633eeb._.js:278:22845)
+      at async (.next/server/chunks/_33633eeb._.js:278:26432)
+      at async l (.next/server/chunks/_33633eeb._.js:246:2073)
+      at async Object.i [as findOne] (.next/server/chunks/_33633eeb._.js:246:9102)
+      at async aw (.next/server/chunks/ssr/_08c8b380._.js:1:43159) {
+    length: 105,
+    severity: 'ERROR',
+    code: '42P01',
+    detail: undefined,
+    hint: undefined,
+    position: '756',
+    internalPosition: undefined,
+    internalQuery: undefined,
+    where: undefined,
+    schema: undefined,
+    table: undefined,
+    column: undefined,
+    dataType: undefined,
+    constraint: undefined,
+    file: 'parse_relation.c',
+    line: '1449',
+    routine: 'parserOpenTable'
+  }
+}
+Error: MISSING_MESSAGE: Footer.login (en)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (en)'
+}
+Error: MISSING_MESSAGE: Footer.login (en)
+    at l (.next/server/chunks/ssr/[root-of-the-server]__0d14bc4b._.js:1:7022) {
+  code: 'MISSING_MESSAGE',
+  originalMessage: 'Footer.login (en)'
+}

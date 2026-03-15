@@ -37,13 +37,17 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 COPY --from=builder --chown=nextjs:nodejs /app/public ./public
 
+# Payload needs i18n message files at runtime for next-intl
+COPY --from=builder --chown=nextjs:nodejs /app/src/messages ./src/messages
+
 USER nextjs
 
 EXPOSE 3001
 ENV PORT=3001
 ENV HOSTNAME=0.0.0.0
 
-HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
+# Increased start-period to 60s to allow Payload schema push on first boot
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
   CMD node -e "const http = require('http'); const req = http.get('http://localhost:3001/api/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1); }); req.on('error', () => process.exit(1)); req.setTimeout(5000, () => { req.destroy(); process.exit(1); });"
 
 CMD ["node", "server.js"]

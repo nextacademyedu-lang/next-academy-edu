@@ -12,6 +12,7 @@ out/
 .env.development
 .env.production
 .env.production.local
+Environment Variables
 
 # TypeScript
 *.tsbuildinfo

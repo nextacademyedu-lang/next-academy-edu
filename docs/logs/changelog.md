@@ -8,6 +8,20 @@
 
 ---
 
+### [2025-07-19 01:00] - Fix: Admin page 500 error (i18n + DB schema push)
+- **الملفات اللي اتعدّلت:**
+  - `src/messages/ar.json` — إضافة `Footer.login` key الناقص
+  - `src/messages/en.json` — إضافة `Footer.login` key الناقص
+  - `src/instrumentation.ts` [🆕] — Eager Payload CMS init عند server startup
+  - `Dockerfile` — نسخ `src/messages` للـ runner stage + زيادة healthcheck `start-period` لـ 60s
+- **المشكلة:**
+  1. `Footer.login` missing from i18n → Next.js throws during SSR
+  2. Payload `push: true` schema sync was lazy (waits for first request) → first page load fails with "relation does not exist"
+- **الحل:**
+  1. إضافة `login` key لـ Footer namespace في ar.json و en.json
+  2. إنشاء `instrumentation.ts` بيعمل `getPayload()` eagerly عند server startup → schema push يحصل قبل أي request
+  3. نسخ i18n messages في Docker runner stage (كانت محذوفة مع standalone build)
+
 ### [2025-07-18 23:45] - Fix docker-compose.yml healthcheck (still using wget)
 - **الملفات:** `docker-compose.yml`
 - **المشكلة:** Dockerfile healthcheck اتصلح قبل كده لـ `node -e`، لكن `docker-compose.yml` لسه بيستخدم `wget` اللي مش موجود في `node:22-alpine`. Coolify بيستخدم docker-compose.yml فبيعمل override.

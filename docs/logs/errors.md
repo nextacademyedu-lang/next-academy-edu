@@ -16,6 +16,17 @@
 
 ---
 
+## 🟢 [2025-07-19 01:00] — Admin Page 500 Error (i18n + DB Schema Push)
+
+| | |
+|---|---|
+| ❌ **Error** | `/admin` returns 500 Server Error. Logs show `Footer.login` missing and `relation "users" does not exist` |
+| 🔍 **Root Cause** | Two issues: (1) `Footer.login` i18n key was missing from `ar.json`/`en.json`. (2) Payload `push: true` DB schema sync only runs lazily on first `getPayload()` call, which happens AFTER SSR tries to render the page — so tables don't exist when queries execute. |
+| ✅ **Fix** | (1) Added `login` key to Footer namespace in both JSON files. (2) Created `src/instrumentation.ts` that calls `getPayload()` eagerly at server startup, ensuring schema push completes before any requests. (3) Updated Dockerfile to copy `src/messages` to runner stage. |
+| 📝 **Note** | In Next.js standalone mode, files outside `.next/standalone` must be explicitly copied in the Dockerfile. The `instrumentation.ts` `register()` hook runs before the server accepts requests, guaranteeing Payload init + schema push complete first. |
+
+---
+
 ## 🟢 [2026-03-05 01:34] — 404 on favicon.ico
 
 | | |
