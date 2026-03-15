@@ -36,3 +36,14 @@
 | 📝 **Note** | Always check Payload's generated types in `src/payload-types.ts` before assuming field types. Relations use numeric IDs. |
 
 ---
+
+## 🟢 [2025-07-18 23:30] — Docker Healthcheck Failure on Coolify
+
+| | |
+| --- | --- |
+| ❌ **Error** | `Health check failed: dial tcp [::1]:3001: connect: connection refused` — container starts then gets killed |
+| 🔍 **Root Cause** | `node:22-alpine` لا يحتوي على `wget`. الـ HEALTHCHECK كان `wget -qO- http://localhost:3001/api/health` فكان بيفشل دايماً. كمان `/api/health` endpoint مكانش موجود. |
+| ✅ **Fix** | (1) استبدال `wget` بـ `node -e` inline HTTP GET. (2) إنشاء `src/app/api/health/route.ts`. (3) زيادة `--start-period` لـ 30s. |
+| 📝 **Note** | في Alpine images، دايماً استخدم `node -e` أو install `curl` صريح. لا تعتمد على `wget`. |
+
+---

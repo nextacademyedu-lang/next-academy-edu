@@ -8,6 +8,14 @@
 
 ---
 
+### [2025-07-18 23:30] - Fix Docker healthcheck failure (Coolify deployment)
+- **الملفات:** `Dockerfile`, `src/app/api/health/route.ts` [NEW]
+- **المشكلة:** Container healthcheck كان بيستخدم `wget` اللي مش موجود في `node:22-alpine`
+- **الحل:**
+  - استبدال `wget` بـ `node -e` inline HTTP request
+  - إنشاء `/api/health` endpoint بيرجع `{ status: "ok" }`
+  - زيادة `--start-period` من 20s لـ 30s عشان Next.js ياخد وقت أكتر في الـ startup
+
 ### [2026-07-18 14:00] - Fix: TypeScript Strict Mode Build Errors (7 API Route Files)
 - الملفات اللي اتعدّلت:
   - `src/app/api/auth/google/callback/route.ts` — nullable `externalId` field
