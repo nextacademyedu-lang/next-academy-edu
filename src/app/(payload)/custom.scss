@@ -1,16 +1,1 @@
-/*
- * FIX: CSS Layer ordering for Payload admin panel
- *
- * globals.css (frontend) is wrapped in @layer frontend.
- * Payload bundles its CSS in @layer payload-default and @layer payload.
- *
- * Layer ordering (lowest → highest priority):
- *   frontend < payload-default < payload
- *
- * This ensures:
- *   - On /admin: Payload styles override frontend resets
- *     (dark bg, margin: 0, button { border: none } won't kill admin UI)
- *   - On frontend: CSS variables still resolve correctly
- *     (CSS custom properties cascade through layers)
- */
-@layer frontend, payload-default, payload;
+/* Payload admin custom overrides — keep this file minimal */
