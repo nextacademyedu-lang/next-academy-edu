@@ -4,6 +4,20 @@
 
 ---
 
+### [2026-07-20 16:00] - Fix: Downgrade Next.js 16.1.6 → 15.4.11 (Admin Panel CSS compatibility)
+
+- **الملفات اللي اتعدّلت:** `package.json`, `src/app/layout.tsx` [🆕], `src/app/privacy-policy/page.tsx`
+- **المشكلة:** الـ Admin Panel CSS كان مكسور على Next.js 16.1.6 — Payload CMS 3.79 مش متوافق رسمياً مع Next.js 16 (يحتاج `>=16.2.0-canary.10` أو يستخدم 15.x). الـ SCSS compilation والـ theme variables كانوا مش شغالين صح. كمان `sass` package كان ناقص (اتضاف قبل كده بس الـ framework version كان هو الـ root cause).
+- **الحل:**
+  1. Downgrade `next` من `16.1.6` → `15.4.11` (آخر stable في النطاق المدعوم من Payload)
+  2. إنشاء `src/app/layout.tsx` — root layout مطلوب في Next.js 15 لكل route tree
+  3. Refactor `privacy-policy/page.tsx` — حذف الـ `<html>/<head>/<body>` tags (بقوا بييجوا من root layout)
+  4. Clean install (`node_modules` + `.next` + `package-lock.json` اتحذفوا وتعملوا من جديد)
+- **النتيجة:** Build ✅ — 60 route اتعملوا compile بنجاح، الـ admin panel bundle 729kB مع CSS chunks سليمة
+- **ملاحظة:** لا تعمل upgrade لـ Next.js 16 غير لما Payload CMS يدعمه رسمياً
+
+---
+
 ### [2026-07-20 15:00] - Fix: Admin Panel Missing CSS on VPS (NEXT_PUBLIC_SERVER_URL not baked into build)
 
 - **الملفات اللي اتعدّلت:** `Dockerfile`, `.env.production.template`
