@@ -1,1 +1,12 @@
-/* Custom Payload admin panel styles */
+/*
+ * FIX: Payload admin CSS layer ordering
+ *
+ * Next.js 15 auto-wraps the root layout in <html><body>, but Payload's
+ * RootLayout also renders <html data-theme><body>. This creates nested
+ * HTML tags — the inner <head> containing @layer ordering is inside
+ * <body> and gets IGNORED by browsers.
+ *
+ * By declaring the layer order here (in a file that gets bundled into
+ * the outer <head>'s CSS links), the browser can properly process it.
+ */
+@layer payload-default, payload;
