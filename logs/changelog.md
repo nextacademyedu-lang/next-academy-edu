@@ -4,6 +4,15 @@
 
 ---
 
+### [2026-07-20 15:00] - Fix: Admin Panel Missing CSS on VPS (NEXT_PUBLIC_SERVER_URL not baked into build)
+
+- **الملفات اللي اتعدّلت:** `Dockerfile`, `.env.production.template`
+- **المشكلة:** الـ admin panel على الـ VPS كان بيظهر بدون CSS (white/unstyled). السبب الجذري: `NEXT_PUBLIC_SERVER_URL` مكانش موجود كـ Docker build arg. بما إن `NEXT_PUBLIC_*` vars بتتعمل bake في الـ client bundle وقت الـ build بواسطة Next.js، الـ `serverURL` في Payload config كان فاضي — الـ theme provider مكانش بيعمل hydrate، و`data-theme` attribute و CSS variables كانوا مش بيتحطوا على `<html>`.
+- **الحل:** إضافة `NEXT_PUBLIC_SERVER_URL` كـ build ARG في Dockerfile مع fallback لـ `NEXT_PUBLIC_APP_URL`: `ENV NEXT_PUBLIC_SERVER_URL=${NEXT_PUBLIC_SERVER_URL:-$NEXT_PUBLIC_APP_URL}`
+- **ملاحظة:** يجب إضافة `NEXT_PUBLIC_SERVER_URL=https://nextacademyedu.com` في `.env.production` على الـ VPS وعمل rebuild
+
+---
+
 ### [2026-07-20 14:00] - Remove: Social Login Buttons (Google, Facebook, Apple)
 
 - **الملفات اللي اتعدّلت:** `src/app/[locale]/(auth)/login/page.tsx`, `src/app/[locale]/(auth)/register/page.tsx`
