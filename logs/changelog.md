@@ -4,11 +4,28 @@
 
 ---
 
-## 🚧 [Unreleased] — آخر تحديث: 2026-03-16
+### [2026-07-20 12:00] - Fix: Admin Panel Missing CSS (sass package missing)
+
+- **الملفات اللي اتعدّلت:** `package.json`
+- **المشكلة:** الـ admin panel على `/admin` كان بيظهر أبيض بالكامل بدون styling — الـ CSS variables (`--theme-bg`, `--theme-elevation-*`, إلخ) كانت undefined. السبب الجذري: `sass` package مش موجود في `package.json`. Payload CMS 3.x بيستخدم SCSS files (`colors.scss`, `app.scss`, `vars.scss`) لتعريف CSS variables — من غير `sass`, Next.js مش بيقدر يعمل compile للـ SCSS → الـ CSS chunks بتطلع فاضية.
+- **الحل:** إضافة `"sass": "^1.89.1"` في `devDependencies`
+- **ملاحظة:** كمان Next.js 16.1.6 مش في النطاق المدعوم من Payload 3.79 (`>=16.2.0-canary.10`) — ده ممكن يسبب مشاكل تانية.
 
 ---
 
+## 🚧 ### [2026-03-16 04:30] - Fix: Database migration applied to VPS
+
+-03-16
+
+---
+
+### [2026-03-16 04:30] - Fix: Database migration applied to VPS
+
+- الملفات اللي اتعدّلت: No code files changed — database-only fix
+- وصف: الـ admin panel على `/admin` كان بيرجّع 500 Server Error بسبب إن الـ PostgreSQL database على الـ VPS كانت فاضية (مفيش tables). تم استخراج الـ raw SQL من `src/migrations/20260316_020144.ts`، رفعه على الـ VPS عن طريق SCP، وتنفيذه في الـ Docker container `nextacademy-db` (`g0wckcksgoo484okg4cg804s`). اتعملوا 46 table بنجاح وتم تسجيل الـ migration في `payload_migrations`.
+
 ### [2026-03-16 02:33] - Fix: DB schema push not running in production (instrumentation.ts)
+
 - **الملفات اللي اتعدّلت:**
   - `src/instrumentation.ts` — إصلاح 3 مشاكل:
     1. استبدال `@payload-config` alias بـ `./payload.config` relative import (الـ alias مش بيتحل في standalone mode)
@@ -18,7 +35,9 @@
 - **الحل:** Relative import + retry + crash-on-failure
 
 ---
+
 ### [2025-07-19 01:00] - Fix: Admin page 500 error (i18n + DB schema push)
+
 - **الملفات اللي اتعدّلت:**
   - `src/messages/ar.json` — إضافة `Footer.login` key الناقص
   - `src/messages/en.json` — إضافة `Footer.login` key الناقص
@@ -33,6 +52,7 @@
   3. نسخ i18n messages في Docker runner stage (كانت محذوفة مع standalone build)
 
 ### [2025-07-18 23:45] - Fix docker-compose.yml healthcheck (still using wget)
+
 - **الملفات:** `docker-compose.yml`
 - **المشكلة:** Dockerfile healthcheck اتصلح قبل كده لـ `node -e`، لكن `docker-compose.yml` لسه بيستخدم `wget` اللي مش موجود في `node:22-alpine`. Coolify بيستخدم docker-compose.yml فبيعمل override.
 - **الحل:**
@@ -40,6 +60,7 @@
   - إضافة `start_period: 30s` عشان الـ container ياخد وقت يعمل boot
 
 ### [2025-07-18 23:30] - Fix Docker healthcheck failure (Coolify deployment)
+
 - **الملفات:** `Dockerfile`, `src/app/api/health/route.ts` [NEW]
 - **المشكلة:** Container healthcheck كان بيستخدم `wget` اللي مش موجود في `node:22-alpine`
 - **الحل:**
@@ -48,6 +69,7 @@
   - زيادة `--start-period` من 20s لـ 30s عشان Next.js ياخد وقت أكتر في الـ startup
 
 ### [2026-07-18 14:00] - Fix: TypeScript Strict Mode Build Errors (7 API Route Files)
+
 - الملفات اللي اتعدّلت:
   - `src/app/api/auth/google/callback/route.ts` — nullable `externalId` field
   - `src/app/api/bookings/create/route.ts` — nullable `currentEnrollments`, `currentUses` fields + `paymentGatewayResponse` JSON cast
@@ -62,6 +84,7 @@
 ---
 
 ### [2026-07-18 11:30] - Fix: Production Server Component Render Errors (4 Public Pages)
+
 - الملفات اللي اتعدّلت: `src/app/[locale]/programs/page.tsx`, `src/app/[locale]/blog/page.tsx`, `src/app/[locale]/instructors/page.tsx`, `src/app/[locale]/about/page.tsx`
 - **المشكلة:** 4 صفحات عامة (programs, blog, instructors, about) كانوا بيعملوا server error في production لأن Next.js كان بيحاول يعمل static render وقت الـ build بس الـ Payload DB مش متاحة
 - **الحل:**
@@ -79,6 +102,7 @@
 - **الحل:** إضافة Next.js redirects في `next.config.ts`: `/privacy-policy` → `/en/privacy` و `/:locale/privacy-policy` → `/:locale/privacy`
 
 ### [2026-07-18 09:47] - Fix: Create BlogPosts Collection (Blog Page Server Error)
+
 - الملفات اللي اتعدّلت: `src/collections/BlogPosts.ts` (🆕), `src/payload.config.ts`, `src/payload-types.ts`
 - **المشكلة:** Blog pages (`/blog` + `/blog/[slug]`) كانوا بيعملوا server error لأن collection `blog-posts` مكانتش موجودة في Payload
 - **الحل:** إنشاء `BlogPosts` collection بـ fields: title, slug, excerpt, content (richText), category, featuredImage, author, tags, status, publishedAt + تسجيلها في `payload.config.ts` + regenerate types
@@ -86,6 +110,7 @@
 ---
 
 ### [2026-07-17 16:00] - Security Fixes: IDOR, Headers, Error Leak, Docker
+
 - الملفات اللي اتعدّلت: `Users.ts`, `nginx.conf`, `proxy.ts`, `checkout/paymob/route.ts`, `Dockerfile`
 - **Critical Fix**: Users collection `update` access changed from `isAuthenticated` → `isAdminOrSelf` (IDOR)
 - **High Fix**: Added 6 security headers to nginx (HSTS, X-Frame-Options, CSP, X-Content-Type-Options, Referrer-Policy, server_tokens off)
@@ -97,6 +122,7 @@
 ---
 
 ### [2026-07-17 14:00] - Deep Security & Code Audit
+
 - الملفات اللي اتراجعت: All 27 Payload collections, access-control.ts, auth-api.ts, payment-api.ts, rate-limit.ts, email.ts, resend-email-adapter.ts, checkout/paymob/route.ts, checkout/easykash/route.ts, cron/check-overdue/route.ts, cron/waitlist/route.ts, webhooks/paymob/route.ts, webhooks/easykash/route.ts, docker-compose.yml, nginx/nginx.conf
 - **Critical**: Users collection `update` access uses `isAuthenticated` — IDOR vulnerability (any user can update any other user)
 - **High**: Missing security headers in nginx (HSTS, CSP, X-Frame-Options, etc.)
@@ -136,6 +162,7 @@
 | `.env` | 🔧 تصحيح `PAYMOB_API_KEY` + تصحيح integration IDs + تحديث ngrok URL |
 
 **نتيجة الاختبار:**
+
 - Paymob card payment → 3DS → Approved ✅
 - EasyKash Fawry voucher → pending page ✅
 - HMAC verification على الـ webhooks ✅
@@ -159,10 +186,12 @@
 | `docs/engineering/env-variables.md` | 🔄 إضافة `PAYMOB_PUBLIC_KEY` + `EASYKASH_API_TOKEN` + `EASYKASH_HMAC_SECRET` |
 
 **الـ Flow:**
+
 - كارت/محفظة → Paymob Intention API → Unified Checkout → webhook → confirmed
 - فوري/أمان → EasyKash Cash API → voucher page → يدفع في الفرع → webhook → confirmed
 
 **Testing:**
+
 - ngrok tunnel: `https://97f9-41-36-59-214.ngrok-free.app`
 - Webhooks tested locally — HMAC rejection ✅
 - Paymob + EasyKash callbacks updated in dashboards ✅
@@ -203,7 +232,7 @@
 | | |
 |---|---|
 | 📁 **ملف جديد** | `.gitignore` — يستثني `node_modules/`, `.next/`, `.env*`, `*.tsbuildinfo`, `client_secret_*.json` |
-| 🔗 **Repo** | https://github.com/nextacademyedu-lang/next-academy-edu (private) |
+| 🔗 **Repo** | <https://github.com/nextacademyedu-lang/next-academy-edu> (private) |
 | 📦 **Commit** | `feat: initial commit — Next Academy platform scaffold` (274 ملف) |
 | 🌿 **Branch** | `main` |
 

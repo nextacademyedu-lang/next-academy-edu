@@ -13,7 +13,16 @@
 | 🟢 | تم الحل |
 | ❌ | المشكلة |
 | ✅ | الحل |
+
 ---
+
+#
+
+### [2026-03-16 04:30] - Admin Panel 500 Server Error
+
+**السبب:** قاعدة البيانات PostgreSQL على الـ VPS كانت فاضية تماماً — مفيش أي tables. الـ Payload CMS كان بيحاول يعمل query على `users` table اللي مش موجودة.
+**الحل:** تم استخراج الـ SQL من `src/migrations/20260316_020144.ts` وتنفيذه مباشرة في الـ Docker container عن طريق `psql`. اتعملوا 46 table + migration record في `payload_migrations`.
+**ملاحظة:** الـ Coolify deployment مش بيشغل migrations تلقائياً. لو حصل deploy جديد والـ DB اتمسحت، لازم يتعمل migration يدوي.
 
 ## 🟢 [2026-03-16 02:33] — Schema Push Fails in Standalone Mode (@payload-config alias)
 
@@ -25,7 +34,6 @@
 | 📝 **Note** | **Never use TypeScript path aliases in `instrumentation.ts`** — standalone mode only resolves raw module paths. Always use relative imports for Payload config in runtime hooks. |
 
 ---
-
 
 | | |
 |---|---|
