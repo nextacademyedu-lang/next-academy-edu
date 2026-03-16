@@ -4,10 +4,20 @@
 
 ---
 
-## 🚧 [Unreleased] — آخر تحديث: 2026-07-18
+## 🚧 [Unreleased] — آخر تحديث: 2026-03-16
 
 ---
 
+### [2026-03-16 02:33] - Fix: DB schema push not running in production (instrumentation.ts)
+- **الملفات اللي اتعدّلت:**
+  - `src/instrumentation.ts` — إصلاح 3 مشاكل:
+    1. استبدال `@payload-config` alias بـ `./payload.config` relative import (الـ alias مش بيتحل في standalone mode)
+    2. إضافة retry logic (5 محاولات، 3 ثواني بين كل محاولة) عشان الـ DB ممكن يكون لسه بيعمل boot
+    3. `process.exit(1)` لو كل المحاولات فشلت بدلاً من swallow الـ error
+- **المشكلة:** `relation "users" does not exist` — الـ schema push مكانش بيتنفذ في production لأن `@payload-config` TypeScript alias مش بيتحل في Next.js standalone runtime
+- **الحل:** Relative import + retry + crash-on-failure
+
+---
 ### [2025-07-19 01:00] - Fix: Admin page 500 error (i18n + DB schema push)
 - **الملفات اللي اتعدّلت:**
   - `src/messages/ar.json` — إضافة `Footer.login` key الناقص

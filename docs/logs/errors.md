@@ -13,10 +13,19 @@
 | 🟢 | تم الحل |
 | ❌ | المشكلة |
 | ✅ | الحل |
+---
+
+## 🟢 [2026-03-16 02:33] — Schema Push Fails in Standalone Mode (@payload-config alias)
+
+| | |
+| --- | --- |
+| ❌ **Error** | `relation "users" does not exist` persists in production even after adding `instrumentation.ts` with eager `getPayload()` |
+| 🔍 **Root Cause** | `instrumentation.ts` imported `@payload-config` — a TypeScript path alias. In Next.js standalone runtime, TS path aliases are NOT resolved. The import fails silently inside the try/catch, so schema push never runs. |
+| ✅ **Fix** | (1) Changed import to relative `./payload.config`. (2) Added retry loop (5×, 3s delay). (3) `process.exit(1)` on total failure so container restarts. |
+| 📝 **Note** | **Never use TypeScript path aliases in `instrumentation.ts`** — standalone mode only resolves raw module paths. Always use relative imports for Payload config in runtime hooks. |
 
 ---
 
-## 🟢 [2025-07-19 01:00] — Admin Page 500 Error (i18n + DB Schema Push)
 
 | | |
 |---|---|
