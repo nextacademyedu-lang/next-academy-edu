@@ -16,11 +16,6 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
   redirects: async () => [
     {
-      source: '/privacy-policy',
-      destination: '/en/privacy',
-      permanent: true,
-    },
-    {
       source: '/:locale/privacy-policy',
       destination: '/:locale/privacy',
       permanent: true,

@@ -43,12 +43,13 @@ function applySecurityHeaders(response: NextResponse): NextResponse {
 export default function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Skip API routes, admin, static assets
+  // Skip API routes, admin, static assets, and legal pages (direct access for Google verification)
   if (
     pathname.startsWith('/api') ||
     pathname.startsWith('/admin') ||
     pathname.startsWith('/_next') ||
     pathname.startsWith('/_vercel') ||
+    pathname === '/privacy-policy' ||
     pathname.includes('.')
   ) {
     return applySecurityHeaders(NextResponse.next());
