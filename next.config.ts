@@ -27,6 +27,7 @@ const nextConfig: NextConfig = {
     },
   ],
   headers: async () => [
+    // ── Security headers for all pages ───────────────────────────────────
     {
       source: '/(.*)',
       headers: [
@@ -36,6 +37,12 @@ const nextConfig: NextConfig = {
         { key: 'X-XSS-Protection', value: '1; mode=block' },
         { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
         { key: 'Strict-Transport-Security', value: 'max-age=63072000; includeSubDomains; preload' },
+      ],
+    },
+    // ── Strict CSP for public-facing pages (exclude /admin) ──────────────
+    {
+      source: '/((?!admin).*)',
+      headers: [
         {
           key: 'Content-Security-Policy',
           value: [
