@@ -1,12 +1,16 @@
 /*
- * FIX: Payload admin CSS layer ordering
+ * FIX: CSS Layer ordering for Payload admin panel
  *
- * Next.js 15 auto-wraps the root layout in <html><body>, but Payload's
- * RootLayout also renders <html data-theme><body>. This creates nested
- * HTML tags — the inner <head> containing @layer ordering is inside
- * <body> and gets IGNORED by browsers.
+ * globals.css (frontend) is wrapped in @layer frontend.
+ * Payload bundles its CSS in @layer payload-default and @layer payload.
  *
- * By declaring the layer order here (in a file that gets bundled into
- * the outer <head>'s CSS links), the browser can properly process it.
+ * Layer ordering (lowest → highest priority):
+ *   frontend < payload-default < payload
+ *
+ * This ensures:
+ *   - On /admin: Payload styles override frontend resets
+ *     (dark bg, margin: 0, button { border: none } won't kill admin UI)
+ *   - On frontend: CSS variables still resolve correctly
+ *     (CSS custom properties cascade through layers)
  */
-@layer payload-default, payload;
+@layer frontend, payload-default, payload;
