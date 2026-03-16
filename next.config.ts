@@ -14,6 +14,15 @@ const nextConfig: NextConfig = {
     formats: ['image/avif', 'image/webp'],
   },
   poweredByHeader: false,
+  // Required by Payload CMS for proper .ts/.tsx resolution
+  webpack: (webpackConfig) => {
+    webpackConfig.resolve.extensionAlias = {
+      '.cjs': ['.cts', '.cjs'],
+      '.js': ['.ts', '.tsx', '.js', '.jsx'],
+      '.mjs': ['.mts', '.mjs'],
+    };
+    return webpackConfig;
+  },
   redirects: async () => [
     {
       source: '/:locale/privacy-policy',
@@ -56,4 +65,4 @@ const nextConfig: NextConfig = {
   ],
 };
 
-export default withPayload(withNextIntl(nextConfig));
+export default withPayload(withNextIntl(nextConfig), { devBundleServerPackages: false });
