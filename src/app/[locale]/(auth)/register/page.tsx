@@ -8,7 +8,7 @@ import { useTranslations, useLocale } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Facebook, Apple, Check, X, Loader2 } from 'lucide-react';
+import { Check, X, Loader2 } from 'lucide-react';
 import { useAuth } from '@/context/auth-context';
 import styles from '../login/login.module.css';
 
@@ -181,25 +181,8 @@ export default function RegisterPage() {
         </Button>
       </form>
 
-      <div className={styles.divider}>
-        <span className={styles.dividerText}>{t('or')}</span>
-      </div>
 
-      <div className={styles.socialAuth}>
-        <button
-          className={styles.socialBtn}
-          type="button"
-          onClick={() => { window.location.href = '/api/auth/google'; }}
-        >
-          <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" className={styles.socialIcon} />
-        </button>
-        <button className={styles.socialBtn} type="button">
-          <Facebook className={styles.socialIconWhite} size={20} fill="#1877F2" stroke="none" />
-        </button>
-        <button className={styles.socialBtn} type="button">
-          <Apple className={styles.socialIconWhite} size={20} fill="white" />
-        </button>
-      </div>
+
 
       <p className={styles.footerText}>
         {t('hasAccount')} <Link href={`/${locale}/login`} className={styles.footerLink}>{t('signIn')}</Link>

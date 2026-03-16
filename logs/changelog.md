@@ -4,6 +4,15 @@
 
 ---
 
+### [2026-07-20 14:00] - Remove: Social Login Buttons (Google, Facebook, Apple)
+
+- **الملفات اللي اتعدّلت:** `src/app/[locale]/(auth)/login/page.tsx`, `src/app/[locale]/(auth)/register/page.tsx`
+- **المشكلة:** أزرار الـ Social Login (Google, Facebook, Apple) كانت موجودة في صفحات Login و Register لكن الـ OAuth providers مش متظبطين — الأزرار كانت بتعمل redirect لـ endpoints مش شغالة
+- **الحل:** حذف الـ social login buttons + الـ divider ("or") + cleanup الـ unused imports (`Facebook`, `Apple` من lucide-react)
+- **ملاحظة:** لما يتم تظبيط OAuth providers في المستقبل، ممكن نرجّعهم تاني
+
+---
+
 ### [2026-07-20 12:00] - Fix: Admin Panel Missing CSS (sass package missing)
 
 - **الملفات اللي اتعدّلت:** `package.json`
