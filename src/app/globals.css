@@ -57,10 +57,10 @@ html[data-app="frontend"] body {
   font-family: var(--font-ar);
 }
 
-html[data-app="frontend"] * {
+html[data-app="frontend"] *,
+html[data-app="frontend"] *::before,
+html[data-app="frontend"] *::after {
   box-sizing: border-box;
-  padding: 0;
-  margin: 0;
 }
 
 html[data-app="frontend"] a {
