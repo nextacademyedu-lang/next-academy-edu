@@ -53,3 +53,33 @@
     display: none; /* Mobile menu handled separately later */
   }
 }
+
+/* ── Search trigger ─────────────────────────────────────────── */
+.searchTrigger {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border: 1px solid var(--border-subtle, rgba(197, 197, 197, 0.25));
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: border-color 0.2s ease, color 0.2s ease;
+}
+
+.searchTrigger:hover {
+  border-color: var(--accent, #6366f1);
+  color: var(--text-primary);
+}
+
+.kbdSmall {
+  font-size: 11px;
+  padding: 1px 5px;
+  border: 1px solid var(--border-subtle, rgba(197, 197, 197, 0.25));
+  border-radius: 4px;
+  background: var(--bg-secondary, rgba(255, 255, 255, 0.05));
+  color: var(--text-tertiary, #888);
+  line-height: 1;
+}
+

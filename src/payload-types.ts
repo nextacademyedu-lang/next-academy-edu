@@ -95,6 +95,7 @@ export interface Config {
     'instructor-blocked-dates': InstructorBlockedDate;
     'verification-codes': VerificationCode;
     'blog-posts': BlogPost;
+    'bulk-seat-allocations': BulkSeatAllocation;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -130,6 +131,7 @@ export interface Config {
     'instructor-blocked-dates': InstructorBlockedDatesSelect<false> | InstructorBlockedDatesSelect<true>;
     'verification-codes': VerificationCodesSelect<false> | VerificationCodesSelect<true>;
     'blog-posts': BlogPostsSelect<false> | BlogPostsSelect<true>;
+    'bulk-seat-allocations': BulkSeatAllocationsSelect<false> | BulkSeatAllocationsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -923,6 +925,32 @@ export interface BlogPost {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "bulk-seat-allocations".
+ */
+export interface BulkSeatAllocation {
+  id: number;
+  company: number | Company;
+  round: number | Round;
+  /**
+   * Number of seats purchased for this round
+   */
+  totalSeats: number;
+  status: 'active' | 'expired' | 'cancelled';
+  allocations?:
+    | {
+        user: number | User;
+        allocatedAt?: string | null;
+        status: 'pending' | 'enrolled' | 'cancelled';
+        id?: string | null;
+      }[]
+    | null;
+  purchaseDate?: string | null;
+  notes?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -1056,6 +1084,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'blog-posts';
         value: number | BlogPost;
+      } | null)
+    | ({
+        relationTo: 'bulk-seat-allocations';
+        value: number | BulkSeatAllocation;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -1708,6 +1740,28 @@ export interface BlogPostsSelect<T extends boolean = true> {
   tags?: T;
   status?: T;
   publishedAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "bulk-seat-allocations_select".
+ */
+export interface BulkSeatAllocationsSelect<T extends boolean = true> {
+  company?: T;
+  round?: T;
+  totalSeats?: T;
+  status?: T;
+  allocations?:
+    | T
+    | {
+        user?: T;
+        allocatedAt?: T;
+        status?: T;
+        id?: T;
+      };
+  purchaseDate?: T;
+  notes?: T;
   updatedAt?: T;
   createdAt?: T;
 }

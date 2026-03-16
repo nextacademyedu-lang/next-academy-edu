@@ -18,6 +18,11 @@
 
 #
 
+### [2026-03-16 19:27] - 🟢 Payload Admin CSS — @layer frontend stripped by Next.js bundler
+**السبب:** Next.js CSS bundler بيعمل strip لمحتوى `@layer frontend {}` في الـ production build. الـ `@layer frontend, payload-default, payload;` declaration بيبقى موجود، لكن الـ rules جوه `@layer frontend` بتطلع بره الـ layer — يعني بتفضل unlayered وبتكسب على Payload.
+**الحل:** استخدام data-attribute scoping بدل CSS layers: كل الـ destructive resets اتلفت في `html[data-app="frontend"]` selector، والـ `[locale]/layout.tsx` بيضيف `data-app="frontend"` على `<html>`. Payload admin مبيضيفش الـ attribute ده.
+**ملاحظة:** CSS `@layer` مش reliable في Next.js App Router — **ماتستخدمش `@layer` لعزل الـ CSS بين route groups**. استخدم selector scoping بدلها.
+
 ### [2025-07-21 02:30] - 🟢 Payload Admin Panel CSS Not Rendering
 **السبب:** الـ root `layout.tsx` كان بيعمل wrap في `<html><body>` وPayload's `RootLayout` كمان بيعمل `<html data-theme><body>`. ده أنتج double-nested `<html>` tags.
 **الحل:** خلّينا الـ root `layout.tsx` يرجع `children` مباشرة بدون `<html>/<body>` wrapping.

@@ -1,0 +1,8 @@
+   ▲ Next.js 15.4.11
+   - Local:        http://localhost:3001
+   - Network:      http://0.0.0.0:3001
+
+ ✓ Starting...
+[instrumentation] Attempt 1/5: Initializing Payload CMS…
+ ✓ Ready in 939ms
+[instrumentation] ✅ Payload CMS initialized. Collections: users, media, companies, user-profiles, tags, categories, instructors, programs, rounds, sessions, payment-plans, bookings, payments, installment-requests, notifications, discount-codes, consultation-types, consultation-availability, consultation-slots, consultation-bookings, leads, waitlist, reviews, certificates, payment-links, instructor-blocked-dates, verification-codes, blog-posts, payload-kv, payload-locked-documents, payload-preferences, payload-migrations

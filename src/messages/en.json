@@ -236,5 +236,24 @@
     "error": "Something went wrong",
     "retry": "Try again",
     "nextAcademy": "Next Academy"
+  },
+  "errors": {
+    "notFound": {
+      "title": "Page Not Found",
+      "description": "The page you're looking for doesn't exist or has been moved.",
+      "backHome": "Back to Homepage"
+    },
+    "serverError": {
+      "title": "Something Went Wrong",
+      "description": "We're sorry about this error. Try refreshing the page or go back to the homepage.",
+      "retry": "Try Again",
+      "backHome": "Homepage"
+    }
+  },
+  "Search": {
+    "placeholder": "Search programs, instructors, articles…",
+    "loading": "Searching…",
+    "noResults": "No results found",
+    "hint": "Type at least 2 characters to search"
   }
 }

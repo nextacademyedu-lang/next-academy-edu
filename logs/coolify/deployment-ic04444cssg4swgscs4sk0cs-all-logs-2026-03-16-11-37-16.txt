@@ -1,0 +1,553 @@
+2026-Mar-16 11:36:36.915605 Starting deployment of nextacademyedu-lang/next-academy-edu:main to localhost.
+2026-Mar-16 11:36:37.688156 Preparing container with helper image: ghcr.io/coollabsio/coolify-helper:1.0.12
+2026-Mar-16 11:36:38.027589 [DEBUG] [CMD]: docker stop -t 30 ic04444cssg4swgscs4sk0cs
+2026-Mar-16 11:36:38.027589 [DEBUG] Error response from daemon: No such container: ic04444cssg4swgscs4sk0cs
+2026-Mar-16 11:36:38.518124 [DEBUG] [CMD]: docker run -d --network coolify --name ic04444cssg4swgscs4sk0cs  --rm -v /var/run/docker.sock:/var/run/docker.sock ghcr.io/coollabsio/coolify-helper:1.0.12
+2026-Mar-16 11:36:38.518124 [DEBUG] 754b793d09e192937ac6d8dc043a2abb384931c597e53319e01409edf4ad1a38
+2026-Mar-16 11:36:41.717708 [DEBUG] [CMD]: docker exec ic04444cssg4swgscs4sk0cs bash -c 'GIT_SSH_COMMAND="ssh -o ConnectTimeout=30 -p 22 -o Port=22 -o LogLevel=ERROR -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" git ls-remote https://x-access-token:<REDACTED>@github.com/nextacademyedu-lang/next-academy-edu.git refs/heads/main'
+2026-Mar-16 11:36:41.717708 [DEBUG] d0de166e8b3327ed16484d078147c42b0e0d63e4	refs/heads/main
+2026-Mar-16 11:36:41.975385 ----------------------------------------
+2026-Mar-16 11:36:41.988400 Importing nextacademyedu-lang/next-academy-edu:main (commit sha d0de166e8b3327ed16484d078147c42b0e0d63e4) to /artifacts/ic04444cssg4swgscs4sk0cs.
+2026-Mar-16 11:36:42.379993 [DEBUG] [CMD]: docker exec ic04444cssg4swgscs4sk0cs bash -c 'git clone --depth=1 --recurse-submodules --shallow-submodules -b 'main' 'https://x-access-token:<REDACTED>@github.com/nextacademyedu-lang/next-academy-edu.git' '/artifacts/ic04444cssg4swgscs4sk0cs' && cd '/artifacts/ic04444cssg4swgscs4sk0cs' && if [ -f .gitmodules ]; then git submodule sync && GIT_SSH_COMMAND="ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" git submodule update --init --recursive --depth=1; fi && cd '/artifacts/ic04444cssg4swgscs4sk0cs' && GIT_SSH_COMMAND="ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" git lfs pull'
+2026-Mar-16 11:36:42.379993 [DEBUG] Cloning into '/artifacts/ic04444cssg4swgscs4sk0cs'...
+2026-Mar-16 11:36:44.678272 [DEBUG] [CMD]: docker exec ic04444cssg4swgscs4sk0cs bash -c 'cd /artifacts/ic04444cssg4swgscs4sk0cs && git log -1 d0de166e8b3327ed16484d078147c42b0e0d63e4 --pretty=%B'
+2026-Mar-16 11:36:44.678272 [DEBUG] fix: downgrade Next.js 16.1.6 to 15.4.11 for Payload CMS CSS compatibility
+2026-Mar-16 11:36:44.678272 [DEBUG] 
+2026-Mar-16 11:36:44.678272 [DEBUG] - Downgrade next from 16.1.6 to 15.4.11 (Payload 3.79 supported range)
+2026-Mar-16 11:36:44.678272 [DEBUG] - Create root src/app/layout.tsx required by Next.js 15
+2026-Mar-16 11:36:44.678272 [DEBUG] - Refactor privacy-policy/page.tsx to use root layout instead of inline html/body
+2026-Mar-16 11:36:44.678272 [DEBUG] - Clean reinstall with updated package-lock.json
+2026-Mar-16 11:36:44.678272 [DEBUG] - Build verified: all 60 routes compile, admin panel CSS loads correctly
+2026-Mar-16 11:36:45.085632 Image not found (xw4k04cosggk0cg0kk84coco:d0de166e8b3327ed16484d078147c42b0e0d63e4). Building new image.
+2026-Mar-16 11:36:46.646839 [DEBUG] [CMD]: docker exec ic04444cssg4swgscs4sk0cs bash -c 'cat /artifacts/ic04444cssg4swgscs4sk0cs/Dockerfile'
+2026-Mar-16 11:36:46.646839 [DEBUG] # To use this Dockerfile, you have to set `output: 'standalone'` in next.config.ts
+2026-Mar-16 11:36:46.646839 [DEBUG] # Based on: https://github.com/payloadcms/payload/blob/main/templates/blank/Dockerfile
+2026-Mar-16 11:36:46.646839 [DEBUG] 
+2026-Mar-16 11:36:46.646839 [DEBUG] FROM node:22-alpine AS base
+2026-Mar-16 11:36:46.646839 [DEBUG] RUN npm install -g pnpm
+2026-Mar-16 11:36:46.646839 [DEBUG] 
+2026-Mar-16 11:36:46.646839 [DEBUG] # ── Stage 1: Install dependencies ─────────────────────────────────────────────
+2026-Mar-16 11:36:46.646839 [DEBUG] FROM base AS deps
+2026-Mar-16 11:36:46.646839 [DEBUG] # libc6-compat is needed for native modules on Alpine
+2026-Mar-16 11:36:46.646839 [DEBUG] RUN apk add --no-cache libc6-compat
+2026-Mar-16 11:36:46.646839 [DEBUG] WORKDIR /app
+2026-Mar-16 11:36:46.646839 [DEBUG] COPY package.json pnpm-lock.yaml ./
+2026-Mar-16 11:36:46.646839 [DEBUG] RUN pnpm install --frozen-lockfile
+2026-Mar-16 11:36:46.646839 [DEBUG] 
+2026-Mar-16 11:36:46.646839 [DEBUG] # ── Stage 2: Build ────────────────────────────────────────────────────────────
+2026-Mar-16 11:36:46.646839 [DEBUG] FROM base AS builder
+2026-Mar-16 11:36:46.646839 [DEBUG] WORKDIR /app
+2026-Mar-16 11:36:46.646839 [DEBUG] COPY --from=deps /app/node_modules ./node_modules
+2026-Mar-16 11:36:46.646839 [DEBUG] COPY . .
+2026-Mar-16 11:36:46.646839 [DEBUG] 
+2026-Mar-16 11:36:46.646839 [DEBUG] ARG NEXT_PUBLIC_APP_URL
+2026-Mar-16 11:36:46.646839 [DEBUG] ARG NEXT_PUBLIC_SERVER_URL
+2026-Mar-16 11:36:46.646839 [DEBUG] ARG PAYLOAD_SECRET
+2026-Mar-16 11:36:46.646839 [DEBUG] ARG DATABASE_URI
+2026-Mar-16 11:36:46.646839 [DEBUG] 
+2026-Mar-16 11:36:46.646839 [DEBUG] ENV NEXT_PUBLIC_APP_URL=$NEXT_PUBLIC_APP_URL
+2026-Mar-16 11:36:46.646839 [DEBUG] ENV NEXT_PUBLIC_SERVER_URL=${NEXT_PUBLIC_SERVER_URL:-$NEXT_PUBLIC_APP_URL}
+2026-Mar-16 11:36:46.646839 [DEBUG] ENV PAYLOAD_SECRET=$PAYLOAD_SECRET
+2026-Mar-16 11:36:46.646839 [DEBUG] ENV DATABASE_URI=$DATABASE_URI
+2026-Mar-16 11:36:46.646839 [DEBUG] ENV NEXT_TELEMETRY_DISABLED=1
+2026-Mar-16 11:36:46.646839 [DEBUG] 
+2026-Mar-16 11:36:46.646839 [DEBUG] RUN pnpm build
+2026-Mar-16 11:36:46.646839 [DEBUG] 
+2026-Mar-16 11:36:46.646839 [DEBUG] # ── Stage 3: Runner ───────────────────────────────────────────────────────────
+2026-Mar-16 11:36:46.646839 [DEBUG] FROM node:22-alpine AS runner
+2026-Mar-16 11:36:46.646839 [DEBUG] WORKDIR /app
+2026-Mar-16 11:36:46.646839 [DEBUG] 
+2026-Mar-16 11:36:46.646839 [DEBUG] ENV NODE_ENV=production
+2026-Mar-16 11:36:46.646839 [DEBUG] ENV NEXT_TELEMETRY_DISABLED=1
+2026-Mar-16 11:36:46.646839 [DEBUG] 
+2026-Mar-16 11:36:46.646839 [DEBUG] RUN addgroup -g 1001 -S nodejs && adduser -S nextjs -u 1001
+2026-Mar-16 11:36:46.646839 [DEBUG] 
+2026-Mar-16 11:36:46.646839 [DEBUG] COPY --from=builder /app/public ./public
+2026-Mar-16 11:36:46.646839 [DEBUG] 
+2026-Mar-16 11:36:46.646839 [DEBUG] # Set the correct permission for prerender cache
+2026-Mar-16 11:36:46.646839 [DEBUG] RUN mkdir .next
+2026-Mar-16 11:36:46.646839 [DEBUG] RUN chown nextjs:nodejs .next
+2026-Mar-16 11:36:46.646839 [DEBUG] 
+2026-Mar-16 11:36:46.646839 [DEBUG] # Automatically leverage output traces to reduce image size
+2026-Mar-16 11:36:46.646839 [DEBUG] COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
+2026-Mar-16 11:36:46.646839 [DEBUG] COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+2026-Mar-16 11:36:46.646839 [DEBUG] 
+2026-Mar-16 11:36:46.646839 [DEBUG] # Payload needs i18n message files at runtime for next-intl
+2026-Mar-16 11:36:46.646839 [DEBUG] COPY --from=builder --chown=nextjs:nodejs /app/src/messages ./src/messages
+2026-Mar-16 11:36:46.646839 [DEBUG] 
+2026-Mar-16 11:36:46.646839 [DEBUG] USER nextjs
+2026-Mar-16 11:36:46.646839 [DEBUG] 
+2026-Mar-16 11:36:46.646839 [DEBUG] EXPOSE 3001
+2026-Mar-16 11:36:46.646839 [DEBUG] ENV PORT=3001
+2026-Mar-16 11:36:46.646839 [DEBUG] ENV HOSTNAME=0.0.0.0
+2026-Mar-16 11:36:46.646839 [DEBUG] 
+2026-Mar-16 11:36:46.646839 [DEBUG] # Increased start-period to 60s to allow Payload schema push on first boot
+2026-Mar-16 11:36:46.646839 [DEBUG] HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+2026-Mar-16 11:36:46.646839 [DEBUG] CMD node -e "const http = require('http'); const req = http.get('http://localhost:3001/api/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1); }); req.on('error', () => process.exit(1)); req.setTimeout(5000, () => { req.destroy(); process.exit(1); });"
+2026-Mar-16 11:36:46.646839 [DEBUG] 
+2026-Mar-16 11:36:46.646839 [DEBUG] CMD ["node", "server.js"]
+2026-Mar-16 11:36:47.131024 [DEBUG] Creating build-time .env file in /artifacts (outside Docker context).
+2026-Mar-16 11:36:47.585996 ----------------------------------------
+2026-Mar-16 11:36:47.590809 ⚠️ Build-time environment variable warning: NODE_ENV=production
+2026-Mar-16 11:36:47.595434 Affects: Node.js/npm/yarn/bun/pnpm
+2026-Mar-16 11:36:47.600054 Issue: Skips devDependencies installation which are often required for building (webpack, typescript, etc.)
+2026-Mar-16 11:36:47.605022 Recommendation: Uncheck "Available at Buildtime" or use "development" during build
+2026-Mar-16 11:36:47.609972 
+2026-Mar-16 11:36:47.614801 💡 Tips to resolve build issues:
+2026-Mar-16 11:36:47.619350 1. Set these variables as "Runtime only" in the environment variables settings
+2026-Mar-16 11:36:47.624128 2. Use different values for build-time (e.g., NODE_ENV=development for build)
+2026-Mar-16 11:36:47.628830 3. Consider using multi-stage Docker builds to separate build and runtime environments
+2026-Mar-16 11:36:48.070071 [DEBUG] [CMD]: docker exec ic04444cssg4swgscs4sk0cs bash -c 'cat /artifacts/ic04444cssg4swgscs4sk0cs/Dockerfile'
+2026-Mar-16 11:36:48.070071 [DEBUG] # To use this Dockerfile, you have to set `output: 'standalone'` in next.config.ts
+2026-Mar-16 11:36:48.070071 [DEBUG] # Based on: https://github.com/payloadcms/payload/blob/main/templates/blank/Dockerfile
+2026-Mar-16 11:36:48.070071 [DEBUG] 
+2026-Mar-16 11:36:48.070071 [DEBUG] FROM node:22-alpine AS base
+2026-Mar-16 11:36:48.070071 [DEBUG] RUN npm install -g pnpm
+2026-Mar-16 11:36:48.070071 [DEBUG] 
+2026-Mar-16 11:36:48.070071 [DEBUG] # ── Stage 1: Install dependencies ─────────────────────────────────────────────
+2026-Mar-16 11:36:48.070071 [DEBUG] FROM base AS deps
+2026-Mar-16 11:36:48.070071 [DEBUG] # libc6-compat is needed for native modules on Alpine
+2026-Mar-16 11:36:48.070071 [DEBUG] RUN apk add --no-cache libc6-compat
+2026-Mar-16 11:36:48.070071 [DEBUG] WORKDIR /app
+2026-Mar-16 11:36:48.070071 [DEBUG] COPY package.json pnpm-lock.yaml ./
+2026-Mar-16 11:36:48.070071 [DEBUG] RUN pnpm install --frozen-lockfile
+2026-Mar-16 11:36:48.070071 [DEBUG] 
+2026-Mar-16 11:36:48.070071 [DEBUG] # ── Stage 2: Build ────────────────────────────────────────────────────────────
+2026-Mar-16 11:36:48.070071 [DEBUG] FROM base AS builder
+2026-Mar-16 11:36:48.070071 [DEBUG] WORKDIR /app
+2026-Mar-16 11:36:48.070071 [DEBUG] COPY --from=deps /app/node_modules ./node_modules
+2026-Mar-16 11:36:48.070071 [DEBUG] COPY . .
+2026-Mar-16 11:36:48.070071 [DEBUG] 
+2026-Mar-16 11:36:48.070071 [DEBUG] ARG NEXT_PUBLIC_APP_URL
+2026-Mar-16 11:36:48.070071 [DEBUG] ARG NEXT_PUBLIC_SERVER_URL
+2026-Mar-16 11:36:48.070071 [DEBUG] ARG PAYLOAD_SECRET
+2026-Mar-16 11:36:48.070071 [DEBUG] ARG DATABASE_URI
+2026-Mar-16 11:36:48.070071 [DEBUG] 
+2026-Mar-16 11:36:48.070071 [DEBUG] ENV NEXT_PUBLIC_APP_URL=$NEXT_PUBLIC_APP_URL
+2026-Mar-16 11:36:48.070071 [DEBUG] ENV NEXT_PUBLIC_SERVER_URL=${NEXT_PUBLIC_SERVER_URL:-$NEXT_PUBLIC_APP_URL}
+2026-Mar-16 11:36:48.070071 [DEBUG] ENV PAYLOAD_SECRET=$PAYLOAD_SECRET
+2026-Mar-16 11:36:48.070071 [DEBUG] ENV DATABASE_URI=$DATABASE_URI
+2026-Mar-16 11:36:48.070071 [DEBUG] ENV NEXT_TELEMETRY_DISABLED=1
+2026-Mar-16 11:36:48.070071 [DEBUG] 
+2026-Mar-16 11:36:48.070071 [DEBUG] RUN pnpm build
+2026-Mar-16 11:36:48.070071 [DEBUG] 
+2026-Mar-16 11:36:48.070071 [DEBUG] # ── Stage 3: Runner ───────────────────────────────────────────────────────────
+2026-Mar-16 11:36:48.070071 [DEBUG] FROM node:22-alpine AS runner
+2026-Mar-16 11:36:48.070071 [DEBUG] WORKDIR /app
+2026-Mar-16 11:36:48.070071 [DEBUG] 
+2026-Mar-16 11:36:48.070071 [DEBUG] ENV NODE_ENV=production
+2026-Mar-16 11:36:48.070071 [DEBUG] ENV NEXT_TELEMETRY_DISABLED=1
+2026-Mar-16 11:36:48.070071 [DEBUG] 
+2026-Mar-16 11:36:48.070071 [DEBUG] RUN addgroup -g 1001 -S nodejs && adduser -S nextjs -u 1001
+2026-Mar-16 11:36:48.070071 [DEBUG] 
+2026-Mar-16 11:36:48.070071 [DEBUG] COPY --from=builder /app/public ./public
+2026-Mar-16 11:36:48.070071 [DEBUG] 
+2026-Mar-16 11:36:48.070071 [DEBUG] # Set the correct permission for prerender cache
+2026-Mar-16 11:36:48.070071 [DEBUG] RUN mkdir .next
+2026-Mar-16 11:36:48.070071 [DEBUG] RUN chown nextjs:nodejs .next
+2026-Mar-16 11:36:48.070071 [DEBUG] 
+2026-Mar-16 11:36:48.070071 [DEBUG] # Automatically leverage output traces to reduce image size
+2026-Mar-16 11:36:48.070071 [DEBUG] COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
+2026-Mar-16 11:36:48.070071 [DEBUG] COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+2026-Mar-16 11:36:48.070071 [DEBUG] 
+2026-Mar-16 11:36:48.070071 [DEBUG] # Payload needs i18n message files at runtime for next-intl
+2026-Mar-16 11:36:48.070071 [DEBUG] COPY --from=builder --chown=nextjs:nodejs /app/src/messages ./src/messages
+2026-Mar-16 11:36:48.070071 [DEBUG] 
+2026-Mar-16 11:36:48.070071 [DEBUG] USER nextjs
+2026-Mar-16 11:36:48.070071 [DEBUG] 
+2026-Mar-16 11:36:48.070071 [DEBUG] EXPOSE 3001
+2026-Mar-16 11:36:48.070071 [DEBUG] ENV PORT=3001
+2026-Mar-16 11:36:48.070071 [DEBUG] ENV HOSTNAME=0.0.0.0
+2026-Mar-16 11:36:48.070071 [DEBUG] 
+2026-Mar-16 11:36:48.070071 [DEBUG] # Increased start-period to 60s to allow Payload schema push on first boot
+2026-Mar-16 11:36:48.070071 [DEBUG] HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+2026-Mar-16 11:36:48.070071 [DEBUG] CMD node -e "const http = require('http'); const req = http.get('http://localhost:3001/api/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1); }); req.on('error', () => process.exit(1)); req.setTimeout(5000, () => { req.destroy(); process.exit(1); });"
+2026-Mar-16 11:36:48.070071 [DEBUG] 
+2026-Mar-16 11:36:48.070071 [DEBUG] CMD ["node", "server.js"]
+2026-Mar-16 11:36:48.122219 [DEBUG] Final Dockerfile:
+2026-Mar-16 11:36:49.030560 [DEBUG] [CMD]: docker exec ic04444cssg4swgscs4sk0cs bash -c 'cat /artifacts/ic04444cssg4swgscs4sk0cs/Dockerfile'
+2026-Mar-16 11:36:49.030560 [DEBUG] # To use this Dockerfile, you have to set `output: 'standalone'` in next.config.ts
+2026-Mar-16 11:36:49.030560 [DEBUG] # Based on: https://github.com/payloadcms/payload/blob/main/templates/blank/Dockerfile
+2026-Mar-16 11:36:49.030560 [DEBUG] 
+2026-Mar-16 11:36:49.030560 [DEBUG] FROM node:22-alpine AS base
+2026-Mar-16 11:36:49.030560 [DEBUG] ARG DATABASE_URI=postgres://postgres:<REDACTED>@g0wckcksgoo484okg4cg804s:5432/postgres
+2026-Mar-16 11:36:49.030560 [DEBUG] ARG PAYLOAD_SECRET=b3f8a2c1d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1
+2026-Mar-16 11:36:49.030560 [DEBUG] ARG NODE_ENV=production
+2026-Mar-16 11:36:49.030560 [DEBUG] ARG NEXT_PUBLIC_APP_URL=https://nextacademyedu.com
+2026-Mar-16 11:36:49.030560 [DEBUG] ARG RESEND_API_KEY=<REDACTED>
+2026-Mar-16 11:36:49.030560 [DEBUG] ARG RESEND_FROM_EMAIL=<REDACTED>
+2026-Mar-16 11:36:49.030560 [DEBUG] ARG RESEND_FROM_NAME=Next Academy
+2026-Mar-16 11:36:49.030560 [DEBUG] ARG PAYMOB_API_KEY=<REDACTED>
+2026-Mar-16 11:36:49.030560 [DEBUG] ARG PAYMOB_INTEGRATION_ID=5485315
+2026-Mar-16 11:36:49.030560 [DEBUG] ARG PAYMOB_WALLET_INTEGRATION_ID=5485317
+2026-Mar-16 11:36:49.030560 [DEBUG] ARG PAYMOB_IFRAME_ID=995831
+2026-Mar-16 11:36:49.030560 [DEBUG] ARG PAYMOB_HMAC_SECRET=A9BBBF2EBAE203AC2B7D94A8FF47386B
+2026-Mar-16 11:36:49.030560 [DEBUG] ARG PAYMOB_PUBLIC_KEY=egy_pk_live_eQsL6t4KuPJ1bFsGvCDnjZEtdelC2iw2
+2026-Mar-16 11:36:49.030560 [DEBUG] ARG EASYKASH_API_TOKEN=hpi6xs6h67ij9mcp
+2026-Mar-16 11:36:49.030560 [DEBUG] ARG EASYKASH_HMAC_SECRET=4767834cca83b27665efd20f2e3f09d8
+2026-Mar-16 11:36:49.030560 [DEBUG] ARG GOOGLE_CLIENT_ID=68040306828-hjhrihhp3q6m91qs25o3rimknafhekms.apps.googleusercontent.com
+2026-Mar-16 11:36:49.030560 [DEBUG] ARG GOOGLE_CLIENT_SECRET=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
+2026-Mar-16 11:36:49.030560 [DEBUG] ARG CRON_SECRET=a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2
+2026-Mar-16 11:36:49.030560 [DEBUG] ARG NEXT_PUBLIC_SERVER_URL=https://nextacademyedu.com
+2026-Mar-16 11:36:49.030560 [DEBUG] ARG REDIS_URL=redis://default:<REDACTED>@l4s8sgcw0wocc8cg0o4ckcs0:6379/0
+2026-Mar-16 11:36:49.030560 [DEBUG] ARG COOLIFY_URL=https://nextacademyedu.com,https//www.nextacademyedu.com
+2026-Mar-16 11:36:49.030560 [DEBUG] ARG COOLIFY_FQDN=nextacademyedu.com,https
+2026-Mar-16 11:36:49.030560 [DEBUG] ARG COOLIFY_BRANCH=main
+2026-Mar-16 11:36:49.030560 [DEBUG] ARG COOLIFY_RESOURCE_UUID=xw4k04cosggk0cg0kk84coco
+2026-Mar-16 11:36:49.030560 [DEBUG] RUN npm install -g pnpm
+2026-Mar-16 11:36:49.030560 [DEBUG] 
+2026-Mar-16 11:36:49.030560 [DEBUG] # ── Stage 1: Install dependencies ─────────────────────────────────────────────
+2026-Mar-16 11:36:49.030560 [DEBUG] FROM base AS deps
+2026-Mar-16 11:36:49.030560 [DEBUG] ARG DATABASE_URI=postgres://postgres:<REDACTED>@g0wckcksgoo484okg4cg804s:5432/postgres
+2026-Mar-16 11:36:49.030560 [DEBUG] ARG PAYLOAD_SECRET=b3f8a2c1d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1
+2026-Mar-16 11:36:49.030560 [DEBUG] ARG NODE_ENV=production
+2026-Mar-16 11:36:49.030560 [DEBUG] ARG NEXT_PUBLIC_APP_URL=https://nextacademyedu.com
+2026-Mar-16 11:36:49.030560 [DEBUG] ARG RESEND_API_KEY=<REDACTED>
+2026-Mar-16 11:36:49.030560 [DEBUG] ARG RESEND_FROM_EMAIL=<REDACTED>
+2026-Mar-16 11:36:49.030560 [DEBUG] ARG RESEND_FROM_NAME=Next Academy
+2026-Mar-16 11:36:49.030560 [DEBUG] ARG PAYMOB_API_KEY=<REDACTED>
+2026-Mar-16 11:36:49.030560 [DEBUG] ARG PAYMOB_INTEGRATION_ID=5485315
+2026-Mar-16 11:36:49.030560 [DEBUG] ARG PAYMOB_WALLET_INTEGRATION_ID=5485317
+2026-Mar-16 11:36:49.030560 [DEBUG] ARG PAYMOB_IFRAME_ID=995831
+2026-Mar-16 11:36:49.030560 [DEBUG] ARG PAYMOB_HMAC_SECRET=A9BBBF2EBAE203AC2B7D94A8FF47386B
+2026-Mar-16 11:36:49.030560 [DEBUG] ARG PAYMOB_PUBLIC_KEY=egy_pk_live_eQsL6t4KuPJ1bFsGvCDnjZEtdelC2iw2
+2026-Mar-16 11:36:49.030560 [DEBUG] ARG EASYKASH_API_TOKEN=hpi6xs6h67ij9mcp
+2026-Mar-16 11:36:49.030560 [DEBUG] ARG EASYKASH_HMAC_SECRET=4767834cca83b27665efd20f2e3f09d8
+2026-Mar-16 11:36:49.030560 [DEBUG] ARG GOOGLE_CLIENT_ID=68040306828-hjhrihhp3q6m91qs25o3rimknafhekms.apps.googleusercontent.com
+2026-Mar-16 11:36:49.030560 [DEBUG] ARG GOOGLE_CLIENT_SECRET=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
+2026-Mar-16 11:36:49.030560 [DEBUG] ARG CRON_SECRET=a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2
+2026-Mar-16 11:36:49.030560 [DEBUG] ARG NEXT_PUBLIC_SERVER_URL=https://nextacademyedu.com
+2026-Mar-16 11:36:49.030560 [DEBUG] ARG REDIS_URL=redis://default:<REDACTED>@l4s8sgcw0wocc8cg0o4ckcs0:6379/0
+2026-Mar-16 11:36:49.030560 [DEBUG] ARG COOLIFY_URL=https://nextacademyedu.com,https//www.nextacademyedu.com
+2026-Mar-16 11:36:49.030560 [DEBUG] ARG COOLIFY_FQDN=nextacademyedu.com,https
+2026-Mar-16 11:36:49.030560 [DEBUG] ARG COOLIFY_BRANCH=main
+2026-Mar-16 11:36:49.030560 [DEBUG] ARG COOLIFY_RESOURCE_UUID=xw4k04cosggk0cg0kk84coco
+2026-Mar-16 11:36:49.030560 [DEBUG] # libc6-compat is needed for native modules on Alpine
+2026-Mar-16 11:36:49.030560 [DEBUG] RUN apk add --no-cache libc6-compat
+2026-Mar-16 11:36:49.030560 [DEBUG] WORKDIR /app
+2026-Mar-16 11:36:49.030560 [DEBUG] COPY package.json pnpm-lock.yaml ./
+2026-Mar-16 11:36:49.030560 [DEBUG] RUN pnpm install --frozen-lockfile
+2026-Mar-16 11:36:49.030560 [DEBUG] 
+2026-Mar-16 11:36:49.030560 [DEBUG] # ── Stage 2: Build ────────────────────────────────────────────────────────────
+2026-Mar-16 11:36:49.030560 [DEBUG] FROM base AS builder
+2026-Mar-16 11:36:49.030560 [DEBUG] ARG DATABASE_URI=postgres://postgres:<REDACTED>@g0wckcksgoo484okg4cg804s:5432/postgres
+2026-Mar-16 11:36:49.030560 [DEBUG] ARG PAYLOAD_SECRET=b3f8a2c1d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1
+2026-Mar-16 11:36:49.030560 [DEBUG] ARG NODE_ENV=production
+2026-Mar-16 11:36:49.030560 [DEBUG] ARG NEXT_PUBLIC_APP_URL=https://nextacademyedu.com
+2026-Mar-16 11:36:49.030560 [DEBUG] ARG RESEND_API_KEY=<REDACTED>
+2026-Mar-16 11:36:49.030560 [DEBUG] ARG RESEND_FROM_EMAIL=<REDACTED>
+2026-Mar-16 11:36:49.030560 [DEBUG] ARG RESEND_FROM_NAME=Next Academy
+2026-Mar-16 11:36:49.030560 [DEBUG] ARG PAYMOB_API_KEY=<REDACTED>
+2026-Mar-16 11:36:49.030560 [DEBUG] ARG PAYMOB_INTEGRATION_ID=5485315
+2026-Mar-16 11:36:49.030560 [DEBUG] ARG PAYMOB_WALLET_INTEGRATION_ID=5485317
+2026-Mar-16 11:36:49.030560 [DEBUG] ARG PAYMOB_IFRAME_ID=995831
+2026-Mar-16 11:36:49.030560 [DEBUG] ARG PAYMOB_HMAC_SECRET=A9BBBF2EBAE203AC2B7D94A8FF47386B
+2026-Mar-16 11:36:49.030560 [DEBUG] ARG PAYMOB_PUBLIC_KEY=egy_pk_live_eQsL6t4KuPJ1bFsGvCDnjZEtdelC2iw2
+2026-Mar-16 11:36:49.030560 [DEBUG] ARG EASYKASH_API_TOKEN=hpi6xs6h67ij9mcp
+2026-Mar-16 11:36:49.030560 [DEBUG] ARG EASYKASH_HMAC_SECRET=4767834cca83b27665efd20f2e3f09d8
+2026-Mar-16 11:36:49.030560 [DEBUG] ARG GOOGLE_CLIENT_ID=68040306828-hjhrihhp3q6m91qs25o3rimknafhekms.apps.googleusercontent.com
+2026-Mar-16 11:36:49.030560 [DEBUG] ARG GOOGLE_CLIENT_SECRET=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
+2026-Mar-16 11:36:49.030560 [DEBUG] ARG CRON_SECRET=a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2
+2026-Mar-16 11:36:49.030560 [DEBUG] ARG NEXT_PUBLIC_SERVER_URL=https://nextacademyedu.com
+2026-Mar-16 11:36:49.030560 [DEBUG] ARG REDIS_URL=redis://default:<REDACTED>@l4s8sgcw0wocc8cg0o4ckcs0:6379/0
+2026-Mar-16 11:36:49.030560 [DEBUG] ARG COOLIFY_URL=https://nextacademyedu.com,https//www.nextacademyedu.com
+2026-Mar-16 11:36:49.030560 [DEBUG] ARG COOLIFY_FQDN=nextacademyedu.com,https
+2026-Mar-16 11:36:49.030560 [DEBUG] ARG COOLIFY_BRANCH=main
+2026-Mar-16 11:36:49.030560 [DEBUG] ARG COOLIFY_RESOURCE_UUID=xw4k04cosggk0cg0kk84coco
+2026-Mar-16 11:36:49.030560 [DEBUG] WORKDIR /app
+2026-Mar-16 11:36:49.030560 [DEBUG] COPY --from=deps /app/node_modules ./node_modules
+2026-Mar-16 11:36:49.030560 [DEBUG] COPY . .
+2026-Mar-16 11:36:49.030560 [DEBUG] 
+2026-Mar-16 11:36:49.030560 [DEBUG] ARG NEXT_PUBLIC_APP_URL
+2026-Mar-16 11:36:49.030560 [DEBUG] ARG NEXT_PUBLIC_SERVER_URL
+2026-Mar-16 11:36:49.030560 [DEBUG] ARG PAYLOAD_SECRET
+2026-Mar-16 11:36:49.030560 [DEBUG] ARG DATABASE_URI
+2026-Mar-16 11:36:49.030560 [DEBUG] 
+2026-Mar-16 11:36:49.030560 [DEBUG] ENV NEXT_PUBLIC_APP_URL=$NEXT_PUBLIC_APP_URL
+2026-Mar-16 11:36:49.030560 [DEBUG] ENV NEXT_PUBLIC_SERVER_URL=${NEXT_PUBLIC_SERVER_URL:-$NEXT_PUBLIC_APP_URL}
+2026-Mar-16 11:36:49.030560 [DEBUG] ENV PAYLOAD_SECRET=$PAYLOAD_SECRET
+2026-Mar-16 11:36:49.030560 [DEBUG] ENV DATABASE_URI=$DATABASE_URI
+2026-Mar-16 11:36:49.030560 [DEBUG] ENV NEXT_TELEMETRY_DISABLED=1
+2026-Mar-16 11:36:49.030560 [DEBUG] 
+2026-Mar-16 11:36:49.030560 [DEBUG] RUN pnpm build
+2026-Mar-16 11:36:49.030560 [DEBUG] 
+2026-Mar-16 11:36:49.030560 [DEBUG] # ── Stage 3: Runner ───────────────────────────────────────────────────────────
+2026-Mar-16 11:36:49.030560 [DEBUG] FROM node:22-alpine AS runner
+2026-Mar-16 11:36:49.030560 [DEBUG] ARG DATABASE_URI=postgres://postgres:<REDACTED>@g0wckcksgoo484okg4cg804s:5432/postgres
+2026-Mar-16 11:36:49.030560 [DEBUG] ARG PAYLOAD_SECRET=b3f8a2c1d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1
+2026-Mar-16 11:36:49.030560 [DEBUG] ARG NODE_ENV=production
+2026-Mar-16 11:36:49.030560 [DEBUG] ARG NEXT_PUBLIC_APP_URL=https://nextacademyedu.com
+2026-Mar-16 11:36:49.030560 [DEBUG] ARG RESEND_API_KEY=<REDACTED>
+2026-Mar-16 11:36:49.030560 [DEBUG] ARG RESEND_FROM_EMAIL=<REDACTED>
+2026-Mar-16 11:36:49.030560 [DEBUG] ARG RESEND_FROM_NAME=Next Academy
+2026-Mar-16 11:36:49.030560 [DEBUG] ARG PAYMOB_API_KEY=<REDACTED>
+2026-Mar-16 11:36:49.030560 [DEBUG] ARG PAYMOB_INTEGRATION_ID=5485315
+2026-Mar-16 11:36:49.030560 [DEBUG] ARG PAYMOB_WALLET_INTEGRATION_ID=5485317
+2026-Mar-16 11:36:49.030560 [DEBUG] ARG PAYMOB_IFRAME_ID=995831
+2026-Mar-16 11:36:49.030560 [DEBUG] ARG PAYMOB_HMAC_SECRET=A9BBBF2EBAE203AC2B7D94A8FF47386B
+2026-Mar-16 11:36:49.030560 [DEBUG] ARG PAYMOB_PUBLIC_KEY=egy_pk_live_eQsL6t4KuPJ1bFsGvCDnjZEtdelC2iw2
+2026-Mar-16 11:36:49.030560 [DEBUG] ARG EASYKASH_API_TOKEN=hpi6xs6h67ij9mcp
+2026-Mar-16 11:36:49.030560 [DEBUG] ARG EASYKASH_HMAC_SECRET=4767834cca83b27665efd20f2e3f09d8
+2026-Mar-16 11:36:49.030560 [DEBUG] ARG GOOGLE_CLIENT_ID=68040306828-hjhrihhp3q6m91qs25o3rimknafhekms.apps.googleusercontent.com
+2026-Mar-16 11:36:49.030560 [DEBUG] ARG GOOGLE_CLIENT_SECRET=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
+2026-Mar-16 11:36:49.030560 [DEBUG] ARG CRON_SECRET=a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2
+2026-Mar-16 11:36:49.030560 [DEBUG] ARG NEXT_PUBLIC_SERVER_URL=https://nextacademyedu.com
+2026-Mar-16 11:36:49.030560 [DEBUG] ARG REDIS_URL=redis://default:<REDACTED>@l4s8sgcw0wocc8cg0o4ckcs0:6379/0
+2026-Mar-16 11:36:49.030560 [DEBUG] ARG COOLIFY_URL=https://nextacademyedu.com,https//www.nextacademyedu.com
+2026-Mar-16 11:36:49.030560 [DEBUG] ARG COOLIFY_FQDN=nextacademyedu.com,https
+2026-Mar-16 11:36:49.030560 [DEBUG] ARG COOLIFY_BRANCH=main
+2026-Mar-16 11:36:49.030560 [DEBUG] ARG COOLIFY_RESOURCE_UUID=xw4k04cosggk0cg0kk84coco
+2026-Mar-16 11:36:49.030560 [DEBUG] WORKDIR /app
+2026-Mar-16 11:36:49.030560 [DEBUG] 
+2026-Mar-16 11:36:49.030560 [DEBUG] ENV NODE_ENV=production
+2026-Mar-16 11:36:49.030560 [DEBUG] ENV NEXT_TELEMETRY_DISABLED=1
+2026-Mar-16 11:36:49.030560 [DEBUG] 
+2026-Mar-16 11:36:49.030560 [DEBUG] RUN addgroup -g 1001 -S nodejs && adduser -S nextjs -u 1001
+2026-Mar-16 11:36:49.030560 [DEBUG] 
+2026-Mar-16 11:36:49.030560 [DEBUG] COPY --from=builder /app/public ./public
+2026-Mar-16 11:36:49.030560 [DEBUG] 
+2026-Mar-16 11:36:49.030560 [DEBUG] # Set the correct permission for prerender cache
+2026-Mar-16 11:36:49.030560 [DEBUG] RUN mkdir .next
+2026-Mar-16 11:36:49.030560 [DEBUG] RUN chown nextjs:nodejs .next
+2026-Mar-16 11:36:49.030560 [DEBUG] 
+2026-Mar-16 11:36:49.030560 [DEBUG] # Automatically leverage output traces to reduce image size
+2026-Mar-16 11:36:49.030560 [DEBUG] COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
+2026-Mar-16 11:36:49.030560 [DEBUG] COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+2026-Mar-16 11:36:49.030560 [DEBUG] 
+2026-Mar-16 11:36:49.030560 [DEBUG] # Payload needs i18n message files at runtime for next-intl
+2026-Mar-16 11:36:49.030560 [DEBUG] COPY --from=builder --chown=nextjs:nodejs /app/src/messages ./src/messages
+2026-Mar-16 11:36:49.030560 [DEBUG] 
+2026-Mar-16 11:36:49.030560 [DEBUG] USER nextjs
+2026-Mar-16 11:36:49.030560 [DEBUG] 
+2026-Mar-16 11:36:49.030560 [DEBUG] EXPOSE 3001
+2026-Mar-16 11:36:49.030560 [DEBUG] ENV PORT=3001
+2026-Mar-16 11:36:49.030560 [DEBUG] ENV HOSTNAME=0.0.0.0
+2026-Mar-16 11:36:49.030560 [DEBUG] 
+2026-Mar-16 11:36:49.030560 [DEBUG] # Increased start-period to 60s to allow Payload schema push on first boot
+2026-Mar-16 11:36:49.030560 [DEBUG] HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+2026-Mar-16 11:36:49.030560 [DEBUG] CMD node -e "const http = require('http'); const req = http.get('http://localhost:3001/api/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1); }); req.on('error', () => process.exit(1)); req.setTimeout(5000, () => { req.destroy(); process.exit(1); });"
+2026-Mar-16 11:36:49.030560 [DEBUG] 
+2026-Mar-16 11:36:49.030560 [DEBUG] CMD ["node", "server.js"]
+2026-Mar-16 11:36:49.041166 ----------------------------------------
+2026-Mar-16 11:36:49.048449 Building docker image started.
+2026-Mar-16 11:36:49.053934 To check the current progress, click on Show Debug Logs.
+2026-Mar-16 11:36:49.895340 [DEBUG] [CMD]: docker exec ic04444cssg4swgscs4sk0cs bash -c 'cat /artifacts/build.sh'
+2026-Mar-16 11:36:49.895340 [DEBUG] cd /artifacts/ic04444cssg4swgscs4sk0cs && set -a && source /artifacts/build-time.env && set +a && docker build  --add-host api-sgwcco4kw80sckwg4c08sgk4:10.0.1.7 --add-host coolify:10.0.1.2 --add-host coolify-db:10.0.1.4 --add-host coolify-realtime:10.0.1.15 --add-host coolify-redis:10.0.1.6 --add-host fsg8k800o0cwgs80scg00gcs:10.0.1.12 --add-host fsg8k800o0cwgs80scg00gcs-proxy:10.0.1.11 --add-host g0wckcksgoo484okg4cg804s:10.0.1.8 --add-host ic4c04s008gwc8cg4k8skkks:10.0.1.3 --add-host kgsw8cwgcswsc4ccsosk0kgg:10.0.1.10 --add-host l4s8sgcw0wocc8cg0o4ckcs0:10.0.1.18 --add-host v004w4ksw4c8ww488ogoo488:10.0.1.14 --add-host v004w4ksw4c8ww488ogoo488-proxy:10.0.1.9 --network host -f /artifacts/ic04444cssg4swgscs4sk0cs/Dockerfile --build-arg COOLIFY_URL --build-arg COOLIFY_FQDN --build-arg COOLIFY_BRANCH --build-arg COOLIFY_RESOURCE_UUID --build-arg DATABASE_URI --build-arg PAYLOAD_SECRET --build-arg NODE_ENV --build-arg NEXT_PUBLIC_APP_URL --build-arg RESEND_API_KEY --build-arg RESEND_FROM_EMAIL --build-arg RESEND_FROM_NAME --build-arg PAYMOB_API_KEY --build-arg PAYMOB_INTEGRATION_ID --build-arg PAYMOB_WALLET_INTEGRATION_ID --build-arg PAYMOB_IFRAME_ID --build-arg PAYMOB_HMAC_SECRET --build-arg PAYMOB_PUBLIC_KEY --build-arg EASYKASH_API_TOKEN --build-arg EASYKASH_HMAC_SECRET --build-arg GOOGLE_CLIENT_ID --build-arg GOOGLE_CLIENT_SECRET --build-arg CRON_SECRET --build-arg NEXT_PUBLIC_SERVER_URL --build-arg REDIS_URL --build-arg COOLIFY_BUILD_SECRETS_HASH=075953edea944d990b4feec8d9a3f8f002c417acd4329fcc7468c8b4dfa8d654 --build-arg 'COOLIFY_URL' --build-arg 'COOLIFY_FQDN' --build-arg 'COOLIFY_BRANCH' --build-arg 'COOLIFY_RESOURCE_UUID' --progress plain -t xw4k04cosggk0cg0kk84coco:d0de166e8b3327ed16484d078147c42b0e0d63e4 /artifacts/ic04444cssg4swgscs4sk0cs
+2026-Mar-16 11:36:50.708072 [DEBUG] [CMD]: docker exec ic04444cssg4swgscs4sk0cs bash -c 'bash /artifacts/build.sh'
+2026-Mar-16 11:36:50.708072 [DEBUG] #0 building with "default" instance using docker driver
+2026-Mar-16 11:36:50.708072 [DEBUG] 
+2026-Mar-16 11:36:50.708072 [DEBUG] #1 [internal] load build definition from Dockerfile
+2026-Mar-16 11:36:50.708072 [DEBUG] #1 transferring dockerfile: 8.46kB done
+2026-Mar-16 11:36:50.708072 [DEBUG] #1 DONE 0.0s
+2026-Mar-16 11:36:50.708072 [DEBUG] 
+2026-Mar-16 11:36:50.708072 [DEBUG] #2 [internal] load metadata for docker.io/library/node:22-alpine
+2026-Mar-16 11:36:51.142460 [DEBUG] #2 DONE 0.6s
+2026-Mar-16 11:36:51.252116 [DEBUG] 
+2026-Mar-16 11:36:51.255603 [DEBUG] #3 [internal] load .dockerignore
+2026-Mar-16 11:36:51.255603 [DEBUG] #3 transferring context: 164B done
+2026-Mar-16 11:36:51.255603 [DEBUG] #3 DONE 0.0s
+2026-Mar-16 11:36:51.255603 [DEBUG] 
+2026-Mar-16 11:36:51.255603 [DEBUG] #4 [base 1/2] FROM docker.io/library/node:22-alpine@sha256:8094c002d08262dba12645a3b4a15cd6cd627d30bc782f53229a2ec13ee22a00
+2026-Mar-16 11:36:51.255603 [DEBUG] #4 DONE 0.0s
+2026-Mar-16 11:36:51.255603 [DEBUG] 
+2026-Mar-16 11:36:51.255603 [DEBUG] #5 [internal] load build context
+2026-Mar-16 11:36:51.255603 [DEBUG] #5 transferring context: 1.99MB 0.1s done
+2026-Mar-16 11:36:51.463005 [DEBUG] #5 DONE 0.1s
+2026-Mar-16 11:36:51.463005 [DEBUG] 
+2026-Mar-16 11:36:51.463005 [DEBUG] #6 [base 2/2] RUN npm install -g pnpm
+2026-Mar-16 11:36:51.463005 [DEBUG] #6 CACHED
+2026-Mar-16 11:36:51.463005 [DEBUG] 
+2026-Mar-16 11:36:51.463005 [DEBUG] #7 [deps 1/4] RUN apk add --no-cache libc6-compat
+2026-Mar-16 11:36:51.463005 [DEBUG] #7 CACHED
+2026-Mar-16 11:36:51.463005 [DEBUG] 
+2026-Mar-16 11:36:51.463005 [DEBUG] #8 [deps 2/4] WORKDIR /app
+2026-Mar-16 11:36:51.463005 [DEBUG] #8 CACHED
+2026-Mar-16 11:36:51.463005 [DEBUG] 
+2026-Mar-16 11:36:51.463005 [DEBUG] #9 [deps 3/4] COPY package.json pnpm-lock.yaml ./
+2026-Mar-16 11:36:51.463005 [DEBUG] #9 DONE 0.0s
+2026-Mar-16 11:36:51.463005 [DEBUG] 
+2026-Mar-16 11:36:51.463005 [DEBUG] #10 [deps 4/4] RUN pnpm install --frozen-lockfile
+2026-Mar-16 11:36:52.199083 [DEBUG] #10 0.887  ERR_PNPM_OUTDATED_LOCKFILE  Cannot install with "frozen-lockfile" because pnpm-lock.yaml is not up to date with <ROOT>/package.json
+2026-Mar-16 11:36:52.199083 [DEBUG] #10 0.887
+2026-Mar-16 11:36:52.199083 [DEBUG] #10 0.887 Note that in CI environments this setting is true by default. If you still need to run install in such cases, use "pnpm install --no-frozen-lockfile"
+2026-Mar-16 11:36:52.199083 [DEBUG] #10 0.887
+2026-Mar-16 11:36:52.199083 [DEBUG] #10 0.887   Failure reason:
+2026-Mar-16 11:36:52.199083 [DEBUG] #10 0.887   specifiers in the lockfile don't match specifiers in package.json:
+2026-Mar-16 11:36:52.199083 [DEBUG] #10 0.887 * 1 dependencies are mismatched:
+2026-Mar-16 11:36:52.199083 [DEBUG] #10 0.887   - next (lockfile: 16.1.6, manifest: 15.4.11)
+2026-Mar-16 11:36:52.199083 [DEBUG] #10 0.887
+2026-Mar-16 11:36:52.276273 [DEBUG] #10 ERROR: process "/bin/sh -c pnpm install --frozen-lockfile" did not complete successfully: exit code: 1
+2026-Mar-16 11:36:52.276273 [DEBUG] ------
+2026-Mar-16 11:36:52.276273 [DEBUG] > [deps 4/4] RUN pnpm install --frozen-lockfile:
+2026-Mar-16 11:36:52.276273 [DEBUG] 0.887  ERR_PNPM_OUTDATED_LOCKFILE  Cannot install with "frozen-lockfile" because pnpm-lock.yaml is not up to date with <ROOT>/package.json
+2026-Mar-16 11:36:52.276273 [DEBUG] 0.887
+2026-Mar-16 11:36:52.276273 [DEBUG] 0.887 Note that in CI environments this setting is true by default. If you still need to run install in such cases, use "pnpm install --no-frozen-lockfile"
+2026-Mar-16 11:36:52.276273 [DEBUG] 0.887
+2026-Mar-16 11:36:52.276273 [DEBUG] 0.887   Failure reason:
+2026-Mar-16 11:36:52.276273 [DEBUG] 0.887   specifiers in the lockfile don't match specifiers in package.json:
+2026-Mar-16 11:36:52.276273 [DEBUG] 0.887 * 1 dependencies are mismatched:
+2026-Mar-16 11:36:52.276273 [DEBUG] 0.887   - next (lockfile: 16.1.6, manifest: 15.4.11)
+2026-Mar-16 11:36:52.276273 [DEBUG] 0.887
+2026-Mar-16 11:36:52.276273 [DEBUG] ------
+2026-Mar-16 11:36:52.331230 [DEBUG] 34 warnings found (use docker --debug to expand):
+2026-Mar-16 11:36:52.331230 [DEBUG] - SecretsUsedInArgOrEnv: Do not use ARG or ENV instructions for sensitive data (ARG "PAYMOB_API_KEY") (line 40)
+2026-Mar-16 11:36:52.331230 [DEBUG] - SecretsUsedInArgOrEnv: Do not use ARG or ENV instructions for sensitive data (ARG "PAYLOAD_SECRET") (line 66)
+2026-Mar-16 11:36:52.331230 [DEBUG] - SecretsUsedInArgOrEnv: Do not use ARG or ENV instructions for sensitive data (ARG "PAYMOB_API_KEY") (line 72)
+2026-Mar-16 11:36:52.331230 [DEBUG] - SecretsUsedInArgOrEnv: Do not use ARG or ENV instructions for sensitive data (ARG "EASYKASH_API_TOKEN") (line 121)
+2026-Mar-16 11:36:52.331230 [DEBUG] - SecretsUsedInArgOrEnv: Do not use ARG or ENV instructions for sensitive data (ARG "CRON_SECRET") (line 50)
+2026-Mar-16 11:36:52.331230 [DEBUG] - SecretsUsedInArgOrEnv: Do not use ARG or ENV instructions for sensitive data (ARG "PAYMOB_HMAC_SECRET") (line 76)
+2026-Mar-16 11:36:52.331230 [DEBUG] - SecretsUsedInArgOrEnv: Do not use ARG or ENV instructions for sensitive data (ARG "GOOGLE_CLIENT_SECRET") (line 81)
+2026-Mar-16 11:36:52.331230 [DEBUG] - SecretsUsedInArgOrEnv: Do not use ARG or ENV instructions for sensitive data (ENV "PAYLOAD_SECRET") (line 100)
+2026-Mar-16 11:36:52.331230 [DEBUG] - SecretsUsedInArgOrEnv: Do not use ARG or ENV instructions for sensitive data (ARG "PAYLOAD_SECRET") (line 109)
+2026-Mar-16 11:36:52.331230 [DEBUG] - SecretsUsedInArgOrEnv: Do not use ARG or ENV instructions for sensitive data (ARG "EASYKASH_HMAC_SECRET") (line 122)
+2026-Mar-16 11:36:52.331230 [DEBUG] - SecretsUsedInArgOrEnv: Do not use ARG or ENV instructions for sensitive data (ARG "EASYKASH_API_TOKEN") (line 46)
+2026-Mar-16 11:36:52.331230 [DEBUG] - SecretsUsedInArgOrEnv: Do not use ARG or ENV instructions for sensitive data (ARG "EASYKASH_HMAC_SECRET") (line 47)
+2026-Mar-16 11:36:52.331230 [DEBUG] - SecretsUsedInArgOrEnv: Do not use ARG or ENV instructions for sensitive data (ARG "GOOGLE_CLIENT_SECRET") (line 49)
+2026-Mar-16 11:36:52.331230 [DEBUG] - SecretsUsedInArgOrEnv: Do not use ARG or ENV instructions for sensitive data (ARG "CRON_SECRET") (line 125)
+2026-Mar-16 11:36:52.331230 [DEBUG] - SecretsUsedInArgOrEnv: Do not use ARG or ENV instructions for sensitive data (ARG "PAYLOAD_SECRET") (line 6)
+2026-Mar-16 11:36:52.331230 [DEBUG] - SecretsUsedInArgOrEnv: Do not use ARG or ENV instructions for sensitive data (ARG "PAYMOB_HMAC_SECRET") (line 16)
+2026-Mar-16 11:36:52.331230 [DEBUG] - SecretsUsedInArgOrEnv: Do not use ARG or ENV instructions for sensitive data (ARG "EASYKASH_API_TOKEN") (line 18)
+2026-Mar-16 11:36:52.331230 [DEBUG] - SecretsUsedInArgOrEnv: Do not use ARG or ENV instructions for sensitive data (ARG "PAYMOB_HMAC_SECRET") (line 44)
+2026-Mar-16 11:36:52.331230 [DEBUG] - SecretsUsedInArgOrEnv: Do not use ARG or ENV instructions for sensitive data (ARG "PAYMOB_API_KEY") (line 115)
+2026-Mar-16 11:36:52.331230 [DEBUG] - SecretsUsedInArgOrEnv: Do not use ARG or ENV instructions for sensitive data (ARG "PAYLOAD_SECRET") (line 34)
+2026-Mar-16 11:36:52.331230 [DEBUG] - SecretsUsedInArgOrEnv: Do not use ARG or ENV instructions for sensitive data (ARG "EASYKASH_API_TOKEN") (line 78)
+2026-Mar-16 11:36:52.331230 [DEBUG] - SecretsUsedInArgOrEnv: Do not use ARG or ENV instructions for sensitive data (ARG "PAYLOAD_SECRET") (line 95)
+2026-Mar-16 11:36:52.331230 [DEBUG] - SecretsUsedInArgOrEnv: Do not use ARG or ENV instructions for sensitive data (ARG "GOOGLE_CLIENT_SECRET") (line 124)
+2026-Mar-16 11:36:52.335536 [DEBUG] - SecretsUsedInArgOrEnv: Do not use ARG or ENV instructions for sensitive data (ARG "RESEND_API_KEY") (line 69)
+2026-Mar-16 11:36:52.335536 [DEBUG] - SecretsUsedInArgOrEnv: Do not use ARG or ENV instructions for sensitive data (ARG "CRON_SECRET") (line 82)
+2026-Mar-16 11:36:52.335536 [DEBUG] - SecretsUsedInArgOrEnv: Do not use ARG or ENV instructions for sensitive data (ARG "PAYMOB_HMAC_SECRET") (line 119)
+2026-Mar-16 11:36:52.335536 [DEBUG] - SecretsUsedInArgOrEnv: Do not use ARG or ENV instructions for sensitive data (ARG "RESEND_API_KEY") (line 9)
+2026-Mar-16 11:36:52.335536 [DEBUG] - SecretsUsedInArgOrEnv: Do not use ARG or ENV instructions for sensitive data (ARG "RESEND_API_KEY") (line 112)
+2026-Mar-16 11:36:52.335536 [DEBUG] - SecretsUsedInArgOrEnv: Do not use ARG or ENV instructions for sensitive data (ARG "PAYMOB_API_KEY") (line 12)
+2026-Mar-16 11:36:52.335536 [DEBUG] - SecretsUsedInArgOrEnv: Do not use ARG or ENV instructions for sensitive data (ARG "EASYKASH_HMAC_SECRET") (line 19)
+2026-Mar-16 11:36:52.335536 [DEBUG] - SecretsUsedInArgOrEnv: Do not use ARG or ENV instructions for sensitive data (ARG "CRON_SECRET") (line 22)
+2026-Mar-16 11:36:52.335536 [DEBUG] - SecretsUsedInArgOrEnv: Do not use ARG or ENV instructions for sensitive data (ARG "RESEND_API_KEY") (line 37)
+2026-Mar-16 11:36:52.335536 [DEBUG] - SecretsUsedInArgOrEnv: Do not use ARG or ENV instructions for sensitive data (ARG "EASYKASH_HMAC_SECRET") (line 79)
+2026-Mar-16 11:36:52.335536 [DEBUG] - SecretsUsedInArgOrEnv: Do not use ARG or ENV instructions for sensitive data (ARG "GOOGLE_CLIENT_SECRET") (line 21)
+2026-Mar-16 11:36:52.335536 [DEBUG] Dockerfile:61
+2026-Mar-16 11:36:52.335536 [DEBUG] --------------------
+2026-Mar-16 11:36:52.335536 [DEBUG] 59 |     WORKDIR /app
+2026-Mar-16 11:36:52.335536 [DEBUG] 60 |     COPY package.json pnpm-lock.yaml ./
+2026-Mar-16 11:36:52.335536 [DEBUG] 61 | >>> RUN pnpm install --frozen-lockfile
+2026-Mar-16 11:36:52.335536 [DEBUG] 62 |
+2026-Mar-16 11:36:52.335536 [DEBUG] 63 |     # ── Stage 2: Build ────────────────────────────────────────────────────────────
+2026-Mar-16 11:36:52.335536 [DEBUG] --------------------
+2026-Mar-16 11:36:52.335536 [DEBUG] ERROR: failed to build: failed to solve: process "/bin/sh -c pnpm install --frozen-lockfile" did not complete successfully: exit code: 1
+2026-Mar-16 11:36:52.340048 [DEBUG] exit status 1
+2026-Mar-16 11:36:52.393749 ========================================
+2026-Mar-16 11:36:52.400581 Deployment failed: Command execution failed (exit code 1): docker exec ic04444cssg4swgscs4sk0cs bash -c 'bash /artifacts/build.sh'
+2026-Mar-16 11:36:52.400581 Error: #0 building with "default" instance using docker driver
+2026-Mar-16 11:36:52.400581 
+2026-Mar-16 11:36:52.400581 #1 [internal] load build definition from Dockerfile
+2026-Mar-16 11:36:52.400581 #1 transferring dockerfile: 8.46kB done
+2026-Mar-16 11:36:52.400581 #1 DONE 0.0s
+2026-Mar-16 11:36:52.400581 
+2026-Mar-16 11:36:52.400581 #2 [internal] load metadata for docker.io/library/node:22-alpine
+2026-Mar-16 11:36:52.400581 #2 DONE 0.6s
+2026-Mar-16 11:36:52.400581 
+2026-Mar-16 11:36:52.400581 #3 [internal] load .dockerignore
+2026-Mar-16 11:36:52.400581 #3 transferring context: 164B done
+2026-Mar-16 11:36:52.400581 #3 DONE 0.0s
+2026-Mar-16 11:36:52.400581 
+2026-Mar-16 11:36:52.400581 #4 [base 1/2] FROM docker.io/library/node:22-alpine@sha256:8094c002d08262dba12645a3b4a15cd6cd627d30bc782f53229a2ec13ee22a00
+2026-Mar-16 11:36:52.400581 #4 DONE 0.0s
+2026-Mar-16 11:36:52.400581 
+2026-Mar-16 11:36:52.400581 #5 [internal] load build context
+2026-Mar-16 11:36:52.400581 #5 transferring context: 1.99MB 0.1s done
+2026-Mar-16 11:36:52.400581 #5 DONE 0.1s
+2026-Mar-16 11:36:52.400581 
+2026-Mar-16 11:36:52.400581 #6 [base 2/2] RUN npm install -g pnpm
+2026-Mar-16 11:36:52.400581 #6 CACHED
+2026-Mar-16 11:36:52.400581 
+2026-Mar-16 11:36:52.400581 #7 [deps 1/4] RUN apk add --no-cache libc6-compat
+2026-Mar-16 11:36:52.400581 #7 CACHED
+2026-Mar-16 11:36:52.400581 
+2026-Mar-16 11:36:52.400581 #8 [deps 2/4] WORKDIR /app
+2026-Mar-16 11:36:52.400581 #8 CACHED
+2026-Mar-16 11:36:52.400581 
+2026-Mar-16 11:36:52.400581 #9 [deps 3/4] COPY package.json pnpm-lock.yaml ./
+2026-Mar-16 11:36:52.400581 #9 DONE 0.0s
+2026-Mar-16 11:36:52.400581 
+2026-Mar-16 11:36:52.400581 #10 [deps 4/4] RUN pnpm install --frozen-lockfile
+2026-Mar-16 11:36:52.400581 #10 0.887  ERR_PNPM_OUTDATED_LOCKFILE  Cannot install with "frozen-lockfile" because pnpm-lock.yaml is not up to date with <ROOT>/package.json
+2026-Mar-16 11:36:52.400581 #10 0.887
+2026-Mar-16 11:36:52.400581 #10 0.887 Note that in CI environments this setting is true by default. If you still need to run install in such cases, use "pnpm install --no-frozen-lockfile"
+2026-Mar-16 11:36:52.400581 #10 0.887
+2026-Mar-16 11:36:52.400581 #10 0.887   Failure reason:
+2026-Mar-16 11:36:52.400581 #10 0.887   specifiers in the lockfile don't match specifiers in package.json:
+2026-Mar-16 11:36:52.400581 #10 0.887 * 1 dependencies are mismatched:
+2026-Mar-16 11:36:52.400581 #10 0.887   - next (lockfile: 16.1.6, manifest: 15.4.11)
+2026-Mar-16 11:36:52.400581 #10 0.887
+2026-Mar-16 11:36:52.400581 #10 ERROR: process "/bin/sh -c pnpm install --frozen-lockfile" did not complete successfully: exit code: 1
+2026-Mar-16 11:36:52.400581 ------
+2026-Mar-16 11:36:52.400581 > [deps 4/4] RUN pnpm install --frozen-lockfile:
+2026-Mar-16 11:36:52.400581 0.887  ERR_PNPM_OUTDATED_LOCKFILE  Cannot install with "frozen-lockfile" because pnpm-lock.yaml is not up to date with <ROOT>/package.json
+2026-Mar-16 11:36:52.400581 0.887
+2026-Mar-16 11:36:52.400581 0.887 Note that in CI environments this setting is true by default. If you still need to run install in such cases, use "pnpm install --no-frozen-lockfile"
+2026-Mar-16 11:36:52.400581 0.887
+2026-Mar-16 11:36:52.400581 0.887   Failure reason:
+2026-Mar-16 11:36:52.400581 0.887   specifiers in the lockfile don't match specifiers in package.json:
+2026-Mar-16 11:36:52.400581 0.887 * 1 dependencies are mismatched:
+2026-Mar-16 11:36:52.400581 0.887   - next (lockfile: 16.1.6, manifest: 15.4.11)
+2026-Mar-16 11:36:52.400581 0.887
+2026-Mar-16 11:36:52.400581 ------
+2026-Mar-16 11:36:52.400581 
+2026-Mar-16 11:36:52.400581 34 warnings found (use docker --debug to expand):
+2026-Mar-16 11:36:52.400581 - SecretsUsedInArgOrEnv: Do not use ARG or ENV instructions for sensitive data (ARG "PAYMOB_API_KEY") (line 40)
+2026-Mar-16 11:36:52.400581 - SecretsUsedInArgOrEnv: Do not use ARG or ENV instructions for sensitive data (ARG "PAYLOAD_SECRET") (line 66)
+2026-Mar-16 11:36:52.400581 - SecretsUsedInArgOrEnv: Do not use ARG or ENV instructions for sensitive data (ARG "PAYMOB_API_KEY") (line 72)
+2026-Mar-16 11:36:52.400581 - SecretsUsedInArgOrEnv: Do not use ARG or ENV instructions for sensitive data (ARG "EASYKASH_API_TOKEN") (line 121)
+2026-Mar-16 11:36:52.400581 - SecretsUsedInArgOrEnv: Do not use ARG or ENV instructions for sensitive data (ARG "CRON_SECRET") (line 50)
+2026-Mar-16 11:36:52.400581 - SecretsUsedInArgOrEnv: Do not use ARG or ENV instructions for sensitive data (ARG "PAYMOB_HMAC_SECRET") (line 76)
+2026-Mar-16 11:36:52.400581 - SecretsUsedInArgOrEnv: Do not use ARG or ENV instructions for sensitive data (ARG "GOOGLE_CLIENT_SECRET") (line 81)
+2026-Mar-16 11:36:52.400581 - SecretsUsedInArgOrEnv: Do not use ARG or ENV instructions for sensitive data (ENV "PAYLOAD_SECRET") (line 100)
+2026-Mar-16 11:36:52.400581 - SecretsUsedInArgOrEnv: Do not use ARG or ENV instructions for sensitive data (ARG "PAYLOAD_SECRET") (line 109)
+2026-Mar-16 11:36:52.400581 - SecretsUsedInArgOrEnv: Do not use ARG or ENV instructions for sensitive data (ARG "EASYKASH_HMAC_SECRET") (line 122)
+2026-Mar-16 11:36:52.400581 - SecretsUsedInArgOrEnv: Do not use ARG or ENV instructions for sensitive data (ARG "EASYKASH_API_TOKEN") (line 46)
+2026-Mar-16 11:36:52.400581 - SecretsUsedInArgOrEnv: Do not use ARG or ENV instructions for sensitive data (ARG "EASYKASH_HMAC_SECRET") (line 47)
+2026-Mar-16 11:36:52.400581 - SecretsUsedInArgOrEnv: Do not use ARG or ENV instructions for sensitive data (ARG "GOOGLE_CLIENT_SECRET") (line 49)
+2026-Mar-16 11:36:52.400581 - SecretsUsedInArgOrEnv: Do not use ARG or ENV instructions for sensitive data (ARG "CRON_SECRET") (line 125)
+2026-Mar-16 11:36:52.400581 - SecretsUsedInArgOrEnv: Do not use ARG or ENV instructions for sensitive data (ARG "PAYLOAD_SECRET") (line 6)
+2026-Mar-16 11:36:52.400581 - SecretsUsedInArgOrEnv: Do not use ARG or ENV instructions for sensitive data (ARG "PAYMOB_HMAC_SECRET") (line 16)
+2026-Mar-16 11:36:52.400581 - SecretsUsedInArgOrEnv: Do not use ARG or ENV instructions for sensitive data (ARG "EASYKASH_API_TOKEN") (line 18)
+2026-Mar-16 11:36:52.400581 - SecretsUsedInArgOrEnv: Do not use ARG or ENV instructions for sensitive data (ARG "PAYMOB_HMAC_SECRET") (line 44)
+2026-Mar-16 11:36:52.400581 - SecretsUsedInArgOrEnv: Do not use ARG or ENV instructions for sensitive data (ARG "PAYMOB_API_KEY") (line 115)
+2026-Mar-16 11:36:52.400581 - SecretsUsedInArgOrEnv: Do not use ARG or ENV instructions for sensitive data (ARG "PAYLOAD_SECRET") (line 34)
+2026-Mar-16 11:36:52.400581 - SecretsUsedInArgOrEnv: Do not use ARG or ENV instructions for sensitive data (ARG "EASYKASH_API_TOKEN") (line 78)
+2026-Mar-16 11:36:52.400581 - SecretsUsedInArgOrEnv: Do not use ARG or ENV instructions for sensitive data (ARG "PAYLOAD_SECRET") (line 95)
+2026-Mar-16 11:36:52.400581 - SecretsUsedInArgOrEnv: Do not use ARG or ENV instructions for sensitive data (ARG "GOOGLE_CLIENT_SECRET") (line 124)
+2026-Mar-16 11:36:52.400581 - SecretsUsedInArgOrEnv: Do not use ARG or ENV instructions for sensitive data (ARG "RESEND_API_KEY") (line 69)
+2026-Mar-16 11:36:52.400581 - SecretsUsedInArgOrEnv: Do not use ARG or ENV instructions for sensitive data (ARG "CRON_SECRET") (line 82)
+2026-Mar-16 11:36:52.400581 - SecretsUsedInArgOrEnv: Do not use ARG or ENV instructions for sensitive data (ARG "PAYMOB_HMAC_SECRET") (line 119)
+2026-Mar-16 11:36:52.400581 - SecretsUsedInArgOrEnv: Do not use ARG or ENV instructions for sensitive data (ARG "RESEND_API_KEY") (line 9)
+2026-Mar-16 11:36:52.400581 - SecretsUsedInArgOrEnv: Do not use ARG or ENV instructions for sensitive data (ARG "RESEND_API_KEY") (line 112)
+2026-Mar-16 11:36:52.400581 - SecretsUsedInArgOrEnv: Do not use ARG or ENV instructions for sensitive data (ARG "PAYMOB_API_KEY") (line 12)
+2026-Mar-16 11:36:52.400581 - SecretsUsedInArgOrEnv: Do not use ARG or ENV instructions for sensitive data (ARG "EASYKASH_HMAC_SECRET") (line 19)
+2026-Mar-16 11:36:52.400581 - SecretsUsedInArgOrEnv: Do not use ARG or ENV instructions for sensitive data (ARG "CRON_SECRET") (line 22)
+2026-Mar-16 11:36:52.400581 - SecretsUsedInArgOrEnv: Do not use ARG or ENV instructions for sensitive data (ARG "RESEND_API_KEY") (line 37)
+2026-Mar-16 11:36:52.400581 - SecretsUsedInArgOrEnv: Do not use ARG or ENV instructions for sensitive data (ARG "EASYKASH_HMAC_SECRET") (line 79)
+2026-Mar-16 11:36:52.400581 - SecretsUsedInArgOrEnv: Do not use ARG or ENV instructions for sensitive data (ARG "GOOGLE_CLIENT_SECRET") (line 21)
+2026-Mar-16 11:36:52.400581 Dockerfile:61
+2026-Mar-16 11:36:52.400581 --------------------
+2026-Mar-16 11:36:52.400581 59 |     WORKDIR /app
+2026-Mar-16 11:36:52.400581 60 |     COPY package.json pnpm-lock.yaml ./
+2026-Mar-16 11:36:52.400581 61 | >>> RUN pnpm install --frozen-lockfile
+2026-Mar-16 11:36:52.400581 62 |
+2026-Mar-16 11:36:52.400581 63 |     # ── Stage 2: Build ────────────────────────────────────────────────────────────
+2026-Mar-16 11:36:52.400581 --------------------
+2026-Mar-16 11:36:52.400581 ERROR: failed to build: failed to solve: process "/bin/sh -c pnpm install --frozen-lockfile" did not complete successfully: exit code: 1
+2026-Mar-16 11:36:52.400581 exit status 1
+2026-Mar-16 11:36:52.406691 [DEBUG] Error type: RuntimeException
+2026-Mar-16 11:36:52.413095 [DEBUG] Error code: 0
+2026-Mar-16 11:36:52.418746 [DEBUG] Location: /var/www/html/app/Traits/ExecuteRemoteCommand.php:243
+2026-Mar-16 11:36:52.424246 [DEBUG] Stack trace (first 5 lines):
+2026-Mar-16 11:36:52.429750 [DEBUG] #0 /var/www/html/app/Traits/ExecuteRemoteCommand.php(104): App\Jobs\ApplicationDeploymentJob->executeCommandWithProcess()
+2026-Mar-16 11:36:52.435402 [DEBUG] #1 /var/www/html/vendor/laravel/framework/src/Illuminate/Collections/Traits/EnumeratesValues.php(271): App\Jobs\ApplicationDeploymentJob->{closure:App\Traits\ExecuteRemoteCommand::execute_remote_command():71}()
+2026-Mar-16 11:36:52.441046 [DEBUG] #2 /var/www/html/app/Traits/ExecuteRemoteCommand.php(71): Illuminate\Support\Collection->each()
+2026-Mar-16 11:36:52.446707 [DEBUG] #3 /var/www/html/app/Jobs/ApplicationDeploymentJob.php(3163): App\Jobs\ApplicationDeploymentJob->execute_remote_command()
+2026-Mar-16 11:36:52.452253 [DEBUG] #4 /var/www/html/app/Jobs/ApplicationDeploymentJob.php(854): App\Jobs\ApplicationDeploymentJob->build_image()
+2026-Mar-16 11:36:52.458321 ========================================
+2026-Mar-16 11:36:52.464932 Deployment failed. Removing the new version of your application.
+2026-Mar-16 11:36:53.968071 Gracefully shutting down build container: ic04444cssg4swgscs4sk0cs
+2026-Mar-16 11:36:54.460793 [DEBUG] [CMD]: docker stop -t 30 ic04444cssg4swgscs4sk0cs
+2026-Mar-16 11:36:54.460793 [DEBUG] ic04444cssg4swgscs4sk0cs

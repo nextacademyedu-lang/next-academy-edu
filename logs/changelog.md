@@ -4,6 +4,25 @@
 
 ---
 
+### [2026-03-16 19:27] - Fix V2: Payload Admin CSS — data-attribute scoping (replaces @layer approach)
+
+- **الملفات اللي اتعدّلت:** `src/app/globals.css`, `src/app/[locale]/layout.tsx`, `src/app/(payload)/custom.scss`
+- **المشكلة:** الـ `@layer frontend` wrapper من الـ fix الأول اتعمله strip من Next.js CSS bundler في الـ production build — الـ layer order declaration ظهر بس محتوى الـ layer اختفى. النتيجة: الـ resets (dark bg, `* { margin: 0 }`, `button { border: none }`) فضلت unlayered وبتكسب على Payload.
+- **الحل:** بدل layers، كل الـ destructive resets اتلفت في `html[data-app="frontend"]` selector. والـ `[locale]/layout.tsx` بقى بيضيف `data-app="frontend"` على `<html>`. Payload admin مبيضيفش الـ attribute ده فالـ resets مبتأثرش عليه.
+- **ملاحظة:** `:root` CSS variables اتسابت بدون scoping لأنها safe — بتتطبق بس لما يتعمللها reference.
+
+---
+
+### [2026-03-16 18:00] - Fix: Payload Admin CSS — wrap globals.css in @layer frontend
+
+- **الملفات اللي اتعدّلت:** `src/app/globals.css`, `src/app/(payload)/custom.scss`
+- **المشكلة:** الـ `globals.css` (dark background, margin/padding resets, button resets) كانت unlayered CSS. Payload بتلف الـ CSS بتاعها في `@layer payload-default`. في CSS Cascade Layers، unlayered styles دايماً بتكسب على layered styles — فالـ frontend CSS كانت بتعمل override كامل للـ admin panel.
+- **الحل:**
+  1. لفينا كل `globals.css` في `@layer frontend { ... }`
+  2. حطينا layer ordering في `custom.scss`: `@layer frontend, payload-default, payload;` — ده بيخلي Payload ياخد أعلى priority
+
+---
+
 ### [2025-07-21 02:30] - Fix: Payload Admin Panel CSS Not Rendering (Double-Nested HTML)
 
 - **الملفات اللي اتعدّلت:** `src/app/layout.tsx`

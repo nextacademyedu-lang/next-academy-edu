@@ -37,6 +37,7 @@ import { PaymentLinks } from './collections/PaymentLinks.ts';
 import { InstructorBlockedDates } from './collections/InstructorBlockedDates.ts';
 import { VerificationCodes } from './collections/VerificationCodes.ts';
 import { BlogPosts } from './collections/BlogPosts.ts';
+import { BulkSeatAllocations } from './collections/BulkSeatAllocations.ts';
 
 if (!process.env.DATABASE_URI) {
   throw new Error('DATABASE_URI environment variable is required');
@@ -119,7 +120,12 @@ const resendAdapter: EmailAdapter = () => {
 
 export default buildConfig({
   serverURL: process.env.NEXT_PUBLIC_SERVER_URL || '',
-  admin: { user: Users.slug },
+  admin: {
+    user: Users.slug,
+    importMap: {
+      baseDir: path.resolve(__dirname),
+    },
+  },
   collections: [
     Users,
     Media,
@@ -149,6 +155,7 @@ export default buildConfig({
     InstructorBlockedDates,
     VerificationCodes,
     BlogPosts,
+    BulkSeatAllocations,
   ],
   editor: lexicalEditor({}),
   db: postgresAdapter({

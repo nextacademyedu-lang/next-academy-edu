@@ -4,13 +4,14 @@ import React, { useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useLocale } from 'next-intl';
-import { LayoutDashboard, Users, BookOpen, LogOut, Building2 } from 'lucide-react';
+import { LayoutDashboard, Users, BookOpen, Package, LogOut, Building2 } from 'lucide-react';
 import { useAuth } from '@/context/auth-context';
 
 const NAV_ITEMS = [
-  { label: 'Overview', href: '/b2b-dashboard',          icon: LayoutDashboard },
-  { label: 'Team',     href: '/b2b-dashboard/team',     icon: Users           },
-  { label: 'Bookings', href: '/b2b-dashboard/bookings', icon: BookOpen        },
+  { label: 'Overview',    href: '/b2b-dashboard',            icon: LayoutDashboard },
+  { label: 'Team',        href: '/b2b-dashboard/team',       icon: Users           },
+  { label: 'Bookings',    href: '/b2b-dashboard/bookings',   icon: BookOpen        },
+  { label: 'Bulk Seats',  href: '/b2b-dashboard/bulk-seats', icon: Package         },
 ];
 
 export default function B2BLayout({ children }: { children: React.ReactNode }) {
