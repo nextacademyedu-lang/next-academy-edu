@@ -3,18 +3,15 @@ import React from 'react';
 /**
  * Root layout — required by Next.js 15 for every route tree.
  *
- * Route groups like (payload) and [locale] have their own layouts
- * that override this. This only exists to satisfy Next.js's root-
- * layout requirement for pages at the app root (e.g. /privacy-policy).
+ * IMPORTANT: This must NOT render <html> or <body> tags because:
+ *  - (payload)/layout.tsx uses Payload's <RootLayout> which renders its own <html>/<body>
+ *  - [locale]/layout.tsx also renders its own <html>/<body>
+ * Wrapping here would cause double-nested <html> tags, breaking Payload admin CSS.
  */
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  return (
-    <html lang="en">
-      <body>{children}</body>
-    </html>
-  );
+  return children as React.JSX.Element;
 }

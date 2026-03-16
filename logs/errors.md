@@ -18,6 +18,17 @@
 
 #
 
+### [2025-07-21 02:30] - 🟢 Payload Admin Panel CSS Not Rendering
+**السبب:** الـ root `layout.tsx` كان بيعمل wrap في `<html><body>` وPayload's `RootLayout` كمان بيعمل `<html data-theme><body>`. ده أنتج double-nested `<html>` tags.
+**الحل:** خلّينا الـ root `layout.tsx` يرجع `children` مباشرة بدون `<html>/<body>` wrapping.
+**ملاحظة:** ده pattern معروف في Payload CMS v3 — كل route group لازم يحط `<html>/<body>` بنفسه.
+
+### [2026-07-20 17:00] - 🟢 pnpm-lock.yaml stale after Next.js downgrade — deployment fail
+
+**السبب:** بعد ما عملنا downgrade لـ `next` من `16.1.6` لـ `15.4.11` في `package.json`، الـ `pnpm-lock.yaml` ماتعملش regenerate — فضل فيه الـ version القديم. الـ Dockerfile بيستخدم `--frozen-lockfile` فالـ build بيفشل.
+**الحل:** `pnpm install --no-frozen-lockfile` عشان يعمل regenerate للـ lockfile.
+**ملاحظة:** لازم **دايماً** نعمل `pnpm install` بعد أي تعديل على versions في `package.json` — والـ `pnpm-lock.yaml` لازم يتعمل commit معاه.
+
 ### [2026-03-16 04:30] - Admin Panel 500 Server Error
 
 **السبب:** قاعدة البيانات PostgreSQL على الـ VPS كانت فاضية تماماً — مفيش أي tables. الـ Payload CMS كان بيحاول يعمل query على `users` table اللي مش موجودة.

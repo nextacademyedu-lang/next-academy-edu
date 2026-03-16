@@ -4,6 +4,21 @@
 
 ---
 
+### [2025-07-21 02:30] - Fix: Payload Admin Panel CSS Not Rendering (Double-Nested HTML)
+
+- **الملفات اللي اتعدّلت:** `src/app/layout.tsx`
+- **المشكلة:** الـ Payload admin panel (`/admin`) كان بيظهر بدون أي CSS — الصفحة HTML خام. السبب إن الـ root `layout.tsx` كان بيعمل `<html><body>` وPayload's `RootLayout` كمان كان بيعمل `<html data-theme="light"><body>` جواه — فبقى فيه double nesting. المتصفح كان بيطبق الـ CSS variables على الـ outer `<html>` اللي مفيهوش `data-theme`.
+- **الحل:** غيّرنا الـ root layout إنه يرجع `children` مباشرة بدون `<html>/<body>` عشان كل route group (`(payload)` و `[locale]`) يحط الـ tags بتاعته بنفسه.
+
+### [2026-07-20 17:00] - Fix: Regenerate pnpm-lock.yaml for deployment (next@15.4.11)
+
+- **الملفات اللي اتعدّلت:** `pnpm-lock.yaml`
+- **المشكلة:** الـ Dockerfile بيستخدم `pnpm install --frozen-lockfile` بس الـ `pnpm-lock.yaml` كان لسه فيه `next@16.1.6` القديم بعد ما عملنا downgrade لـ `next@15.4.11` في الـ `package.json`. ده كان بيعمل version mismatch وفشل في الـ deployment.
+- **الحل:** عملنا `pnpm install --no-frozen-lockfile` عشان نعمل regenerate للـ lockfile. اتأكدنا إن الـ version بقى `15.4.11` وامتحنّا إن `16.1.6` اتشال تماماً.
+- **Commit:** `78a36a2`
+
+---
+
 ### [2026-07-20 16:00] - Fix: Downgrade Next.js 16.1.6 → 15.4.11 (Admin Panel CSS compatibility)
 
 - **الملفات اللي اتعدّلت:** `package.json`, `src/app/layout.tsx` [🆕], `src/app/privacy-policy/page.tsx`
