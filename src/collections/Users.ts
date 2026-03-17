@@ -3,7 +3,11 @@ import { isAdmin, isAdminOrSelf } from '../lib/access-control.ts';
 
 export const Users: CollectionConfig = {
   slug: 'users',
-  auth: { useAPIKey: true },
+  auth: {
+    useAPIKey: true,
+    maxLoginAttempts: 10,
+    lockTime: 600 * 1000, // 10 minutes
+  },
   admin: { useAsTitle: 'email' },
   access: {
     read: isAdminOrSelf,
@@ -51,7 +55,5 @@ export const Users: CollectionConfig = {
     { name: 'googleId', type: 'text', admin: { readOnly: true, description: 'Google OAuth sub ID' } },
     { name: 'emailVerified', type: 'checkbox', defaultValue: false },
     { name: 'lastLogin', type: 'date', admin: { readOnly: true } },
-    { name: 'loginAttempts', type: 'number', defaultValue: 0, admin: { readOnly: true } },
-    { name: 'lockedUntil', type: 'date', admin: { readOnly: true } },
   ],
 };
