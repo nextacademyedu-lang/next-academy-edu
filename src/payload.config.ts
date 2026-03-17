@@ -126,6 +126,40 @@ export default buildConfig({
       baseDir: path.resolve(__dirname),
     },
   },
+  async onInit(payload) {
+    // Seed first admin user from env vars so there's always a way to bootstrap
+    const adminEmail = process.env.PAYLOAD_ADMIN_EMAIL;
+    const adminPassword = process.env.PAYLOAD_ADMIN_PASSWORD;
+    if (!adminEmail || !adminPassword) return;
+
+    const existing = await payload.find({
+      collection: 'users',
+      where: { email: { equals: adminEmail } },
+      limit: 1,
+    });
+
+    if (existing.docs.length === 0) {
+      await payload.create({
+        collection: 'users',
+        data: {
+          email: adminEmail,
+          password: adminPassword,
+          firstName: 'Admin',
+          lastName: 'User',
+          role: 'admin',
+          emailVerified: true,
+        },
+      });
+      payload.logger.info(`[onInit] Created admin user: ${adminEmail}`);
+    } else if (existing.docs[0].role !== 'admin') {
+      await payload.update({
+        collection: 'users',
+        id: existing.docs[0].id,
+        data: { role: 'admin' },
+      });
+      payload.logger.info(`[onInit] Promoted to admin: ${adminEmail}`);
+    }
+  },
   collections: [
     Users,
     Media,
