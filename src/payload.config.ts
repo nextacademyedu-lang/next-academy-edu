@@ -50,7 +50,7 @@ if (!process.env.PAYLOAD_SECRET) {
 const resendAdapter: EmailAdapter = () => {
   const apiKey = process.env.RESEND_API_KEY;
   const fromRaw =
-    process.env.RESEND_FROM_EMAIL || 'Next Academy <noreply@nextacademy.com>';
+    process.env.RESEND_FROM_EMAIL || 'Next Academy <noreply@nextacademyedu.com>';
 
   const nameMatch = fromRaw.match(/^(.+?)\s*<(.+?)>$/);
   const defaultFromName = nameMatch ? nameMatch[1].trim() : 'Next Academy';

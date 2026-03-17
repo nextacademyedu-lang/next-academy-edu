@@ -127,7 +127,7 @@ export async function POST(request: NextRequest) {
     const firstName = user.firstName || '';
 
     await resend.emails.send({
-      from: process.env.RESEND_FROM_EMAIL || 'Next Academy <noreply@nextacademy.com>',
+      from: `${process.env.RESEND_FROM_NAME || 'Next Academy'} <${process.env.RESEND_FROM_EMAIL || 'noreply@nextacademyedu.com'}>`,
       to: normalizedEmail,
       subject: 'Verify your email — Next Academy',
       html: `
