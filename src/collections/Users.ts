@@ -14,6 +14,30 @@ export const Users: CollectionConfig = {
     create: () => true,
     update: isAdminOrSelf,
     delete: isAdmin,
+    // Only admins can access the admin panel for this collection
+    admin: ({ req: { user } }) => Boolean(user && user.role === 'admin'),
+  },
+  hooks: {
+    beforeChange: [
+      ({ req, data, originalDoc, operation }) => {
+        // Allow onInit seed and server-side operations (no user = internal API)
+        if (!req.user) return data;
+
+        // If role is being changed and user is not admin, revert it
+        if (operation === 'update' && data.role && originalDoc && data.role !== originalDoc.role) {
+          if (req.user.role !== 'admin') {
+            data.role = originalDoc.role; // silently revert
+          }
+        }
+
+        // On create, non-admins always get 'user' role
+        if (operation === 'create' && req.user.role !== 'admin') {
+          data.role = 'user';
+        }
+
+        return data;
+      },
+    ],
   },
   fields: [
     { name: 'firstName', type: 'text', required: true },
@@ -32,9 +56,8 @@ export const Users: CollectionConfig = {
       ],
       defaultValue: 'user',
       required: true,
-      access: {
-        update: ({ req: { user } }) => Boolean(user && user.role === 'admin'),
-      },
+      // NOTE: field-level access removed — it crashes Payload 3.x admin UI.
+      // Role protection is handled by the beforeChange hook above.
     },
     { name: 'instructorId', type: 'relationship', relationTo: 'instructors', hasMany: false },
     { name: 'preferredLanguage', type: 'select', options: ['ar', 'en'], defaultValue: 'ar' },
@@ -57,3 +80,4 @@ export const Users: CollectionConfig = {
     { name: 'lastLogin', type: 'date', admin: { readOnly: true } },
   ],
 };
+
