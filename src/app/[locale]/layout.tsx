@@ -26,6 +26,9 @@ const cinzel = Cinzel({
 export const metadata: Metadata = {
   title: 'Next Academy',
   description: 'B2B Educational Platform for Entrepreneurs',
+  other: {
+    'facebook-domain-verification': 'fbphl02fxa6p06kjwce9vw24thiz44',
+  },
 };
 
 export default async function LocaleLayout({
