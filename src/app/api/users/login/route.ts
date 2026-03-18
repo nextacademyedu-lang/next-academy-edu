@@ -61,11 +61,26 @@ export async function POST(req: NextRequest) {
     }
 
     return response;
-  } catch (err: any) {
-    // Payload throws on invalid credentials — return generic message
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : '';
+    const isAuthError =
+      message.includes('credentials') ||
+      message.includes('locked') ||
+      message.includes('The email or password') ||
+      message.includes('not verified');
+
+    if (isAuthError) {
+      return NextResponse.json(
+        { errors: [{ message: 'بيانات الدخول غير صحيحة.' }] },
+        { status: 401 },
+      );
+    }
+
+    // Unexpected error — log it so admins can debug
+    console.error('[login] Unexpected error:', err);
     return NextResponse.json(
-      { errors: [{ message: 'بيانات الدخول غير صحيحة.' }] },
-      { status: 401 },
+      { errors: [{ message: 'حدث خطأ في السيرفر. حاول مرة أخرى.' }] },
+      { status: 500 },
     );
   }
 }

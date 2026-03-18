@@ -1,7 +1,12 @@
-# Next Academy — Deployment Guide
+# Next Academy — Deployment Guide (DEPRECATED)
 
-> Last Updated: 2026-03-13 04:00
-> Hosting: Vercel (website) + Railway (CRM) + Neon (Database)
+> ⚠️ **DEPRECATED:** This guide was written for a Vercel + Neon setup.
+> The project has migrated to **Coolify (self-hosted Docker Compose on VPS)**.
+> **Use [`coolify-deployment.md`](file:///d:/projects/nextacademy/docs/engineering/coolify-deployment.md) instead.**
+
+> Last Updated: 2026-03-17 15:40 (deprecated)
+> ~~Hosting: Vercel (website) + Railway (CRM) + Neon (Database)~~
+> Current Hosting: **Coolify** — see `docs/engineering/coolify-deployment.md`
 
 ---
 
