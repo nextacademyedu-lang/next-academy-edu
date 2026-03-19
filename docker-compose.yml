@@ -10,6 +10,7 @@ services:
       POSTGRES_DB: ${DB_NAME}
     volumes:
       - pgdata:/var/lib/postgresql/data
+      - ./docker/init-twenty-db.sh:/docker-entrypoint-initdb.d/init-twenty-db.sh:ro
     networks:
       - internal
     healthcheck:
@@ -71,6 +72,7 @@ services:
       - certbot_conf:/etc/letsencrypt:ro
     depends_on:
       - app
+      - twenty-server
     networks:
       - internal
 
@@ -84,6 +86,53 @@ services:
     profiles:
       - ssl
 
+  # ── Twenty CRM ──────────────────────────────────────────────────────────────
+  twenty-server:
+    image: twentycrm/twenty:${TWENTY_TAG:-latest}
+    container_name: nextacademy-twenty-server
+    restart: unless-stopped
+    volumes:
+      - twenty_local_data:/app/packages/twenty-server/.local-storage
+    environment:
+      NODE_PORT: 3000
+      PG_DATABASE_URL: postgres://${DB_USER}:${DB_PASSWORD}@postgres:5432/twenty
+      SERVER_URL: ${TWENTY_SERVER_URL:-https://crm.nextacademyedu.com}
+      REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379/1
+      APP_SECRET: ${TWENTY_APP_SECRET}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - internal
+    healthcheck:
+      test: ["CMD-SHELL", "curl --fail http://localhost:3000/healthz || exit 1"]
+      interval: 15s
+      timeout: 5s
+      start_period: 60s
+      retries: 10
+
+  twenty-worker:
+    image: twentycrm/twenty:${TWENTY_TAG:-latest}
+    container_name: nextacademy-twenty-worker
+    restart: unless-stopped
+    command: ["yarn", "worker:prod"]
+    volumes:
+      - twenty_local_data:/app/packages/twenty-server/.local-storage
+    environment:
+      PG_DATABASE_URL: postgres://${DB_USER}:${DB_PASSWORD}@postgres:5432/twenty
+      SERVER_URL: ${TWENTY_SERVER_URL:-https://crm.nextacademyedu.com}
+      REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379/1
+      APP_SECRET: ${TWENTY_APP_SECRET}
+      DISABLE_DB_MIGRATIONS: "true"
+      DISABLE_CRON_JOBS_REGISTRATION: "true"
+    depends_on:
+      twenty-server:
+        condition: service_healthy
+    networks:
+      - internal
+
 networks:
   internal:
     driver: bridge
@@ -93,3 +142,4 @@ volumes:
   redisdata:
   certbot_www:
   certbot_conf:
+  twenty_local_data:

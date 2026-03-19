@@ -1,8 +1,8 @@
 # Next Academy — Coolify Deployment Rules
 
-> **Last Updated:** 2026-03-17 15:40
+> **Last Updated:** 2026-03-20 01:42
 > **Platform:** Coolify (self-hosted PaaS on VPS)
-> **Architecture:** Docker Compose — Next.js + Payload CMS + PostgreSQL 16 + Redis 7 + Nginx
+> **Architecture:** Docker Compose — Next.js + Payload CMS + Twenty CRM + PostgreSQL 16 + Redis 7 + Nginx
 
 ---
 
@@ -36,30 +36,28 @@
 Internet
    │
    ▼
-┌──────────────────────────────┐
-│     Nginx (port 80 / 443)    │
-│  ├── SSL termination         │
-│  ├── Security headers        │
-│  ├── Rate: client_max 25M    │
-│  └── Proxy → app:3001        │
-└──────────────┬───────────────┘
-               │
-    ┌──────────┴──────────┐
-    ▼                     ▼
-┌────────────┐   ┌──────────────┐
-│ Next.js    │   │ PostgreSQL 16│
-│ App:3001   │   │ (port 5432)  │
-│ + Payload  │   │ Volume:      │
-│   CMS      │   │ pgdata       │
-│ standalone │   └──────────────┘
-└─────┬──────┘
-      │
-      ▼
-┌──────────────┐
-│ Redis 7      │
-│ (port 6379)  │
-│ AOF persist  │
-└──────────────┘
+┌───────────────────────────────────────────────┐
+│            Nginx (port 80 / 443)              │
+│  ├── nextacademyedu.com   → app:3001          │
+│  └── crm.nextacademyedu.com → twenty:3000     │
+└──────────┬───────────────────┬────────────────┘
+           │                   │
+     ┌─────┴─────┐     ┌───────┴────────┐
+     ▼           │     ▼                │
+┌────────────┐   │  ┌────────────────┐  │
+│ Next.js    │   │  │ Twenty Server  │  │
+│ App:3001   │   │  │ (port 3000)    │  │
+│ + Payload  │   │  │ + Twenty Worker│  │
+│   CMS      │   │  │ (background)   │  │
+└─────┬──────┘   │  └──────┬─────────┘  │
+      │          │         │            │
+      └──────┐   │   ┌─────┘            │
+             ▼   ▼   ▼                  ▼
+       ┌──────────────┐          ┌──────────────┐
+       │ PostgreSQL 16│          │ Redis 7      │
+       │ DB: nextacad │          │ DB 0: app    │
+       │ DB: twenty   │          │ DB 1: twenty │
+       └──────────────┘          └──────────────┘
 ```
 
 **Key points:**
@@ -72,13 +70,15 @@ Internet
 
 ## 2. Docker Services (docker-compose.yml)
 
-| Service   | Image            | Ports     | Volumes              | Depends On |
-|-----------|------------------|-----------|----------------------|------------|
-| `app`     | Custom Dockerfile| 3001      | —                    | db, redis  |
-| `db`      | postgres:16-alpine| 5432     | `pgdata`             | —          |
-| `redis`   | redis:7-alpine   | 6379      | `redis_data`         | —          |
-| `nginx`   | nginx:alpine     | 80, 443   | certs, `nginx.conf`  | app        |
-| `certbot` | certbot/certbot  | —         | certs                | nginx      |
+| Service         | Image               | Ports   | Volumes                 | Depends On       |
+|-----------------|----------------------|---------|-------------------------|------------------|
+| `app`           | Custom Dockerfile    | 3001    | —                       | postgres, redis  |
+| `postgres`      | postgres:16-alpine   | 5432    | `pgdata`, init script   | —                |
+| `redis`         | redis:7-alpine       | 6379    | `redisdata`             | —                |
+| `nginx`         | nginx:alpine         | 80, 443 | certs, `nginx.conf`     | app, twenty-server |
+| `certbot`       | certbot/certbot      | —       | certs                   | —                |
+| `twenty-server` | twentycrm/twenty     | 3000    | `twenty_local_data`     | postgres, redis  |
+| `twenty-worker` | twentycrm/twenty     | —       | `twenty_local_data`     | twenty-server    |
 
 ---
 
@@ -127,6 +127,16 @@ Set these in **Coolify → Service → Environment Variables**:
 | `PAYLOAD_ADMIN_EMAIL` | Initial admin email (auto-seeded on first boot) |
 | `PAYLOAD_ADMIN_PASSWORD` | Initial admin password |
 
+### Twenty CRM
+
+| Variable | Notes |
+|---|---|
+| `TWENTY_APP_SECRET` | ≥32 char random string (e.g. `openssl rand -base64 32`) |
+| `TWENTY_SERVER_URL` | `https://crm.nextacademyedu.com` |
+| `TWENTY_CRM_URL` | Same as above (used by app to call Twenty API) |
+| `TWENTY_CRM_API_KEY` | API key generated from Twenty UI Settings |
+| `TWENTY_TAG` | Docker image tag, default `latest` |
+
 ### Security
 
 | Variable | Notes |
@@ -173,21 +183,22 @@ HEALTHCHECK --interval=15s --timeout=5s --retries=3 --start-period=30s \
 File: `nginx/nginx.conf`
 
 **What it does:**
-- HTTP → HTTPS redirect (port 80 → 443)
+- HTTP → HTTPS redirect (port 80 → 443) for both domains
 - SSL termination with Let's Encrypt certs
 - Security headers (X-Frame-Options, HSTS, X-Content-Type-Options, etc.)
-- Proxy to `http://nextapp` (upstream → `app:3001`)
+- Proxy `nextacademyedu.com` → `http://nextapp` (upstream → `app:3001`)
+- Proxy `crm.nextacademyedu.com` → `http://twentyapp` (upstream → `twenty-server:3000`)
 - Cache static assets (`/_next/static/` — 1 year, immutable)
 - Max upload: 25MB (`client_max_body_size`)
 - `server_tokens off` — hides nginx version
 
-**SSL certs location:**
+**SSL certs locations:**
 ```
 /etc/letsencrypt/live/nextacademyedu.com/fullchain.pem
-/etc/letsencrypt/live/nextacademyedu.com/privkey.pem
+/etc/letsencrypt/live/crm.nextacademyedu.com/fullchain.pem
 ```
 
-**Note on duplicate headers:** Both `nginx.conf` and `next.config.ts` set security headers. This is intentional — nginx covers static files, Next.js covers dynamic routes. For `X-Frame-Options`, nginx uses `SAMEORIGIN` while Next.js uses `DENY`. The Next.js value takes precedence for dynamic pages.
+**Note on duplicate headers:** Both `nginx.conf` and `next.config.ts` set security headers. This is intentional — nginx covers static files, Next.js covers dynamic routes.
 
 ---
 
@@ -210,19 +221,26 @@ File: `nginx/nginx.conf`
 
 ```text
 1. Push code to GitHub repo linked to Coolify
-2. In Coolify dashboard:
+2. Create DNS A record: crm.nextacademyedu.com → VPS IP
+3. In Coolify dashboard:
    a. Create new service → Docker Compose
-   b. Set all environment variables (§3 above)
+   b. Set all environment variables (§3 above, incl. Twenty CRM vars)
    c. Deploy
-3. Wait for build + healthcheck pass
-4. If DB is empty:
+4. Wait for build + healthcheck pass
+5. If DB already has data (existing pgdata volume):
    a. SSH into VPS
-   b. docker exec -it <postgres-container> psql -U postgres
-   c. Run migration SQL from src/migrations/
-5. Verify:
+   b. docker exec -it nextacademy-db psql -U <DB_USER> -c "CREATE DATABASE twenty;"
+   c. Restart twenty-server: docker compose restart twenty-server
+6. Obtain SSL cert for CRM subdomain:
+   docker compose run --rm certbot certonly --webroot -w /var/www/certbot -d crm.nextacademyedu.com
+7. Reload nginx: docker compose exec nginx nginx -s reload
+8. Verify:
    - https://nextacademyedu.com → homepage loads
    - https://nextacademyedu.com/admin → login with PAYLOAD_ADMIN_EMAIL
    - https://nextacademyedu.com/api/health → returns 200
+   - https://crm.nextacademyedu.com → Twenty CRM login
+   - https://crm.nextacademyedu.com/healthz → returns 200
+9. In Twenty UI: generate API key, set TWENTY_CRM_API_KEY in Coolify, restart app
 ```
 
 ### Subsequent Deployments
