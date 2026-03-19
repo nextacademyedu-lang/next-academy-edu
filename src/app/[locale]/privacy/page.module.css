@@ -80,7 +80,7 @@
 }
 
 .navList a:hover {
-  color: var(--accent-primary);
+  color: var(--accent-text);
 }
 
 .document {

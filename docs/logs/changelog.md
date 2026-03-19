@@ -1,0 +1,763 @@
+# 📋 Next Academy — Changelog
+
+> كل التغييرات المهمة بتتسجل هنا. الفورمات: `### [YYYY-MM-DD HH:MM] - العنوان`
+
+---
+
+### [2026-03-19 12:35] - RTL CSS Fixes (Arabic Default Language)
+
+**Files:**
+
+- `src/components/sections/video-testimonials.module.css` (MODIFIED) — logical properties for RTL
+- `src/components/instructor/instructors-preview.module.css` (MODIFIED) — logical properties for RTL
+- `src/components/sections/featured.module.css` (MODIFIED) — logical properties for RTL
+- `src/components/sections/blogs-preview.module.css` (MODIFIED) — logical properties for RTL
+- `src/components/sections/why-choose-us.module.css` (MODIFIED) — logical properties for RTL
+- `src/components/ui/popup-modal.module.css` (MODIFIED) — logical properties for RTL
+- Hero button variant changed from `outline` → `secondary`
+
+**Reason:** Making Arabic (RTL) the default language — replaced directional CSS properties (`margin-left`, `padding-right`, etc.) with CSS logical properties (`margin-inline-start`, `padding-inline-end`, etc.) for proper RTL support.
+
+**Build status:** ✅ Compilation, TypeScript, and 29/29 static pages pass. Symlink EPERM on Windows is known (Docker/Coolify unaffected).
+
+---
+
+### [2025-07-22 00:30] - WCAG AA Contrast Fix: `--accent-text` Token
+
+**Files changed (16):**
+- `src/app/globals.css` — added `--accent-text` token
+- 15 `.module.css` files — replaced `color: var(--accent-primary)` → `color: var(--accent-text)`
+
+**Reason:** `#FF3333` (`--accent-primary`) failed WCAG AA (4.5:1) when used as text color on dark backgrounds. New token `--accent-text` uses `#E63030` (dark) / `#B71616` (light) to pass contrast.
+
+### [2026-03-18 21:05] - Housekeeping: Logs & Session Verification
+
+- **Files:**
+  - `docs/sessions/2026-03-18-21-05-session-7.md` — **NEW** — Session 7 log (documentation housekeeping)
+  - `docs/logs/changelog.md` — Updated with this entry
+  - `docs/logs/tasks.md` — Updated with session 7 record
+- **Reason:** User requested verification and update of all logs/sessions for the day's work (sessions 1–6). All previous logs confirmed up-to-date; created session 7 for traceability.
+
+---
+
+### [2026-03-18 20:30] - Feature: About Page — Full Build with 5 Sections
+
+- **Files:**
+  - `src/app/[locale]/about/page.tsx` — Rewrote from placeholder to full About page composing 5 sections
+  - `src/app/[locale]/about/page.module.css` — Overhauled with dark mode tokens, mobile-first breakpoints, RTL logical properties
+  - `src/components/about/hero-section.tsx` — **NEW** — Animated gradient hero with heading + CTA
+  - `src/components/about/hero-section.module.css` — **NEW** — Hero styles with gradient animation
+  - `src/components/about/story-section.tsx` — **NEW** — Academy origin story with stat cards
+  - `src/components/about/story-section.module.css` — **NEW** — Story layout with glassmorphic stat cards
+  - `src/components/about/values-section.tsx` — **NEW** — 6 core values with icon cards
+  - `src/components/about/values-section.module.css` — **NEW** — Card grid with hover effects
+  - `src/components/about/team-section.tsx` — **NEW** — Team member cards with role badges
+  - `src/components/about/team-section.module.css` — **NEW** — Team grid with avatar placeholders
+  - `src/components/about/cta-section.tsx` — **NEW** — Contact CTA with gradient background
+  - `src/components/about/cta-section.module.css` — **NEW** — CTA styles with glow effects
+  - `src/app/[locale]/about/loading.tsx` — **NEW** — Skeleton loading state
+  - `src/app/[locale]/about/error.tsx` — **NEW** — Error boundary with retry
+- **i18n:** All content uses `useTranslations('About')` — zero hardcoded strings (ar.json + en.json already populated)
+- **Design:** Dark glassmorphism, mobile-first CSS, RTL logical properties, design system tokens
+- **Verification:** `pnpm build` — compiled ✓, types valid ✓, 26/26 static pages ✓
+
+---
+
+### [2026-03-18 19:45] - Refactor: Split Email Templates into Domain-Specific Files
+
+- **Files:**
+  - `src/lib/email/booking-emails.ts` — **NEW** — `sendBookingConfirmation`, `sendBookingCancelled`
+  - `src/lib/email/payment-emails.ts` — **NEW** — `sendPaymentReceipt`, `sendPaymentReminder`, `sendPaymentOverdue`, `sendInstallmentReminder`
+  - `src/lib/email/user-emails.ts` — **NEW** — `sendWelcomeEmail`, `sendPasswordResetEmail`, `sendEmailVerification`
+  - `src/lib/email/admin-emails.ts` — **NEW** — `sendAdminNewBookingNotification`, `sendAdminPaymentAlert`
+  - `src/lib/email/index.ts` — Updated barrel with re-exports + legacy aliases
+  - `src/app/api/cron/check-overdue/route.ts` — Fixed: `amount` → `amountDue`
+  - `src/app/api/webhooks/easykash/route.ts` — Fixed: `amount` → `amountPaid`
+  - `src/app/api/webhooks/paymob/route.ts` — Fixed: `amount` → `amountPaid`
+- **Reason:** Single 400-line email.ts was hard to maintain; split into domain modules with consistent naming.
+- **Verification:** `pnpm build` — compiled + type-checked ✅, 26/26 static pages ✅.
+
+---
+
+### [2026-03-18 20:15] - Content: About Page i18n Strings
+
+- **Files:**
+  - `src/messages/en.json` — Added `About` namespace (34 keys: hero, story, values, team, CTA)
+  - `src/messages/ar.json` — Added `About` namespace (34 keys: Arabic translations for all About page content)
+- **Reason:** Preparing i18n strings for the upcoming About page build.
+
+---
+
+### [2026-03-18 19:30] - Fix: Light Mode Color Contrast & Theme-Safe CSS Tokens
+
+- **Files:**
+  - `src/app/globals.css` — Added 12 component-level CSS tokens (`--glass-bg`, `--glass-border`, `--grid-line`, `--hover-overlay`, `--icon-bg`, `--icon-border`, `--badge-bg`, `--card-shadow`, `--card-shadow-hover`, `--sidebar-bg`, `--topbar-bg`, `--glass-shadow`) with dark defaults + light overrides
+  - `src/components/ui/button.module.css` — Replaced hardcoded white-rgba borders/bg
+  - `src/components/sections/why-choose-us.module.css` — Fixed grid lines, icon bg/border, glass card bg/shadow
+  - `src/components/sections/text-testimonials.module.css` — Fixed carousel card bg, border, shadow, dot indicators
+  - `src/components/sections/featured.module.css` — Fixed typeBadge bg
+  - `src/components/layout/footer.module.css` — Fixed border-top, watermark text color
+  - `src/components/auth/auth-layout.module.css` — Fixed grid pattern, testimonial card bg/border/shadow, badge bg
+  - `src/components/instructor/instructor.module.css` — Fixed sidebar bg, topbar bg, nav links, mobile bottom bar, page grid
+  - `src/components/search/global-search.module.css` — Fixed kbd badge, thumbnail placeholder bg
+- **Reason:** Light mode had invisible/washed-out elements because ~50 hardcoded `rgba(255, 255, 255, ...)` values showed white-on-white.
+- **Verification:** All changes are CSS variable substitutions (no logic changes), structurally safe.
+
+---
+
+### [2026-03-18 19:00] - Feature: Dark/Light Theme Toggle
+
+- **Files:**
+  - `src/context/theme-context.tsx` — **NEW** — ThemeProvider + useTheme hook (localStorage persistence)
+  - `src/components/layout/theme-toggle.tsx` — **NEW** — Animated sun/moon toggle button
+  - `src/components/layout/theme-toggle.module.css` — **NEW** — Toggle component styles
+  - `src/app/globals.css` — Added `html[data-theme="light"]` CSS vars block
+  - `src/components/layout/navbar.tsx` — Integrated toggle in desktop + mobile menu
+  - `src/app/[locale]/layout.tsx` — Wrapped with ThemeProvider + anti-FOUC inline script
+  - `src/messages/ar.json` — Added `Accessibility.lightMode` + `Accessibility.darkMode`
+  - `src/messages/en.json` — Added `Accessibility.lightMode` + `Accessibility.darkMode`
+- **Reason:** Users need ability to switch between dark and light modes with persistence across sessions.
+- **Verification:** `pnpm build` → compiled ✓, types valid ✓, 26/26 static pages ✓ (standalone symlink error is pre-existing Windows/pnpm issue).
+
+---
+
+### [2026-03-18 18:30] - Refactor: Email System — Split Monolith into Domain Modules
+
+- **Files:**
+  - `src/lib/email.ts` — **DELETED** (monolith — 700+ lines)
+  - `src/lib/email/email-core.ts` — **NEW** — shared utilities (send, layout, greeting, types)
+  - `src/lib/email/auth-emails.ts` — **NEW** — 7 auth/account functions
+  - `src/lib/email/booking-emails.ts` — **NEW** — 9 booking/program functions
+  - `src/lib/email/payment-emails.ts` — **NEW** — 9 payment/installment functions
+  - `src/lib/email/engagement-emails.ts` — **NEW** — 6 consultation/lifecycle functions
+  - `src/lib/email/index.ts` — **NEW** — barrel re-export (31 functions + 2 legacy aliases)
+- **Reason:** 700+ line monolith was hard to navigate and maintain. Split into 4 domain-specific modules with a shared core and barrel re-export for backward-compatible imports.
+- **Verification:** `pnpm tsc --noEmit` ✅ — zero errors. All `@/lib/email` imports resolve correctly through the barrel.
+
+---
+
+### [2026-03-18 19:15] - Fix: UI Audit Phase 2 — Page-Level CSS Design System Alignment (4 CSS files)
+
+- **Files:**
+  - `src/app/[locale]/programs/page.module.css` — Converted to mobile-first breakpoints, replaced magic numbers with design tokens, switched to RTL logical properties
+  - `src/app/[locale]/programs/[slug]/page.module.css` — Converted to mobile-first breakpoints, design token alignment, RTL logical properties
+  - `src/app/[locale]/instructors/page.module.css` — Converted to mobile-first breakpoints, design token alignment, RTL logical properties
+  - `src/app/[locale]/instructors/[slug]/page.module.css` — Converted to mobile-first breakpoints, design token alignment, RTL logical properties
+- **Issues Fixed:**
+  1. Desktop-first `max-width` breakpoints → mobile-first `min-width` breakpoints
+  2. Magic numbers (colors, spacing, radii, font-sizes) → CSS custom properties from `design-system.md`
+  3. Physical properties (`padding-left`, `margin-right`) → RTL logical properties (`padding-inline-start`, `margin-inline-end`)
+  4. `box-shadow` → `border` (per design system — no shadows except hero CTA)
+  5. Hardcoded breakpoint values → `993px` and `769px` per design system
+- **Verification:** `pnpm build` → compiled successfully.
+
+---
+
+### [2026-03-18 18:00] - Fix: UI Audit — Design System Alignment (7 CSS files)
+
+- **Files:**
+  - `src/app/globals.css` — Added 8 missing design tokens (z-index scale, spacing aliases, badge status colors)
+  - `src/components/ui/button.module.css` — Changed border-radius to 4px, font-weight to 800
+  - `src/components/ui/card.module.css` — Changed border-radius to 8px, resting border to transparent, removed min-height
+  - `src/components/ui/badge.module.css` — Added status color variants using new tokens, added dot indicator
+  - `src/components/layout/navbar.module.css` — Replaced magic z-index with `var(--z-sticky)`, converted to mobile-first `min-width` breakpoints
+  - `src/components/layout/footer.module.css` — Converted to mobile-first responsive (stacked default → row at 993px)
+  - `src/components/sections/featured.module.css` — Converted to mobile-first responsive, used z-index tokens
+- **Issue:** CSS files used values that contradict `docs/design/design-system.md` — wrong border-radii, wrong font-weights, magic z-index numbers, desktop-first breakpoints.
+- **Fix:** Aligned all 7 files with documented design system. Mobile-first CSS is now the default pattern.
+- **Verification:** `pnpm build` → compiled successfully in 39s, types valid. `_document` error is pre-existing/unrelated.
+
+---
+
+### [2026-03-18 14:30] - Fix: Program Detail Page TypeScript Errors (Proper Payload Types)
+
+- **Files:**
+  - `src/app/[locale]/programs/[slug]/page.tsx` — Rewrote with proper `Program`, `Round`, `Instructor` types from `@/payload-types`
+- **Issue:** The program detail page used `Record<string, unknown>` casts with non-existent field names (`maxSeats`, `enrolledCount`, `format`, `syllabus`), causing TypeScript errors and potential runtime crashes.
+- **Fix:**
+  - Imported `Program`, `Round`, `Instructor` types from `@/payload-types`
+  - Fixed field names to match schema: `maxCapacity`, `currentEnrollments`, `locationType`, `shortDescriptionAr`/`shortDescriptionEn`
+  - Fetched rounds from separate `rounds` collection (correct Payload pattern) instead of assuming embedded
+  - Removed non-existent `syllabus` section
+  - Properly handled `number | Instructor` union type for instructor field
+- **Verification:** `pnpm exec tsc --noEmit` — zero errors in `page.tsx`. Only pre-existing drizzle-orm errors in `reset-admin/route.ts` remain (unrelated).
+
+---
+
+### [2026-03-18 15:00] - Fix: Missing i18n Keys + Program Detail Objectives Rendering
+
+- **Files:**
+  - `src/messages/en.json` — Added `Auth.checkEmail`, `Auth.resetLinkSent`, `Auth.enterEmailError`
+  - `src/messages/ar.json` — Added same 3 keys in Arabic
+  - `src/app/[locale]/programs/[slug]/page.tsx` — Fixed `objectives` type from `string[]` to `{id?, item}[]` and updated `.map()` rendering
+- **Issue:** Forgot-password page crashed at runtime with `MISSING_MESSAGE: Could not resolve 'Auth.checkEmail'` (and 2 related keys). Program detail page crashed with `obj.item is not a function` because `objectives` is an array of objects, not strings.
+- **Fix:** Added the 3 missing i18n keys to both locale files. Changed objectives rendering to access `.item` property.
+
+---
+
+### [2026-03-18 00:00] - Created Agent Workflow Files (4 new workflows)
+
+- **Files:**
+  - `.agents/workflows/local-dev-setup.md` (NEW) — local PostgreSQL via Docker, env vars, schema sync, seed, troubleshooting
+  - `.agents/workflows/debug-production.md` (NEW) — container crashes, auth issues, schema failures, email, SSL, rollback
+  - `.agents/workflows/deploy.md` (already existed — Coolify full deploy)
+  - `.agents/workflows/pre-deploy-check.md` (already existed — 10-step pre-deploy gate)
+- **Reason:** Codified the full local development setup and production debugging procedures that were previously undocumented. These are now accessible as `/local-dev-setup` and `/debug-production` slash commands.
+
+---
+
+### [2026-03-18 08:25] - Log Unification & Cleanup
+
+- **Files:** `logs/changelog.md`, `logs/tasks.md`, `logs/errors.md`
+- **Deleted:** `docs/logs/` directory (was a duplicate of `logs/`)
+- **Reason:** Two log directories existed (`logs/` and `docs/logs/`) with overlapping but inconsistent content. Both `tasks.md` and `errors.md` had duplicate sections within the same file.
+- **Changes:**
+  - Merged 2 unique changelog entries from `docs/logs/changelog.md` → `logs/changelog.md`
+  - Merged 1 unique error entry from `docs/logs/errors.md` → `logs/errors.md`
+  - Deleted `docs/logs/` entirely
+  - Rewrote `tasks.md` — removed duplicates, added session log section with per-session breakdowns
+  - Rewrote `errors.md` — removed duplicates, added missing CSS fix error, organized chronologically
+  - `logs/` is now the **single source of truth** for all project logs
+
+---
+
+### [2026-03-18 08:15] - Role-Based Dashboard Routing After Login
+
+- **Files:** `src/lib/role-redirect.ts` (NEW), `src/app/[locale]/(auth)/login/page.tsx`, `src/lib/auth-api.ts`
+- **Reason:** All users were redirected to `/dashboard` after login regardless of role. Per `roles-permissions.md`, each role should land on its own dashboard (`user` → `/dashboard`, `b2b_manager` → `/b2b-dashboard`, `instructor` → `/instructor`, `admin` → `/admin`).
+- **Changes:**
+  - Created `getDashboardPath(role, locale)` utility mapping each role to its correct dashboard path
+  - Updated login page `useEffect` redirect to use user's role from auth context
+  - Updated login `handleSubmit` success to extract role from login API response and redirect accordingly
+  - Changed `redirectToGoogle()` default from `/dashboard` to `/`
+
+---
+
+### [2026-03-16 09:00] - Fix Login Route Body Parsing for Payload Admin Panel
+
+- **Files:** `src/app/api/users/login/route.ts`
+- **Reason:** Payload CMS admin panel sends login data as `multipart/form-data` with a `_payload` field. The custom login route only handled `application/json`, causing a 500 error on every login attempt from the admin panel.
+- **Changes:**
+  - Added `Content-Type` header detection to distinguish between `multipart/form-data` and `application/json`
+  - For multipart requests, parse `_payload` field from `formData()`
+  - For JSON requests, use `req.json()` as before
+  - Properly type `email`/`password` as `string | undefined` instead of using `as string` casts on `unknown` values
+
+---
+
+### [2026-03-16 19:27] - Fix V2: Payload Admin CSS — data-attribute scoping (replaces @layer approach)
+
+- **الملفات اللي اتعدّلت:** `src/app/globals.css`, `src/app/[locale]/layout.tsx`, `src/app/(payload)/custom.scss`
+- **المشكلة:** الـ `@layer frontend` wrapper من الـ fix الأول اتعمله strip من Next.js CSS bundler في الـ production build — الـ layer order declaration ظهر بس محتوى الـ layer اختفى. النتيجة: الـ resets (dark bg, `* { margin: 0 }`, `button { border: none }`) فضلت unlayered وبتكسب على Payload.
+- **الحل:** بدل layers، كل الـ destructive resets اتلفت في `html[data-app="frontend"]` selector. والـ `[locale]/layout.tsx` بقى بيضيف `data-app="frontend"` على `<html>`. Payload admin مبيضيفش الـ attribute ده فالـ resets مبتأثرش عليه.
+- **ملاحظة:** `:root` CSS variables اتسابت بدون scoping لأنها safe — بتتطبق بس لما يتعمللها reference.
+
+---
+
+### [2026-03-16 18:00] - Fix: Payload Admin CSS — wrap globals.css in @layer frontend
+
+- **الملفات اللي اتعدّلت:** `src/app/globals.css`, `src/app/(payload)/custom.scss`
+- **المشكلة:** الـ `globals.css` (dark background, margin/padding resets, button resets) كانت unlayered CSS. Payload بتلف الـ CSS بتاعها في `@layer payload-default`. في CSS Cascade Layers، unlayered styles دايماً بتكسب على layered styles — فالـ frontend CSS كانت بتعمل override كامل للـ admin panel.
+- **الحل:**
+  1. لفينا كل `globals.css` في `@layer frontend { ... }`
+  2. حطينا layer ordering في `custom.scss`: `@layer frontend, payload-default, payload;` — ده بيخلي Payload ياخد أعلى priority
+
+---
+
+### [2026-03-16 14:12] - Fix: Payload Admin Panel CSS Not Rendering (Double-Nested HTML)
+
+- **الملفات اللي اتعدّلت:** `src/app/layout.tsx`
+- **المشكلة:** الـ Payload admin panel (`/admin`) كان بيظهر بدون أي CSS — الصفحة HTML خام. السبب إن الـ root `layout.tsx` كان بيعمل `<html><body>` وPayload's `RootLayout` كمان كان بيعمل `<html data-theme="light"><body>` جواه — فبقى فيه double nesting. المتصفح كان بيطبق الـ CSS variables على الـ outer `<html>` اللي مفيهوش `data-theme`.
+- **الحل:** غيّرنا الـ root layout إنه يرجع `children` مباشرة بدون `<html>/<body>` عشان كل route group (`(payload)` و `[locale]`) يحط الـ tags بتاعته بنفسه.
+
+### [2026-03-16 13:46] - Fix: Regenerate pnpm-lock.yaml for deployment (next@15.4.11)
+
+- **الملفات اللي اتعدّلت:** `pnpm-lock.yaml`
+- **المشكلة:** الـ Dockerfile بيستخدم `pnpm install --frozen-lockfile` بس الـ `pnpm-lock.yaml` كان لسه فيه `next@16.1.6` القديم بعد ما عملنا downgrade لـ `next@15.4.11` في الـ `package.json`. ده كان بيعمل version mismatch وفشل في الـ deployment.
+- **الحل:** عملنا `pnpm install --no-frozen-lockfile` عشان نعمل regenerate للـ lockfile. اتأكدنا إن الـ version بقى `15.4.11` وامتحنّا إن `16.1.6` اتشال تماماً.
+- **Commit:** `78a36a2`
+
+---
+
+### [2026-03-16 13:36] - Fix: Downgrade Next.js 16.1.6 → 15.4.11 (Admin Panel CSS compatibility)
+
+- **الملفات اللي اتعدّلت:** `package.json`, `src/app/layout.tsx` [🆕], `src/app/privacy-policy/page.tsx`
+- **المشكلة:** الـ Admin Panel CSS كان مكسور على Next.js 16.1.6 — Payload CMS 3.79 مش متوافق رسمياً مع Next.js 16 (يحتاج `>=16.2.0-canary.10` أو يستخدم 15.x). الـ SCSS compilation والـ theme variables كانوا مش شغالين صح. كمان `sass` package كان ناقص (اتضاف قبل كده بس الـ framework version كان هو الـ root cause).
+- **الحل:**
+  1. Downgrade `next` من `16.1.6` → `15.4.11` (آخر stable في النطاق المدعوم من Payload)
+  2. إنشاء `src/app/layout.tsx` — root layout مطلوب في Next.js 15 لكل route tree
+  3. Refactor `privacy-policy/page.tsx` — حذف الـ `<html>/<head>/<body>` tags (بقوا بييجوا من root layout)
+  4. Clean install (`node_modules` + `.next` + `package-lock.json` اتحذفوا وتعملوا من جديد)
+- **النتيجة:** Build ✅ — 60 route اتعملوا compile بنجاح، الـ admin panel bundle 729kB مع CSS chunks سليمة
+- **ملاحظة:** لا تعمل upgrade لـ Next.js 16 غير لما Payload CMS يدعمه رسمياً
+
+---
+
+### [2026-03-16 12:05] - Fix: Admin Panel Missing CSS on VPS (NEXT_PUBLIC_SERVER_URL not baked into build)
+
+- **الملفات اللي اتعدّلت:** `Dockerfile`, `.env.production.template`
+- **المشكلة:** الـ admin panel على الـ VPS كان بيظهر بدون CSS (white/unstyled). السبب الجذري: `NEXT_PUBLIC_SERVER_URL` مكانش موجود كـ Docker build arg. بما إن `NEXT_PUBLIC_*` vars بتتعمل bake في الـ client bundle وقت الـ build بواسطة Next.js، الـ `serverURL` في Payload config كان فاضي — الـ theme provider مكانش بيعمل hydrate، و`data-theme` attribute و CSS variables كانوا مش بيتحطوا على `<html>`.
+- **الحل:** إضافة `NEXT_PUBLIC_SERVER_URL` كـ build ARG في Dockerfile مع fallback لـ `NEXT_PUBLIC_APP_URL`: `ENV NEXT_PUBLIC_SERVER_URL=${NEXT_PUBLIC_SERVER_URL:-$NEXT_PUBLIC_APP_URL}`
+- **ملاحظة:** يجب إضافة `NEXT_PUBLIC_SERVER_URL=https://nextacademyedu.com` في `.env.production` على الـ VPS وعمل rebuild
+
+---
+
+### [2026-03-16 11:03] - Remove: Social Login Buttons (Google, Facebook, Apple)
+
+- **الملفات اللي اتعدّلت:** `src/app/[locale]/(auth)/login/page.tsx`, `src/app/[locale]/(auth)/register/page.tsx`
+- **المشكلة:** أزرار الـ Social Login (Google, Facebook, Apple) كانت موجودة في صفحات Login و Register لكن الـ OAuth providers مش متظبطين — الأزرار كانت بتعمل redirect لـ endpoints مش شغالة
+- **الحل:** حذف الـ social login buttons + الـ divider ("or") + cleanup الـ unused imports (`Facebook`, `Apple` من lucide-react)
+- **ملاحظة:** لما يتم تظبيط OAuth providers في المستقبل، ممكن نرجّعهم تاني
+
+---
+
+### [2026-03-16 09:29] - Fix: Admin Panel Missing CSS (sass package missing)
+
+- **الملفات اللي اتعدّلت:** `package.json`
+- **المشكلة:** الـ admin panel على `/admin` كان بيظهر أبيض بالكامل بدون styling — الـ CSS variables (`--theme-bg`, `--theme-elevation-*`, إلخ) كانت undefined. السبب الجذري: `sass` package مش موجود في `package.json`. Payload CMS 3.x بيستخدم SCSS files (`colors.scss`, `app.scss`, `vars.scss`) لتعريف CSS variables — من غير `sass`, Next.js مش بيقدر يعمل compile للـ SCSS → الـ CSS chunks بتطلع فاضية.
+- **الحل:** إضافة `"sass": "^1.89.1"` في `devDependencies`
+- **ملاحظة:** كمان Next.js 16.1.6 مش في النطاق المدعوم من Payload 3.79 (`>=16.2.0-canary.10`) — ده ممكن يسبب مشاكل تانية.
+
+---
+
+## 🚧 ### [2026-03-16 04:30] - Fix: Database migration applied to VPS
+
+-03-16
+
+---
+
+### [2026-03-16 04:30] - Fix: Database migration applied to VPS
+
+- الملفات اللي اتعدّلت: No code files changed — database-only fix
+- وصف: الـ admin panel على `/admin` كان بيرجّع 500 Server Error بسبب إن الـ PostgreSQL database على الـ VPS كانت فاضية (مفيش tables). تم استخراج الـ raw SQL من `src/migrations/20260316_020144.ts`، رفعه على الـ VPS عن طريق SCP، وتنفيذه في الـ Docker container `nextacademy-db` (`g0wckcksgoo484okg4cg804s`). اتعملوا 46 table بنجاح وتم تسجيل الـ migration في `payload_migrations`.
+
+### [2026-03-16 02:33] - Fix: DB schema push not running in production (instrumentation.ts)
+
+- **الملفات اللي اتعدّلت:**
+  - `src/instrumentation.ts` — إصلاح 3 مشاكل:
+    1. استبدال `@payload-config` alias بـ `./payload.config` relative import (الـ alias مش بيتحل في standalone mode)
+    2. إضافة retry logic (5 محاولات، 3 ثواني بين كل محاولة) عشان الـ DB ممكن يكون لسه بيعمل boot
+    3. `process.exit(1)` لو كل المحاولات فشلت بدلاً من swallow الـ error
+- **المشكلة:** `relation "users" does not exist` — الـ schema push مكانش بيتنفذ في production لأن `@payload-config` TypeScript alias مش بيتحل في Next.js standalone runtime
+- **الحل:** Relative import + retry + crash-on-failure
+
+---
+
+### [2026-03-16 01:59] - Fix: Admin page 500 error (i18n + DB schema push)
+
+- **الملفات اللي اتعدّلت:**
+  - `src/messages/ar.json` — إضافة `Footer.login` key الناقص
+  - `src/messages/en.json` — إضافة `Footer.login` key الناقص
+  - `src/instrumentation.ts` [🆕] — Eager Payload CMS init عند server startup
+  - `Dockerfile` — نسخ `src/messages` للـ runner stage + زيادة healthcheck `start-period` لـ 60s
+- **المشكلة:**
+  1. `Footer.login` missing from i18n → Next.js throws during SSR
+  2. Payload `push: true` schema sync was lazy (waits for first request) → first page load fails with "relation does not exist"
+- **الحل:**
+  1. إضافة `login` key لـ Footer namespace في ar.json و en.json
+  2. إنشاء `instrumentation.ts` بيعمل `getPayload()` eagerly عند server startup → schema push يحصل قبل أي request
+  3. نسخ i18n messages في Docker runner stage (كانت محذوفة مع standalone build)
+
+### [2026-03-15 14:07] - Fix docker-compose.yml healthcheck (still using wget)
+
+- **الملفات:** `docker-compose.yml`
+- **المشكلة:** Dockerfile healthcheck اتصلح قبل كده لـ `node -e`، لكن `docker-compose.yml` لسه بيستخدم `wget` اللي مش موجود في `node:22-alpine`. Coolify بيستخدم docker-compose.yml فبيعمل override.
+- **الحل:**
+  - استبدال `wget -qO-` بـ `node -e` inline HTTP GET (زي الـ Dockerfile)
+  - إضافة `start_period: 30s` عشان الـ container ياخد وقت يعمل boot
+
+### [2026-03-15 13:54] - Fix Docker healthcheck failure (Coolify deployment)
+
+- **الملفات:** `Dockerfile`, `src/app/api/health/route.ts` [NEW]
+- **المشكلة:** Container healthcheck كان بيستخدم `wget` اللي مش موجود في `node:22-alpine`
+- **الحل:**
+  - استبدال `wget` بـ `node -e` inline HTTP request
+  - إنشاء `/api/health` endpoint بيرجع `{ status: "ok" }`
+  - زيادة `--start-period` من 20s لـ 30s عشان Next.js ياخد وقت أكتر في الـ startup
+
+### [2026-03-15 13:45] - Fix: TypeScript Strict Mode Build Errors (7 API Route Files)
+
+- الملفات اللي اتعدّلت:
+  - `src/app/api/auth/google/callback/route.ts` — nullable `externalId` field
+  - `src/app/api/bookings/create/route.ts` — nullable `currentEnrollments`, `currentUses` fields + `paymentGatewayResponse` JSON cast
+  - `src/app/api/checkout/easykash/route.ts` — `paymentGatewayResponse` typed as `Record<string, unknown>` instead of specific interface
+  - `src/app/api/cron/waitlist/route.ts` — nullable `currentEnrollments`, user relation narrowing from `number | User`
+  - `src/app/api/discount-codes/validate/route.ts` — nullable `currentUses` comparison
+  - `src/app/api/notifications/[id]/read/route.ts` — relation ID typed as `number | User` not `string | User`
+  - `src/app/api/reviews/moderate/route.ts` — statusMap values inferred as `string` instead of enum literals (fixed with `as const`)
+- **المشكلة:** الـ build كان فاشل بسبب TypeScript strict mode — nullable fields, relation type narrowing, and enum inference
+- **الحل:** إضافة nullish coalescing (`?? 0`), type casts, `as const` assertions, وتصحيح relation narrowing من `typeof === 'string'` لـ `typeof === 'object'`
+
+---
+
+### [2026-03-15 13:08] - Fix: Production Server Component Render Errors (4 Public Pages)
+
+- الملفات اللي اتعدّلت: `src/app/[locale]/programs/page.tsx`, `src/app/[locale]/blog/page.tsx`, `src/app/[locale]/instructors/page.tsx`, `src/app/[locale]/about/page.tsx`
+- **المشكلة:** 4 صفحات عامة (programs, blog, instructors, about) كانوا بيعملوا server error في production لأن Next.js كان بيحاول يعمل static render وقت الـ build بس الـ Payload DB مش متاحة
+- **الحل:**
+  - إضافة `export const dynamic = 'force-dynamic'` لكل الـ 4 صفحات عشان تتعمل render وقت الـ request
+  - إضافة try-catch حول Payload queries في `programs` و `blog` (instructors كان عنده already)
+  - تصحيح CSS module import في `about` page (`about.module.css` → `page.module.css`)
+  - إضافة type annotations لـ TypeScript strict mode compliance
+
+---
+
+### [2026-03-15 09:58] - Fix: Add /privacy-policy redirect for branding verification
+
+- الملفات اللي اتعدّلت: `next.config.ts`
+- **المشكلة:** Google branding verification بيفشل لأن `/privacy-policy` بيرجع 404 — الصفحة موجودة على `/privacy`
+- **الحل:** إضافة Next.js redirects في `next.config.ts`: `/privacy-policy` → `/en/privacy` و `/:locale/privacy-policy` → `/:locale/privacy`
+
+### [2026-03-15 09:55] - Fix: Create BlogPosts Collection (Blog Page Server Error)
+
+- الملفات اللي اتعدّلت: `src/collections/BlogPosts.ts` (🆕), `src/payload.config.ts`, `src/payload-types.ts`
+- **المشكلة:** Blog pages (`/blog` + `/blog/[slug]`) كانوا بيعملوا server error لأن collection `blog-posts` مكانتش موجودة في Payload
+- **الحل:** إنشاء `BlogPosts` collection بـ fields: title, slug, excerpt, content (richText), category, featuredImage, author, tags, status, publishedAt + تسجيلها في `payload.config.ts` + regenerate types
+
+---
+
+### [2026-03-15 01:44] - Security Fixes: IDOR, Headers, Error Leak, Docker
+
+- الملفات اللي اتعدّلت: `Users.ts`, `nginx.conf`, `proxy.ts`, `checkout/paymob/route.ts`, `Dockerfile`
+- **Critical Fix**: Users collection `update` access changed from `isAuthenticated` → `isAdminOrSelf` (IDOR)
+- **High Fix**: Added 6 security headers to nginx (HSTS, X-Frame-Options, CSP, X-Content-Type-Options, Referrer-Policy, server_tokens off)
+- **High Fix**: Added security headers to `proxy.ts` (X-Content-Type-Options, X-Frame-Options, Referrer-Policy, Permissions-Policy) — deleted conflicting `middleware.ts`
+- **High Fix**: Paymob checkout error leak — now returns generic message, logs details server-side
+- **Low Fix**: Added `HEALTHCHECK` to Dockerfile for container health monitoring
+- **Verified OK**: docker-compose uses env vars (no hardcoded secrets), email.ts FROM address is display name not a secret
+
+---
+
+### [2026-03-15 01:00] - Deep Security & Code Audit
+
+- الملفات اللي اتراجعت: All 27 Payload collections, access-control.ts, auth-api.ts, payment-api.ts, rate-limit.ts, email.ts, resend-email-adapter.ts, checkout/paymob/route.ts, checkout/easykash/route.ts, cron/check-overdue/route.ts, cron/waitlist/route.ts, webhooks/paymob/route.ts, webhooks/easykash/route.ts, docker-compose.yml, nginx/nginx.conf
+- **Critical**: Users collection `update` access uses `isAuthenticated` — IDOR vulnerability (any user can update any other user)
+- **High**: Missing security headers in nginx (HSTS, CSP, X-Frame-Options, etc.)
+- **High**: No Next.js middleware.ts for route protection
+- **High**: Users `read` access exposes all user records to any authenticated user
+- **Medium**: PAYLOAD_SECRET in Docker build args, console.log in prod, no rate limiting on checkout, hardcoded phone fallback
+- Full report: [walkthrough.md](../../.gemini/antigravity/brain/7b117a1f-0242-44d1-bb95-f9a7350e9ce3/walkthrough.md)
+
+---
+
+### ✅ [2026-03-14 23:00] — Security Hardening + VPS Docker Setup
+
+| الملف | التغيير |
+|---|---|
+| `next.config.ts` | 🔧 HSTS + CSP headers + `output: standalone` |
+| `src/proxy.ts` | 🔧 حماية `/b2b-dashboard` + `/onboarding` |
+| `src/lib/rate-limit.ts` | 🆕 ioredis sliding window rate limiter + in-memory fallback |
+| `src/app/api/users/login/route.ts` | 🆕 Rate-limited login (10 req/min per IP) |
+| `src/app/api/discount-codes/validate/route.ts` | 🆕 Server-side discount validation |
+| `src/components/layout/Navbar.tsx` | 🔧 Auth-aware — show/hide login buttons |
+| `Dockerfile` | 🆕 Multi-stage production build |
+| `docker-compose.yml` | 🔧 كامل: postgres + redis + app + nginx + certbot |
+| `nginx/nginx.conf` | 🆕 Reverse proxy + SSL termination |
+| `.env.production.template` | 🆕 Production env template |
+
+---
+
+### ✅ [2026-03-14 22:00] — Payment Gateway Testing & Bug Fixes
+
+| الملف | التغيير |
+|---|---|
+| `src/app/.../checkout/[bookingId]/page.tsx` | 🔧 Fix booking ID type mismatch (number vs string) |
+| `src/lib/dashboard-api.ts` | 🔧 إضافة `discountAmount` لـ `PayloadBooking` type |
+| `src/lib/payment-api.ts` | 🔧 تغيير `Authorization: Token` → `Bearer` للـ Paymob key الجديد |
+| `src/app/api/checkout/paymob/route.ts` | 🔧 إرجاع actual error message بدل generic message |
+| `scripts/seed-test-payment.sql` | 🆕 SQL seed script لبيانات الاختبار |
+| `.env` | 🔧 تصحيح `PAYMOB_API_KEY` + تصحيح integration IDs + تحديث ngrok URL |
+
+**نتيجة الاختبار:**
+
+- Paymob card payment → 3DS → Approved ✅
+- EasyKash Fawry voucher → pending page ✅
+- HMAC verification على الـ webhooks ✅
+
+---
+
+### ✅ [2026-03-14 20:00] — Payment Gateway Integration (Paymob + EasyKash)
+
+| الملف | التغيير |
+|---|---|
+| `src/lib/payment-api.ts` | 🆕 Shared types + Paymob Intention API + EasyKash Cash API + HMAC verification |
+| `src/app/api/checkout/paymob/route.ts` | 🆕 POST — ينشئ Paymob Intention → يرجع redirect URL |
+| `src/app/api/checkout/easykash/route.ts` | 🆕 POST — ينشئ EasyKash Cash voucher (Fawry/Aman) |
+| `src/app/api/webhooks/paymob/route.ts` | 🆕 POST — HMAC verify → amount check → confirm booking |
+| `src/app/api/webhooks/paymob/redirect/route.ts` | 🆕 GET — Paymob redirect handler → success/pending/failed |
+| `src/app/api/webhooks/easykash/route.ts` | 🆕 POST — HMAC verify → amount check → confirm booking |
+| `src/app/.../checkout/[bookingId]/page.tsx` | 🔄 Wired لـ real APIs — بيجيب بيانات الحجز الحقيقية |
+| `src/app/.../checkout/success/page.tsx` | 🆕 Success page بعد كارت/محفظة |
+| `src/app/.../checkout/pending/page.tsx` | 🆕 Pending page — voucher + copy button + خطوات فوري/أمان |
+| `src/app/.../checkout/failed/page.tsx` | 🆕 Failed page — retry + واتساب |
+| `docs/engineering/env-variables.md` | 🔄 إضافة `PAYMOB_PUBLIC_KEY` + `EASYKASH_API_TOKEN` + `EASYKASH_HMAC_SECRET` |
+
+**الـ Flow:**
+
+- كارت/محفظة → Paymob Intention API → Unified Checkout → webhook → confirmed
+- فوري/أمان → EasyKash Cash API → voucher page → يدفع في الفرع → webhook → confirmed
+
+**Testing:**
+
+- ngrok tunnel: `https://97f9-41-36-59-214.ngrok-free.app`
+- Webhooks tested locally — HMAC rejection ✅
+- Paymob + EasyKash callbacks updated in dashboards ✅
+
+---
+
+---
+
+### ✅ [2026-03-14 18:00] — B2B Manager Dashboard
+
+| الملف | التغيير |
+|---|---|
+| `src/lib/b2b-api.ts` | 🆕 Typed fetch helpers للـ B2B dashboard |
+| `src/components/b2b/B2BLayout.tsx` | 🆕 Sidebar layout مع nav + logout |
+| `src/app/.../b2b-dashboard/page.tsx` | 🆕 Overview — stats + team + recent bookings |
+| `src/app/.../b2b-dashboard/team/page.tsx` | 🆕 Team members table + search |
+| `src/app/.../b2b-dashboard/bookings/page.tsx` | 🆕 Bookings + filter (all/upcoming/completed) |
+| `src/app/../(b2b)/layout.tsx` | 🆕 Route group layout |
+| `src/app/../(b2b)/loading.tsx` + `error.tsx` | 🆕 Loading + error boundaries |
+
+---
+
+### ✅ [2026-03-14 17:00] — Notifications Page + Instructor Portal Backend Wiring
+
+| الملف | التغيير |
+|---|---|
+| `src/lib/instructor-api.ts` | 🆕 Typed fetch helpers للـ instructor portal |
+| `src/app/.../dashboard/notifications/page.tsx` | 🆕 Notifications page — real data + mark read + mark all read |
+| `src/app/.../instructor/page.tsx` | 🔄 Wire لـ real sessions + consultations بدل mock |
+| `src/app/.../instructor/sessions/page.tsx` | 🔄 Wire لـ real sessions + search |
+| `src/app/.../instructor/bookings/page.tsx` | 🔄 Wire لـ real consultation bookings + approve/decline |
+| `src/app/.../instructor/availability/page.tsx` | 🔄 Wire لـ real availability + blocked dates (add/delete) |
+
+---
+
+### ✅ [2026-03-14 16:00] — GitHub Repository Setup + Initial Push
+
+| | |
+|---|---|
+| 📁 **ملف جديد** | `.gitignore` — يستثني `node_modules/`, `.next/`, `.env*`, `*.tsbuildinfo`, `client_secret_*.json` |
+| 🔗 **Repo** | <https://github.com/nextacademyedu-lang/next-academy-edu> (private) |
+| 📦 **Commit** | `feat: initial commit — Next Academy platform scaffold` (274 ملف) |
+| 🌿 **Branch** | `main` |
+
+---
+
+### ✅ [2026-03-14 15:30] — Phase 5: Dashboard Backend Wiring
+
+| الملف | التغيير |
+|---|---|
+| `src/lib/dashboard-api.ts` | 🆕 Typed fetch helpers للـ Overview, Bookings, Payments, Profile |
+| `src/components/dashboard/DashboardLayout.tsx` | 🔄 ربط `useAuth()` بدل `MOCK_USER` + avatar + logout |
+| `src/app/.../dashboard/page.tsx` | 🔄 Overview بيجيب stats + next sessions من API |
+| `src/app/.../dashboard/bookings/page.tsx` | 🔄 Bookings grid بالبيانات الحقيقية + progress bars |
+| `src/app/.../dashboard/payments/page.tsx` | 🔄 Payments بـ tabs: Active Installments + History |
+| `src/app/.../dashboard/profile/page.tsx` | 🔄 Profile بيجيب بيانات اليوزر + save + change password |
+
+**النتيجة:** TypeScript build ✅ exit code 0 — كل الـ dashboard wired للـ backend
+
+---
+
+### 🔧 [2026-03-14 15:00] — Fix: Normalize Access-Control Imports
+
+| | |
+|---|---|
+| 📁 **الملفات** | `Waitlist.ts`, `Reviews.ts`, `PaymentLinks.ts`, `InstructorBlockedDates.ts`, `Certificates.ts` |
+| ❌ **المشكلة** | 5 collections كانوا بيستخدموا `@/lib/access-control` بدون `.ts` |
+| ✅ **الحل** | Normalize لـ `../lib/access-control.ts` في كل الـ 27 collection |
+
+---
+
+### 🔧 [2026-03-14 14:30] — Fix: Payload Build Errors (importMap + serverFunction)
+
+| المشكلة | الحل |
+|---|---|
+| `importMap` error — ملف فاضي بدون exports | Rename `.ts` → `.js` + regenerate types + إضافة `.ts` extension لـ 13 collection |
+| `serverFunction` error — Payload 3.79.0 يحتاج prop جديد | إضافة `serverFunction` wrapper مع `'use server'` على `RootLayout` |
+
+**النتيجة:** Build ✅ — 32 routes generated
+
+---
+
+### ✅ [2026-03-14 14:00] — Phase 4: Resend Email Adapter + Google OAuth
+
+| الملف | التغيير |
+|---|---|
+| `src/lib/resend-adapter.ts` | 🆕 Resend adapter بـ REST API + type safety |
+| `src/payload.config.ts` | 🔄 Wire `resendAdapter` في Payload email config |
+| `src/app/api/auth/google/route.ts` | 🆕 Google OAuth entry point |
+| `src/app/api/auth/google/callback/route.ts` | 🆕 Token exchange + find-or-create user + JWT |
+| `src/collections/Users.ts` | 🔄 إضافة `googleId` field |
+| `src/app/.../login/page.tsx` | 🔄 Wire Google button |
+| `src/app/.../register/page.tsx` | 🔄 Wire Google button |
+
+> ⚠️ **Env vars مطلوبة:** `RESEND_API_KEY`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`
+
+---
+
+### 🔧 [2026-03-14 05:05] — Fix: OTP Double-Submit Race Condition
+
+| | |
+|---|---|
+| 📁 **الملف** | `src/app/[locale]/(auth)/verify-email/page.tsx` |
+| ❌ **المشكلة** | `handleVerify` بتتنادي مرتين (auto-submit + manual) → الكود يتعمل mark used → "الرمز غلط" |
+| ✅ **الحل** | `verifyingRef` — ref-based lock يمنع الاستدعاء المتزامن |
+
+---
+
+### 🔧 [2026-03-14 12:30] — Fix: Signup Redirects to Dashboard Instead of Register
+
+| | |
+|---|---|
+| 📁 **الملفات** | `src/proxy.ts`, `src/app/.../login/page.tsx` |
+| ❌ **المشكلة** | Middleware كان بيشوف `payload-token` stale cookie ويعمل redirect لـ `/dashboard` |
+| ✅ **الحل** | شيل الـ server-side redirect من auth routes + client-side auth check في login page |
+
+---
+
+### 🔧 [2026-03-13 18:45] — Fix: Middleware/Proxy Conflict (Next.js 16)
+
+| | |
+|---|---|
+| 📁 **الملفات** | `src/proxy.ts` (دمج), `src/middleware.ts` (🗑️ محذوف) |
+| ❌ **المشكلة** | Next.js 16 بيرفض وجود `middleware.ts` و`proxy.ts` مع بعض |
+| ✅ **الحل** | نقل كل اللوجيك (auth + i18n + route protection) لـ `proxy.ts` وحذف `middleware.ts` |
+
+---
+
+### ✅ [2026-03-14 12:00] — Sprint 4: Onboarding i18n + Premium CSS Redesign
+
+| الملف | التغيير |
+|---|---|
+| `src/app/.../onboarding/page.tsx` | 🔄 `useTranslations('Auth')` — صفر hardcoded text |
+| `src/components/onboarding/step-1.tsx` | 🔄 i18n كامل |
+| `src/components/onboarding/step-2.tsx` | 🔄 i18n كامل |
+| `src/components/onboarding/step-3.tsx` | 🔄 i18n كامل |
+| `src/components/onboarding/onboarding.module.css` | 🔄 Premium CSS: radial gradient + glassmorphism + glow animations |
+| `src/app/.../onboarding/onboarding.module.css` | 🗑️ حذف duplicate |
+
+---
+
+### ✅ [2026-03-14 11:30] — Sprint 4: Multi-Step Onboarding Wizard
+
+| الملف | التغيير |
+|---|---|
+| `src/app/.../onboarding/page.tsx` | 🆕 3-step wizard orchestrator + framer-motion |
+| `src/components/onboarding/step-1.tsx` | 🆕 Professional Info |
+| `src/components/onboarding/step-2.tsx` | 🆕 Company & Location |
+| `src/components/onboarding/step-3.tsx` | 🆕 Learning Goals + tag chips |
+
+---
+
+### ✅ [2026-03-14 10:00] — Sprint 0: Access Control Fix (5 Collections)
+
+| Collection | Access Control المضاف |
+|---|---|
+| `Reviews.ts` | Public read, auth create, owner/admin update, admin delete |
+| `Certificates.ts` | Owner/admin read, admin create/update/delete |
+| `InstructorBlockedDates.ts` | Instructor-owner + admin لكل العمليات |
+| `PaymentLinks.ts` | Admin-only لكل CRUD |
+| `Waitlist.ts` | Owner/admin read, auth create, admin update/delete |
+
+---
+
+### 📁 [2026-03-13 14:31] — 3-Phase: Docs Organize + API Verify + Code Audit
+
+| Phase | التغيير |
+|---|---|
+| Phase 1 | نقل 28 ملف لـ 6 subdirectories + `docs/README.md` index |
+| Phase 2 | `api-contracts.md` — إضافة 8 sections جديدة (411 → 749 سطر) |
+| Phase 3 | `code-audit.md` — تقرير شامل لـ 21 collection |
+
+---
+
+### 📁 [2026-03-13 04:00] — Documentation Gap Fill (15 Files)
+
+> أنشأنا 12 ملف جديد + وسّعنا 3 ملفات موجودة
+
+| الملفات الجديدة |
+|---|
+| `security.md`, `payment-scenarios.md`, `error-handling.md`, `api-contracts.md` |
+| `rate-limiting.md`, `testing-strategy.md`, `env-variables.md`, `deployment.md` |
+| `monitoring.md`, `accessibility.md`, `performance.md`, `data-privacy.md` |
+
+---
+
+### ✅ [2026-03-14 12:00] — Sprint 4: Foundation Fixes Batch
+
+| Fix | التفاصيل |
+|---|---|
+| proxy.ts convention | Renamed لـ Next.js 16 convention |
+| Instructor layout | حذف duplicate `NextIntlClientProvider` + old params syntax |
+| loading/error pages | إضافة لكل 5 route groups |
+| ar.json + en.json | Populated بكل UI string keys |
+| useTranslations | Updated في 7 components — صفر hardcoded strings |
+| TypeScript fix | حذف duplicate `color` property في instructor sessions |
+
+---
+
+### ✅ [2026-03-05 01:00] — Phase 3: Static Pages
+
+> تم تنفيذ routes و layout components لـ `/about`, `/contact`, `/blog`, `/privacy`, `/terms`, `/refund-policy`
+> تثبيت brand colors في `globals.css` (`#C51B1B`, `#020504`)
+
+---
+
+### [2026-03-17 15:40] - Created Coolify Deployment Rules
+
+**Files:**
+
+- `docs/engineering/coolify-deployment.md` (NEW) — comprehensive deployment rules for Coolify
+- `docs/engineering/deployment.md` (MODIFIED) — deprecated, pointing to coolify-deployment.md
+
+**Reason:** Project migrated from Vercel to Coolify (self-hosted Docker Compose on VPS). Documented all known deployment issues, Dockerfile rules, environment variables, and troubleshooting based on error history.
+
+---
+
+### [2026-03-17 15:45] - Created Agent Rules (GEMINI.md) + Logs Structure
+
+**Files:**
+
+- `GEMINI.md` (NEW) — root-level agent rules file
+- `docs/logs/changelog.md` (NEW) — this file
+- `docs/logs/tasks.md` (NEW) — task tracking
+- `docs/logs/errors.md` (NEW) — error history
+
+**Reason:** Enforcing documentation-first development and log maintenance discipline.
+
+---
+
+### [2026-03-17 ~13:00] - Debugging Payload Authentication Issues
+
+**Files:**
+
+- `src/app/api/auth/login/route.ts` (INVESTIGATED) — login returning 401 for all errors
+- `src/app/api/reset-admin/route.ts` (INVESTIGATED) — discovered hardcoded password
+- `.env` (INVESTIGATED) — `serverURL` pointing to production domain during local dev
+
+**Reason:** Newly created admin users could not sign in, and the initial admin user could not log back in after logging out. Investigated auth flow end-to-end.
+
+---
+
+### [2026-03-17 ~22:00] - Deep Audit of Payload Auth — Fixes Applied
+
+**Files:**
+
+- `src/app/api/reset-admin/route.ts` (DELETED) — security risk: plain-text password in code & response
+- `src/app/api/users/login/route.ts` (MODIFIED) — fixed error handling: auth errors → 401, server errors → 500
+- `.env.local` (NEW) — local dev URLs to avoid hitting production domain
+- `بص المشكلة دي ف payload...md` (DELETED) — outdated troubleshooting file in repo root
+
+**Reason:** Deep audit of 14 auth-related files. Fixed security vulnerability (hardcoded password), improved error handling, resolved serverURL mismatch for local development.
+
+---
+
+### [2026-03-17 ~10:00] - Added Facebook Domain Verification Meta Tag
+
+**Files:**
+
+- `src/app/layout.tsx` (MODIFIED) — added `<meta>` tag for Facebook domain verification
+
+**Reason:** Required for Facebook Business verification of the `nextacademyedu.com` domain.

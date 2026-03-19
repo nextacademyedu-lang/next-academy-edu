@@ -2,8 +2,6 @@
 description: Mandatory pre-build checklist and discipline rules for every feature
 ---
 
-// turbo-all
-
 # Build Discipline — Mandatory Workflow
 
 > **هذا الملف يُقرأ قبل بناء أي feature أو تعديل أي collection أو إنشاء أي API route.**

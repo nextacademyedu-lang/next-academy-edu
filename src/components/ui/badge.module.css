@@ -2,30 +2,39 @@
   display: inline-flex;
   align-items: center;
   padding: 4px 12px;
-  border-radius: var(--radius-full, 9999px);
-  font-size: 12px;
+  border-radius: 100px;
+  font-size: var(--text-small, 14px);
   font-weight: var(--font-medium, 600);
   white-space: nowrap;
+  gap: 6px;
+}
+
+.badge::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
 }
 
 .badge-default {
-  background-color: var(--bg-surface-hover, #1a1a1a);
-  color: var(--text-secondary);
+  background-color: var(--status-neutral-bg, #2a2a2a);
+  color: var(--status-neutral, #a1a1aa);
 }
 
 .badge-success {
-  background-color: rgba(0, 212, 126, 0.1);
-  color: var(--success, #00D47E);
+  background-color: var(--status-success-bg, #1a3a1a);
+  color: var(--status-success, #4ade80);
 }
 
 .badge-warning {
-  background-color: rgba(255, 184, 0, 0.1);
-  color: var(--warning, #FFB800);
+  background-color: var(--status-warning-bg, #3a2a1a);
+  color: var(--status-warning, #fbbf24);
 }
 
 .badge-error {
-  background-color: rgba(255, 68, 68, 0.1);
-  color: var(--error, #FF4444);
+  background-color: var(--status-error-bg, #3a1a1a);
+  color: var(--status-error, #f87171);
 }
 
 .badge-outline {

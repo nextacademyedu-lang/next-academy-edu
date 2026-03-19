@@ -29,8 +29,26 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const body = await req.json();
-    const { email, password } = body;
+    // Parse body — Payload CMS admin sends multipart/form-data with a _payload field,
+    // while external API consumers may send application/json.
+    let email: string | undefined;
+    let password: string | undefined;
+
+    const contentType = req.headers.get('content-type') ?? '';
+
+    if (contentType.includes('multipart/form-data')) {
+      const formData = await req.formData();
+      const payloadField = formData.get('_payload');
+      if (typeof payloadField === 'string') {
+        const parsed = JSON.parse(payloadField);
+        email = parsed.email;
+        password = parsed.password;
+      }
+    } else {
+      const body = await req.json();
+      email = body.email;
+      password = body.password;
+    }
 
     if (!email || !password) {
       return NextResponse.json(
@@ -42,7 +60,7 @@ export async function POST(req: NextRequest) {
     const payload = await getPayload({ config });
     const result = await payload.login({
       collection: 'users',
-      data: { email, password },
+      data: { email: email as string, password: password as string },
       req: req as any,
     });
 

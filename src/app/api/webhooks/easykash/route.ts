@@ -90,7 +90,7 @@ export async function POST(req: NextRequest) {
           userName: `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.email,
           programTitle: program?.titleAr || program?.titleEn || 'البرنامج',
           bookingCode: booking.bookingCode || String(booking.id),
-          amount: booking.finalAmount,
+          amountPaid: booking.finalAmount,
           startDate: round?.startDate ? new Date(round.startDate).toLocaleDateString('ar-EG') : '',
         });
         await payload.update({

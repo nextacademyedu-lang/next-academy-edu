@@ -155,7 +155,7 @@ export async function verifyOtp(
  * Redirect to Google OAuth flow.
  * This triggers a full-page redirect — not a fetch call.
  */
-export function redirectToGoogle(redirectAfterLogin = '/dashboard'): void {
+export function redirectToGoogle(redirectAfterLogin = '/'): void {
   const params = new URLSearchParams({ redirect: redirectAfterLogin });
   window.location.href = `/api/auth/google?${params.toString()}`;
 }

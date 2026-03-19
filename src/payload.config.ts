@@ -38,6 +38,9 @@ import { InstructorBlockedDates } from './collections/InstructorBlockedDates.ts'
 import { VerificationCodes } from './collections/VerificationCodes.ts';
 import { BlogPosts } from './collections/BlogPosts.ts';
 import { BulkSeatAllocations } from './collections/BulkSeatAllocations.ts';
+import { Popups } from './collections/Popups.ts';
+import { AnnouncementBars } from './collections/AnnouncementBars.ts';
+import { UpcomingEventsConfig } from './collections/UpcomingEventsConfig.ts';
 
 if (!process.env.DATABASE_URI) {
   throw new Error('DATABASE_URI environment variable is required');
@@ -190,6 +193,9 @@ export default buildConfig({
     VerificationCodes,
     BlogPosts,
     BulkSeatAllocations,
+    Popups,
+    AnnouncementBars,
+    UpcomingEventsConfig,
   ],
   editor: lexicalEditor({}),
   db: postgresAdapter({

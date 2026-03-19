@@ -1,0 +1,125 @@
+.bar {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 16px;
+  position: relative;
+  z-index: 100;
+  overflow: hidden;
+}
+
+.barInfo {
+  background: linear-gradient(135deg, var(--accent-primary, #c51b1b), #d93636);
+  color: #fff;
+}
+
+.barWarning {
+  background: linear-gradient(135deg, #e6a817, #d4961a);
+  color: #1a1a2e;
+}
+
+.barSuccess {
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: #fff;
+}
+
+.barPromo {
+  background: linear-gradient(135deg, #7c3aed, #6d28d9);
+  color: #fff;
+}
+
+.inner {
+  max-width: 1280px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-md, 16px);
+  position: relative;
+}
+
+.icon {
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.text {
+  font-size: var(--text-body-sm, 14px);
+  font-weight: var(--font-medium, 500);
+  text-align: center;
+  line-height: 1.4;
+}
+
+.link {
+  color: inherit;
+  font-weight: var(--font-bold, 700);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  white-space: nowrap;
+  transition: opacity 0.2s;
+}
+
+.link:hover {
+  opacity: 0.8;
+}
+
+/* Countdown inline */
+.countdown {
+  display: inline-flex;
+  gap: 6px;
+  font-weight: var(--font-bold, 700);
+  font-variant-numeric: tabular-nums;
+}
+
+.dismissBtn {
+  position: absolute;
+  right: 0;
+  background: none;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  padding: 4px;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+  font-size: 16px;
+  line-height: 1;
+}
+
+[dir="rtl"] .dismissBtn {
+  right: auto;
+  left: 0;
+}
+
+.dismissBtn:hover {
+  opacity: 1;
+}
+
+/* Marquee / scroll animation for long text */
+@keyframes marquee {
+  0% { transform: translateX(100%); }
+  100% { transform: translateX(-100%); }
+}
+
+[dir="rtl"] .marqueeTrack {
+  animation-direction: reverse;
+}
+
+.marqueeTrack {
+  animation: marquee 20s linear infinite;
+  white-space: nowrap;
+}
+
+@media (max-width: 480px) {
+  .bar {
+    padding: 8px 12px;
+  }
+
+  .text {
+    font-size: var(--text-caption, 12px);
+  }
+
+  .icon {
+    display: none;
+  }
+}

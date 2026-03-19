@@ -93,9 +93,8 @@ export async function GET(req: NextRequest) {
       to: user.email,
       userName: `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.email,
       programTitle: program?.titleAr || program?.titleEn || 'البرنامج',
-      amount: payment.amount,
+      amountDue: payment.amount,
       dueDate: new Date(payment.dueDate).toLocaleDateString('ar-EG'),
-      bookingId: String(bookingId),
     });
 
     await payload.update({

@@ -10,7 +10,7 @@ description: Next Academy development workflow and project rules
 
 - **Framework:** Next.js 15 (App Router with Server Components)
 - **CMS:** Payload CMS 3.0 (embedded inside Next.js — NOT standalone)
-- **Database:** PostgreSQL (Neon for production, Docker locally)
+- **Database:** PostgreSQL (Docker in Coolify production, Docker locally)
 - **ORM:** Drizzle ORM (via Payload CMS adapter)
 - **Language:** TypeScript (strict mode, no `any`)
 - **Styling:** Vanilla CSS + CSS Modules (NO TailwindCSS unless user explicitly asks)

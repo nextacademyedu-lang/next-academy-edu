@@ -7,13 +7,16 @@
     "dev": "next dev",
     "build": "payload generate:importmap && next build",
     "generate:importmap": "payload generate:importmap",
-    "start": "next start"
+    "start": "next start",
+    "seed:admin": "node --env-file=.env --env-file=.env.local --import tsx scripts/seed-admin.ts",
+    "seed:dev": "node --env-file=.env --env-file=.env.local --import tsx scripts/seed-dev.ts"
   },
   "dependencies": {
     "@payloadcms/db-postgres": "^3.79.0",
     "@payloadcms/next": "^3.79.0",
     "@payloadcms/richtext-lexical": "^3.79.0",
     "@payloadcms/ui": "^3.79.0",
+    "@react-email/components": "^1.0.10",
     "embla-carousel-react": "^8.6.0",
     "framer-motion": "^12.35.0",
     "graphql": "^16.13.1",
@@ -25,6 +28,7 @@
     "payload": "^3.79.0",
     "react": "19.2.3",
     "react-dom": "19.2.3",
+    "react-email": "^5.2.10",
     "resend": "^6.9.3",
     "sharp": "0.34.2"
   },

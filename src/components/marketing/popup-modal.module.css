@@ -1,0 +1,341 @@
+/* ── Popup Modal ─────────────────────────────────────── */
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-md);
+}
+
+.modal {
+  position: relative;
+  border-radius: var(--radius-lg, 16px);
+  max-width: 520px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5);
+}
+
+/* ── Popup Types ─────────────────────────────────────── */
+
+.slideIn {
+  position: fixed;
+  bottom: var(--space-md, 16px);
+  right: var(--space-md, 16px);
+  left: auto;
+  top: auto;
+  max-width: 400px;
+  width: calc(100% - 32px);
+}
+
+[dir='rtl'] .slideIn {
+  right: auto;
+  left: var(--space-md, 16px);
+}
+
+.bottomBar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  top: auto;
+  max-width: 100%;
+  border-radius: 0;
+  max-height: 40vh;
+}
+
+.fullScreen {
+  max-width: 100%;
+  max-height: 100%;
+  height: 100%;
+  border-radius: 0;
+}
+
+/* ── Close Button ────────────────────────────────────── */
+
+.closeBtn {
+  position: absolute;
+  top: var(--space-sm, 12px);
+  right: var(--space-sm, 12px);
+  z-index: 10;
+  background: var(--bg-elevated);
+  border: none;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: inherit;
+  transition: background 0.2s ease;
+}
+
+[dir='rtl'] .closeBtn {
+  right: auto;
+  left: var(--space-sm, 12px);
+}
+
+.closeBtn:hover {
+  background: var(--bg-surface);
+}
+
+/* ── Content Layout ──────────────────────────────────── */
+
+.content {
+  padding: var(--space-lg, 32px);
+}
+
+.imageTop {
+  width: 100%;
+  max-height: 200px;
+  object-fit: cover;
+  border-radius: var(--radius-lg, 16px) var(--radius-lg, 16px) 0 0;
+}
+
+.imageSide {
+  display: flex;
+  gap: 0;
+}
+
+.imageSide .sideImage {
+  width: 40%;
+  min-height: 250px;
+  object-fit: cover;
+}
+
+.imageSide .content {
+  flex: 1;
+}
+
+.title {
+  font-family: var(--font-cairo), var(--font-montserrat), sans-serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0 0 var(--space-sm, 12px);
+  line-height: 1.3;
+}
+
+.description {
+  font-size: 0.95rem;
+  opacity: 0.85;
+  line-height: 1.6;
+  margin-bottom: var(--space-md, 16px);
+}
+
+.description p {
+  margin: 0 0 var(--space-xs, 8px);
+}
+
+/* ── Promo Code ──────────────────────────────────────── */
+
+.promoCode {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs, 8px);
+  background: var(--bg-elevated);
+  border: 1px dashed var(--border);
+  border-radius: var(--radius-sm, 8px);
+  padding: var(--space-sm, 12px);
+  margin-bottom: var(--space-md, 16px);
+}
+
+.promoLabel {
+  font-size: 0.8rem;
+  opacity: 0.7;
+}
+
+.code {
+  font-family: monospace;
+  font-size: 1.2rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+}
+
+.copyBtn {
+  margin-inline-start: auto;
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm, 8px);
+  padding: 4px 12px;
+  color: inherit;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.copyBtn:hover {
+  background: var(--bg-elevated);
+}
+
+/* ── Countdown ───────────────────────────────────────── */
+
+.countdown {
+  display: flex;
+  gap: var(--space-sm, 12px);
+  justify-content: center;
+  margin-bottom: var(--space-md, 16px);
+}
+
+.countdownUnit {
+  text-align: center;
+}
+
+.countdownValue {
+  font-size: 1.8rem;
+  font-weight: 800;
+  line-height: 1;
+  display: block;
+}
+
+.countdownLabel {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  opacity: 0.6;
+  letter-spacing: 1px;
+}
+
+/* ── CTA ─────────────────────────────────────────────── */
+
+.ctaRow {
+  display: flex;
+  gap: var(--space-sm, 12px);
+  margin-top: var(--space-md, 16px);
+}
+
+.primaryCta {
+  flex: 1;
+  padding: var(--space-sm, 12px) var(--space-md, 16px);
+  border: none;
+  border-radius: var(--radius-sm, 8px);
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  text-decoration: none;
+  text-align: center;
+  transition: opacity 0.2s;
+}
+
+.primaryCta:hover {
+  opacity: 0.9;
+}
+
+.secondaryCta {
+  flex: 1;
+  padding: var(--space-sm, 12px) var(--space-md, 16px);
+  background: transparent;
+  border: 1px solid currentColor;
+  border-radius: var(--radius-sm, 8px);
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  text-decoration: none;
+  text-align: center;
+  color: inherit;
+  transition: background 0.2s;
+}
+
+.secondaryCta:hover {
+  background: var(--bg-elevated);
+}
+
+/* ── Form ────────────────────────────────────────────── */
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm, 12px);
+  margin-top: var(--space-md, 16px);
+}
+
+.input {
+  width: 100%;
+  padding: var(--space-sm, 12px);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm, 8px);
+  font-size: 0.95rem;
+  color: inherit;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.input:focus {
+  border-color: var(--text-secondary);
+}
+
+.input::placeholder {
+  opacity: 0.5;
+}
+
+.submitBtn {
+  padding: var(--space-sm, 12px);
+  border: none;
+  border-radius: var(--radius-sm, 8px);
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.submitBtn:hover {
+  opacity: 0.9;
+}
+
+.successMsg {
+  text-align: center;
+  padding: var(--space-md, 16px);
+  font-size: 1rem;
+  opacity: 0.9;
+}
+
+/* ── Mobile ──────────────────────────────────────────── */
+
+@media (max-width: 600px) {
+  .modal {
+    max-width: 100%;
+    border-radius: var(--radius-md, 12px);
+  }
+
+  .slideIn {
+    right: var(--space-xs, 8px);
+    left: var(--space-xs, 8px);
+    bottom: var(--space-xs, 8px);
+    max-width: 100%;
+    width: auto;
+  }
+
+  [dir='rtl'] .slideIn {
+    right: var(--space-xs, 8px);
+    left: var(--space-xs, 8px);
+  }
+
+  .imageSide {
+    flex-direction: column;
+  }
+
+  .imageSide .sideImage {
+    width: 100%;
+    max-height: 150px;
+  }
+
+  .title {
+    font-size: 1.25rem;
+  }
+
+  .countdown {
+    gap: var(--space-xs, 8px);
+  }
+
+  .countdownValue {
+    font-size: 1.4rem;
+  }
+
+  .ctaRow {
+    flex-direction: column;
+  }
+}

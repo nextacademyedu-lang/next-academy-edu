@@ -3,8 +3,8 @@
   padding: 120px 0;
   background-color: var(--bg-main, #020504);
   background-image: 
-    linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
   background-size: 48px 48px;
   position: relative;
 }
@@ -58,7 +58,7 @@
 
 .word {
   display: inline-block;
-  margin-right: 12px;
+  margin-inline-end: 12px;
   will-change: opacity, transform;
 }
 
@@ -103,17 +103,17 @@
 .serviceItem:hover .iconWrapper {
   background-color: var(--bg-main);
   border-color: var(--accent-primary);
-  color: var(--accent-primary);
+  color: var(--accent-text);
   transform: scale(1.1);
 }
 
 .iconWrapper {
   position: absolute;
   top: -32px;
-  left: 32px;
+  inset-inline-start: 32px;
   width: 64px;
   height: 64px;
-  background-color: rgba(26, 26, 26, 0.8);
+  background-color: var(--icon-bg);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border-radius: var(--radius-lg, 16px);
@@ -121,17 +121,17 @@
   align-items: center;
   justify-content: center;
   z-index: 10;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: var(--card-shadow);
+  border: 1px solid var(--icon-border);
   color: var(--text-primary);
   transition: all 0.3s ease;
 }
 
 .card {
-  background-color: rgba(26, 26, 26, 0.4);
+  background-color: var(--glass-bg);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.05); /* or border-subtle */
+  border: 1px solid var(--glass-border);
   height: 100%;
   padding-top: 24px;
   transition: border-color 0.3s ease, box-shadow 0.3s ease;
@@ -169,12 +169,12 @@
   }
   
   .word {
-    margin-right: 8px;
+    margin-inline-end: 8px;
   }
   
   .manifestoWrapper {
     margin-bottom: 60px;
-    text-align: left; /* Better readability on mobile for multiline text */
+    text-align: start; /* Better readability on mobile for multiline text */
   }
   
   .manifestoSubtitle {

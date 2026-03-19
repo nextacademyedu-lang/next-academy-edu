@@ -14,7 +14,7 @@
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
-  text-align: left;
+  text-align: start;
   margin-bottom: var(--space-2xl, 64px);
 }
 
@@ -37,13 +37,13 @@
 
 .prevBtn {
   position: absolute;
-  left: -24px;
+  inset-inline-start: -24px;
   z-index: 20;
 }
 
 .nextBtn {
   position: absolute;
-  right: -24px;
+  inset-inline-end: -24px;
   z-index: 20;
 }
 
@@ -77,14 +77,14 @@
 
 .embla__container {
   display: flex;
-  margin-left: -32px;
+  margin-inline-start: -32px;
   padding: 20px 0;
 }
 
 .embla__slide {
   flex: 0 0 calc(350px + 32px);
   min-width: 0;
-  padding-left: 32px;
+  padding-inline-start: 32px;
 }
 
 .activeSlide {

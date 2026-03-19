@@ -45,7 +45,7 @@ export function HeroSection() {
             initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}
           >
             <Button size="lg" variant="primary">{t('exploreCta')}</Button>
-            <Button size="lg" variant="outline">{t('businessCta')}</Button>
+            <Button size="lg" variant="secondary">{t('businessCta')}</Button>
           </motion.div>
         </motion.div>
 

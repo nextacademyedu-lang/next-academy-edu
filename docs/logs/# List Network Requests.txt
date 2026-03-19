@@ -1,0 +1,9 @@
+# List Network Requests
+
+| reqid | method | url | status |
+|---|---|---|---|
+| 20 | GET | https://nextacademyedu.com/api/users/me | success - 200 |
+| 21 | GET | https://nextacademyedu.com/api/payload-preferences/nav | success - 200 |
+| 22 | POST | https://nextacademyedu.com/api/users/login | failed - 401 |
+| 23 | POST | https://nextacademyedu.com/api/users/login | failed - 401 |
+| 24 | POST | https://nextacademyedu.com/api/users/login | failed - 401 |

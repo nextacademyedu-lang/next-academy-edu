@@ -96,6 +96,9 @@ export interface Config {
     'verification-codes': VerificationCode;
     'blog-posts': BlogPost;
     'bulk-seat-allocations': BulkSeatAllocation;
+    popups: Popup;
+    'announcement-bars': AnnouncementBar;
+    'upcoming-events-config': UpcomingEventsConfig;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -132,6 +135,9 @@ export interface Config {
     'verification-codes': VerificationCodesSelect<false> | VerificationCodesSelect<true>;
     'blog-posts': BlogPostsSelect<false> | BlogPostsSelect<true>;
     'bulk-seat-allocations': BulkSeatAllocationsSelect<false> | BulkSeatAllocationsSelect<true>;
+    popups: PopupsSelect<false> | PopupsSelect<true>;
+    'announcement-bars': AnnouncementBarsSelect<false> | AnnouncementBarsSelect<true>;
+    'upcoming-events-config': UpcomingEventsConfigSelect<false> | UpcomingEventsConfigSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -950,6 +956,236 @@ export interface BulkSeatAllocation {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "popups".
+ */
+export interface Popup {
+  id: number;
+  name: string;
+  status: 'draft' | 'active' | 'paused' | 'archived';
+  content?: {
+    titleAr?: string | null;
+    titleEn?: string | null;
+    descriptionAr?: {
+      root: {
+        type: string;
+        children: {
+          type: any;
+          version: number;
+          [k: string]: unknown;
+        }[];
+        direction: ('ltr' | 'rtl') | null;
+        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+        indent: number;
+        version: number;
+      };
+      [k: string]: unknown;
+    } | null;
+    descriptionEn?: {
+      root: {
+        type: string;
+        children: {
+          type: any;
+          version: number;
+          [k: string]: unknown;
+        }[];
+        direction: ('ltr' | 'rtl') | null;
+        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+        indent: number;
+        version: number;
+      };
+      [k: string]: unknown;
+    } | null;
+    image?: (number | null) | Media;
+    imagePosition?: ('left' | 'right' | 'top' | 'none') | null;
+  };
+  cta?: {
+    primaryCtaText?: string | null;
+    primaryCtaLink?: string | null;
+    secondaryCtaText?: string | null;
+    secondaryCtaLink?: string | null;
+  };
+  promo?: {
+    hasPromoCode?: boolean | null;
+    promoCode?: string | null;
+    promoDelivery?: ('show_directly' | 'after_form' | 'send_email') | null;
+  };
+  form?: {
+    hasForm?: boolean | null;
+    formFields?:
+      | {
+          fieldLabel: string;
+          fieldType: 'email' | 'text' | 'phone' | 'name';
+          isRequired?: boolean | null;
+          id?: string | null;
+        }[]
+      | null;
+    successMessage?: string | null;
+    redirectUrl?: string | null;
+  };
+  appearance?: {
+    popupType?: ('modal' | 'slide_in' | 'bottom_bar' | 'full_screen') | null;
+    animation?: ('fade' | 'slide_up' | 'slide_side' | 'zoom') | null;
+    /**
+     * Overlay opacity 0-100%
+     */
+    overlayDarkness?: number | null;
+    closeOnOutsideClick?: boolean | null;
+    bgColor?: string | null;
+    textColor?: string | null;
+    accentColor?: string | null;
+  };
+  countdown?: {
+    hasCountdown?: boolean | null;
+    countdownTarget?: string | null;
+  };
+  targeting?: {
+    displayPages?: ('all' | 'specific') | null;
+    specificPages?:
+      | {
+          url: string;
+          id?: string | null;
+        }[]
+      | null;
+    triggerType?: ('on_load' | 'after_delay' | 'on_exit' | 'on_scroll') | null;
+    /**
+     * Seconds
+     */
+    triggerDelay?: number | null;
+    /**
+     * Scroll percentage
+     */
+    triggerScroll?: number | null;
+    frequency?: ('every_time' | 'once_session' | 'once_day' | 'once_ever') | null;
+    targetAudience?: ('all' | 'guests_only' | 'logged_in' | 'specific_role') | null;
+    targetRole?: ('student' | 'instructor' | 'b2b_manager') | null;
+    targetDevice?: ('all' | 'mobile' | 'desktop') | null;
+  };
+  startDate?: string | null;
+  endDate?: string | null;
+  /**
+   * Higher = shows first
+   */
+  priority?: number | null;
+  viewCount?: number | null;
+  clickCount?: number | null;
+  conversionCount?: number | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "announcement-bars".
+ */
+export interface AnnouncementBar {
+  id: number;
+  name: string;
+  status: 'draft' | 'active' | 'paused';
+  messages: {
+    textAr: string;
+    textEn: string;
+    linkUrl?: string | null;
+    /**
+     * Emoji or icon name
+     */
+    icon?: string | null;
+    id?: string | null;
+  }[];
+  appearance?: {
+    position?: ('top' | 'bottom') | null;
+    bgColor?: string | null;
+    /**
+     * Optional CSS gradient (overrides bgColor)
+     */
+    bgGradient?: string | null;
+    textColor?: string | null;
+    fontSize?: ('sm' | 'md' | 'lg') | null;
+  };
+  animation?: {
+    isAnimated?: boolean | null;
+    animationSpeed?: ('slow' | 'normal' | 'fast') | null;
+    animationDirection?: ('ltr' | 'rtl') | null;
+  };
+  ctaButton?: {
+    hasCtaButton?: boolean | null;
+    ctaText?: string | null;
+    ctaLink?: string | null;
+  };
+  countdown?: {
+    hasCountdown?: boolean | null;
+    countdownTarget?: string | null;
+  };
+  behavior?: {
+    isDismissible?: boolean | null;
+    /**
+     * Remember dismiss via localStorage
+     */
+    rememberDismiss?: boolean | null;
+  };
+  targeting?: {
+    displayPages?: ('all' | 'specific') | null;
+    specificPages?:
+      | {
+          url: string;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  startDate?: string | null;
+  endDate?: string | null;
+  /**
+   * Higher = shows first
+   */
+  priority?: number | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "upcoming-events-config".
+ */
+export interface UpcomingEventsConfig {
+  id: number;
+  isEnabled?: boolean | null;
+  sectionTitleAr?: string | null;
+  sectionTitleEn?: string | null;
+  mode?: ('automatic' | 'manual') | null;
+  filterType?: ('all' | 'workshop' | 'course' | 'webinar') | null;
+  maxItems?: number | null;
+  sortOrder?: ('date_asc' | 'manual') | null;
+  /**
+   * Auto-play interval in ms (0 = disabled)
+   */
+  autoPlaySpeed?: number | null;
+  cardDisplay?: {
+    showPrice?: boolean | null;
+    showDate?: boolean | null;
+    showInstructor?: boolean | null;
+    showLocation?: boolean | null;
+  };
+  /**
+   * URL for "View All" button
+   */
+  viewAllLink?: string | null;
+  emptyMessageAr?: string | null;
+  emptyMessageEn?: string | null;
+  manualItems?:
+    | {
+        program: number | Program;
+        round?: (number | null) | Round;
+        customImage?: (number | null) | Media;
+        customUrl?: string | null;
+        /**
+         * Lower = shows first
+         */
+        sortOrder?: number | null;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -1087,6 +1323,18 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'bulk-seat-allocations';
         value: number | BulkSeatAllocation;
+      } | null)
+    | ({
+        relationTo: 'popups';
+        value: number | Popup;
+      } | null)
+    | ({
+        relationTo: 'announcement-bars';
+        value: number | AnnouncementBar;
+      } | null)
+    | ({
+        relationTo: 'upcoming-events-config';
+        value: number | UpcomingEventsConfig;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -1760,6 +2008,202 @@ export interface BulkSeatAllocationsSelect<T extends boolean = true> {
       };
   purchaseDate?: T;
   notes?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "popups_select".
+ */
+export interface PopupsSelect<T extends boolean = true> {
+  name?: T;
+  status?: T;
+  content?:
+    | T
+    | {
+        titleAr?: T;
+        titleEn?: T;
+        descriptionAr?: T;
+        descriptionEn?: T;
+        image?: T;
+        imagePosition?: T;
+      };
+  cta?:
+    | T
+    | {
+        primaryCtaText?: T;
+        primaryCtaLink?: T;
+        secondaryCtaText?: T;
+        secondaryCtaLink?: T;
+      };
+  promo?:
+    | T
+    | {
+        hasPromoCode?: T;
+        promoCode?: T;
+        promoDelivery?: T;
+      };
+  form?:
+    | T
+    | {
+        hasForm?: T;
+        formFields?:
+          | T
+          | {
+              fieldLabel?: T;
+              fieldType?: T;
+              isRequired?: T;
+              id?: T;
+            };
+        successMessage?: T;
+        redirectUrl?: T;
+      };
+  appearance?:
+    | T
+    | {
+        popupType?: T;
+        animation?: T;
+        overlayDarkness?: T;
+        closeOnOutsideClick?: T;
+        bgColor?: T;
+        textColor?: T;
+        accentColor?: T;
+      };
+  countdown?:
+    | T
+    | {
+        hasCountdown?: T;
+        countdownTarget?: T;
+      };
+  targeting?:
+    | T
+    | {
+        displayPages?: T;
+        specificPages?:
+          | T
+          | {
+              url?: T;
+              id?: T;
+            };
+        triggerType?: T;
+        triggerDelay?: T;
+        triggerScroll?: T;
+        frequency?: T;
+        targetAudience?: T;
+        targetRole?: T;
+        targetDevice?: T;
+      };
+  startDate?: T;
+  endDate?: T;
+  priority?: T;
+  viewCount?: T;
+  clickCount?: T;
+  conversionCount?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "announcement-bars_select".
+ */
+export interface AnnouncementBarsSelect<T extends boolean = true> {
+  name?: T;
+  status?: T;
+  messages?:
+    | T
+    | {
+        textAr?: T;
+        textEn?: T;
+        linkUrl?: T;
+        icon?: T;
+        id?: T;
+      };
+  appearance?:
+    | T
+    | {
+        position?: T;
+        bgColor?: T;
+        bgGradient?: T;
+        textColor?: T;
+        fontSize?: T;
+      };
+  animation?:
+    | T
+    | {
+        isAnimated?: T;
+        animationSpeed?: T;
+        animationDirection?: T;
+      };
+  ctaButton?:
+    | T
+    | {
+        hasCtaButton?: T;
+        ctaText?: T;
+        ctaLink?: T;
+      };
+  countdown?:
+    | T
+    | {
+        hasCountdown?: T;
+        countdownTarget?: T;
+      };
+  behavior?:
+    | T
+    | {
+        isDismissible?: T;
+        rememberDismiss?: T;
+      };
+  targeting?:
+    | T
+    | {
+        displayPages?: T;
+        specificPages?:
+          | T
+          | {
+              url?: T;
+              id?: T;
+            };
+      };
+  startDate?: T;
+  endDate?: T;
+  priority?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "upcoming-events-config_select".
+ */
+export interface UpcomingEventsConfigSelect<T extends boolean = true> {
+  isEnabled?: T;
+  sectionTitleAr?: T;
+  sectionTitleEn?: T;
+  mode?: T;
+  filterType?: T;
+  maxItems?: T;
+  sortOrder?: T;
+  autoPlaySpeed?: T;
+  cardDisplay?:
+    | T
+    | {
+        showPrice?: T;
+        showDate?: T;
+        showInstructor?: T;
+        showLocation?: T;
+      };
+  viewAllLink?: T;
+  emptyMessageAr?: T;
+  emptyMessageEn?: T;
+  manualItems?:
+    | T
+    | {
+        program?: T;
+        round?: T;
+        customImage?: T;
+        customUrl?: T;
+        sortOrder?: T;
+        id?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
 }

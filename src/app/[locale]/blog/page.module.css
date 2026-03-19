@@ -32,7 +32,7 @@
 }
 
 .highlight {
-  color: var(--accent-primary);
+  color: var(--accent-text);
 }
 
 .subtitle {
@@ -110,7 +110,7 @@
 }
 
 .readMore {
-  color: var(--accent-primary);
+  color: var(--accent-text);
   font-weight: 800;
   font-size: 16px;
   transition: opacity 0.2s ease;

@@ -1,0 +1,17 @@
+.themeToggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 10px;
+  border: 1px solid var(--border-subtle, rgba(197, 197, 197, 0.25));
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: border-color 0.2s ease, color 0.2s ease;
+}
+
+.themeToggle:hover {
+  border-color: var(--accent-primary, #C51B1B);
+  color: var(--text-primary);
+}

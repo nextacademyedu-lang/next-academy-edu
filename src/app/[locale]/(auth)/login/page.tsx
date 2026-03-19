@@ -10,11 +10,12 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Loader2 } from 'lucide-react';
 import { useAuth } from '@/context/auth-context';
+import { getDashboardPath } from '@/lib/role-redirect';
 import styles from './login.module.css';
 
 export default function LoginPage() {
   const router = useRouter();
-  const { login, isAuthenticated, isLoading: authLoading } = useAuth();
+  const { login, user, isAuthenticated, isLoading: authLoading } = useAuth();
   const t = useTranslations('Auth');
   const locale = useLocale();
 
@@ -25,10 +26,10 @@ export default function LoginPage() {
 
   // If already authenticated, redirect to dashboard
   useEffect(() => {
-    if (!authLoading && isAuthenticated) {
-      router.push(`/${locale}/dashboard`);
+    if (!authLoading && isAuthenticated && user) {
+      router.push(getDashboardPath(user.role, locale));
     }
-  }, [isAuthenticated, authLoading, router, locale]);
+  }, [isAuthenticated, authLoading, router, locale, user]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -43,8 +44,10 @@ export default function LoginPage() {
     try {
       const result = await login(email, password);
 
-      if (result.success) {
-        router.push(`/${locale}/dashboard`);
+      if (result.success && result.data) {
+        const loginData = result.data as { user?: { role: 'user' | 'admin' | 'instructor' | 'b2b_manager' } };
+        const role = loginData.user?.role ?? 'user';
+        router.push(getDashboardPath(role, locale));
       } else if (result.error === 'EMAIL_NOT_VERIFIED') {
         router.push(`/${locale}/verify-email?email=${encodeURIComponent(email)}`);
       } else {

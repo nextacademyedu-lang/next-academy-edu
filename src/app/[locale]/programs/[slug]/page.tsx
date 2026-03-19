@@ -1,9 +1,10 @@
 import React from 'react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { getLocale } from 'next-intl/server';
+import { getLocale, getTranslations } from 'next-intl/server';
 import { getPayload } from 'payload';
 import config from '@payload-config';
+import type { Program, Round, Instructor } from '@/payload-types';
 import { Navbar } from '@/components/layout/navbar';
 import { Footer } from '@/components/layout/footer';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
@@ -18,6 +19,7 @@ export default async function ProgramDetailsPage({
 }) {
   const { slug } = await params;
   const locale = await getLocale();
+  const t = await getTranslations('ProgramDetail');
   const payload = await getPayload({ config });
 
   const { docs } = await payload.find({
@@ -27,18 +29,36 @@ export default async function ProgramDetailsPage({
     limit: 1,
   });
 
-  const program = docs[0];
+  const program: Program | undefined = docs[0];
   if (!program) notFound();
 
-  const p = program as any;
-  const title = p.titleEn || p.titleAr || 'Program';
-  const description = p.descriptionEn || p.descriptionAr || '';
-  const objectives: string[] = p.objectives ?? [];
-  const syllabus: any[] = p.syllabus ?? [];
-  const rounds: any[] = p.rounds?.docs ?? p.rounds ?? [];
-  const instructorName = typeof p.instructor === 'object'
-    ? `${p.instructor.user?.firstName ?? ''} ${p.instructor.user?.lastName ?? ''}`.trim() || p.instructor.name
+  // --- Derive display values from the typed Program ---
+  const title = program.titleEn || program.titleAr || 'Program';
+  const description = program.shortDescriptionEn || program.shortDescriptionAr || '';
+  const objectives = (program.objectives ?? []).filter(
+    (obj): obj is { item: string; id?: string | null } => typeof obj.item === 'string',
+  );
+
+  // Instructor — may be a populated Instructor object or just a number (FK)
+  const instructor: Instructor | null =
+    typeof program.instructor === 'object' && program.instructor !== null
+      ? program.instructor
+      : null;
+  const instructorName = instructor
+    ? `${instructor.firstName ?? ''} ${instructor.lastName ?? ''}`.trim()
     : '';
+
+  // Fetch rounds for this program from the separate "rounds" collection
+  const { docs: roundDocs } = await payload.find({
+    collection: 'rounds',
+    where: { program: { equals: program.id } },
+    depth: 0,
+    limit: 50,
+    sort: 'startDate',
+  });
+  const rounds: Round[] = roundDocs;
+
+  const dateLocale = locale === 'ar' ? 'ar-EG' : 'en-US';
 
   return (
     <div className={styles.wrapper}>
@@ -49,12 +69,12 @@ export default async function ProgramDetailsPage({
         <section className={styles.heroSection}>
           <div className={styles.heroContainer}>
             <div className={styles.heroMeta}>
-              <Badge variant="default">{p.type}</Badge>
-              {p.level && <Badge variant="outline">{p.level}</Badge>}
+              <Badge variant="default">{program.type}</Badge>
+              {program.level && <Badge variant="outline">{program.level}</Badge>}
             </div>
             <h1 className={styles.title}>{title}</h1>
             {instructorName && (
-              <p className={styles.instructor}>Led by <strong>{instructorName}</strong></p>
+              <p className={styles.instructor}>{t('ledBy')} <strong>{instructorName}</strong></p>
             )}
           </div>
         </section>
@@ -64,40 +84,19 @@ export default async function ProgramDetailsPage({
           <div className={styles.mainContent}>
             {description && (
               <section className={styles.sectionBlock}>
-                <h2 className={styles.sectionTitle}>About the Program</h2>
+                <h2 className={styles.sectionTitle}>{t('aboutProgram')}</h2>
                 <p className={styles.paragraph}>{description}</p>
               </section>
             )}
 
             {objectives.length > 0 && (
               <section className={styles.sectionBlock}>
-                <h3 className={styles.subTitle}>What you&apos;ll learn:</h3>
+                <h3 className={styles.subTitle}>{t('whatYouLearn')}</h3>
                 <ul className={styles.list}>
                   {objectives.map((obj, i) => (
-                    <li key={i} className={styles.listItem}>{obj}</li>
+                    <li key={obj.id ?? i} className={styles.listItem}>{obj.item}</li>
                   ))}
                 </ul>
-              </section>
-            )}
-
-            {syllabus.length > 0 && (
-              <section className={styles.sectionBlock}>
-                <h2 className={styles.sectionTitle}>Syllabus</h2>
-                <div className={styles.syllabusList}>
-                  {syllabus.map((item: any, i: number) => (
-                    <Card key={i} className={styles.syllabusCard}>
-                      <CardHeader>
-                        {item.day && <span className={styles.dayTag}>{item.day}</span>}
-                        <CardTitle className={styles.topicTitle}>{item.topic || item.title}</CardTitle>
-                      </CardHeader>
-                      {item.desc && (
-                        <CardContent>
-                          <p className={styles.paragraph} style={{ margin: 0 }}>{item.desc}</p>
-                        </CardContent>
-                      )}
-                    </Card>
-                  ))}
-                </div>
               </section>
             )}
           </div>
@@ -105,20 +104,20 @@ export default async function ProgramDetailsPage({
           {/* Sidebar */}
           <aside className={styles.sidebar}>
             <div className={styles.stickyBox}>
-              <h3 className={styles.sidebarTitle}>Available Rounds</h3>
+              <h3 className={styles.sidebarTitle}>{t('availableRounds')}</h3>
               {rounds.length === 0 && (
-                <p style={{ color: 'var(--text-muted)', fontSize: '14px' }}>No rounds available yet.</p>
+                <p style={{ color: 'var(--text-muted)', fontSize: '14px' }}>{t('noRounds')}</p>
               )}
               <div className={styles.roundsList}>
-                {rounds.map((round: any) => {
+                {rounds.map((round) => {
                   const startDate = round.startDate
-                    ? new Date(round.startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+                    ? new Date(round.startDate).toLocaleDateString(dateLocale, { month: 'short', day: 'numeric' })
                     : '';
                   const endDate = round.endDate
-                    ? new Date(round.endDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+                    ? new Date(round.endDate).toLocaleDateString(dateLocale, { month: 'short', day: 'numeric', year: 'numeric' })
                     : '';
-                  const seatsLeft = (round.maxSeats ?? 0) - (round.enrolledCount ?? 0);
-                  const price = round.price ?? p.price ?? 0;
+                  const seatsLeft = round.maxCapacity - (round.currentEnrollments ?? 0);
+                  const price = round.price ?? 0;
 
                   return (
                     <Card key={round.id} className={styles.roundCard}>
@@ -126,23 +125,23 @@ export default async function ProgramDetailsPage({
                         {startDate && (
                           <span className={styles.roundDate}>{startDate}{endDate ? ` – ${endDate}` : ''}</span>
                         )}
-                        {round.maxSeats && (
-                          <Badge variant="success">{seatsLeft} Seats Left</Badge>
+                        {round.maxCapacity > 0 && (
+                          <Badge variant="success">{t('seatsLeft', { count: seatsLeft })}</Badge>
                         )}
                       </CardHeader>
                       <CardContent className={styles.roundContent}>
-                        {round.format && (
+                        {round.locationType && (
                           <div className={styles.roundInfo}>
-                            <span className={styles.label}>Format:</span>
-                            <span className={styles.value}>{round.format}</span>
+                            <span className={styles.label}>{t('format')}</span>
+                            <span className={styles.value}>{round.locationType}</span>
                           </div>
                         )}
                         <div className={styles.roundInfo}>
-                          <span className={styles.label}>Price:</span>
-                          <span className={styles.price}>{price.toLocaleString()} EGP</span>
+                          <span className={styles.label}>{t('price')}</span>
+                          <span className={styles.price}>{price.toLocaleString()} {t('currency')}</span>
                         </div>
                         <Link href={`/${locale}/checkout/${round.id}`} style={{ textDecoration: 'none' }}>
-                          <Button fullWidth className={styles.bookBtn}>Book This Round</Button>
+                          <Button fullWidth className={styles.bookBtn}>{t('bookRound')}</Button>
                         </Link>
                       </CardContent>
                     </Card>

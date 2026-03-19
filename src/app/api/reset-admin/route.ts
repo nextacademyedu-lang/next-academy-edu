@@ -26,12 +26,12 @@ export async function GET(req: NextRequest) {
 
     // Check user state with raw SQL
     const result = await db.execute(
-      sql`SELECT id, email, role, "login_attempts", "lock_until", "locked_until" FROM users WHERE email = 'nextacademyedu@gmail.com' LIMIT 1`
+      sql`SELECT id, email, role, "login_attempts", "lock_until", "locked_until" FROM users WHERE email = 'nextacademyedu@gmail.com' LIMIT 1` as unknown as Parameters<typeof db.execute>[0]
     );
 
     return NextResponse.json({
       status: 'ok',
-      user: result.rows?.[0] ?? result[0] ?? 'No user found',
+      user: result.rows?.[0] ?? 'No user found',
       debug: {
         resultType: typeof result,
         hasRows: 'rows' in result,
@@ -57,18 +57,18 @@ export async function POST(req: NextRequest) {
 
     // Step 1: Reset lockout via raw SQL
     await db.execute(
-      sql`UPDATE users SET login_attempts = 0, lock_until = NULL, locked_until = NULL WHERE email = 'nextacademyedu@gmail.com'`
+      sql`UPDATE users SET login_attempts = 0, lock_until = NULL, locked_until = NULL WHERE email = 'nextacademyedu@gmail.com'` as unknown as Parameters<typeof db.execute>[0]
     );
 
     // Step 2: Check updated state
     const result = await db.execute(
-      sql`SELECT id, email, role, "login_attempts", "lock_until", "locked_until" FROM users WHERE email = 'nextacademyedu@gmail.com' LIMIT 1`
+      sql`SELECT id, email, role, "login_attempts", "lock_until", "locked_until" FROM users WHERE email = 'nextacademyedu@gmail.com' LIMIT 1` as unknown as Parameters<typeof db.execute>[0]
     );
 
     return NextResponse.json({
       success: true,
       message: 'Lockout reset. Try logging in again with your password.',
-      user: result.rows?.[0] ?? result[0] ?? 'check DB manually',
+      user: result.rows?.[0] ?? 'check DB manually',
     });
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : 'Unknown error';

@@ -8,10 +8,10 @@
 
 .sidebar {
   width: 260px;
-  background-color: rgba(255, 255, 255, 0.03);
+  background-color: var(--sidebar-bg);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border-right: 1px solid rgba(255, 255, 255, 0.05);
+  border-right: 1px solid var(--border-subtle);
   display: flex;
   flex-direction: column;
   transition: width 0.3s ease;
@@ -22,7 +22,7 @@
   display: flex;
   align-items: center;
   padding: 0 24px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid var(--border-subtle);
 }
 
 .logo {
@@ -53,19 +53,19 @@
 }
 
 .navLink:hover {
-  background-color: rgba(255, 255, 255, 0.05);
+  background-color: var(--hover-overlay);
   color: var(--text-primary);
 }
 
 .navLinkActive {
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: var(--active-bg);
   color: var(--text-primary);
-  border: 1px solid rgba(255,255,255,0.05);
+  border: 1px solid var(--border-subtle);
 }
 
 .sidebarFooter {
   padding: 24px 16px;
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  border-top: 1px solid var(--border-subtle);
 }
 
 .mainContent {
@@ -78,10 +78,10 @@
 
 .topbar {
   height: 72px;
-  background-color: rgba(2, 5, 4, 0.8);
+  background-color: var(--topbar-bg);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid var(--border-subtle);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -111,7 +111,7 @@
 }
 
 .notificationBtn:hover {
-  background-color: rgba(255, 255, 255, 0.05);
+  background-color: var(--hover-overlay);
   color: var(--text-primary);
 }
 
@@ -136,7 +136,7 @@
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--bg-surface-hover) 0%, rgba(255,255,255,0.1) 100%);
+  background: linear-gradient(135deg, var(--bg-surface-hover) 0%, var(--active-bg) 100%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -165,8 +165,8 @@
   overflow-y: auto;
   padding: 32px;
   background-image: 
-    linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+    linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
   background-size: 40px 40px;
 }
 
@@ -211,10 +211,10 @@
     left: 0;
     right: 0;
     height: 70px;
-    background-color: rgba(26, 26, 26, 0.9);
+    background-color: var(--mobile-bar-bg);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    border-top: 1px solid var(--border-subtle);
     display: flex;
     justify-content: space-around;
     align-items: center;
@@ -235,7 +235,7 @@
   }
 
   .mobileNavLinkActive {
-    color: var(--accent-primary);
+    color: var(--accent-text);
   }
 }
 
