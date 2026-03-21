@@ -19,7 +19,9 @@ function normalizeNumericId(value: unknown): number | null {
 }
 
 export async function POST(req: NextRequest) {
+  let stage = 'init';
   try {
+    stage = 'parse_request';
     const { roundId, paymentPlanId, discountCode } = await req.json() as {
       roundId: string | number;
       paymentPlanId?: string | number;
@@ -33,13 +35,16 @@ export async function POST(req: NextRequest) {
 
     const normalizedPaymentPlanId = normalizeNumericId(paymentPlanId ?? null);
 
+    stage = 'get_payload';
     const payload = await getPayload({ config });
 
     // ── Auth ──────────────────────────────────────────────────────────────
+    stage = 'auth';
     const { user } = await payload.auth({ headers: req.headers });
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
     // ── Fetch round ───────────────────────────────────────────────────────
+    stage = 'find_round';
     const round = await payload.findByID({
       collection: 'rounds',
       id: normalizedRoundId,
@@ -54,6 +59,7 @@ export async function POST(req: NextRequest) {
     }
 
     // ── Check duplicate booking ───────────────────────────────────────────
+    stage = 'check_duplicate';
     const existing = await payload.find({
       collection: 'bookings',
       where: {
@@ -68,6 +74,7 @@ export async function POST(req: NextRequest) {
     }
 
     // ── Calculate amount ──────────────────────────────────────────────────
+    stage = 'calculate_amount';
     let basePrice = round.price;
     if (round.earlyBirdPrice && round.earlyBirdDeadline && new Date(round.earlyBirdDeadline) > new Date()) {
       basePrice = round.earlyBirdPrice;
@@ -77,6 +84,7 @@ export async function POST(req: NextRequest) {
     let appliedDiscountCode: string | undefined;
 
     if (discountCode) {
+      stage = 'find_discount';
       const discountResult = await payload.find({
         collection: 'discount-codes',
         where: { code: { equals: discountCode.toUpperCase() }, isActive: { equals: true } },
@@ -85,12 +93,14 @@ export async function POST(req: NextRequest) {
       });
       const discount = discountResult.docs[0];
       if (discount && new Date(discount.validUntil) > new Date() && (!discount.maxUses || (discount.currentUses ?? 0) < discount.maxUses)) {
+        stage = 'apply_discount';
         discountAmount = discount.type === 'percentage'
           ? Math.round((basePrice * discount.value) / 100)
           : Math.min(discount.value, basePrice);
         appliedDiscountCode = discount.code;
 
         // Increment usage
+        stage = 'increment_discount_uses';
         await payload.update({
           collection: 'discount-codes',
           id: discount.id,
@@ -104,6 +114,7 @@ export async function POST(req: NextRequest) {
     const finalAmount = basePrice - discountAmount;
 
     // ── Create booking ────────────────────────────────────────────────────
+    stage = 'create_booking';
     const booking = await payload.create({
       collection: 'bookings',
       data: {
@@ -128,12 +139,14 @@ export async function POST(req: NextRequest) {
 
     if (normalizedPaymentPlanId != null) {
       // Installment plan — create N payment records
+      stage = 'find_payment_plan';
       const plan = await payload.findByID({
         collection: 'payment-plans',
         id: normalizedPaymentPlanId,
       });
       if (!plan) return NextResponse.json({ error: 'خطة الدفع مش موجودة' }, { status: 404 });
 
+      stage = 'create_installments';
       for (const installment of plan.installments) {
         const dueDate = new Date(now.getTime() + installment.dueDaysFromBooking * 24 * 60 * 60 * 1000);
         const amount = Math.round((finalAmount * installment.percentage) / 100);
@@ -154,6 +167,7 @@ export async function POST(req: NextRequest) {
       }
     } else {
       // Full payment — single payment record
+      stage = 'create_full_payment';
       await payload.create({
         collection: 'payments',
         data: {
@@ -169,6 +183,7 @@ export async function POST(req: NextRequest) {
     }
 
     // ── Increment round enrollments ───────────────────────────────────────
+    stage = 'increment_round_enrollments';
     await payload.update({
       collection: 'rounds',
       id: normalizedRoundId,
@@ -180,9 +195,10 @@ export async function POST(req: NextRequest) {
       req: req as any,
     });
 
+    stage = 'done';
     return NextResponse.json({ bookingId: booking.id, bookingCode: booking.bookingCode });
   } catch (err) {
     console.error('[bookings/create]', err);
-    return NextResponse.json({ error: 'حصلت مشكلة' }, { status: 500 });
+    return NextResponse.json({ error: 'حصلت مشكلة', stage }, { status: 500 });
   }
 }
