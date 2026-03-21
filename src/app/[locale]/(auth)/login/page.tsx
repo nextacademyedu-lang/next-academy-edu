@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { useTranslations, useLocale } from 'next-intl';
 import { Button } from '@/components/ui/button';
@@ -10,14 +10,19 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Loader2 } from 'lucide-react';
 import { useAuth } from '@/context/auth-context';
-import { getDashboardPath } from '@/lib/role-redirect';
+import { getDashboardPath, getSafeRedirectPath } from '@/lib/role-redirect';
 import styles from './login.module.css';
 
 export default function LoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { login, user, isAuthenticated, isLoading: authLoading } = useAuth();
   const t = useTranslations('Auth');
   const locale = useLocale();
+  const redirectParam = searchParams.get('redirect');
+  const registerHref = redirectParam
+    ? `/${locale}/register?redirect=${encodeURIComponent(redirectParam)}`
+    : `/${locale}/register`;
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -27,9 +32,14 @@ export default function LoginPage() {
   // If already authenticated, redirect to dashboard
   useEffect(() => {
     if (!authLoading && isAuthenticated && user) {
-      router.push(getDashboardPath(user.role, locale));
+      const fallbackPath = getDashboardPath(user.role, locale);
+      const redirectPath = getSafeRedirectPath(
+        redirectParam,
+        fallbackPath,
+      );
+      router.push(redirectPath);
     }
-  }, [isAuthenticated, authLoading, router, locale, user]);
+  }, [isAuthenticated, authLoading, router, locale, user, redirectParam]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -47,9 +57,18 @@ export default function LoginPage() {
       if (result.success && result.data) {
         const loginData = result.data as { user?: { role: 'user' | 'admin' | 'instructor' | 'b2b_manager' } };
         const role = loginData.user?.role ?? 'user';
-        router.push(getDashboardPath(role, locale));
+        const fallbackPath = getDashboardPath(role, locale);
+        const redirectPath = getSafeRedirectPath(
+          redirectParam,
+          fallbackPath,
+        );
+        router.push(redirectPath);
       } else if (result.error === 'EMAIL_NOT_VERIFIED') {
-        router.push(`/${locale}/verify-email?email=${encodeURIComponent(email)}`);
+        const verifyParams = new URLSearchParams({ email });
+        if (redirectParam) {
+          verifyParams.set('redirect', redirectParam);
+        }
+        router.push(`/${locale}/verify-email?${verifyParams.toString()}`);
       } else {
         setError(t('invalidCredentials'));
       }
@@ -135,7 +154,7 @@ export default function LoginPage() {
 
 
       <p className={styles.footerText}>
-        {t('noAccount')} <Link href={`/${locale}/register`} className={styles.footerLink}>{t('register')}</Link>
+        {t('noAccount')} <Link href={registerHref} className={styles.footerLink}>{t('register')}</Link>
       </p>
     </motion.div>
   );

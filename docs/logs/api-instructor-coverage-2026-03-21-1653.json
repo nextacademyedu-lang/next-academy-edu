@@ -1,0 +1,48 @@
+{
+  "total": 8,
+  "passed": 8,
+  "failed": 0,
+  "failedCases": [],
+  "details": [
+    {
+      "name": "create admin user",
+      "status": 201,
+      "ok": true
+    },
+    {
+      "name": "login admin",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "name": "create instructor",
+      "status": 201,
+      "ok": true
+    },
+    {
+      "name": "create instructor user",
+      "status": 201,
+      "ok": true
+    },
+    {
+      "name": "login instructor user",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "name": "instructor availability GET",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "name": "instructor availability PUT",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "name": "instructor availability GET after PUT",
+      "status": 200,
+      "ok": true
+    }
+  ]
+}

@@ -4,6 +4,32 @@
 
 ---
 
+### [2026-03-21 19:13] - Logs Refresh: Final API Audit Snapshot + Traceability
+
+**Files updated (this pass):**
+- `docs/logs/api-audit-latest.md`
+- `docs/logs/changelog.md`
+- `docs/logs/tasks.md`
+
+**What changed technically:**
+- Refreshed `api-audit-latest.md` to avoid stale status and reflect final remediation rounds:
+  - Full sweep baseline: `150 total / 145 passed / 5 failed / 5 skipped`
+  - Auth/role gap pass: `26 total / 26 passed / 0 failed / 6 skipped`
+  - Gap-fix verification pass: `22 total / 22 passed / 0 failed / 0 skipped`
+  - Instructor scope coverage pass: `8 total / 8 passed / 0 failed`
+- Added direct references from the latest snapshot to:
+  - `docs/logs/2026-03-21-work-summary.md`
+  - `docs/logs/2026-03-21-checkout-intent-fix.md`
+  - `docs/logs/2026-03-21-users-role-escalation-fix.md`
+
+**Reason:**
+- User requested `update /docs/logs`, and the previous "latest" report still reflected the pre-fix baseline run.
+
+**Verification:**
+- Docs-only update completed (no code/runtime behavior changed).
+
+---
+
 ### [2026-03-21 12:55] - CRM User Sync Fix for Twenty "people" Object
 
 **Files updated (this pass):**

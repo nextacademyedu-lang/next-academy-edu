@@ -1,5 +1,4 @@
 import React from 'react';
-import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { getLocale, getTranslations } from 'next-intl/server';
 import { getPayload } from 'payload';
@@ -7,9 +6,9 @@ import config from '@payload-config';
 import type { Program, Round, Instructor } from '@/payload-types';
 import { Navbar } from '@/components/layout/navbar';
 import { Footer } from '@/components/layout/footer';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { Card, CardHeader, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { BookRoundButton } from '@/components/checkout/book-round-button';
 import styles from './page.module.css';
 
 export default async function ProgramDetailsPage({
@@ -140,9 +139,13 @@ export default async function ProgramDetailsPage({
                           <span className={styles.label}>{t('price')}</span>
                           <span className={styles.price}>{price.toLocaleString()} {t('currency')}</span>
                         </div>
-                        <Link href={`/${locale}/checkout/${round.id}`} style={{ textDecoration: 'none' }}>
-                          <Button fullWidth className={styles.bookBtn}>{t('bookRound')}</Button>
-                        </Link>
+                        <BookRoundButton
+                          locale={locale}
+                          roundId={round.id}
+                          programSlug={program.slug || String(program.id)}
+                          label={t('bookRound')}
+                          className={styles.bookBtn}
+                        />
                       </CardContent>
                     </Card>
                   );

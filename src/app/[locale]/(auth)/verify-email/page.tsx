@@ -7,6 +7,7 @@ import { useTranslations, useLocale } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { verifyOtp, sendVerificationCode } from '@/lib/auth-api';
 import { useAuth } from '@/context/auth-context';
+import { getSafeRedirectPath } from '@/lib/role-redirect';
 import styles from './verify-email.module.css';
 
 const OTP_LENGTH = 6;
@@ -116,8 +117,12 @@ export default function VerifyEmailPage() {
       if (result.success) {
         setSuccessMsg(t('emailVerifiedRedirecting'));
         await refreshUser();
+        const redirectPath = getSafeRedirectPath(
+          searchParams.get('redirect'),
+          `/${locale}/onboarding`,
+        );
         setTimeout(() => {
-          router.push(`/${locale}/onboarding`);
+          router.push(redirectPath);
         }, 1500);
       } else {
         setError(result.error || t('invalidCode'));

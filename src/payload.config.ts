@@ -156,6 +156,7 @@ export default buildConfig({
           role: 'admin',
           emailVerified: true,
         },
+        context: { allowPrivilegedRoleWrite: true },
       });
       payload.logger.info(`[onInit] Created admin user: ${adminEmail}`);
     } else {
@@ -174,6 +175,7 @@ export default buildConfig({
           ...(syncAdminPassword ? { password: adminPassword } : {}),
         },
         overrideAccess: true,
+        context: { allowPrivilegedRoleWrite: true },
       });
 
       const notes = [

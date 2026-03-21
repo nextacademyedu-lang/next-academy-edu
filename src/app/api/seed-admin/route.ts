@@ -74,6 +74,7 @@ export async function POST(req: NextRequest) {
           lastName,
         },
         overrideAccess: true,
+        context: { allowPrivilegedRoleWrite: true },
       });
 
       return NextResponse.json({
@@ -94,6 +95,7 @@ export async function POST(req: NextRequest) {
         emailVerified: true,
       },
       overrideAccess: true,
+      context: { allowPrivilegedRoleWrite: true },
     });
 
     return NextResponse.json({

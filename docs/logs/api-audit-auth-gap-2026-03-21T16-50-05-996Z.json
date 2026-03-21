@@ -1,0 +1,807 @@
+{
+  "summary": {
+    "baseUrl": "https://nextacademyedu.com",
+    "generatedAt": "2026-03-21T16:50:05.996Z",
+    "total": 26,
+    "passed": 26,
+    "failed": 0,
+    "skipped": 6
+  },
+  "failed": [],
+  "skipped": [
+    {
+      "name": "instructor auth routes",
+      "reason": "No instructor records available"
+    },
+    {
+      "name": "reviews moderate admin",
+      "reason": "review not created"
+    },
+    {
+      "name": "b2b endpoints",
+      "reason": "company creation failed"
+    },
+    {
+      "name": "instructor availability endpoints",
+      "reason": "missing instructor token/role"
+    },
+    {
+      "name": "notification by id read",
+      "reason": "notification #2 create failed"
+    },
+    {
+      "name": "bulk seats allocate",
+      "reason": "missing company/round context"
+    }
+  ],
+  "results": [
+    {
+      "name": "seed test data (pass2)",
+      "method": "POST",
+      "path": "/api/seed-test-data",
+      "status": 200,
+      "ok": true,
+      "expected": "200",
+      "response": {
+        "success": true,
+        "data": {
+          "category": {
+            "id": 1,
+            "slug": "test-workshops"
+          },
+          "program": {
+            "id": 2,
+            "slug": "test-payment-workshop",
+            "title": "ورشة تجريبية - اختبار الدفع"
+          },
+          "round": {
+            "id": 2,
+            "price": 10,
+            "currency": "EGP",
+            "status": "open"
+          },
+          "discountCode": {
+            "id": 1,
+            "code": "TEST9",
+            "type": "fixed",
+            "value": 9
+          }
+        },
+        "summary": {
+          "testWorkshopPrice": "10 EGP",
+          "discountCode": "TEST9 (9 EGP off → final price: 1 EGP)",
+          "workshopSlug": "test-payment-workshop"
+        }
+      }
+    },
+    {
+      "name": "create user normal2",
+      "method": "POST",
+      "path": "/api/users",
+      "status": 201,
+      "ok": true,
+      "expected": "200|201",
+      "response": {
+        "doc": {
+          "id": 44,
+          "firstName": "API2",
+          "lastName": "normal2",
+          "phone": null,
+          "gender": null,
+          "picture": null,
+          "role": "user",
+          "instructorId": null,
+          "preferredLanguage": "ar",
+          "newsletterOptIn": false,
+          "whatsappOptIn": false,
+          "lifecycleStage": "lead"
+        },
+        "message": "User successfully created."
+      }
+    },
+    {
+      "name": "login normal2",
+      "method": "POST",
+      "path": "/api/users/login",
+      "status": 200,
+      "ok": true,
+      "expected": "200",
+      "response": {
+        "exp": 1774118997,
+        "token": "[REDACTED]",
+        "user": {
+          "id": 44,
+          "firstName": "API2",
+          "lastName": "normal2",
+          "phone": null,
+          "gender": null,
+          "picture": null,
+          "role": "user",
+          "instructorId": null,
+          "preferredLanguage": "ar",
+          "newsletterOptIn": false,
+          "whatsappOptIn": false,
+          "lifecycleStage": "lead"
+        }
+      }
+    },
+    {
+      "name": "me normal2",
+      "method": "GET",
+      "path": "/api/users/me",
+      "status": 200,
+      "ok": true,
+      "expected": "200",
+      "response": {
+        "user": {
+          "id": 44,
+          "firstName": "API2",
+          "lastName": "normal2",
+          "phone": null,
+          "gender": null,
+          "picture": null,
+          "role": "user",
+          "instructorId": null,
+          "preferredLanguage": "ar",
+          "newsletterOptIn": false,
+          "whatsappOptIn": false,
+          "lifecycleStage": "lead"
+        },
+        "collection": "users",
+        "strategy": "local-jwt",
+        "exp": 1774118997,
+        "token": "[REDACTED]",
+        "message": "Account"
+      }
+    },
+    {
+      "name": "create user admin2",
+      "method": "POST",
+      "path": "/api/users",
+      "status": 201,
+      "ok": true,
+      "expected": "200|201",
+      "response": {
+        "doc": {
+          "id": 45,
+          "firstName": "API2",
+          "lastName": "admin2",
+          "phone": null,
+          "gender": null,
+          "picture": null,
+          "role": "admin",
+          "instructorId": null,
+          "preferredLanguage": "ar",
+          "newsletterOptIn": false,
+          "whatsappOptIn": false,
+          "lifecycleStage": "lead"
+        },
+        "message": "User successfully created."
+      }
+    },
+    {
+      "name": "login admin2",
+      "method": "POST",
+      "path": "/api/users/login",
+      "status": 200,
+      "ok": true,
+      "expected": "200",
+      "response": {
+        "exp": 1774118997,
+        "token": "[REDACTED]",
+        "user": {
+          "id": 45,
+          "firstName": "API2",
+          "lastName": "admin2",
+          "phone": null,
+          "gender": null,
+          "picture": null,
+          "role": "admin",
+          "instructorId": null,
+          "preferredLanguage": "ar",
+          "newsletterOptIn": false,
+          "whatsappOptIn": false,
+          "lifecycleStage": "lead"
+        }
+      }
+    },
+    {
+      "name": "me admin2",
+      "method": "GET",
+      "path": "/api/users/me",
+      "status": 200,
+      "ok": true,
+      "expected": "200",
+      "response": {
+        "user": {
+          "id": 45,
+          "firstName": "API2",
+          "lastName": "admin2",
+          "phone": null,
+          "gender": null,
+          "picture": null,
+          "role": "admin",
+          "instructorId": null,
+          "preferredLanguage": "ar",
+          "newsletterOptIn": false,
+          "whatsappOptIn": false,
+          "lifecycleStage": "lead"
+        },
+        "collection": "users",
+        "strategy": "local-jwt",
+        "exp": 1774118997,
+        "token": "[REDACTED]",
+        "message": "Account"
+      }
+    },
+    {
+      "name": "create user b2b2",
+      "method": "POST",
+      "path": "/api/users",
+      "status": 201,
+      "ok": true,
+      "expected": "200|201",
+      "response": {
+        "doc": {
+          "id": 46,
+          "firstName": "API2",
+          "lastName": "b2b2",
+          "phone": null,
+          "gender": null,
+          "picture": null,
+          "role": "b2b_manager",
+          "instructorId": null,
+          "preferredLanguage": "ar",
+          "newsletterOptIn": false,
+          "whatsappOptIn": false,
+          "lifecycleStage": "lead"
+        },
+        "message": "User successfully created."
+      }
+    },
+    {
+      "name": "login b2b2",
+      "method": "POST",
+      "path": "/api/users/login",
+      "status": 200,
+      "ok": true,
+      "expected": "200",
+      "response": {
+        "exp": 1774118998,
+        "token": "[REDACTED]",
+        "user": {
+          "id": 46,
+          "firstName": "API2",
+          "lastName": "b2b2",
+          "phone": null,
+          "gender": null,
+          "picture": null,
+          "role": "b2b_manager",
+          "instructorId": null,
+          "preferredLanguage": "ar",
+          "newsletterOptIn": false,
+          "whatsappOptIn": false,
+          "lifecycleStage": "lead"
+        }
+      }
+    },
+    {
+      "name": "me b2b2",
+      "method": "GET",
+      "path": "/api/users/me",
+      "status": 200,
+      "ok": true,
+      "expected": "200",
+      "response": {
+        "user": {
+          "id": 46,
+          "firstName": "API2",
+          "lastName": "b2b2",
+          "phone": null,
+          "gender": null,
+          "picture": null,
+          "role": "b2b_manager",
+          "instructorId": null,
+          "preferredLanguage": "ar",
+          "newsletterOptIn": false,
+          "whatsappOptIn": false,
+          "lifecycleStage": "lead"
+        },
+        "collection": "users",
+        "strategy": "local-jwt",
+        "exp": 1774118998,
+        "token": "[REDACTED]",
+        "message": "Account"
+      }
+    },
+    {
+      "name": "list instructors public (pass2)",
+      "method": "GET",
+      "path": "/api/instructors?limit=1",
+      "status": 200,
+      "ok": true,
+      "expected": "200",
+      "response": {
+        "docs": [],
+        "hasNextPage": false,
+        "hasPrevPage": false,
+        "limit": 1,
+        "nextPage": null,
+        "page": 1,
+        "pagingCounter": 1,
+        "prevPage": null,
+        "totalDocs": 0,
+        "totalPages": 1
+      }
+    },
+    {
+      "name": "bookings create authorized (pass2)",
+      "method": "POST",
+      "path": "/api/bookings/create",
+      "status": 200,
+      "ok": true,
+      "expected": "200",
+      "response": {
+        "bookingId": 12,
+        "bookingCode": "BK-MN0KCWMG-ZW2D"
+      }
+    },
+    {
+      "name": "discount validate authorized (pass2)",
+      "method": "POST",
+      "path": "/api/discount-codes/validate",
+      "status": 200,
+      "ok": true,
+      "expected": "200",
+      "response": {
+        "valid": true,
+        "discountAmount": 1,
+        "newAmount": 0,
+        "type": "fixed",
+        "value": 9
+      }
+    },
+    {
+      "name": "list payments by booking owner (pass2)",
+      "method": "GET",
+      "path": "/api/payments?where[booking][equals]=12&limit=1",
+      "status": 200,
+      "ok": true,
+      "expected": "200",
+      "response": {
+        "docs": [
+          {
+            "id": 10,
+            "paymentCode": "PAY-MN0KCWN7-1JLF",
+            "booking": {
+              "id": 12,
+              "bookingCode": "BK-MN0KCWMG-ZW2D",
+              "user": {
+                "id": 44,
+                "firstName": "API2",
+                "lastName": "normal2",
+                "phone": null,
+                "gender": null,
+                "picture": null,
+                "role": "user",
+                "instructorId": null,
+                "preferredLanguage": "ar",
+                "newsletterOptIn": false,
+                "whatsappOptIn": false,
+                "lifecycleStage": "lead"
+              },
+              "round": {
+                "id": 2,
+                "program": 2,
+                "roundNumber": 1,
+                "title": "الدورة التجريبية #1",
+                "startDate": "2026-04-01T10:00:00.000Z",
+                "endDate": "2026-04-01T12:00:00.000Z",
+                "timezone": "Africa/Cairo",
+                "locationType": "online",
+                "locationName": null,
+                "locationAddress": null,
+                "locationMapUrl": null,
+                "meetingUrl": "https://zoom.us/test"
+              },
+              "paymentPlan": null,
+              "installmentRequest": null,
+              "status": "pending",
+              "totalAmount": 10,
+              "paidAmount": 0,
+              "remainingAmount": 1,
+              "discountCode": "TEST9",
+              "discountAmount": 9
+            },
+            "installmentNumber": null,
+            "amount": 1,
+            "dueDate": "2026-03-22T16:49:58.339Z",
+            "paidDate": null,
+            "status": "pending",
+            "paymentMethod": null,
+            "transactionId": null,
+            "paymobOrderId": null,
+            "paymentGatewayResponse": null
+          }
+        ],
+        "hasNextPage": false,
+        "hasPrevPage": false,
+        "limit": 1,
+        "nextPage": null,
+        "page": 1,
+        "pagingCounter": 1,
+        "prevPage": null,
+        "totalDocs": 1,
+        "totalPages": 1
+      }
+    },
+    {
+      "name": "checkout paymob card (pass2)",
+      "method": "POST",
+      "path": "/api/checkout/paymob",
+      "status": 200,
+      "ok": true,
+      "expected": "200",
+      "response": {
+        "redirectUrl": "https://accept.paymob.com/unifiedcheckout/?publicKey=egy_pk_test_ECEqIVf0eA4iF98gLhmLp9YpbDBoGTw7&clientSecret=egy_csk_test_d17ef28e8b6654bf2169347d7a3080a1"
+      }
+    },
+    {
+      "name": "checkout easykash (pass2)",
+      "method": "POST",
+      "path": "/api/checkout/easykash",
+      "status": 200,
+      "ok": true,
+      "expected": "200",
+      "response": {
+        "voucher": "9597691580",
+        "provider": "Fawry",
+        "expiryDate": "23/03/2026, 6:50:00 PM",
+        "easykashRef": "21031988143",
+        "bookingId": 12
+      }
+    },
+    {
+      "name": "webhook paymob valid (pass2)",
+      "method": "POST",
+      "path": "/api/webhooks/paymob",
+      "status": 200,
+      "ok": true,
+      "expected": "200",
+      "response": {
+        "received": true
+      }
+    },
+    {
+      "name": "webhook easykash valid (pass2)",
+      "method": "POST",
+      "path": "/api/webhooks/easykash",
+      "status": 200,
+      "ok": true,
+      "expected": "200",
+      "response": {
+        "received": true
+      }
+    },
+    {
+      "name": "paymob redirect success (pass2)",
+      "method": "GET",
+      "path": "/api/webhooks/paymob/redirect?success=true&merchant_order_id=12",
+      "status": 307,
+      "ok": true,
+      "expected": "302|307",
+      "response": "",
+      "location": "https://nextacademyedu.com/ar/checkout/success?bookingId=12"
+    },
+    {
+      "name": "create review by user (pass2)",
+      "method": "POST",
+      "path": "/api/reviews",
+      "status": 201,
+      "ok": true,
+      "expected": "200|201",
+      "response": {
+        "doc": {
+          "id": 1,
+          "user": {
+            "id": 44,
+            "firstName": "API2",
+            "lastName": "normal2",
+            "phone": null,
+            "gender": null,
+            "picture": null,
+            "role": "user",
+            "instructorId": null,
+            "preferredLanguage": "ar",
+            "newsletterOptIn": false,
+            "whatsappOptIn": false,
+            "lifecycleStage": "lead"
+          },
+          "program": {
+            "id": 2,
+            "type": "workshop",
+            "titleAr": "ورشة تجريبية - اختبار الدفع",
+            "titleEn": "Test Workshop - Payment Testing",
+            "slug": "test-payment-workshop",
+            "descriptionAr": null,
+            "descriptionEn": null,
+            "shortDescriptionAr": "ورشة تجريبية لاختبار نظام الدفع - السعر ١٠ جنيه",
+            "shortDescriptionEn": "A test workshop for payment system testing - Price 10 EGP",
+            "category": {
+              "id": 1,
+              "nameAr": "ورش تجريبية",
+              "nameEn": "Test Workshops",
+              "slug": "test-workshops",
+              "descriptionAr": null,
+              "descriptionEn": null,
+              "icon": null,
+              "parent": null,
+              "order": 0,
+              "isActive": true,
+              "updatedAt": "2026-03-21T16:47:09.353Z",
+              "createdAt": "2026-03-21T16:47:09.353Z"
+            },
+            "instructor": null,
+            "thumbnail": null
+          },
+          "round": {
+            "id": 2,
+            "program": {
+              "id": 2,
+              "type": "workshop",
+              "titleAr": "ورشة تجريبية - اختبار الدفع",
+              "titleEn": "Test Workshop - Payment Testing",
+              "slug": "test-payment-workshop",
+              "descriptionAr": null,
+              "descriptionEn": null,
+              "shortDescriptionAr": "ورشة تجريبية لاختبار نظام الدفع - السعر ١٠ جنيه",
+              "shortDescriptionEn": "A test workshop for payment system testing - Price 10 EGP",
+              "category": 1,
+              "instructor": null,
+              "thumbnail": null
+            },
+            "roundNumber": 1,
+            "title": "الدورة التجريبية #1",
+            "startDate": "2026-04-01T10:00:00.000Z",
+            "endDate": "2026-04-01T12:00:00.000Z",
+            "timezone": "Africa/Cairo",
+            "locationType": "online",
+            "locationName": null,
+            "locationAddress": null,
+            "locationMapUrl": null,
+            "meetingUrl": "https://zoom.us/test"
+          },
+          "booking": {
+            "id": 12,
+            "bookingCode": "BK-MN0KCWMG-ZW2D",
+            "user": {
+              "id": 44,
+              "firstName": "API2",
+              "lastName": "normal2",
+              "phone": null,
+              "gender": null,
+              "picture": null,
+              "role": "user",
+              "instructorId": null,
+              "preferredLanguage": "ar",
+              "newsletterOptIn": false,
+              "whatsappOptIn": false,
+              "lifecycleStage": "lead"
+            },
+            "round": {
+              "id": 2,
+              "program": 2,
+              "roundNumber": 1,
+              "title": "الدورة التجريبية #1",
+              "startDate": "2026-04-01T10:00:00.000Z",
+              "endDate": "2026-04-01T12:00:00.000Z",
+              "timezone": "Africa/Cairo",
+              "locationType": "online",
+              "locationName": null,
+              "locationAddress": null,
+              "locationMapUrl": null,
+              "meetingUrl": "https://zoom.us/test"
+            },
+            "paymentPlan": null,
+            "installmentRequest": null,
+            "status": "confirmed",
+            "totalAmount": 10,
+            "paidAmount": 1,
+            "remainingAmount": 0,
+            "discountCode": "TEST9",
+            "discountAmount": 9
+          },
+          "rating": 5,
+          "title": null,
+          "comment": "pass2 review 1774111805155",
+          "status": "pending",
+          "helpfulCount": 0,
+          "isVerifiedPurchase": true,
+          "adminNotes": null
+        },
+        "message": "Review successfully created."
+      }
+    },
+    {
+      "name": "booking status check (pass2)",
+      "method": "GET",
+      "path": "/api/bookings/12",
+      "status": 200,
+      "ok": true,
+      "expected": "200",
+      "response": {
+        "id": 12,
+        "bookingCode": "BK-MN0KCWMG-ZW2D",
+        "user": {
+          "id": 44,
+          "firstName": "API2",
+          "lastName": "normal2",
+          "phone": null,
+          "gender": null,
+          "picture": null,
+          "role": "user",
+          "instructorId": null,
+          "preferredLanguage": "ar",
+          "newsletterOptIn": false,
+          "whatsappOptIn": false,
+          "lifecycleStage": "lead"
+        },
+        "round": {
+          "id": 2,
+          "program": {
+            "id": 2,
+            "type": "workshop",
+            "titleAr": "ورشة تجريبية - اختبار الدفع",
+            "titleEn": "Test Workshop - Payment Testing",
+            "slug": "test-payment-workshop",
+            "descriptionAr": null,
+            "descriptionEn": null,
+            "shortDescriptionAr": "ورشة تجريبية لاختبار نظام الدفع - السعر ١٠ جنيه",
+            "shortDescriptionEn": "A test workshop for payment system testing - Price 10 EGP",
+            "category": 1,
+            "instructor": null,
+            "thumbnail": null
+          },
+          "roundNumber": 1,
+          "title": "الدورة التجريبية #1",
+          "startDate": "2026-04-01T10:00:00.000Z",
+          "endDate": "2026-04-01T12:00:00.000Z",
+          "timezone": "Africa/Cairo",
+          "locationType": "online",
+          "locationName": null,
+          "locationAddress": null,
+          "locationMapUrl": null,
+          "meetingUrl": "https://zoom.us/test"
+        },
+        "paymentPlan": null,
+        "installmentRequest": null,
+        "status": "confirmed",
+        "totalAmount": 10,
+        "paidAmount": 1,
+        "remainingAmount": 0,
+        "discountCode": "TEST9",
+        "discountAmount": 9
+      }
+    },
+    {
+      "name": "certificate generate admin (pass2)",
+      "method": "POST",
+      "path": "/api/certificates/generate",
+      "status": 200,
+      "ok": true,
+      "expected": "200",
+      "response": {
+        "certificateCode": "CERT-P2YZ-5D4P-C6RB",
+        "verificationUrl": "https://nextacademyedu.com/certificates/CERT-P2YZ-5D4P-C6RB"
+      }
+    },
+    {
+      "name": "create company as b2b (pass2)",
+      "method": "POST",
+      "path": "/api/companies",
+      "status": 201,
+      "ok": true,
+      "expected": "200|201",
+      "response": {
+        "doc": {
+          "id": 1,
+          "name": "Pass2 Co 1774111805657",
+          "industry": "Education",
+          "size": "11-50",
+          "type": "sme",
+          "website": null,
+          "country": null,
+          "city": null,
+          "logo": null,
+          "twentyCrmCompanyId": null,
+          "updatedAt": "2026-03-21T16:50:06.587Z",
+          "createdAt": "2026-03-21T16:50:06.587Z"
+        },
+        "message": "Company successfully created."
+      }
+    },
+    {
+      "name": "create notification #1 admin (pass2)",
+      "method": "POST",
+      "path": "/api/notifications",
+      "status": 201,
+      "ok": true,
+      "expected": "200|201",
+      "response": {
+        "doc": {
+          "id": 1,
+          "user": {
+            "id": 44,
+            "firstName": "API2",
+            "lastName": "normal2",
+            "phone": null,
+            "gender": null,
+            "picture": null,
+            "role": "user",
+            "instructorId": null,
+            "preferredLanguage": "ar",
+            "newsletterOptIn": false,
+            "whatsappOptIn": false,
+            "lifecycleStage": "lead"
+          },
+          "type": "booking_confirmed",
+          "title": "Pass2 notif 1",
+          "message": "mark all read",
+          "actionUrl": null,
+          "isRead": false,
+          "readAt": null,
+          "updatedAt": "2026-03-21T16:50:06.666Z",
+          "createdAt": "2026-03-21T16:50:06.665Z"
+        },
+        "message": "Notification successfully created."
+      }
+    },
+    {
+      "name": "notifications read-all authorized (pass2)",
+      "method": "PUT",
+      "path": "/api/notifications/read-all",
+      "status": 200,
+      "ok": true,
+      "expected": "200",
+      "response": {
+        "success": true
+      }
+    },
+    {
+      "name": "create notification #2 admin (pass2)",
+      "method": "POST",
+      "path": "/api/notifications",
+      "status": 201,
+      "ok": true,
+      "expected": "200|201",
+      "response": {
+        "doc": {
+          "id": 2,
+          "user": {
+            "id": 44,
+            "firstName": "API2",
+            "lastName": "normal2",
+            "phone": null,
+            "gender": null,
+            "picture": null,
+            "role": "user",
+            "instructorId": null,
+            "preferredLanguage": "ar",
+            "newsletterOptIn": false,
+            "whatsappOptIn": false,
+            "lifecycleStage": "lead"
+          },
+          "type": "payment_reminder",
+          "title": "Pass2 notif 2",
+          "message": "single read",
+          "actionUrl": null,
+          "isRead": false,
+          "readAt": null,
+          "updatedAt": "2026-03-21T16:50:06.855Z",
+          "createdAt": "2026-03-21T16:50:06.855Z"
+        },
+        "message": "Notification successfully created."
+      }
+    }
+  ]
+}

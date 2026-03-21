@@ -1,0 +1,146 @@
+{
+  "summary": {
+    "baseUrl": "https://nextacademyedu.com",
+    "generatedAt": "2026-03-21T16:51:59.050Z",
+    "total": 22,
+    "passed": 22,
+    "failed": 0,
+    "skipped": 0
+  },
+  "failed": [],
+  "skipped": [],
+  "results": [
+    {
+      "name": "seed test data (pass3)",
+      "status": 200,
+      "ok": true,
+      "path": "/api/seed-test-data"
+    },
+    {
+      "name": "create user normal3",
+      "status": 201,
+      "ok": true,
+      "path": "/api/users"
+    },
+    {
+      "name": "login normal3",
+      "status": 200,
+      "ok": true,
+      "path": "/api/users/login"
+    },
+    {
+      "name": "me normal3",
+      "status": 200,
+      "ok": true,
+      "path": "/api/users/me"
+    },
+    {
+      "name": "create user admin3",
+      "status": 201,
+      "ok": true,
+      "path": "/api/users"
+    },
+    {
+      "name": "login admin3",
+      "status": 200,
+      "ok": true,
+      "path": "/api/users/login"
+    },
+    {
+      "name": "me admin3",
+      "status": 200,
+      "ok": true,
+      "path": "/api/users/me"
+    },
+    {
+      "name": "create user b2b3",
+      "status": 201,
+      "ok": true,
+      "path": "/api/users"
+    },
+    {
+      "name": "login b2b3",
+      "status": 200,
+      "ok": true,
+      "path": "/api/users/login"
+    },
+    {
+      "name": "me b2b3",
+      "status": 200,
+      "ok": true,
+      "path": "/api/users/me"
+    },
+    {
+      "name": "bookings create for review (pass3)",
+      "status": 200,
+      "ok": true,
+      "path": "/api/bookings/create"
+    },
+    {
+      "name": "create review (pass3)",
+      "status": 201,
+      "ok": true,
+      "path": "/api/reviews"
+    },
+    {
+      "name": "reviews moderate admin (pass3)",
+      "status": 200,
+      "ok": true,
+      "path": "/api/reviews/moderate"
+    },
+    {
+      "name": "create company as b2b (pass3)",
+      "status": 201,
+      "ok": true,
+      "path": "/api/companies"
+    },
+    {
+      "name": "create user profile as b2b (pass3)",
+      "status": 201,
+      "ok": true,
+      "path": "/api/user-profiles"
+    },
+    {
+      "name": "b2b dashboard authorized (pass3)",
+      "status": 200,
+      "ok": true,
+      "path": "/api/b2b/dashboard"
+    },
+    {
+      "name": "b2b team authorized (pass3)",
+      "status": 200,
+      "ok": true,
+      "path": "/api/b2b/team"
+    },
+    {
+      "name": "b2b bookings authorized (pass3)",
+      "status": 200,
+      "ok": true,
+      "path": "/api/b2b/bookings"
+    },
+    {
+      "name": "create notification admin (pass3)",
+      "status": 201,
+      "ok": true,
+      "path": "/api/notifications"
+    },
+    {
+      "name": "notification by id read authorized (pass3)",
+      "status": 200,
+      "ok": true,
+      "path": "/api/notifications/3/read"
+    },
+    {
+      "name": "create bulk-seat-allocation admin (pass3)",
+      "status": 201,
+      "ok": true,
+      "path": "/api/bulk-seat-allocations"
+    },
+    {
+      "name": "bulk seats allocate (pass3)",
+      "status": 200,
+      "ok": true,
+      "path": "/api/bulk-seats/allocate"
+    }
+  ]
+}

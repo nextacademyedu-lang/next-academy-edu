@@ -21,20 +21,32 @@ export const Users: CollectionConfig = {
   },
   hooks: {
     beforeChange: [
-      ({ req, data, originalDoc, operation }) => {
-        // Allow onInit seed and server-side operations (no user = internal API)
-        if (!req.user) return data;
+      ({ req, data, originalDoc, operation, context }) => {
+        const actorRole = req.user?.role;
+        const isAdminActor = actorRole === 'admin';
+        const hasPrivilegedRoleWriteBypass =
+          Boolean((context as { allowPrivilegedRoleWrite?: boolean } | undefined)?.allowPrivilegedRoleWrite);
+        const canWritePrivilegedRole = isAdminActor || hasPrivilegedRoleWriteBypass;
 
-        // If role is being changed and user is not admin, revert it
-        if (operation === 'update' && data.role && originalDoc && data.role !== originalDoc.role) {
-          if (req.user.role !== 'admin') {
-            data.role = originalDoc.role; // silently revert
+        // Public/self-service create must never be allowed to assign privileged roles.
+        if (operation === 'create') {
+          if (!canWritePrivilegedRole) {
+            data.role = 'user';
+            data.instructorId = null;
+          } else if (!data.role) {
+            data.role = 'user';
           }
         }
 
-        // On create, non-admins always get 'user' role
-        if (operation === 'create' && req.user.role !== 'admin') {
-          data.role = 'user';
+        // Non-admin / non-bypass updates cannot escalate role or bind instructor profile.
+        if (operation === 'update' && originalDoc && !canWritePrivilegedRole) {
+          if (data.role && data.role !== originalDoc.role) {
+            data.role = originalDoc.role;
+          }
+
+          if (data.instructorId !== undefined) {
+            data.instructorId = originalDoc.instructorId ?? null;
+          }
         }
 
         return data;

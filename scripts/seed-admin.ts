@@ -39,6 +39,7 @@ async function seed() {
         id: existing.docs[0].id,
         data: { role: 'admin' },
         overrideAccess: true,
+        context: { allowPrivilegedRoleWrite: true },
       });
       console.log('   → Promoted to admin role.');
     }
@@ -54,6 +55,7 @@ async function seed() {
         emailVerified: true,
       },
       overrideAccess: true,
+      context: { allowPrivilegedRoleWrite: true },
     });
     console.log(`✅ Created admin user: ${EMAIL} (id: ${user.id})`);
   }

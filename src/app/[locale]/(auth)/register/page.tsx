@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { useTranslations, useLocale } from 'next-intl';
 import { Button } from '@/components/ui/button';
@@ -20,9 +20,14 @@ const hasSpecial = (str: string) => /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+/.tes
 
 export default function RegisterPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { register } = useAuth();
   const t = useTranslations('Auth');
   const locale = useLocale();
+  const redirectParam = searchParams.get('redirect');
+  const loginHref = redirectParam
+    ? `/${locale}/login?redirect=${encodeURIComponent(redirectParam)}`
+    : `/${locale}/login`;
 
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
@@ -60,7 +65,11 @@ export default function RegisterPage() {
 
       if (result.success) {
         // Registration successful — redirect to verify email
-        router.push(`/${locale}/verify-email?email=${encodeURIComponent(email)}`);
+        const verifyParams = new URLSearchParams({ email });
+        if (redirectParam) {
+          verifyParams.set('redirect', redirectParam);
+        }
+        router.push(`/${locale}/verify-email?${verifyParams.toString()}`);
       } else {
         // Handle common errors
         const errMsg = result.error || t('registrationFailed');
@@ -185,7 +194,7 @@ export default function RegisterPage() {
 
 
       <p className={styles.footerText}>
-        {t('hasAccount')} <Link href={`/${locale}/login`} className={styles.footerLink}>{t('signIn')}</Link>
+        {t('hasAccount')} <Link href={loginHref} className={styles.footerLink}>{t('signIn')}</Link>
       </p>
     </motion.div>
   );

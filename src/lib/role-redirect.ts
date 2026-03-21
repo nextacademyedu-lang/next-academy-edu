@@ -24,3 +24,27 @@ export function getDashboardPath(role: UserData['role'], locale: string): string
   if (role === 'admin') return '/admin';
   return `/${locale}${base}`;
 }
+
+/**
+ * Sanitizes a post-auth redirect target to avoid external/open redirects.
+ * Accepts only internal absolute paths like `/ar/checkout/123`.
+ */
+export function getSafeRedirectPath(
+  redirect: string | null | undefined,
+  fallbackPath: string,
+): string {
+  if (!redirect) return fallbackPath;
+
+  let normalized = redirect.trim();
+  try {
+    normalized = decodeURIComponent(normalized);
+  } catch {
+    // Keep original value if it's not URI-encoded.
+  }
+
+  if (!normalized.startsWith('/')) return fallbackPath;
+  if (normalized.startsWith('//')) return fallbackPath;
+  if (normalized.startsWith('/api') || normalized.startsWith('/_next')) return fallbackPath;
+
+  return normalized;
+}

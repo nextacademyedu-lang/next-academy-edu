@@ -6,6 +6,17 @@
 
 ## Session Log
 
+### Session 2026-03-21 (19:13) — Docs Logs Refresh
+
+- [x] Updated `docs/logs/api-audit-latest.md` to reflect final post-fix audit state
+- [x] Consolidated round status in one place (baseline + auth-gap + gap-fixes + instructor coverage)
+- [x] Added traceability links to detailed fix notes:
+  - [x] `docs/logs/2026-03-21-work-summary.md`
+  - [x] `docs/logs/2026-03-21-checkout-intent-fix.md`
+  - [x] `docs/logs/2026-03-21-users-role-escalation-fix.md`
+- [x] Updated `docs/logs/changelog.md` with this documentation pass
+- [ ] Optional: commit/push docs-only changes
+
 ### Session 2026-03-21 (12:55) — CRM Sync: Users Not Appearing in Twenty
 
 - [x] Reproduced CRM sync failure through cron endpoint output:

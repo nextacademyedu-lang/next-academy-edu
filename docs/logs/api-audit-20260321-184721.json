@@ -1,0 +1,3512 @@
+{
+  "summary": {
+    "baseUrl": "https://nextacademyedu.com",
+    "generatedAt": "2026-03-21T16:47:21.067Z",
+    "totals": {
+      "total": 150,
+      "passed": 145,
+      "failed": 5,
+      "skipped": 5
+    },
+    "state": {
+      "seedRoundId": 2,
+      "bookingId": null,
+      "paymentId": null,
+      "companyId": null,
+      "bulkSeatId": null,
+      "reviewId": null,
+      "notification2Id": null,
+      "roles": {
+        "normal": null,
+        "admin": null,
+        "b2b": null,
+        "instructor": null
+      }
+    }
+  },
+  "failed": [
+    {
+      "name": "bookings create authorized",
+      "method": "POST",
+      "path": "/api/bookings/create",
+      "status": 401,
+      "ok": false,
+      "expected": "200",
+      "response": {
+        "error": "Unauthorized"
+      }
+    },
+    {
+      "name": "payload company create (b2b)",
+      "method": "POST",
+      "path": "/api/companies",
+      "status": 403,
+      "ok": false,
+      "expected": "200|201",
+      "response": {
+        "errors": [
+          {
+            "message": "You are not allowed to perform this action."
+          }
+        ]
+      }
+    },
+    {
+      "name": "payload notification create #1 (admin)",
+      "method": "POST",
+      "path": "/api/notifications",
+      "status": 403,
+      "ok": false,
+      "expected": "200|201",
+      "response": {
+        "errors": [
+          {
+            "message": "You are not allowed to perform this action."
+          }
+        ]
+      }
+    },
+    {
+      "name": "notifications read-all authorized",
+      "method": "PUT",
+      "path": "/api/notifications/read-all",
+      "status": 401,
+      "ok": false,
+      "expected": "200",
+      "response": {
+        "error": "Unauthorized"
+      }
+    },
+    {
+      "name": "payload notification create #2 (admin)",
+      "method": "POST",
+      "path": "/api/notifications",
+      "status": 403,
+      "ok": false,
+      "expected": "200|201",
+      "response": {
+        "errors": [
+          {
+            "message": "You are not allowed to perform this action."
+          }
+        ]
+      }
+    }
+  ],
+  "skipped": [
+    {
+      "name": "instructor role flow",
+      "reason": "No instructor records found to link instructor user"
+    },
+    {
+      "name": "b2b scoped routes",
+      "reason": "Could not create company/profile scope"
+    },
+    {
+      "name": "instructor availability routes",
+      "reason": "Missing instructor user token"
+    },
+    {
+      "name": "notifications [id] read authorized",
+      "reason": "Could not create notification #2"
+    },
+    {
+      "name": "bulk seats allocate",
+      "reason": "Missing admin token/company/round/user context"
+    }
+  ],
+  "results": [
+    {
+      "name": "health",
+      "method": "GET",
+      "path": "/api/health",
+      "status": 200,
+      "ok": true,
+      "expected": "200",
+      "response": {
+        "status": "ok",
+        "timestamp": "2026-03-21T16:47:07.214Z"
+      }
+    },
+    {
+      "name": "home stats",
+      "method": "GET",
+      "path": "/api/home/stats",
+      "status": 200,
+      "ok": true,
+      "expected": "200",
+      "response": {
+        "stats": {
+          "professionals": 1,
+          "partners": 0,
+          "instructors": 0,
+          "completionRate": 0
+        }
+      }
+    },
+    {
+      "name": "home featured programs",
+      "method": "GET",
+      "path": "/api/home/featured-programs",
+      "status": 200,
+      "ok": true,
+      "expected": "200",
+      "response": {
+        "programs": [
+          {
+            "id": "1",
+            "title": "QA Smoke Program 1774037601",
+            "kind": "Course",
+            "category": "General",
+            "enrolledCount": 5,
+            "rating": 0,
+            "ratingCount": 0,
+            "instructor": "Next Team",
+            "date": "Mar 25 - Apr 24",
+            "price": "100 EGP",
+            "image": null,
+            "href": "/en/programs/qa-smoke-1774037601"
+          }
+        ]
+      }
+    },
+    {
+      "name": "home instructors",
+      "method": "GET",
+      "path": "/api/home/instructors",
+      "status": 200,
+      "ok": true,
+      "expected": "200",
+      "response": {
+        "instructors": []
+      }
+    },
+    {
+      "name": "home testimonials",
+      "method": "GET",
+      "path": "/api/home/testimonials",
+      "status": 200,
+      "ok": true,
+      "expected": "200",
+      "response": {
+        "testimonials": []
+      }
+    },
+    {
+      "name": "home video testimonials",
+      "method": "GET",
+      "path": "/api/home/video-testimonials",
+      "status": 200,
+      "ok": true,
+      "expected": "200",
+      "response": {
+        "videos": []
+      }
+    },
+    {
+      "name": "home blog posts",
+      "method": "GET",
+      "path": "/api/home/blog-posts",
+      "status": 200,
+      "ok": true,
+      "expected": "200",
+      "response": {
+        "posts": []
+      }
+    },
+    {
+      "name": "upcoming events",
+      "method": "GET",
+      "path": "/api/upcoming-events",
+      "status": 200,
+      "ok": true,
+      "expected": "200",
+      "response": {
+        "events": [],
+        "config": null
+      }
+    },
+    {
+      "name": "announcement active",
+      "method": "GET",
+      "path": "/api/announcement-bars/active?page=/ar",
+      "status": 200,
+      "ok": true,
+      "expected": "200",
+      "response": {
+        "bar": null
+      }
+    },
+    {
+      "name": "popups active",
+      "method": "GET",
+      "path": "/api/popups/active?page=/ar&firstVisit=1&emailCaptured=0&sessionPageViews=1",
+      "status": 200,
+      "ok": true,
+      "expected": "200",
+      "response": {
+        "popups": []
+      }
+    },
+    {
+      "name": "auth google redirect",
+      "method": "GET",
+      "path": "/api/auth/google?redirect=/dashboard",
+      "status": 307,
+      "ok": true,
+      "expected": "302|307",
+      "location": "https://accounts.google.com/o/oauth2/v2/auth?client_id=68040306828-hjhrihhp3q6m91qs25o3rimknafhekms.apps.googleusercontent.com&redirect_uri=https%3A%2F%2Fnextacademyedu.com%2Fapi%2Fauth%2Fgoogle%2Fcallback&response_type=code&scope=openid+email+profile&access_type=offline&prompt=consent&state=eyJyZWRpcmVjdCI6Ii9kYXNoYm9hcmQifQ",
+      "response": ""
+    },
+    {
+      "name": "auth google callback missing code",
+      "method": "GET",
+      "path": "/api/auth/google/callback",
+      "status": 307,
+      "ok": true,
+      "expected": "302|307",
+      "location": "https://nextacademyedu.com/ar/login?error=missing_code",
+      "response": ""
+    },
+    {
+      "name": "send otp unknown user",
+      "method": "POST",
+      "path": "/api/auth/send-otp",
+      "status": 200,
+      "ok": true,
+      "expected": "200",
+      "response": {
+        "message": "If an account exists, a verification code has been sent."
+      }
+    },
+    {
+      "name": "verify otp invalid",
+      "method": "POST",
+      "path": "/api/auth/verify-otp",
+      "status": 400,
+      "ok": true,
+      "expected": "400",
+      "response": {
+        "error": "Invalid or expired verification code"
+      }
+    },
+    {
+      "name": "custom login invalid creds",
+      "method": "POST",
+      "path": "/api/users/login",
+      "status": 401,
+      "ok": true,
+      "expected": "401",
+      "response": {
+        "errors": [
+          {
+            "message": "بيانات الدخول غير صحيحة."
+          }
+        ]
+      }
+    },
+    {
+      "name": "bookings create unauthorized",
+      "method": "POST",
+      "path": "/api/bookings/create",
+      "status": 401,
+      "ok": true,
+      "expected": "401",
+      "response": {
+        "error": "Unauthorized"
+      }
+    },
+    {
+      "name": "discount validate unauthorized",
+      "method": "POST",
+      "path": "/api/discount-codes/validate",
+      "status": 401,
+      "ok": true,
+      "expected": "401",
+      "response": {
+        "error": "Unauthorized"
+      }
+    },
+    {
+      "name": "checkout paymob unauthorized",
+      "method": "POST",
+      "path": "/api/checkout/paymob",
+      "status": 401,
+      "ok": true,
+      "expected": "401",
+      "response": {
+        "error": "Unauthorized"
+      }
+    },
+    {
+      "name": "checkout easykash unauthorized",
+      "method": "POST",
+      "path": "/api/checkout/easykash",
+      "status": 401,
+      "ok": true,
+      "expected": "401",
+      "response": {
+        "error": "Unauthorized"
+      }
+    },
+    {
+      "name": "notifications read-all unauthorized",
+      "method": "PUT",
+      "path": "/api/notifications/read-all",
+      "status": 401,
+      "ok": true,
+      "expected": "401",
+      "response": {
+        "error": "Unauthorized"
+      }
+    },
+    {
+      "name": "notifications [id] read unauthorized",
+      "method": "PUT",
+      "path": "/api/notifications/1/read",
+      "status": 401,
+      "ok": true,
+      "expected": "401",
+      "response": {
+        "error": "Unauthorized"
+      }
+    },
+    {
+      "name": "instructor availability unauthorized",
+      "method": "GET",
+      "path": "/api/instructor/availability",
+      "status": 401,
+      "ok": true,
+      "expected": "401",
+      "response": {
+        "error": "Unauthorized"
+      }
+    },
+    {
+      "name": "b2b dashboard unauthorized",
+      "method": "GET",
+      "path": "/api/b2b/dashboard",
+      "status": 401,
+      "ok": true,
+      "expected": "401",
+      "response": {
+        "error": "Unauthorized"
+      }
+    },
+    {
+      "name": "b2b team unauthorized",
+      "method": "GET",
+      "path": "/api/b2b/team",
+      "status": 401,
+      "ok": true,
+      "expected": "401",
+      "response": {
+        "error": "Unauthorized"
+      }
+    },
+    {
+      "name": "b2b bookings unauthorized",
+      "method": "GET",
+      "path": "/api/b2b/bookings",
+      "status": 401,
+      "ok": true,
+      "expected": "401",
+      "response": {
+        "error": "Unauthorized"
+      }
+    },
+    {
+      "name": "reviews moderate unauthorized",
+      "method": "POST",
+      "path": "/api/reviews/moderate",
+      "status": 403,
+      "ok": true,
+      "expected": "403",
+      "response": {
+        "error": "Forbidden"
+      }
+    },
+    {
+      "name": "certificates generate unauthorized",
+      "method": "POST",
+      "path": "/api/certificates/generate",
+      "status": 403,
+      "ok": true,
+      "expected": "403",
+      "response": {
+        "error": "Forbidden"
+      }
+    },
+    {
+      "name": "seed test data",
+      "method": "POST",
+      "path": "/api/seed-test-data",
+      "status": 200,
+      "ok": true,
+      "expected": "200",
+      "response": {
+        "success": true,
+        "data": {
+          "category": {
+            "id": 1,
+            "slug": "test-workshops"
+          },
+          "program": {
+            "id": 2,
+            "slug": "test-payment-workshop",
+            "title": "ورشة تجريبية - اختبار الدفع"
+          },
+          "round": {
+            "id": 2,
+            "price": 10,
+            "currency": "EGP",
+            "status": "open"
+          },
+          "discountCode": {
+            "id": 1,
+            "code": "TEST9",
+            "type": "fixed",
+            "value": 9
+          }
+        },
+        "summary": {
+          "testWorkshopPrice": "10 EGP",
+          "discountCode": "TEST9 (9 EGP off → final price: 1 EGP)",
+          "workshopSlug": "test-payment-workshop"
+        }
+      }
+    },
+    {
+      "name": "seed admin endpoint baseline",
+      "method": "POST",
+      "path": "/api/seed-admin",
+      "status": 404,
+      "ok": true,
+      "expected": "401|404",
+      "response": {
+        "error": "Not found"
+      }
+    },
+    {
+      "name": "payload users create (normal)",
+      "method": "POST",
+      "path": "/api/users",
+      "status": 201,
+      "ok": true,
+      "expected": "200|201",
+      "response": {
+        "doc": {
+          "id": 41,
+          "firstName": "API",
+          "lastName": "Audit-normal",
+          "phone": null,
+          "gender": null,
+          "picture": null,
+          "role": "user",
+          "instructorId": null,
+          "preferredLanguage": "ar",
+          "newsletterOptIn": false,
+          "whatsappOptIn": false,
+          "lifecycleStage": "lead",
+          "contactSource": null,
+          "twentyCrmContactId": null,
+          "googleId": null,
+          "emailVerified": false,
+          "lastLogin": null,
+          "updatedAt": "2026-03-21T16:47:09.643Z",
+          "createdAt": "2026-03-21T16:47:09.643Z",
+          "enableAPIKey": "[REDACTED]",
+          "apiKey": "[REDACTED]",
+          "email": "api.audit.normal.1774111628656@nextacademyedu.com",
+          "collection": "users",
+          "sessions": []
+        },
+        "message": "User successfully created."
+      }
+    },
+    {
+      "name": "custom login (normal)",
+      "method": "POST",
+      "path": "/api/users/login",
+      "status": 200,
+      "ok": true,
+      "expected": "200",
+      "response": {
+        "exp": 1774118829,
+        "token": "[REDACTED]",
+        "user": {
+          "id": 41,
+          "firstName": "API",
+          "lastName": "Audit-normal",
+          "phone": null,
+          "gender": null,
+          "picture": null,
+          "role": "user",
+          "instructorId": null,
+          "preferredLanguage": "ar",
+          "newsletterOptIn": false,
+          "whatsappOptIn": false,
+          "lifecycleStage": "lead",
+          "contactSource": null,
+          "twentyCrmContactId": null,
+          "googleId": null,
+          "emailVerified": false,
+          "lastLogin": null,
+          "updatedAt": null,
+          "createdAt": "2026-03-21T16:47:09.643Z",
+          "enableAPIKey": "[REDACTED]",
+          "apiKey": "[REDACTED]",
+          "email": "api.audit.normal.1774111628656@nextacademyedu.com",
+          "sessions": [
+            {
+              "id": "e2aa67ab-c236-4d6e-b5d5-8ceef574539a",
+              "createdAt": "2026-03-21T16:47:09.787Z",
+              "expiresAt": "2026-03-21T18:47:09.787Z"
+            }
+          ],
+          "collection": "users",
+          "_strategy": "local-jwt"
+        }
+      }
+    },
+    {
+      "name": "payload users me (normal)",
+      "method": "GET",
+      "path": "/api/users/me",
+      "status": 200,
+      "ok": true,
+      "expected": "200",
+      "response": {
+        "user": null,
+        "message": "Account"
+      }
+    },
+    {
+      "name": "payload users create (admin)",
+      "method": "POST",
+      "path": "/api/users",
+      "status": 201,
+      "ok": true,
+      "expected": "200|201",
+      "response": {
+        "doc": {
+          "id": 42,
+          "firstName": "API",
+          "lastName": "Audit-admin",
+          "phone": null,
+          "gender": null,
+          "picture": null,
+          "role": "admin",
+          "instructorId": null,
+          "preferredLanguage": "ar",
+          "newsletterOptIn": false,
+          "whatsappOptIn": false,
+          "lifecycleStage": "lead",
+          "contactSource": null,
+          "twentyCrmContactId": null,
+          "googleId": null,
+          "emailVerified": false,
+          "lastLogin": null,
+          "updatedAt": "2026-03-21T16:47:09.986Z",
+          "createdAt": "2026-03-21T16:47:09.986Z",
+          "enableAPIKey": "[REDACTED]",
+          "apiKey": "[REDACTED]",
+          "email": "api.audit.admin.1774111629001@nextacademyedu.com",
+          "collection": "users",
+          "sessions": []
+        },
+        "message": "User successfully created."
+      }
+    },
+    {
+      "name": "custom login (admin)",
+      "method": "POST",
+      "path": "/api/users/login",
+      "status": 200,
+      "ok": true,
+      "expected": "200",
+      "response": {
+        "exp": 1774118830,
+        "token": "[REDACTED]",
+        "user": {
+          "id": 42,
+          "firstName": "API",
+          "lastName": "Audit-admin",
+          "phone": null,
+          "gender": null,
+          "picture": null,
+          "role": "admin",
+          "instructorId": null,
+          "preferredLanguage": "ar",
+          "newsletterOptIn": false,
+          "whatsappOptIn": false,
+          "lifecycleStage": "lead",
+          "contactSource": null,
+          "twentyCrmContactId": null,
+          "googleId": null,
+          "emailVerified": false,
+          "lastLogin": null,
+          "updatedAt": null,
+          "createdAt": "2026-03-21T16:47:09.986Z",
+          "enableAPIKey": "[REDACTED]",
+          "apiKey": "[REDACTED]",
+          "email": "api.audit.admin.1774111629001@nextacademyedu.com",
+          "sessions": [
+            {
+              "id": "8f977c8f-accc-4b7f-bf47-1445ee370973",
+              "createdAt": "2026-03-21T16:47:10.116Z",
+              "expiresAt": "2026-03-21T18:47:10.116Z"
+            }
+          ],
+          "collection": "users",
+          "_strategy": "local-jwt"
+        }
+      }
+    },
+    {
+      "name": "payload users me (admin)",
+      "method": "GET",
+      "path": "/api/users/me",
+      "status": 200,
+      "ok": true,
+      "expected": "200",
+      "response": {
+        "user": null,
+        "message": "Account"
+      }
+    },
+    {
+      "name": "payload users create (b2b)",
+      "method": "POST",
+      "path": "/api/users",
+      "status": 201,
+      "ok": true,
+      "expected": "200|201",
+      "response": {
+        "doc": {
+          "id": 43,
+          "firstName": "API",
+          "lastName": "Audit-b2b",
+          "phone": null,
+          "gender": null,
+          "picture": null,
+          "role": "b2b_manager",
+          "instructorId": null,
+          "preferredLanguage": "ar",
+          "newsletterOptIn": false,
+          "whatsappOptIn": false,
+          "lifecycleStage": "lead",
+          "contactSource": null,
+          "twentyCrmContactId": null,
+          "googleId": null,
+          "emailVerified": false,
+          "lastLogin": null,
+          "updatedAt": "2026-03-21T16:47:10.332Z",
+          "createdAt": "2026-03-21T16:47:10.332Z",
+          "enableAPIKey": "[REDACTED]",
+          "apiKey": "[REDACTED]",
+          "email": "api.audit.b2b.1774111629334@nextacademyedu.com",
+          "collection": "users",
+          "sessions": []
+        },
+        "message": "User successfully created."
+      }
+    },
+    {
+      "name": "custom login (b2b)",
+      "method": "POST",
+      "path": "/api/users/login",
+      "status": 200,
+      "ok": true,
+      "expected": "200",
+      "response": {
+        "exp": 1774118830,
+        "token": "[REDACTED]",
+        "user": {
+          "id": 43,
+          "firstName": "API",
+          "lastName": "Audit-b2b",
+          "phone": null,
+          "gender": null,
+          "picture": null,
+          "role": "b2b_manager",
+          "instructorId": null,
+          "preferredLanguage": "ar",
+          "newsletterOptIn": false,
+          "whatsappOptIn": false,
+          "lifecycleStage": "lead",
+          "contactSource": null,
+          "twentyCrmContactId": null,
+          "googleId": null,
+          "emailVerified": false,
+          "lastLogin": null,
+          "updatedAt": null,
+          "createdAt": "2026-03-21T16:47:10.332Z",
+          "enableAPIKey": "[REDACTED]",
+          "apiKey": "[REDACTED]",
+          "email": "api.audit.b2b.1774111629334@nextacademyedu.com",
+          "sessions": [
+            {
+              "id": "7c0ada20-7790-4dd8-b6f8-dacd1597f952",
+              "createdAt": "2026-03-21T16:47:10.476Z",
+              "expiresAt": "2026-03-21T18:47:10.476Z"
+            }
+          ],
+          "collection": "users",
+          "_strategy": "local-jwt"
+        }
+      }
+    },
+    {
+      "name": "payload users me (b2b)",
+      "method": "GET",
+      "path": "/api/users/me",
+      "status": 200,
+      "ok": true,
+      "expected": "200",
+      "response": {
+        "user": null,
+        "message": "Account"
+      }
+    },
+    {
+      "name": "payload instructors list public",
+      "method": "GET",
+      "path": "/api/instructors?limit=1",
+      "status": 200,
+      "ok": true,
+      "expected": "200",
+      "response": {
+        "docs": [],
+        "hasNextPage": false,
+        "hasPrevPage": false,
+        "limit": 1,
+        "nextPage": null,
+        "page": 1,
+        "pagingCounter": 1,
+        "prevPage": null,
+        "totalDocs": 0,
+        "totalPages": 1
+      }
+    },
+    {
+      "name": "bookings create authorized",
+      "method": "POST",
+      "path": "/api/bookings/create",
+      "status": 401,
+      "ok": false,
+      "expected": "200",
+      "response": {
+        "error": "Unauthorized"
+      }
+    },
+    {
+      "name": "payload company create (b2b)",
+      "method": "POST",
+      "path": "/api/companies",
+      "status": 403,
+      "ok": false,
+      "expected": "200|201",
+      "response": {
+        "errors": [
+          {
+            "message": "You are not allowed to perform this action."
+          }
+        ]
+      }
+    },
+    {
+      "name": "payload notification create #1 (admin)",
+      "method": "POST",
+      "path": "/api/notifications",
+      "status": 403,
+      "ok": false,
+      "expected": "200|201",
+      "response": {
+        "errors": [
+          {
+            "message": "You are not allowed to perform this action."
+          }
+        ]
+      }
+    },
+    {
+      "name": "notifications read-all authorized",
+      "method": "PUT",
+      "path": "/api/notifications/read-all",
+      "status": 401,
+      "ok": false,
+      "expected": "200",
+      "response": {
+        "error": "Unauthorized"
+      }
+    },
+    {
+      "name": "payload notification create #2 (admin)",
+      "method": "POST",
+      "path": "/api/notifications",
+      "status": 403,
+      "ok": false,
+      "expected": "200|201",
+      "response": {
+        "errors": [
+          {
+            "message": "You are not allowed to perform this action."
+          }
+        ]
+      }
+    },
+    {
+      "name": "cron check-overdue unauthorized",
+      "method": "GET",
+      "path": "/api/cron/check-overdue",
+      "status": 401,
+      "ok": true,
+      "expected": "401",
+      "response": {
+        "error": "Unauthorized"
+      }
+    },
+    {
+      "name": "cron crm-sync unauthorized",
+      "method": "GET",
+      "path": "/api/cron/crm-sync",
+      "status": 401,
+      "ok": true,
+      "expected": "401",
+      "response": {
+        "error": "Unauthorized"
+      }
+    },
+    {
+      "name": "cron waitlist unauthorized",
+      "method": "GET",
+      "path": "/api/cron/waitlist",
+      "status": 401,
+      "ok": true,
+      "expected": "401",
+      "response": {
+        "error": "Unauthorized"
+      }
+    },
+    {
+      "name": "cron check-overdue authorized",
+      "method": "GET",
+      "path": "/api/cron/check-overdue",
+      "status": 200,
+      "ok": true,
+      "expected": "200",
+      "response": {
+        "success": true,
+        "overdue": 0,
+        "reminded": 8,
+        "blocked": 0
+      }
+    },
+    {
+      "name": "cron crm-sync authorized",
+      "method": "GET",
+      "path": "/api/cron/crm-sync",
+      "status": 200,
+      "ok": true,
+      "expected": "200|207",
+      "response": {
+        "success": true,
+        "data": {
+          "success": true,
+          "disabled": false,
+          "processed": 15,
+          "succeeded": 4,
+          "failed": 0,
+          "deadLettered": 0,
+          "skipped": 11,
+          "durationMs": 1718,
+          "errors": []
+        }
+      }
+    },
+    {
+      "name": "cron waitlist authorized",
+      "method": "GET",
+      "path": "/api/cron/waitlist",
+      "status": 200,
+      "ok": true,
+      "expected": "200",
+      "response": {
+        "success": true,
+        "notified": 0,
+        "expired": 0
+      }
+    },
+    {
+      "name": "seed admin with cron secret",
+      "method": "POST",
+      "path": "/api/seed-admin",
+      "status": 404,
+      "ok": true,
+      "expected": "200|404",
+      "response": {
+        "error": "Not found"
+      }
+    },
+    {
+      "name": "payload users list unauth",
+      "method": "GET",
+      "path": "/api/users?limit=1",
+      "status": 403,
+      "ok": true,
+      "expected": "200|401|403",
+      "response": {
+        "errors": [
+          {
+            "message": "You are not allowed to perform this action."
+          }
+        ]
+      }
+    },
+    {
+      "name": "payload users list user",
+      "method": "GET",
+      "path": "/api/users?limit=1",
+      "status": 403,
+      "ok": true,
+      "expected": "200|401|403",
+      "response": {
+        "errors": [
+          {
+            "message": "You are not allowed to perform this action."
+          }
+        ]
+      }
+    },
+    {
+      "name": "payload users list admin",
+      "method": "GET",
+      "path": "/api/users?limit=1",
+      "status": 403,
+      "ok": true,
+      "expected": "200|401|403",
+      "response": {
+        "errors": [
+          {
+            "message": "You are not allowed to perform this action."
+          }
+        ]
+      }
+    },
+    {
+      "name": "payload media list unauth",
+      "method": "GET",
+      "path": "/api/media?limit=1",
+      "status": 200,
+      "ok": true,
+      "expected": "200|401|403",
+      "response": {
+        "docs": [],
+        "hasNextPage": false,
+        "hasPrevPage": false,
+        "limit": 1,
+        "nextPage": null,
+        "page": 1,
+        "pagingCounter": 1,
+        "prevPage": null,
+        "totalDocs": 0,
+        "totalPages": 1
+      }
+    },
+    {
+      "name": "payload media list user",
+      "method": "GET",
+      "path": "/api/media?limit=1",
+      "status": 200,
+      "ok": true,
+      "expected": "200|401|403",
+      "response": {
+        "docs": [],
+        "hasNextPage": false,
+        "hasPrevPage": false,
+        "limit": 1,
+        "nextPage": null,
+        "page": 1,
+        "pagingCounter": 1,
+        "prevPage": null,
+        "totalDocs": 0,
+        "totalPages": 1
+      }
+    },
+    {
+      "name": "payload media list admin",
+      "method": "GET",
+      "path": "/api/media?limit=1",
+      "status": 200,
+      "ok": true,
+      "expected": "200|401|403",
+      "response": {
+        "docs": [],
+        "hasNextPage": false,
+        "hasPrevPage": false,
+        "limit": 1,
+        "nextPage": null,
+        "page": 1,
+        "pagingCounter": 1,
+        "prevPage": null,
+        "totalDocs": 0,
+        "totalPages": 1
+      }
+    },
+    {
+      "name": "payload companies list unauth",
+      "method": "GET",
+      "path": "/api/companies?limit=1",
+      "status": 403,
+      "ok": true,
+      "expected": "200|401|403",
+      "response": {
+        "errors": [
+          {
+            "message": "You are not allowed to perform this action."
+          }
+        ]
+      }
+    },
+    {
+      "name": "payload companies list user",
+      "method": "GET",
+      "path": "/api/companies?limit=1",
+      "status": 403,
+      "ok": true,
+      "expected": "200|401|403",
+      "response": {
+        "errors": [
+          {
+            "message": "You are not allowed to perform this action."
+          }
+        ]
+      }
+    },
+    {
+      "name": "payload companies list admin",
+      "method": "GET",
+      "path": "/api/companies?limit=1",
+      "status": 403,
+      "ok": true,
+      "expected": "200|401|403",
+      "response": {
+        "errors": [
+          {
+            "message": "You are not allowed to perform this action."
+          }
+        ]
+      }
+    },
+    {
+      "name": "payload user-profiles list unauth",
+      "method": "GET",
+      "path": "/api/user-profiles?limit=1",
+      "status": 403,
+      "ok": true,
+      "expected": "200|401|403",
+      "response": {
+        "errors": [
+          {
+            "message": "You are not allowed to perform this action."
+          }
+        ]
+      }
+    },
+    {
+      "name": "payload user-profiles list user",
+      "method": "GET",
+      "path": "/api/user-profiles?limit=1",
+      "status": 403,
+      "ok": true,
+      "expected": "200|401|403",
+      "response": {
+        "errors": [
+          {
+            "message": "You are not allowed to perform this action."
+          }
+        ]
+      }
+    },
+    {
+      "name": "payload user-profiles list admin",
+      "method": "GET",
+      "path": "/api/user-profiles?limit=1",
+      "status": 403,
+      "ok": true,
+      "expected": "200|401|403",
+      "response": {
+        "errors": [
+          {
+            "message": "You are not allowed to perform this action."
+          }
+        ]
+      }
+    },
+    {
+      "name": "payload tags list unauth",
+      "method": "GET",
+      "path": "/api/tags?limit=1",
+      "status": 200,
+      "ok": true,
+      "expected": "200|401|403",
+      "response": {
+        "docs": [],
+        "hasNextPage": false,
+        "hasPrevPage": false,
+        "limit": 1,
+        "nextPage": null,
+        "page": 1,
+        "pagingCounter": 1,
+        "prevPage": null,
+        "totalDocs": 0,
+        "totalPages": 1
+      }
+    },
+    {
+      "name": "payload tags list user",
+      "method": "GET",
+      "path": "/api/tags?limit=1",
+      "status": 200,
+      "ok": true,
+      "expected": "200|401|403",
+      "response": {
+        "docs": [],
+        "hasNextPage": false,
+        "hasPrevPage": false,
+        "limit": 1,
+        "nextPage": null,
+        "page": 1,
+        "pagingCounter": 1,
+        "prevPage": null,
+        "totalDocs": 0,
+        "totalPages": 1
+      }
+    },
+    {
+      "name": "payload tags list admin",
+      "method": "GET",
+      "path": "/api/tags?limit=1",
+      "status": 200,
+      "ok": true,
+      "expected": "200|401|403",
+      "response": {
+        "docs": [],
+        "hasNextPage": false,
+        "hasPrevPage": false,
+        "limit": 1,
+        "nextPage": null,
+        "page": 1,
+        "pagingCounter": 1,
+        "prevPage": null,
+        "totalDocs": 0,
+        "totalPages": 1
+      }
+    },
+    {
+      "name": "payload categories list unauth",
+      "method": "GET",
+      "path": "/api/categories?limit=1",
+      "status": 200,
+      "ok": true,
+      "expected": "200|401|403",
+      "response": {
+        "docs": [
+          {
+            "id": 1,
+            "nameAr": "ورش تجريبية",
+            "nameEn": "Test Workshops",
+            "slug": "test-workshops",
+            "descriptionAr": null,
+            "descriptionEn": null,
+            "icon": null,
+            "parent": null,
+            "order": 0,
+            "isActive": true,
+            "updatedAt": "2026-03-21T16:47:09.353Z",
+            "createdAt": "2026-03-21T16:47:09.353Z"
+          }
+        ],
+        "hasNextPage": false,
+        "hasPrevPage": false,
+        "limit": 1,
+        "nextPage": null,
+        "page": 1,
+        "pagingCounter": 1,
+        "prevPage": null,
+        "totalDocs": 1,
+        "totalPages": 1
+      }
+    },
+    {
+      "name": "payload categories list user",
+      "method": "GET",
+      "path": "/api/categories?limit=1",
+      "status": 200,
+      "ok": true,
+      "expected": "200|401|403",
+      "response": {
+        "docs": [
+          {
+            "id": 1,
+            "nameAr": "ورش تجريبية",
+            "nameEn": "Test Workshops",
+            "slug": "test-workshops",
+            "descriptionAr": null,
+            "descriptionEn": null,
+            "icon": null,
+            "parent": null,
+            "order": 0,
+            "isActive": true,
+            "updatedAt": "2026-03-21T16:47:09.353Z",
+            "createdAt": "2026-03-21T16:47:09.353Z"
+          }
+        ],
+        "hasNextPage": false,
+        "hasPrevPage": false,
+        "limit": 1,
+        "nextPage": null,
+        "page": 1,
+        "pagingCounter": 1,
+        "prevPage": null,
+        "totalDocs": 1,
+        "totalPages": 1
+      }
+    },
+    {
+      "name": "payload categories list admin",
+      "method": "GET",
+      "path": "/api/categories?limit=1",
+      "status": 200,
+      "ok": true,
+      "expected": "200|401|403",
+      "response": {
+        "docs": [
+          {
+            "id": 1,
+            "nameAr": "ورش تجريبية",
+            "nameEn": "Test Workshops",
+            "slug": "test-workshops",
+            "descriptionAr": null,
+            "descriptionEn": null,
+            "icon": null,
+            "parent": null,
+            "order": 0,
+            "isActive": true,
+            "updatedAt": "2026-03-21T16:47:09.353Z",
+            "createdAt": "2026-03-21T16:47:09.353Z"
+          }
+        ],
+        "hasNextPage": false,
+        "hasPrevPage": false,
+        "limit": 1,
+        "nextPage": null,
+        "page": 1,
+        "pagingCounter": 1,
+        "prevPage": null,
+        "totalDocs": 1,
+        "totalPages": 1
+      }
+    },
+    {
+      "name": "payload instructors list unauth",
+      "method": "GET",
+      "path": "/api/instructors?limit=1",
+      "status": 200,
+      "ok": true,
+      "expected": "200|401|403",
+      "response": {
+        "docs": [],
+        "hasNextPage": false,
+        "hasPrevPage": false,
+        "limit": 1,
+        "nextPage": null,
+        "page": 1,
+        "pagingCounter": 1,
+        "prevPage": null,
+        "totalDocs": 0,
+        "totalPages": 1
+      }
+    },
+    {
+      "name": "payload instructors list user",
+      "method": "GET",
+      "path": "/api/instructors?limit=1",
+      "status": 200,
+      "ok": true,
+      "expected": "200|401|403",
+      "response": {
+        "docs": [],
+        "hasNextPage": false,
+        "hasPrevPage": false,
+        "limit": 1,
+        "nextPage": null,
+        "page": 1,
+        "pagingCounter": 1,
+        "prevPage": null,
+        "totalDocs": 0,
+        "totalPages": 1
+      }
+    },
+    {
+      "name": "payload instructors list admin",
+      "method": "GET",
+      "path": "/api/instructors?limit=1",
+      "status": 200,
+      "ok": true,
+      "expected": "200|401|403",
+      "response": {
+        "docs": [],
+        "hasNextPage": false,
+        "hasPrevPage": false,
+        "limit": 1,
+        "nextPage": null,
+        "page": 1,
+        "pagingCounter": 1,
+        "prevPage": null,
+        "totalDocs": 0,
+        "totalPages": 1
+      }
+    },
+    {
+      "name": "payload programs list unauth",
+      "method": "GET",
+      "path": "/api/programs?limit=1",
+      "status": 200,
+      "ok": true,
+      "expected": "200|401|403",
+      "response": {
+        "docs": [
+          {
+            "id": 2,
+            "type": "workshop",
+            "titleAr": "ورشة تجريبية - اختبار الدفع",
+            "titleEn": "Test Workshop - Payment Testing",
+            "slug": "test-payment-workshop",
+            "descriptionAr": null,
+            "descriptionEn": null,
+            "shortDescriptionAr": "ورشة تجريبية لاختبار نظام الدفع - السعر ١٠ جنيه",
+            "shortDescriptionEn": "A test workshop for payment system testing - Price 10 EGP",
+            "category": {
+              "id": 1,
+              "nameAr": "ورش تجريبية",
+              "nameEn": "Test Workshops",
+              "slug": "test-workshops",
+              "descriptionAr": null,
+              "descriptionEn": null,
+              "icon": null,
+              "parent": null,
+              "order": 0,
+              "isActive": true,
+              "updatedAt": "2026-03-21T16:47:09.353Z",
+              "createdAt": "2026-03-21T16:47:09.353Z"
+            },
+            "instructor": null,
+            "thumbnail": null,
+            "coverImage": null,
+            "durationHours": 2,
+            "sessionsCount": 1,
+            "level": "beginner",
+            "language": "ar",
+            "objectives": [],
+            "requirements": [],
+            "targetAudience": [],
+            "tags": [],
+            "isFeatured": false,
+            "featuredPriority": 0,
+            "isActive": true,
+            "learnersCount": 0,
+            "viewCount": 0,
+            "averageRating": 0,
+            "reviewCount": 0,
+            "seoTitle": null,
+            "seoDescription": null,
+            "seoKeywords": [],
+            "updatedAt": "2026-03-21T16:47:09.374Z",
+            "createdAt": "2026-03-21T16:47:09.373Z"
+          }
+        ],
+        "hasNextPage": true,
+        "hasPrevPage": false,
+        "limit": 1,
+        "nextPage": 2,
+        "page": 1,
+        "pagingCounter": 1,
+        "prevPage": null,
+        "totalDocs": 2,
+        "totalPages": 2
+      }
+    },
+    {
+      "name": "payload programs list user",
+      "method": "GET",
+      "path": "/api/programs?limit=1",
+      "status": 200,
+      "ok": true,
+      "expected": "200|401|403",
+      "response": {
+        "docs": [
+          {
+            "id": 2,
+            "type": "workshop",
+            "titleAr": "ورشة تجريبية - اختبار الدفع",
+            "titleEn": "Test Workshop - Payment Testing",
+            "slug": "test-payment-workshop",
+            "descriptionAr": null,
+            "descriptionEn": null,
+            "shortDescriptionAr": "ورشة تجريبية لاختبار نظام الدفع - السعر ١٠ جنيه",
+            "shortDescriptionEn": "A test workshop for payment system testing - Price 10 EGP",
+            "category": {
+              "id": 1,
+              "nameAr": "ورش تجريبية",
+              "nameEn": "Test Workshops",
+              "slug": "test-workshops",
+              "descriptionAr": null,
+              "descriptionEn": null,
+              "icon": null,
+              "parent": null,
+              "order": 0,
+              "isActive": true,
+              "updatedAt": "2026-03-21T16:47:09.353Z",
+              "createdAt": "2026-03-21T16:47:09.353Z"
+            },
+            "instructor": null,
+            "thumbnail": null,
+            "coverImage": null,
+            "durationHours": 2,
+            "sessionsCount": 1,
+            "level": "beginner",
+            "language": "ar",
+            "objectives": [],
+            "requirements": [],
+            "targetAudience": [],
+            "tags": [],
+            "isFeatured": false,
+            "featuredPriority": 0,
+            "isActive": true,
+            "learnersCount": 0,
+            "viewCount": 0,
+            "averageRating": 0,
+            "reviewCount": 0,
+            "seoTitle": null,
+            "seoDescription": null,
+            "seoKeywords": [],
+            "updatedAt": "2026-03-21T16:47:09.374Z",
+            "createdAt": "2026-03-21T16:47:09.373Z"
+          }
+        ],
+        "hasNextPage": true,
+        "hasPrevPage": false,
+        "limit": 1,
+        "nextPage": 2,
+        "page": 1,
+        "pagingCounter": 1,
+        "prevPage": null,
+        "totalDocs": 2,
+        "totalPages": 2
+      }
+    },
+    {
+      "name": "payload programs list admin",
+      "method": "GET",
+      "path": "/api/programs?limit=1",
+      "status": 200,
+      "ok": true,
+      "expected": "200|401|403",
+      "response": {
+        "docs": [
+          {
+            "id": 2,
+            "type": "workshop",
+            "titleAr": "ورشة تجريبية - اختبار الدفع",
+            "titleEn": "Test Workshop - Payment Testing",
+            "slug": "test-payment-workshop",
+            "descriptionAr": null,
+            "descriptionEn": null,
+            "shortDescriptionAr": "ورشة تجريبية لاختبار نظام الدفع - السعر ١٠ جنيه",
+            "shortDescriptionEn": "A test workshop for payment system testing - Price 10 EGP",
+            "category": {
+              "id": 1,
+              "nameAr": "ورش تجريبية",
+              "nameEn": "Test Workshops",
+              "slug": "test-workshops",
+              "descriptionAr": null,
+              "descriptionEn": null,
+              "icon": null,
+              "parent": null,
+              "order": 0,
+              "isActive": true,
+              "updatedAt": "2026-03-21T16:47:09.353Z",
+              "createdAt": "2026-03-21T16:47:09.353Z"
+            },
+            "instructor": null,
+            "thumbnail": null,
+            "coverImage": null,
+            "durationHours": 2,
+            "sessionsCount": 1,
+            "level": "beginner",
+            "language": "ar",
+            "objectives": [],
+            "requirements": [],
+            "targetAudience": [],
+            "tags": [],
+            "isFeatured": false,
+            "featuredPriority": 0,
+            "isActive": true,
+            "learnersCount": 0,
+            "viewCount": 0,
+            "averageRating": 0,
+            "reviewCount": 0,
+            "seoTitle": null,
+            "seoDescription": null,
+            "seoKeywords": [],
+            "updatedAt": "2026-03-21T16:47:09.374Z",
+            "createdAt": "2026-03-21T16:47:09.373Z"
+          }
+        ],
+        "hasNextPage": true,
+        "hasPrevPage": false,
+        "limit": 1,
+        "nextPage": 2,
+        "page": 1,
+        "pagingCounter": 1,
+        "prevPage": null,
+        "totalDocs": 2,
+        "totalPages": 2
+      }
+    },
+    {
+      "name": "payload rounds list unauth",
+      "method": "GET",
+      "path": "/api/rounds?limit=1",
+      "status": 200,
+      "ok": true,
+      "expected": "200|401|403",
+      "response": {
+        "docs": [
+          {
+            "id": 2,
+            "program": {
+              "id": 2,
+              "type": "workshop",
+              "titleAr": "ورشة تجريبية - اختبار الدفع",
+              "titleEn": "Test Workshop - Payment Testing",
+              "slug": "test-payment-workshop",
+              "descriptionAr": null,
+              "descriptionEn": null,
+              "shortDescriptionAr": "ورشة تجريبية لاختبار نظام الدفع - السعر ١٠ جنيه",
+              "shortDescriptionEn": "A test workshop for payment system testing - Price 10 EGP",
+              "category": {
+                "id": 1,
+                "nameAr": "ورش تجريبية",
+                "nameEn": "Test Workshops",
+                "slug": "test-workshops",
+                "descriptionAr": null,
+                "descriptionEn": null,
+                "icon": null,
+                "parent": null,
+                "order": 0,
+                "isActive": true,
+                "updatedAt": "2026-03-21T16:47:09.353Z",
+                "createdAt": "2026-03-21T16:47:09.353Z"
+              },
+              "instructor": null,
+              "thumbnail": null,
+              "coverImage": null,
+              "durationHours": 2,
+              "sessionsCount": 1,
+              "level": "beginner",
+              "language": "ar",
+              "objectives": [],
+              "requirements": [],
+              "targetAudience": [],
+              "tags": [],
+              "isFeatured": false,
+              "featuredPriority": 0,
+              "isActive": true,
+              "learnersCount": 0,
+              "viewCount": 0,
+              "averageRating": 0,
+              "reviewCount": 0,
+              "seoTitle": null,
+              "seoDescription": null,
+              "seoKeywords": [],
+              "updatedAt": "2026-03-21T16:47:09.374Z",
+              "createdAt": "2026-03-21T16:47:09.373Z"
+            },
+            "roundNumber": 1,
+            "title": "الدورة التجريبية #1",
+            "startDate": "2026-04-01T10:00:00.000Z",
+            "endDate": "2026-04-01T12:00:00.000Z",
+            "timezone": "Africa/Cairo",
+            "locationType": "online",
+            "locationName": null,
+            "locationAddress": null,
+            "locationMapUrl": null,
+            "meetingUrl": "https://zoom.us/test",
+            "maxCapacity": 100,
+            "currentEnrollments": 0,
+            "price": 10,
+            "earlyBirdPrice": null,
+            "earlyBirdDeadline": null,
+            "currency": "EGP",
+            "status": "open",
+            "isActive": true,
+            "autoCloseOnFull": true,
+            "reminderSent": false,
+            "notes": null,
+            "updatedAt": "2026-03-21T16:47:09.401Z",
+            "createdAt": "2026-03-21T16:47:09.401Z"
+          }
+        ],
+        "hasNextPage": true,
+        "hasPrevPage": false,
+        "limit": 1,
+        "nextPage": 2,
+        "page": 1,
+        "pagingCounter": 1,
+        "prevPage": null,
+        "totalDocs": 2,
+        "totalPages": 2
+      }
+    },
+    {
+      "name": "payload rounds list user",
+      "method": "GET",
+      "path": "/api/rounds?limit=1",
+      "status": 200,
+      "ok": true,
+      "expected": "200|401|403",
+      "response": {
+        "docs": [
+          {
+            "id": 2,
+            "program": {
+              "id": 2,
+              "type": "workshop",
+              "titleAr": "ورشة تجريبية - اختبار الدفع",
+              "titleEn": "Test Workshop - Payment Testing",
+              "slug": "test-payment-workshop",
+              "descriptionAr": null,
+              "descriptionEn": null,
+              "shortDescriptionAr": "ورشة تجريبية لاختبار نظام الدفع - السعر ١٠ جنيه",
+              "shortDescriptionEn": "A test workshop for payment system testing - Price 10 EGP",
+              "category": {
+                "id": 1,
+                "nameAr": "ورش تجريبية",
+                "nameEn": "Test Workshops",
+                "slug": "test-workshops",
+                "descriptionAr": null,
+                "descriptionEn": null,
+                "icon": null,
+                "parent": null,
+                "order": 0,
+                "isActive": true,
+                "updatedAt": "2026-03-21T16:47:09.353Z",
+                "createdAt": "2026-03-21T16:47:09.353Z"
+              },
+              "instructor": null,
+              "thumbnail": null,
+              "coverImage": null,
+              "durationHours": 2,
+              "sessionsCount": 1,
+              "level": "beginner",
+              "language": "ar",
+              "objectives": [],
+              "requirements": [],
+              "targetAudience": [],
+              "tags": [],
+              "isFeatured": false,
+              "featuredPriority": 0,
+              "isActive": true,
+              "learnersCount": 0,
+              "viewCount": 0,
+              "averageRating": 0,
+              "reviewCount": 0,
+              "seoTitle": null,
+              "seoDescription": null,
+              "seoKeywords": [],
+              "updatedAt": "2026-03-21T16:47:09.374Z",
+              "createdAt": "2026-03-21T16:47:09.373Z"
+            },
+            "roundNumber": 1,
+            "title": "الدورة التجريبية #1",
+            "startDate": "2026-04-01T10:00:00.000Z",
+            "endDate": "2026-04-01T12:00:00.000Z",
+            "timezone": "Africa/Cairo",
+            "locationType": "online",
+            "locationName": null,
+            "locationAddress": null,
+            "locationMapUrl": null,
+            "meetingUrl": "https://zoom.us/test",
+            "maxCapacity": 100,
+            "currentEnrollments": 0,
+            "price": 10,
+            "earlyBirdPrice": null,
+            "earlyBirdDeadline": null,
+            "currency": "EGP",
+            "status": "open",
+            "isActive": true,
+            "autoCloseOnFull": true,
+            "reminderSent": false,
+            "notes": null,
+            "updatedAt": "2026-03-21T16:47:09.401Z",
+            "createdAt": "2026-03-21T16:47:09.401Z"
+          }
+        ],
+        "hasNextPage": true,
+        "hasPrevPage": false,
+        "limit": 1,
+        "nextPage": 2,
+        "page": 1,
+        "pagingCounter": 1,
+        "prevPage": null,
+        "totalDocs": 2,
+        "totalPages": 2
+      }
+    },
+    {
+      "name": "payload rounds list admin",
+      "method": "GET",
+      "path": "/api/rounds?limit=1",
+      "status": 200,
+      "ok": true,
+      "expected": "200|401|403",
+      "response": {
+        "docs": [
+          {
+            "id": 2,
+            "program": {
+              "id": 2,
+              "type": "workshop",
+              "titleAr": "ورشة تجريبية - اختبار الدفع",
+              "titleEn": "Test Workshop - Payment Testing",
+              "slug": "test-payment-workshop",
+              "descriptionAr": null,
+              "descriptionEn": null,
+              "shortDescriptionAr": "ورشة تجريبية لاختبار نظام الدفع - السعر ١٠ جنيه",
+              "shortDescriptionEn": "A test workshop for payment system testing - Price 10 EGP",
+              "category": {
+                "id": 1,
+                "nameAr": "ورش تجريبية",
+                "nameEn": "Test Workshops",
+                "slug": "test-workshops",
+                "descriptionAr": null,
+                "descriptionEn": null,
+                "icon": null,
+                "parent": null,
+                "order": 0,
+                "isActive": true,
+                "updatedAt": "2026-03-21T16:47:09.353Z",
+                "createdAt": "2026-03-21T16:47:09.353Z"
+              },
+              "instructor": null,
+              "thumbnail": null,
+              "coverImage": null,
+              "durationHours": 2,
+              "sessionsCount": 1,
+              "level": "beginner",
+              "language": "ar",
+              "objectives": [],
+              "requirements": [],
+              "targetAudience": [],
+              "tags": [],
+              "isFeatured": false,
+              "featuredPriority": 0,
+              "isActive": true,
+              "learnersCount": 0,
+              "viewCount": 0,
+              "averageRating": 0,
+              "reviewCount": 0,
+              "seoTitle": null,
+              "seoDescription": null,
+              "seoKeywords": [],
+              "updatedAt": "2026-03-21T16:47:09.374Z",
+              "createdAt": "2026-03-21T16:47:09.373Z"
+            },
+            "roundNumber": 1,
+            "title": "الدورة التجريبية #1",
+            "startDate": "2026-04-01T10:00:00.000Z",
+            "endDate": "2026-04-01T12:00:00.000Z",
+            "timezone": "Africa/Cairo",
+            "locationType": "online",
+            "locationName": null,
+            "locationAddress": null,
+            "locationMapUrl": null,
+            "meetingUrl": "https://zoom.us/test",
+            "maxCapacity": 100,
+            "currentEnrollments": 0,
+            "price": 10,
+            "earlyBirdPrice": null,
+            "earlyBirdDeadline": null,
+            "currency": "EGP",
+            "status": "open",
+            "isActive": true,
+            "autoCloseOnFull": true,
+            "reminderSent": false,
+            "notes": null,
+            "updatedAt": "2026-03-21T16:47:09.401Z",
+            "createdAt": "2026-03-21T16:47:09.401Z"
+          }
+        ],
+        "hasNextPage": true,
+        "hasPrevPage": false,
+        "limit": 1,
+        "nextPage": 2,
+        "page": 1,
+        "pagingCounter": 1,
+        "prevPage": null,
+        "totalDocs": 2,
+        "totalPages": 2
+      }
+    },
+    {
+      "name": "payload sessions list unauth",
+      "method": "GET",
+      "path": "/api/sessions?limit=1",
+      "status": 200,
+      "ok": true,
+      "expected": "200|401|403",
+      "response": {
+        "docs": [],
+        "hasNextPage": false,
+        "hasPrevPage": false,
+        "limit": 1,
+        "nextPage": null,
+        "page": 1,
+        "pagingCounter": 1,
+        "prevPage": null,
+        "totalDocs": 0,
+        "totalPages": 1
+      }
+    },
+    {
+      "name": "payload sessions list user",
+      "method": "GET",
+      "path": "/api/sessions?limit=1",
+      "status": 200,
+      "ok": true,
+      "expected": "200|401|403",
+      "response": {
+        "docs": [],
+        "hasNextPage": false,
+        "hasPrevPage": false,
+        "limit": 1,
+        "nextPage": null,
+        "page": 1,
+        "pagingCounter": 1,
+        "prevPage": null,
+        "totalDocs": 0,
+        "totalPages": 1
+      }
+    },
+    {
+      "name": "payload sessions list admin",
+      "method": "GET",
+      "path": "/api/sessions?limit=1",
+      "status": 200,
+      "ok": true,
+      "expected": "200|401|403",
+      "response": {
+        "docs": [],
+        "hasNextPage": false,
+        "hasPrevPage": false,
+        "limit": 1,
+        "nextPage": null,
+        "page": 1,
+        "pagingCounter": 1,
+        "prevPage": null,
+        "totalDocs": 0,
+        "totalPages": 1
+      }
+    },
+    {
+      "name": "payload payment-plans list unauth",
+      "method": "GET",
+      "path": "/api/payment-plans?limit=1",
+      "status": 200,
+      "ok": true,
+      "expected": "200|401|403",
+      "response": {
+        "docs": [],
+        "hasNextPage": false,
+        "hasPrevPage": false,
+        "limit": 1,
+        "nextPage": null,
+        "page": 1,
+        "pagingCounter": 1,
+        "prevPage": null,
+        "totalDocs": 0,
+        "totalPages": 1
+      }
+    },
+    {
+      "name": "payload payment-plans list user",
+      "method": "GET",
+      "path": "/api/payment-plans?limit=1",
+      "status": 200,
+      "ok": true,
+      "expected": "200|401|403",
+      "response": {
+        "docs": [],
+        "hasNextPage": false,
+        "hasPrevPage": false,
+        "limit": 1,
+        "nextPage": null,
+        "page": 1,
+        "pagingCounter": 1,
+        "prevPage": null,
+        "totalDocs": 0,
+        "totalPages": 1
+      }
+    },
+    {
+      "name": "payload payment-plans list admin",
+      "method": "GET",
+      "path": "/api/payment-plans?limit=1",
+      "status": 200,
+      "ok": true,
+      "expected": "200|401|403",
+      "response": {
+        "docs": [],
+        "hasNextPage": false,
+        "hasPrevPage": false,
+        "limit": 1,
+        "nextPage": null,
+        "page": 1,
+        "pagingCounter": 1,
+        "prevPage": null,
+        "totalDocs": 0,
+        "totalPages": 1
+      }
+    },
+    {
+      "name": "payload bookings list unauth",
+      "method": "GET",
+      "path": "/api/bookings?limit=1",
+      "status": 403,
+      "ok": true,
+      "expected": "200|401|403",
+      "response": {
+        "errors": [
+          {
+            "message": "You are not allowed to perform this action."
+          }
+        ]
+      }
+    },
+    {
+      "name": "payload bookings list user",
+      "method": "GET",
+      "path": "/api/bookings?limit=1",
+      "status": 403,
+      "ok": true,
+      "expected": "200|401|403",
+      "response": {
+        "errors": [
+          {
+            "message": "You are not allowed to perform this action."
+          }
+        ]
+      }
+    },
+    {
+      "name": "payload bookings list admin",
+      "method": "GET",
+      "path": "/api/bookings?limit=1",
+      "status": 403,
+      "ok": true,
+      "expected": "200|401|403",
+      "response": {
+        "errors": [
+          {
+            "message": "You are not allowed to perform this action."
+          }
+        ]
+      }
+    },
+    {
+      "name": "payload payments list unauth",
+      "method": "GET",
+      "path": "/api/payments?limit=1",
+      "status": 403,
+      "ok": true,
+      "expected": "200|401|403",
+      "response": {
+        "errors": [
+          {
+            "message": "You are not allowed to perform this action."
+          }
+        ]
+      }
+    },
+    {
+      "name": "payload payments list user",
+      "method": "GET",
+      "path": "/api/payments?limit=1",
+      "status": 403,
+      "ok": true,
+      "expected": "200|401|403",
+      "response": {
+        "errors": [
+          {
+            "message": "You are not allowed to perform this action."
+          }
+        ]
+      }
+    },
+    {
+      "name": "payload payments list admin",
+      "method": "GET",
+      "path": "/api/payments?limit=1",
+      "status": 403,
+      "ok": true,
+      "expected": "200|401|403",
+      "response": {
+        "errors": [
+          {
+            "message": "You are not allowed to perform this action."
+          }
+        ]
+      }
+    },
+    {
+      "name": "payload installment-requests list unauth",
+      "method": "GET",
+      "path": "/api/installment-requests?limit=1",
+      "status": 403,
+      "ok": true,
+      "expected": "200|401|403",
+      "response": {
+        "errors": [
+          {
+            "message": "You are not allowed to perform this action."
+          }
+        ]
+      }
+    },
+    {
+      "name": "payload installment-requests list user",
+      "method": "GET",
+      "path": "/api/installment-requests?limit=1",
+      "status": 403,
+      "ok": true,
+      "expected": "200|401|403",
+      "response": {
+        "errors": [
+          {
+            "message": "You are not allowed to perform this action."
+          }
+        ]
+      }
+    },
+    {
+      "name": "payload installment-requests list admin",
+      "method": "GET",
+      "path": "/api/installment-requests?limit=1",
+      "status": 403,
+      "ok": true,
+      "expected": "200|401|403",
+      "response": {
+        "errors": [
+          {
+            "message": "You are not allowed to perform this action."
+          }
+        ]
+      }
+    },
+    {
+      "name": "payload notifications list unauth",
+      "method": "GET",
+      "path": "/api/notifications?limit=1",
+      "status": 403,
+      "ok": true,
+      "expected": "200|401|403",
+      "response": {
+        "errors": [
+          {
+            "message": "You are not allowed to perform this action."
+          }
+        ]
+      }
+    },
+    {
+      "name": "payload notifications list user",
+      "method": "GET",
+      "path": "/api/notifications?limit=1",
+      "status": 403,
+      "ok": true,
+      "expected": "200|401|403",
+      "response": {
+        "errors": [
+          {
+            "message": "You are not allowed to perform this action."
+          }
+        ]
+      }
+    },
+    {
+      "name": "payload notifications list admin",
+      "method": "GET",
+      "path": "/api/notifications?limit=1",
+      "status": 403,
+      "ok": true,
+      "expected": "200|401|403",
+      "response": {
+        "errors": [
+          {
+            "message": "You are not allowed to perform this action."
+          }
+        ]
+      }
+    },
+    {
+      "name": "payload discount-codes list unauth",
+      "method": "GET",
+      "path": "/api/discount-codes?limit=1",
+      "status": 403,
+      "ok": true,
+      "expected": "200|401|403",
+      "response": {
+        "errors": [
+          {
+            "message": "You are not allowed to perform this action."
+          }
+        ]
+      }
+    },
+    {
+      "name": "payload discount-codes list user",
+      "method": "GET",
+      "path": "/api/discount-codes?limit=1",
+      "status": 403,
+      "ok": true,
+      "expected": "200|401|403",
+      "response": {
+        "errors": [
+          {
+            "message": "You are not allowed to perform this action."
+          }
+        ]
+      }
+    },
+    {
+      "name": "payload discount-codes list admin",
+      "method": "GET",
+      "path": "/api/discount-codes?limit=1",
+      "status": 403,
+      "ok": true,
+      "expected": "200|401|403",
+      "response": {
+        "errors": [
+          {
+            "message": "You are not allowed to perform this action."
+          }
+        ]
+      }
+    },
+    {
+      "name": "payload consultation-types list unauth",
+      "method": "GET",
+      "path": "/api/consultation-types?limit=1",
+      "status": 200,
+      "ok": true,
+      "expected": "200|401|403",
+      "response": {
+        "docs": [],
+        "hasNextPage": false,
+        "hasPrevPage": false,
+        "limit": 1,
+        "nextPage": null,
+        "page": 1,
+        "pagingCounter": 1,
+        "prevPage": null,
+        "totalDocs": 0,
+        "totalPages": 1
+      }
+    },
+    {
+      "name": "payload consultation-types list user",
+      "method": "GET",
+      "path": "/api/consultation-types?limit=1",
+      "status": 200,
+      "ok": true,
+      "expected": "200|401|403",
+      "response": {
+        "docs": [],
+        "hasNextPage": false,
+        "hasPrevPage": false,
+        "limit": 1,
+        "nextPage": null,
+        "page": 1,
+        "pagingCounter": 1,
+        "prevPage": null,
+        "totalDocs": 0,
+        "totalPages": 1
+      }
+    },
+    {
+      "name": "payload consultation-types list admin",
+      "method": "GET",
+      "path": "/api/consultation-types?limit=1",
+      "status": 200,
+      "ok": true,
+      "expected": "200|401|403",
+      "response": {
+        "docs": [],
+        "hasNextPage": false,
+        "hasPrevPage": false,
+        "limit": 1,
+        "nextPage": null,
+        "page": 1,
+        "pagingCounter": 1,
+        "prevPage": null,
+        "totalDocs": 0,
+        "totalPages": 1
+      }
+    },
+    {
+      "name": "payload consultation-availability list unauth",
+      "method": "GET",
+      "path": "/api/consultation-availability?limit=1",
+      "status": 200,
+      "ok": true,
+      "expected": "200|401|403",
+      "response": {
+        "docs": [],
+        "hasNextPage": false,
+        "hasPrevPage": false,
+        "limit": 1,
+        "nextPage": null,
+        "page": 1,
+        "pagingCounter": 1,
+        "prevPage": null,
+        "totalDocs": 0,
+        "totalPages": 1
+      }
+    },
+    {
+      "name": "payload consultation-availability list user",
+      "method": "GET",
+      "path": "/api/consultation-availability?limit=1",
+      "status": 200,
+      "ok": true,
+      "expected": "200|401|403",
+      "response": {
+        "docs": [],
+        "hasNextPage": false,
+        "hasPrevPage": false,
+        "limit": 1,
+        "nextPage": null,
+        "page": 1,
+        "pagingCounter": 1,
+        "prevPage": null,
+        "totalDocs": 0,
+        "totalPages": 1
+      }
+    },
+    {
+      "name": "payload consultation-availability list admin",
+      "method": "GET",
+      "path": "/api/consultation-availability?limit=1",
+      "status": 200,
+      "ok": true,
+      "expected": "200|401|403",
+      "response": {
+        "docs": [],
+        "hasNextPage": false,
+        "hasPrevPage": false,
+        "limit": 1,
+        "nextPage": null,
+        "page": 1,
+        "pagingCounter": 1,
+        "prevPage": null,
+        "totalDocs": 0,
+        "totalPages": 1
+      }
+    },
+    {
+      "name": "payload consultation-slots list unauth",
+      "method": "GET",
+      "path": "/api/consultation-slots?limit=1",
+      "status": 200,
+      "ok": true,
+      "expected": "200|401|403",
+      "response": {
+        "docs": [],
+        "hasNextPage": false,
+        "hasPrevPage": false,
+        "limit": 1,
+        "nextPage": null,
+        "page": 1,
+        "pagingCounter": 1,
+        "prevPage": null,
+        "totalDocs": 0,
+        "totalPages": 1
+      }
+    },
+    {
+      "name": "payload consultation-slots list user",
+      "method": "GET",
+      "path": "/api/consultation-slots?limit=1",
+      "status": 200,
+      "ok": true,
+      "expected": "200|401|403",
+      "response": {
+        "docs": [],
+        "hasNextPage": false,
+        "hasPrevPage": false,
+        "limit": 1,
+        "nextPage": null,
+        "page": 1,
+        "pagingCounter": 1,
+        "prevPage": null,
+        "totalDocs": 0,
+        "totalPages": 1
+      }
+    },
+    {
+      "name": "payload consultation-slots list admin",
+      "method": "GET",
+      "path": "/api/consultation-slots?limit=1",
+      "status": 200,
+      "ok": true,
+      "expected": "200|401|403",
+      "response": {
+        "docs": [],
+        "hasNextPage": false,
+        "hasPrevPage": false,
+        "limit": 1,
+        "nextPage": null,
+        "page": 1,
+        "pagingCounter": 1,
+        "prevPage": null,
+        "totalDocs": 0,
+        "totalPages": 1
+      }
+    },
+    {
+      "name": "payload consultation-bookings list unauth",
+      "method": "GET",
+      "path": "/api/consultation-bookings?limit=1",
+      "status": 403,
+      "ok": true,
+      "expected": "200|401|403",
+      "response": {
+        "errors": [
+          {
+            "message": "You are not allowed to perform this action."
+          }
+        ]
+      }
+    },
+    {
+      "name": "payload consultation-bookings list user",
+      "method": "GET",
+      "path": "/api/consultation-bookings?limit=1",
+      "status": 403,
+      "ok": true,
+      "expected": "200|401|403",
+      "response": {
+        "errors": [
+          {
+            "message": "You are not allowed to perform this action."
+          }
+        ]
+      }
+    },
+    {
+      "name": "payload consultation-bookings list admin",
+      "method": "GET",
+      "path": "/api/consultation-bookings?limit=1",
+      "status": 403,
+      "ok": true,
+      "expected": "200|401|403",
+      "response": {
+        "errors": [
+          {
+            "message": "You are not allowed to perform this action."
+          }
+        ]
+      }
+    },
+    {
+      "name": "payload leads list unauth",
+      "method": "GET",
+      "path": "/api/leads?limit=1",
+      "status": 403,
+      "ok": true,
+      "expected": "200|401|403",
+      "response": {
+        "errors": [
+          {
+            "message": "You are not allowed to perform this action."
+          }
+        ]
+      }
+    },
+    {
+      "name": "payload leads list user",
+      "method": "GET",
+      "path": "/api/leads?limit=1",
+      "status": 403,
+      "ok": true,
+      "expected": "200|401|403",
+      "response": {
+        "errors": [
+          {
+            "message": "You are not allowed to perform this action."
+          }
+        ]
+      }
+    },
+    {
+      "name": "payload leads list admin",
+      "method": "GET",
+      "path": "/api/leads?limit=1",
+      "status": 403,
+      "ok": true,
+      "expected": "200|401|403",
+      "response": {
+        "errors": [
+          {
+            "message": "You are not allowed to perform this action."
+          }
+        ]
+      }
+    },
+    {
+      "name": "payload waitlist list unauth",
+      "method": "GET",
+      "path": "/api/waitlist?limit=1",
+      "status": 403,
+      "ok": true,
+      "expected": "200|401|403",
+      "response": {
+        "errors": [
+          {
+            "message": "You are not allowed to perform this action."
+          }
+        ]
+      }
+    },
+    {
+      "name": "payload waitlist list user",
+      "method": "GET",
+      "path": "/api/waitlist?limit=1",
+      "status": 403,
+      "ok": true,
+      "expected": "200|401|403",
+      "response": {
+        "errors": [
+          {
+            "message": "You are not allowed to perform this action."
+          }
+        ]
+      }
+    },
+    {
+      "name": "payload waitlist list admin",
+      "method": "GET",
+      "path": "/api/waitlist?limit=1",
+      "status": 403,
+      "ok": true,
+      "expected": "200|401|403",
+      "response": {
+        "errors": [
+          {
+            "message": "You are not allowed to perform this action."
+          }
+        ]
+      }
+    },
+    {
+      "name": "payload reviews list unauth",
+      "method": "GET",
+      "path": "/api/reviews?limit=1",
+      "status": 200,
+      "ok": true,
+      "expected": "200|401|403",
+      "response": {
+        "docs": [],
+        "hasNextPage": false,
+        "hasPrevPage": false,
+        "limit": 1,
+        "nextPage": null,
+        "page": 1,
+        "pagingCounter": 1,
+        "prevPage": null,
+        "totalDocs": 0,
+        "totalPages": 1
+      }
+    },
+    {
+      "name": "payload reviews list user",
+      "method": "GET",
+      "path": "/api/reviews?limit=1",
+      "status": 200,
+      "ok": true,
+      "expected": "200|401|403",
+      "response": {
+        "docs": [],
+        "hasNextPage": false,
+        "hasPrevPage": false,
+        "limit": 1,
+        "nextPage": null,
+        "page": 1,
+        "pagingCounter": 1,
+        "prevPage": null,
+        "totalDocs": 0,
+        "totalPages": 1
+      }
+    },
+    {
+      "name": "payload reviews list admin",
+      "method": "GET",
+      "path": "/api/reviews?limit=1",
+      "status": 200,
+      "ok": true,
+      "expected": "200|401|403",
+      "response": {
+        "docs": [],
+        "hasNextPage": false,
+        "hasPrevPage": false,
+        "limit": 1,
+        "nextPage": null,
+        "page": 1,
+        "pagingCounter": 1,
+        "prevPage": null,
+        "totalDocs": 0,
+        "totalPages": 1
+      }
+    },
+    {
+      "name": "payload certificates list unauth",
+      "method": "GET",
+      "path": "/api/certificates?limit=1",
+      "status": 403,
+      "ok": true,
+      "expected": "200|401|403",
+      "response": {
+        "errors": [
+          {
+            "message": "You are not allowed to perform this action."
+          }
+        ]
+      }
+    },
+    {
+      "name": "payload certificates list user",
+      "method": "GET",
+      "path": "/api/certificates?limit=1",
+      "status": 403,
+      "ok": true,
+      "expected": "200|401|403",
+      "response": {
+        "errors": [
+          {
+            "message": "You are not allowed to perform this action."
+          }
+        ]
+      }
+    },
+    {
+      "name": "payload certificates list admin",
+      "method": "GET",
+      "path": "/api/certificates?limit=1",
+      "status": 403,
+      "ok": true,
+      "expected": "200|401|403",
+      "response": {
+        "errors": [
+          {
+            "message": "You are not allowed to perform this action."
+          }
+        ]
+      }
+    },
+    {
+      "name": "payload payment-links list unauth",
+      "method": "GET",
+      "path": "/api/payment-links?limit=1",
+      "status": 403,
+      "ok": true,
+      "expected": "200|401|403",
+      "response": {
+        "errors": [
+          {
+            "message": "You are not allowed to perform this action."
+          }
+        ]
+      }
+    },
+    {
+      "name": "payload payment-links list user",
+      "method": "GET",
+      "path": "/api/payment-links?limit=1",
+      "status": 403,
+      "ok": true,
+      "expected": "200|401|403",
+      "response": {
+        "errors": [
+          {
+            "message": "You are not allowed to perform this action."
+          }
+        ]
+      }
+    },
+    {
+      "name": "payload payment-links list admin",
+      "method": "GET",
+      "path": "/api/payment-links?limit=1",
+      "status": 403,
+      "ok": true,
+      "expected": "200|401|403",
+      "response": {
+        "errors": [
+          {
+            "message": "You are not allowed to perform this action."
+          }
+        ]
+      }
+    },
+    {
+      "name": "payload instructor-blocked-dates list unauth",
+      "method": "GET",
+      "path": "/api/instructor-blocked-dates?limit=1",
+      "status": 403,
+      "ok": true,
+      "expected": "200|401|403",
+      "response": {
+        "errors": [
+          {
+            "message": "You are not allowed to perform this action."
+          }
+        ]
+      }
+    },
+    {
+      "name": "payload instructor-blocked-dates list user",
+      "method": "GET",
+      "path": "/api/instructor-blocked-dates?limit=1",
+      "status": 403,
+      "ok": true,
+      "expected": "200|401|403",
+      "response": {
+        "errors": [
+          {
+            "message": "You are not allowed to perform this action."
+          }
+        ]
+      }
+    },
+    {
+      "name": "payload instructor-blocked-dates list admin",
+      "method": "GET",
+      "path": "/api/instructor-blocked-dates?limit=1",
+      "status": 403,
+      "ok": true,
+      "expected": "200|401|403",
+      "response": {
+        "errors": [
+          {
+            "message": "You are not allowed to perform this action."
+          }
+        ]
+      }
+    },
+    {
+      "name": "payload verification-codes list unauth",
+      "method": "GET",
+      "path": "/api/verification-codes?limit=1",
+      "status": 403,
+      "ok": true,
+      "expected": "200|401|403",
+      "response": {
+        "errors": [
+          {
+            "message": "You are not allowed to perform this action."
+          }
+        ]
+      }
+    },
+    {
+      "name": "payload verification-codes list user",
+      "method": "GET",
+      "path": "/api/verification-codes?limit=1",
+      "status": 403,
+      "ok": true,
+      "expected": "200|401|403",
+      "response": {
+        "errors": [
+          {
+            "message": "You are not allowed to perform this action."
+          }
+        ]
+      }
+    },
+    {
+      "name": "payload verification-codes list admin",
+      "method": "GET",
+      "path": "/api/verification-codes?limit=1",
+      "status": 403,
+      "ok": true,
+      "expected": "200|401|403",
+      "response": {
+        "errors": [
+          {
+            "message": "You are not allowed to perform this action."
+          }
+        ]
+      }
+    },
+    {
+      "name": "payload blog-posts list unauth",
+      "method": "GET",
+      "path": "/api/blog-posts?limit=1",
+      "status": 200,
+      "ok": true,
+      "expected": "200|401|403",
+      "response": {
+        "docs": [],
+        "hasNextPage": false,
+        "hasPrevPage": false,
+        "limit": 1,
+        "nextPage": null,
+        "page": 1,
+        "pagingCounter": 1,
+        "prevPage": null,
+        "totalDocs": 0,
+        "totalPages": 1
+      }
+    },
+    {
+      "name": "payload blog-posts list user",
+      "method": "GET",
+      "path": "/api/blog-posts?limit=1",
+      "status": 200,
+      "ok": true,
+      "expected": "200|401|403",
+      "response": {
+        "docs": [],
+        "hasNextPage": false,
+        "hasPrevPage": false,
+        "limit": 1,
+        "nextPage": null,
+        "page": 1,
+        "pagingCounter": 1,
+        "prevPage": null,
+        "totalDocs": 0,
+        "totalPages": 1
+      }
+    },
+    {
+      "name": "payload blog-posts list admin",
+      "method": "GET",
+      "path": "/api/blog-posts?limit=1",
+      "status": 200,
+      "ok": true,
+      "expected": "200|401|403",
+      "response": {
+        "docs": [],
+        "hasNextPage": false,
+        "hasPrevPage": false,
+        "limit": 1,
+        "nextPage": null,
+        "page": 1,
+        "pagingCounter": 1,
+        "prevPage": null,
+        "totalDocs": 0,
+        "totalPages": 1
+      }
+    },
+    {
+      "name": "payload bulk-seat-allocations list unauth",
+      "method": "GET",
+      "path": "/api/bulk-seat-allocations?limit=1",
+      "status": 403,
+      "ok": true,
+      "expected": "200|401|403",
+      "response": {
+        "errors": [
+          {
+            "message": "You are not allowed to perform this action."
+          }
+        ]
+      }
+    },
+    {
+      "name": "payload bulk-seat-allocations list user",
+      "method": "GET",
+      "path": "/api/bulk-seat-allocations?limit=1",
+      "status": 403,
+      "ok": true,
+      "expected": "200|401|403",
+      "response": {
+        "errors": [
+          {
+            "message": "You are not allowed to perform this action."
+          }
+        ]
+      }
+    },
+    {
+      "name": "payload bulk-seat-allocations list admin",
+      "method": "GET",
+      "path": "/api/bulk-seat-allocations?limit=1",
+      "status": 403,
+      "ok": true,
+      "expected": "200|401|403",
+      "response": {
+        "errors": [
+          {
+            "message": "You are not allowed to perform this action."
+          }
+        ]
+      }
+    },
+    {
+      "name": "payload popups list unauth",
+      "method": "GET",
+      "path": "/api/popups?limit=1",
+      "status": 200,
+      "ok": true,
+      "expected": "200|401|403",
+      "response": {
+        "docs": [
+          {
+            "id": 1,
+            "name": "Muhammad mikki",
+            "status": "paused",
+            "content": {
+              "titleAr": "رسي",
+              "titleEn": "dasd",
+              "badgeAr": "ثشي",
+              "badgeEn": "assd",
+              "subtitleAr": null,
+              "subtitleEn": null,
+              "descriptionAr": {
+                "root": {
+                  "type": "root",
+                  "format": "",
+                  "indent": 0,
+                  "version": 1,
+                  "children": [
+                    {
+                      "type": "paragraph",
+                      "format": "",
+                      "indent": 0,
+                      "version": 1,
+                      "children": [
+                        {
+                          "mode": "normal",
+                          "text": "dsa",
+                          "type": "text",
+                          "style": "",
+                          "detail": 0,
+                          "format": 0,
+                          "version": 1
+                        }
+                      ],
+                      "direction": null,
+                      "textStyle": "",
+                      "textFormat": 0
+                    }
+                  ],
+                  "direction": null
+                }
+              },
+              "descriptionEn": {
+                "root": {
+                  "type": "root",
+                  "format": "",
+                  "indent": 0,
+                  "version": 1,
+                  "children": [
+                    {
+                      "type": "paragraph",
+                      "format": "",
+                      "indent": 0,
+                      "version": 1,
+                      "children": [
+                        {
+                          "mode": "normal",
+                          "text": "dsa",
+                          "type": "text",
+                          "style": "",
+                          "detail": 0,
+                          "format": 0,
+                          "version": 1
+                        }
+                      ],
+                      "direction": null,
+                      "textStyle": "",
+                      "textFormat": 0
+                    }
+                  ],
+                  "direction": null
+                }
+              },
+              "legalNoteAr": "d",
+              "legalNoteEn": "a",
+              "image": null,
+              "imagePosition": "top"
+            },
+            "cta": {
+              "primaryCtaText": "dasc",
+              "primaryCtaLink": "https://www.facebook.com/photo/?fbid=122173056734855546&set=a.122105233766855546",
+              "secondaryCtaText": "dasd",
+              "secondaryCtaLink": "https://www.facebook.com/photo/?fbid=122173056734855546&set=a.122105233766855546"
+            },
+            "promo": {
+              "hasPromoCode": true,
+              "promoCode": "432d",
+              "promoDelivery": "show_directly"
+            },
+            "form": {
+              "hasForm": false,
+              "formFields": [],
+              "successMessage": null,
+              "redirectUrl": null
+            },
+            "appearance": {
+              "stylePreset": "default",
+              "popupType": "modal",
+              "animation": "fade",
+              "overlayDarkness": 50,
+              "closeOnOutsideClick": true,
+              "bgColor": "#1a1a2e",
+              "textColor": "#ffffff",
+              "accentColor": "#e94560",
+              "backgroundImage": null,
+              "backgroundOverlayOpacity": 62,
+              "borderColor": "rgba(255,255,255,0.16)",
+              "badgeBgColor": "#117fb2",
+              "badgeTextColor": "#ffffff"
+            },
+            "countdown": {
+              "hasCountdown": false,
+              "countdownTarget": null
+            },
+            "targeting": {
+              "displayPages": "all",
+              "specificPages": [],
+              "triggerType": "on_load",
+              "triggerDelay": 3,
+              "triggerScroll": 50,
+              "frequency": "once_session",
+              "targetAudience": "all",
+              "targetRole": null,
+              "targetDevice": "all",
+              "visitorCondition": "all",
+              "purchaseCondition": "all",
+              "emailCaptureCondition": "all",
+              "minSessionPageViews": null
+            },
+            "startDate": "2026-03-20T22:00:00.000Z",
+            "endDate": null,
+            "priority": 1,
+            "viewCount": 0,
+            "clickCount": 0,
+            "conversionCount": 0,
+            "updatedAt": "2026-03-21T13:09:51.941Z",
+            "createdAt": "2026-03-21T13:09:51.940Z"
+          }
+        ],
+        "hasNextPage": false,
+        "hasPrevPage": false,
+        "limit": 1,
+        "nextPage": null,
+        "page": 1,
+        "pagingCounter": 1,
+        "prevPage": null,
+        "totalDocs": 1,
+        "totalPages": 1
+      }
+    },
+    {
+      "name": "payload popups list user",
+      "method": "GET",
+      "path": "/api/popups?limit=1",
+      "status": 200,
+      "ok": true,
+      "expected": "200|401|403",
+      "response": {
+        "docs": [
+          {
+            "id": 1,
+            "name": "Muhammad mikki",
+            "status": "paused",
+            "content": {
+              "titleAr": "رسي",
+              "titleEn": "dasd",
+              "badgeAr": "ثشي",
+              "badgeEn": "assd",
+              "subtitleAr": null,
+              "subtitleEn": null,
+              "descriptionAr": {
+                "root": {
+                  "type": "root",
+                  "format": "",
+                  "indent": 0,
+                  "version": 1,
+                  "children": [
+                    {
+                      "type": "paragraph",
+                      "format": "",
+                      "indent": 0,
+                      "version": 1,
+                      "children": [
+                        {
+                          "mode": "normal",
+                          "text": "dsa",
+                          "type": "text",
+                          "style": "",
+                          "detail": 0,
+                          "format": 0,
+                          "version": 1
+                        }
+                      ],
+                      "direction": null,
+                      "textStyle": "",
+                      "textFormat": 0
+                    }
+                  ],
+                  "direction": null
+                }
+              },
+              "descriptionEn": {
+                "root": {
+                  "type": "root",
+                  "format": "",
+                  "indent": 0,
+                  "version": 1,
+                  "children": [
+                    {
+                      "type": "paragraph",
+                      "format": "",
+                      "indent": 0,
+                      "version": 1,
+                      "children": [
+                        {
+                          "mode": "normal",
+                          "text": "dsa",
+                          "type": "text",
+                          "style": "",
+                          "detail": 0,
+                          "format": 0,
+                          "version": 1
+                        }
+                      ],
+                      "direction": null,
+                      "textStyle": "",
+                      "textFormat": 0
+                    }
+                  ],
+                  "direction": null
+                }
+              },
+              "legalNoteAr": "d",
+              "legalNoteEn": "a",
+              "image": null,
+              "imagePosition": "top"
+            },
+            "cta": {
+              "primaryCtaText": "dasc",
+              "primaryCtaLink": "https://www.facebook.com/photo/?fbid=122173056734855546&set=a.122105233766855546",
+              "secondaryCtaText": "dasd",
+              "secondaryCtaLink": "https://www.facebook.com/photo/?fbid=122173056734855546&set=a.122105233766855546"
+            },
+            "promo": {
+              "hasPromoCode": true,
+              "promoCode": "432d",
+              "promoDelivery": "show_directly"
+            },
+            "form": {
+              "hasForm": false,
+              "formFields": [],
+              "successMessage": null,
+              "redirectUrl": null
+            },
+            "appearance": {
+              "stylePreset": "default",
+              "popupType": "modal",
+              "animation": "fade",
+              "overlayDarkness": 50,
+              "closeOnOutsideClick": true,
+              "bgColor": "#1a1a2e",
+              "textColor": "#ffffff",
+              "accentColor": "#e94560",
+              "backgroundImage": null,
+              "backgroundOverlayOpacity": 62,
+              "borderColor": "rgba(255,255,255,0.16)",
+              "badgeBgColor": "#117fb2",
+              "badgeTextColor": "#ffffff"
+            },
+            "countdown": {
+              "hasCountdown": false,
+              "countdownTarget": null
+            },
+            "targeting": {
+              "displayPages": "all",
+              "specificPages": [],
+              "triggerType": "on_load",
+              "triggerDelay": 3,
+              "triggerScroll": 50,
+              "frequency": "once_session",
+              "targetAudience": "all",
+              "targetRole": null,
+              "targetDevice": "all",
+              "visitorCondition": "all",
+              "purchaseCondition": "all",
+              "emailCaptureCondition": "all",
+              "minSessionPageViews": null
+            },
+            "startDate": "2026-03-20T22:00:00.000Z",
+            "endDate": null,
+            "priority": 1,
+            "viewCount": 0,
+            "clickCount": 0,
+            "conversionCount": 0,
+            "updatedAt": "2026-03-21T13:09:51.941Z",
+            "createdAt": "2026-03-21T13:09:51.940Z"
+          }
+        ],
+        "hasNextPage": false,
+        "hasPrevPage": false,
+        "limit": 1,
+        "nextPage": null,
+        "page": 1,
+        "pagingCounter": 1,
+        "prevPage": null,
+        "totalDocs": 1,
+        "totalPages": 1
+      }
+    },
+    {
+      "name": "payload popups list admin",
+      "method": "GET",
+      "path": "/api/popups?limit=1",
+      "status": 200,
+      "ok": true,
+      "expected": "200|401|403",
+      "response": {
+        "docs": [
+          {
+            "id": 1,
+            "name": "Muhammad mikki",
+            "status": "paused",
+            "content": {
+              "titleAr": "رسي",
+              "titleEn": "dasd",
+              "badgeAr": "ثشي",
+              "badgeEn": "assd",
+              "subtitleAr": null,
+              "subtitleEn": null,
+              "descriptionAr": {
+                "root": {
+                  "type": "root",
+                  "format": "",
+                  "indent": 0,
+                  "version": 1,
+                  "children": [
+                    {
+                      "type": "paragraph",
+                      "format": "",
+                      "indent": 0,
+                      "version": 1,
+                      "children": [
+                        {
+                          "mode": "normal",
+                          "text": "dsa",
+                          "type": "text",
+                          "style": "",
+                          "detail": 0,
+                          "format": 0,
+                          "version": 1
+                        }
+                      ],
+                      "direction": null,
+                      "textStyle": "",
+                      "textFormat": 0
+                    }
+                  ],
+                  "direction": null
+                }
+              },
+              "descriptionEn": {
+                "root": {
+                  "type": "root",
+                  "format": "",
+                  "indent": 0,
+                  "version": 1,
+                  "children": [
+                    {
+                      "type": "paragraph",
+                      "format": "",
+                      "indent": 0,
+                      "version": 1,
+                      "children": [
+                        {
+                          "mode": "normal",
+                          "text": "dsa",
+                          "type": "text",
+                          "style": "",
+                          "detail": 0,
+                          "format": 0,
+                          "version": 1
+                        }
+                      ],
+                      "direction": null,
+                      "textStyle": "",
+                      "textFormat": 0
+                    }
+                  ],
+                  "direction": null
+                }
+              },
+              "legalNoteAr": "d",
+              "legalNoteEn": "a",
+              "image": null,
+              "imagePosition": "top"
+            },
+            "cta": {
+              "primaryCtaText": "dasc",
+              "primaryCtaLink": "https://www.facebook.com/photo/?fbid=122173056734855546&set=a.122105233766855546",
+              "secondaryCtaText": "dasd",
+              "secondaryCtaLink": "https://www.facebook.com/photo/?fbid=122173056734855546&set=a.122105233766855546"
+            },
+            "promo": {
+              "hasPromoCode": true,
+              "promoCode": "432d",
+              "promoDelivery": "show_directly"
+            },
+            "form": {
+              "hasForm": false,
+              "formFields": [],
+              "successMessage": null,
+              "redirectUrl": null
+            },
+            "appearance": {
+              "stylePreset": "default",
+              "popupType": "modal",
+              "animation": "fade",
+              "overlayDarkness": 50,
+              "closeOnOutsideClick": true,
+              "bgColor": "#1a1a2e",
+              "textColor": "#ffffff",
+              "accentColor": "#e94560",
+              "backgroundImage": null,
+              "backgroundOverlayOpacity": 62,
+              "borderColor": "rgba(255,255,255,0.16)",
+              "badgeBgColor": "#117fb2",
+              "badgeTextColor": "#ffffff"
+            },
+            "countdown": {
+              "hasCountdown": false,
+              "countdownTarget": null
+            },
+            "targeting": {
+              "displayPages": "all",
+              "specificPages": [],
+              "triggerType": "on_load",
+              "triggerDelay": 3,
+              "triggerScroll": 50,
+              "frequency": "once_session",
+              "targetAudience": "all",
+              "targetRole": null,
+              "targetDevice": "all",
+              "visitorCondition": "all",
+              "purchaseCondition": "all",
+              "emailCaptureCondition": "all",
+              "minSessionPageViews": null
+            },
+            "startDate": "2026-03-20T22:00:00.000Z",
+            "endDate": null,
+            "priority": 1,
+            "viewCount": 0,
+            "clickCount": 0,
+            "conversionCount": 0,
+            "updatedAt": "2026-03-21T13:09:51.941Z",
+            "createdAt": "2026-03-21T13:09:51.940Z"
+          }
+        ],
+        "hasNextPage": false,
+        "hasPrevPage": false,
+        "limit": 1,
+        "nextPage": null,
+        "page": 1,
+        "pagingCounter": 1,
+        "prevPage": null,
+        "totalDocs": 1,
+        "totalPages": 1
+      }
+    },
+    {
+      "name": "payload announcement-bars list unauth",
+      "method": "GET",
+      "path": "/api/announcement-bars?limit=1",
+      "status": 200,
+      "ok": true,
+      "expected": "200|401|403",
+      "response": {
+        "docs": [],
+        "hasNextPage": false,
+        "hasPrevPage": false,
+        "limit": 1,
+        "nextPage": null,
+        "page": 1,
+        "pagingCounter": 1,
+        "prevPage": null,
+        "totalDocs": 0,
+        "totalPages": 1
+      }
+    },
+    {
+      "name": "payload announcement-bars list user",
+      "method": "GET",
+      "path": "/api/announcement-bars?limit=1",
+      "status": 200,
+      "ok": true,
+      "expected": "200|401|403",
+      "response": {
+        "docs": [],
+        "hasNextPage": false,
+        "hasPrevPage": false,
+        "limit": 1,
+        "nextPage": null,
+        "page": 1,
+        "pagingCounter": 1,
+        "prevPage": null,
+        "totalDocs": 0,
+        "totalPages": 1
+      }
+    },
+    {
+      "name": "payload announcement-bars list admin",
+      "method": "GET",
+      "path": "/api/announcement-bars?limit=1",
+      "status": 200,
+      "ok": true,
+      "expected": "200|401|403",
+      "response": {
+        "docs": [],
+        "hasNextPage": false,
+        "hasPrevPage": false,
+        "limit": 1,
+        "nextPage": null,
+        "page": 1,
+        "pagingCounter": 1,
+        "prevPage": null,
+        "totalDocs": 0,
+        "totalPages": 1
+      }
+    },
+    {
+      "name": "payload upcoming-events-config list unauth",
+      "method": "GET",
+      "path": "/api/upcoming-events-config?limit=1",
+      "status": 200,
+      "ok": true,
+      "expected": "200|401|403",
+      "response": {
+        "docs": [],
+        "hasNextPage": false,
+        "hasPrevPage": false,
+        "limit": 1,
+        "nextPage": null,
+        "page": 1,
+        "pagingCounter": 1,
+        "prevPage": null,
+        "totalDocs": 0,
+        "totalPages": 1
+      }
+    },
+    {
+      "name": "payload upcoming-events-config list user",
+      "method": "GET",
+      "path": "/api/upcoming-events-config?limit=1",
+      "status": 200,
+      "ok": true,
+      "expected": "200|401|403",
+      "response": {
+        "docs": [],
+        "hasNextPage": false,
+        "hasPrevPage": false,
+        "limit": 1,
+        "nextPage": null,
+        "page": 1,
+        "pagingCounter": 1,
+        "prevPage": null,
+        "totalDocs": 0,
+        "totalPages": 1
+      }
+    },
+    {
+      "name": "payload upcoming-events-config list admin",
+      "method": "GET",
+      "path": "/api/upcoming-events-config?limit=1",
+      "status": 200,
+      "ok": true,
+      "expected": "200|401|403",
+      "response": {
+        "docs": [],
+        "hasNextPage": false,
+        "hasPrevPage": false,
+        "limit": 1,
+        "nextPage": null,
+        "page": 1,
+        "pagingCounter": 1,
+        "prevPage": null,
+        "totalDocs": 0,
+        "totalPages": 1
+      }
+    },
+    {
+      "name": "payload crm-sync-events list unauth",
+      "method": "GET",
+      "path": "/api/crm-sync-events?limit=1",
+      "status": 403,
+      "ok": true,
+      "expected": "200|401|403",
+      "response": {
+        "errors": [
+          {
+            "message": "You are not allowed to perform this action."
+          }
+        ]
+      }
+    },
+    {
+      "name": "payload crm-sync-events list user",
+      "method": "GET",
+      "path": "/api/crm-sync-events?limit=1",
+      "status": 403,
+      "ok": true,
+      "expected": "200|401|403",
+      "response": {
+        "errors": [
+          {
+            "message": "You are not allowed to perform this action."
+          }
+        ]
+      }
+    },
+    {
+      "name": "payload crm-sync-events list admin",
+      "method": "GET",
+      "path": "/api/crm-sync-events?limit=1",
+      "status": 403,
+      "ok": true,
+      "expected": "200|401|403",
+      "response": {
+        "errors": [
+          {
+            "message": "You are not allowed to perform this action."
+          }
+        ]
+      }
+    }
+  ]
+}
