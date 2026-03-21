@@ -47,7 +47,21 @@ function extractRecordFromResponse(payload: unknown): unknown {
   const obj = payload as Record<string, unknown>;
   if (obj.data && typeof obj.data === 'object') {
     if (Array.isArray(obj.data)) return obj.data[0] ?? null;
-    return obj.data;
+
+    const dataObj = obj.data as Record<string, unknown>;
+    if (extractRecordId(dataObj)) return dataObj;
+
+    // Twenty often wraps records as data.createPerson / data.updateOpportunity / ...
+    for (const value of Object.values(dataObj)) {
+      if (Array.isArray(value)) {
+        const first = value[0];
+        if (first && typeof first === 'object') return first;
+      } else if (value && typeof value === 'object') {
+        return value;
+      }
+    }
+
+    return dataObj;
   }
   if (obj.item && typeof obj.item === 'object') return obj.item;
   if (obj.record && typeof obj.record === 'object') return obj.record;
@@ -61,12 +75,28 @@ function extractListFromResponse(payload: unknown): unknown[] {
   if (typeof payload !== 'object') return [];
 
   const obj = payload as Record<string, unknown>;
+  if (obj.data && typeof obj.data === 'object') {
+    const data = obj.data as Record<string, unknown>;
+    if (Array.isArray(data)) return data;
+    for (const value of Object.values(data)) {
+      if (Array.isArray(value)) return value;
+    }
+  }
+
   const listCandidates = ['data', 'items', 'records', 'docs', 'results'];
   for (const key of listCandidates) {
     const value = obj[key];
     if (Array.isArray(value)) return value;
   }
   return [];
+}
+
+function extractPrimaryEmail(record: unknown): string | null {
+  if (!record || typeof record !== 'object') return null;
+  const emails = (record as Record<string, unknown>).emails;
+  if (!emails || typeof emails !== 'object') return null;
+  const primary = (emails as Record<string, unknown>).primaryEmail;
+  return typeof primary === 'string' ? primary : null;
 }
 
 export class TwentyClient {
@@ -229,5 +259,23 @@ export class TwentyClient {
   ): Promise<TwentyUpsertResult> {
     const resourcePath = this.getResourcePath(resource);
     return this.updateRecord(resourcePath, id, payload);
+  }
+
+  async findPersonByPrimaryEmail(email: string): Promise<string | null> {
+    const normalized = email.trim().toLowerCase();
+    if (!normalized) return null;
+    if (this.getResourcePath('contacts') !== 'people') return null;
+
+    const raw = await this.request('GET', '/rest/people?limit=200');
+    const people = extractListFromResponse(raw);
+    for (const person of people) {
+      const primary = extractPrimaryEmail(person)?.trim().toLowerCase();
+      if (primary && primary === normalized) {
+        const id = extractRecordId(person);
+        if (id) return id;
+      }
+    }
+
+    return null;
   }
 }

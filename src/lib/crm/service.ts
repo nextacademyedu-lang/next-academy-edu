@@ -196,6 +196,7 @@ export class CRMService {
 
     const contactsResourcePath = this.client.getResourcePath('contacts');
     const existingContactId = getString(user.twentyCrmContactId);
+    const userEmail = getString(user.email);
 
     let result: { id: string | null; raw: unknown };
 
@@ -210,7 +211,35 @@ export class CRMService {
           result = await this.client.create('contacts', personPayload);
         }
       } else {
-        result = await this.client.create('contacts', personPayload);
+        const discoveredContactId = userEmail
+          ? await this.client.findPersonByPrimaryEmail(userEmail)
+          : null;
+
+        if (discoveredContactId) {
+          result = await this.client.updateById('contacts', discoveredContactId, personPayload);
+        } else {
+          try {
+            result = await this.client.create('contacts', personPayload);
+          } catch (error) {
+            // Recover from duplicate person rows where local twentyCrmContactId is missing.
+            const message = safeErrorMessage(error).toLowerCase();
+            if (!message.includes('duplicate')) {
+              throw error;
+            }
+
+            const fallbackId = userEmail
+              ? await this.client.findPersonByPrimaryEmail(userEmail)
+              : null;
+            if (!fallbackId) {
+              return {
+                skipped: true,
+                reason: 'Duplicate person exists in Twenty and could not be resolved',
+              };
+            }
+
+            result = await this.client.updateById('contacts', fallbackId, personPayload);
+          }
+        }
       }
     } else {
       const contactPayload = mapUserToCrmContact({ user, profile, company });
@@ -304,6 +333,13 @@ export class CRMService {
 
     const profile = await this.resolveUserProfile(userId);
     const company = await this.resolveCompanyFromProfile(profile);
+    const dealsResourcePath = this.client.getResourcePath('deals');
+    if (dealsResourcePath === 'opportunities') {
+      return {
+        skipped: true,
+        reason: 'Deal sync is disabled for default opportunities schema (no externalId)',
+      };
+    }
 
     const dealPayload = mapBookingToCrmDeal({ booking, user, company });
     const result = await this.client.upsert('deals', dealPayload.externalId, dealPayload);
@@ -345,6 +381,13 @@ export class CRMService {
       overrideAccess: true,
     });
     if (!booking) return { skipped: true, reason: 'Booking not found for payment sync' };
+    const dealsResourcePath = this.client.getResourcePath('deals');
+    if (dealsResourcePath === 'opportunities') {
+      return {
+        skipped: true,
+        reason: 'Deal sync is disabled for default opportunities schema (no externalId)',
+      };
+    }
 
     const dealPatch = mapPaymentToCrmDealPatch({ payment, booking });
     const externalId = makeEntityExternalId('booking', bookingId);
@@ -393,6 +436,13 @@ export class CRMService {
     const instructor = asRecord(consultation.instructor);
     const consultationType = asRecord(consultation.consultationType);
     const slot = asRecord(consultation.slot);
+    const dealsResourcePath = this.client.getResourcePath('deals');
+    if (dealsResourcePath === 'opportunities') {
+      return {
+        skipped: true,
+        reason: 'Deal sync is disabled for default opportunities schema (no externalId)',
+      };
+    }
 
     const dealPayload = mapConsultationToCrmDeal({
       consultation,
