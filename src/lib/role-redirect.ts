@@ -21,5 +21,6 @@ const DASHBOARD_ROUTES: Record<UserData['role'], string> = {
  */
 export function getDashboardPath(role: UserData['role'], locale: string): string {
   const base = DASHBOARD_ROUTES[role] ?? '/dashboard';
+  if (role === 'admin') return '/admin';
   return `/${locale}${base}`;
 }

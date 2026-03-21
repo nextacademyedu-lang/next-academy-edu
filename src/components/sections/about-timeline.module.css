@@ -1,7 +1,9 @@
 .section {
   width: 100%;
   padding: 100px 0;
-  background-color: var(--bg-primary, #020504);
+  background:
+    radial-gradient(circle at 18% 14%, var(--accent-gold-10), transparent 36%),
+    linear-gradient(180deg, var(--bg-main) 0%, var(--bg-surface-2) 100%);
   position: relative;
 }
 
@@ -51,8 +53,8 @@
   background: linear-gradient(
     180deg,
     transparent 0%,
-    rgba(212, 175, 55, 0.3) 10%,
-    rgba(212, 175, 55, 0.3) 90%,
+    var(--accent-gold-20) 10%,
+    var(--accent-gold-20) 90%,
     transparent 100%
   );
   transform: translateX(-50%);
@@ -83,8 +85,8 @@
   width: 16px;
   height: 16px;
   border-radius: 50%;
-  background: var(--bg-primary, #020504);
-  border: 2px solid rgba(212, 175, 55, 0.4);
+  background: var(--bg-main);
+  border: 2px solid var(--accent-gold-20);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -119,7 +121,7 @@
 }
 
 .card:hover {
-  border-color: rgba(212, 175, 55, 0.2);
+  border-color: var(--accent-gold-20);
   background: var(--hover-overlay);
 }
 
@@ -128,7 +130,7 @@
   font-size: var(--text-small, 13px);
   font-weight: var(--font-bold, 700);
   color: var(--accent-gold, #D4AF37);
-  background: rgba(212, 175, 55, 0.08);
+  background: var(--accent-gold-10);
   padding: 4px 12px;
   border-radius: 20px;
   margin-bottom: 12px;

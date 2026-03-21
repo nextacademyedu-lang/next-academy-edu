@@ -64,7 +64,7 @@ export async function POST(req: NextRequest) {
       collection: 'payments',
       id: payment.id,
       data: {
-        paymentMethod: method === 'wallet' ? 'paymob' : 'paymob',
+        paymentMethod: 'paymob',
         paymentGatewayResponse: { client_secret: intention.client_secret },
       },
     });

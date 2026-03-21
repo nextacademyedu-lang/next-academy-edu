@@ -2,6 +2,55 @@ import { NextResponse } from 'next/server';
 import { getPayload } from 'payload';
 import type { Where } from 'payload';
 import config from '@payload-config';
+import type { Media, Program, Round } from '@/payload-types';
+
+type EventCard = {
+  id: string | number;
+  titleAr: string;
+  titleEn: string;
+  startDate: string;
+  endDate?: string;
+  location?: string;
+  isOnline?: boolean;
+  price?: number;
+  currency?: string;
+  isFree?: boolean;
+  registrationUrl?: string;
+  image?: string;
+};
+
+function extractMediaUrl(value: unknown): string | undefined {
+  if (!value || typeof value === 'number') return undefined;
+  return (value as Media).url || undefined;
+}
+
+function buildEventCard(input: {
+  program: Program;
+  round: Round | null;
+  customImage?: unknown;
+  customUrl?: string;
+}): EventCard {
+  const { program, round, customImage, customUrl } = input;
+  const location = round?.locationName || round?.locationAddress || undefined;
+  const image = extractMediaUrl(customImage)
+    || extractMediaUrl(program.coverImage)
+    || extractMediaUrl(program.thumbnail);
+
+  return {
+    id: round?.id || program.id,
+    titleAr: program.titleAr || 'برنامج',
+    titleEn: program.titleEn || program.titleAr || 'Program',
+    startDate: round?.startDate || new Date().toISOString(),
+    endDate: round?.endDate || undefined,
+    location,
+    isOnline: round?.locationType === 'online',
+    price: round?.price ?? undefined,
+    currency: round?.currency || 'EGP',
+    isFree: (round?.price ?? 0) <= 0,
+    registrationUrl: customUrl || `/${program.slug ? `programs/${program.slug}` : `programs/${program.id}`}`,
+    image,
+  };
+}
 
 /**
  * GET /api/upcoming-events
@@ -52,30 +101,30 @@ export async function GET() {
             ? (item.program as unknown as { id: string | number }).id
             : item.program;
 
-          const program = await payload.findByID({
+          const programDoc = await payload.findByID({
             collection: 'programs',
             id: programId,
             depth: 1,
-          });
+          }) as Program;
 
-          let round = null;
+          let roundDoc: Round | null = null;
           if (item.round) {
             const roundId = typeof item.round === 'object'
               ? (item.round as unknown as { id: string | number }).id
               : item.round;
-            round = await payload.findByID({
+            roundDoc = await payload.findByID({
               collection: 'rounds',
               id: roundId,
               depth: 1,
-            });
+            }) as Round;
           }
 
-          return {
-            program,
-            round,
+          return buildEventCard({
+            program: programDoc,
+            round: roundDoc,
             customImage: item.customImage,
-            customUrl: item.customUrl,
-          };
+            customUrl: item.customUrl || undefined,
+          });
         }),
       );
 
@@ -117,12 +166,18 @@ export async function GET() {
       depth: 2, // populate program + instructor
     });
 
-    const events = rounds.docs.map((round) => ({
-      program: round.program,
-      round,
-      customImage: null,
-      customUrl: null,
-    }));
+    const events = rounds.docs
+      .map((round) => {
+        const program = typeof round.program === 'object'
+          ? round.program as Program
+          : null;
+        if (!program) return null;
+        return buildEventCard({
+          program,
+          round: round as Round,
+        });
+      })
+      .filter(Boolean);
 
     return NextResponse.json({
       events,

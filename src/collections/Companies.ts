@@ -1,5 +1,7 @@
 import type { CollectionConfig } from 'payload';
 import { isAdmin, isAuthenticated, isPublic } from '../lib/access-control.ts';
+import { createCrmDedupeKey } from '../lib/crm/dedupe.ts';
+import { enqueueCrmSyncEvent } from '../lib/crm/queue.ts';
 
 export const Companies: CollectionConfig = {
   slug: 'companies',
@@ -9,6 +11,42 @@ export const Companies: CollectionConfig = {
     create: isAuthenticated,
     update: isAdmin,
     delete: isAdmin,
+  },
+  hooks: {
+    afterChange: [
+      async ({ req, doc, operation }) => {
+        const action = operation === 'create' ? 'company_created' : 'company_updated';
+        const fingerprint = [
+          doc.updatedAt || doc.createdAt || '',
+          doc.name || '',
+          doc.website || '',
+        ].join('|');
+
+        await enqueueCrmSyncEvent({
+          payload: req.payload,
+          req,
+          entityType: 'company',
+          entityId: String(doc.id),
+          action,
+          dedupeKey: createCrmDedupeKey({
+            entityType: 'company',
+            entityId: String(doc.id),
+            action,
+            fingerprint,
+          }),
+          priority: 10,
+          sourceCollection: 'companies',
+          payloadSnapshot: {
+            id: doc.id,
+            name: doc.name,
+            industry: doc.industry,
+            size: doc.size,
+            type: doc.type,
+            updatedAt: doc.updatedAt,
+          },
+        });
+      },
+    ],
   },
   fields: [
     { name: 'name', type: 'text', required: true },

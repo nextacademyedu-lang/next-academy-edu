@@ -56,7 +56,7 @@ export default function B2BBookingsPage() {
           <h1 style={{ fontSize: '28px', fontWeight: 700, marginBottom: '8px', color: 'var(--text-primary)' }}>Team Bookings</h1>
           <p style={{ color: 'var(--text-secondary)', fontSize: '15px' }}>All program enrollments across your company.</p>
         </div>
-        <div style={{ position: 'relative', width: '260px' }}>
+        <div style={{ position: 'relative', width: 'min(100%, 280px)' }}>
           <Search size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
           <Input
             placeholder="Search bookings..."
@@ -68,7 +68,7 @@ export default function B2BBookingsPage() {
       </div>
 
       {/* Filters */}
-      <div style={{ display: 'flex', gap: '8px' }}>
+      <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
         {FILTERS.map(f => (
           <button key={f} style={tabStyle(filter === f)} onClick={() => setFilter(f)}>
             {f.charAt(0).toUpperCase() + f.slice(1)}
@@ -77,7 +77,7 @@ export default function B2BBookingsPage() {
       </div>
 
       {/* Table */}
-      <Card style={{ background: 'rgba(255,255,255,0.03)', backdropFilter: 'blur(12px)', border: '1px solid rgba(255,255,255,0.05)' }}>
+      <Card style={{ background: 'var(--bg-elevated)', backdropFilter: 'blur(12px)', border: '1px solid var(--border-subtle)' }}>
         <CardHeader>
           <CardTitle>Bookings</CardTitle>
           <CardDescription>{loading ? '…' : `${filtered.length} result${filtered.length !== 1 ? 's' : ''}`}</CardDescription>

@@ -29,5 +29,11 @@ export const Reviews: CollectionConfig = {
     { name: 'isVerifiedPurchase', type: 'checkbox', defaultValue: true },
     { name: 'adminNotes', type: 'textarea' },
     { name: 'removedReason', type: 'textarea' },
+    // Video testimonial fields
+    { name: 'isVideoTestimonial', type: 'checkbox', defaultValue: false },
+    { name: 'videoUrl', type: 'text', admin: { condition: (data) => data?.isVideoTestimonial } },
+    { name: 'videoThumbnail', type: 'upload', relationTo: 'media', admin: { condition: (data) => data?.isVideoTestimonial } },
+    { name: 'videoCaption', type: 'text', admin: { condition: (data) => data?.isVideoTestimonial } },
+    { name: 'videoSubtitle', type: 'text', admin: { condition: (data) => data?.isVideoTestimonial } },
   ],
 };

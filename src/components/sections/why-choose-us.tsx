@@ -3,6 +3,7 @@
 import { Target, Lightbulb, Users, Mic } from 'lucide-react';
 import React, { useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
+import { useTranslations } from 'next-intl';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
@@ -10,65 +11,51 @@ import styles from './why-choose-us.module.css';
 
 gsap.registerPlugin(ScrollTrigger);
 
-const SERVICES = [
-  {
-    title: 'Practical Workshops',
-    description: 'We offer hands-on workshops that teach you how to immediately apply what you learn in marketing, sales, or management.',
-    icon: Target
-  },
-  {
-    title: '1:1 Consultations',
-    description: 'If you have a business idea or a project to grow, our expert consultation sessions help you plan smart and scale faster.',
-    icon: Lightbulb
-  },
-  {
-    title: 'Entrepreneur Community',
-    description: 'Join the Next community, exchange experiences, ideas, and find support from people who share your passion and ambition.',
-    icon: Users
-  },
-  {
-    title: 'Live Events & Meetups',
-    description: 'We organize camps and live events that combine intense learning with real-world experience and networking.',
-    icon: Mic
-  }
-];
+const SERVICE_ICONS = [Target, Lightbulb, Users, Mic];
 
 export function WhyChooseUs() {
+  const t = useTranslations('WhyChooseUs');
   const textRef = useRef<HTMLDivElement>(null);
+
+  const services = [
+    { title: t('service1Title'), description: t('service1Desc'), icon: SERVICE_ICONS[0] },
+    { title: t('service2Title'), description: t('service2Desc'), icon: SERVICE_ICONS[1] },
+    { title: t('service3Title'), description: t('service3Desc'), icon: SERVICE_ICONS[2] },
+    { title: t('service4Title'), description: t('service4Desc'), icon: SERVICE_ICONS[3] },
+  ];
 
   useEffect(() => {
     if (typeof window !== "undefined") {
       let ctx = gsap.context(() => {
         const words = gsap.utils.toArray('.word');
         
-        // تأثير إظهار النص عند التمرير
         gsap.fromTo(words,
           { 
-            opacity: 0.2, // الحالة المبدئية: النص شفاف شوية
-            y: 15, // بيبدأ وهو نازل لتحت سنة صغيرة
-            color: '#000000' // بيبدأ لونه أسود تماماً عشان يكون مندمج مع الخلفية
+            opacity: 0.2,
+            y: 15,
+            color: '#000000'
           },
           {
-            opacity: 1, // الحالة النهائية: النص ظاهر بالكامل
-            y: 0, // بيرجع لمكانه الطبيعي
-            color: 'var(--text-primary)', // لونه بيرجع أبيض تاني 
-            stagger: 0.05, // حركة الكلمات بتظهر واحدة ورا التانية بفرق جزء من الثانية
-            ease: 'power2.out', // عشان الحركة تكون ناعمة في نهايتها
+            opacity: 1,
+            y: 0,
+            color: 'var(--text-primary)',
+            stagger: 0.05,
+            ease: 'power2.out',
             scrollTrigger: {
-              trigger: textRef.current, // الأنميشن بيبدأ لما السيكشن ده يبدأ يظهر
-              start: 'top 80%', // بيبدأ لما بداية السيكشن توصل لـ 80% من الشاشة
-              end: 'bottom 50%', // بينتهي لما نهاية السيكشن توصل لنص الشاشة
-              scrub: true, // مهم جداً: ده اللي بيخلي الأنميشن مربوط بحركة الماوس بالظبط
+              trigger: textRef.current,
+              start: 'top 80%',
+              end: 'bottom 50%',
+              scrub: true,
             }
           }
         );
       }, textRef);
       
-      return () => ctx.revert(); // Cleanup GSAP context on unmount
+      return () => ctx.revert();
     }
   }, []);
 
-  const manifestoText = "We're not just a place that offers courses and workshops... we're a true partner in the journey of every entrepreneur, idea owner, or anyone ambitious who wants to grow and succeed in the business world.";
+  const manifestoText = t('manifesto');
   const words = manifestoText.split(" ");
 
   return (
@@ -78,7 +65,7 @@ export function WhyChooseUs() {
         {/* GSAP Text Reveal Manifesto Section */}
         <div className={styles.manifestoWrapper} ref={textRef}>
           <div className={styles.labelSection}>
-            <span className={styles.label}>Your Next Step</span>
+            <span className={styles.label}>{t('label')}</span>
           </div>
           <h2 className={styles.manifestoTitle}>
             {words.map((word, index) => (
@@ -87,9 +74,7 @@ export function WhyChooseUs() {
               </span>
             ))}
           </h2>
-          <p className={styles.manifestoSubtitle}>
-            We speak to the <strong>NEXT GENERATION</strong> of professionals. We help you take your business to the <strong>NEXT LEVEL</strong>.
-          </p>
+          <p className={styles.manifestoSubtitle} dangerouslySetInnerHTML={{ __html: t('subtitle') }} />
         </div>
 
         {/* Framer Motion Fade-up Grid for Services */}
@@ -103,7 +88,7 @@ export function WhyChooseUs() {
             hidden: {}
           }}
         >
-          {SERVICES.map((service, index) => {
+          {services.map((service, index) => {
             const Icon = service.icon;
             
             return (

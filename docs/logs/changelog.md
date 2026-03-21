@@ -4,6 +4,578 @@
 
 ---
 
+### [2026-03-20 03:42] - CRM Production Incident Audit (Coolify Logs + Live Endpoint Checks)
+
+**Files updated (this pass):**
+- Documentation:
+  - `docs/logs/changelog.md`
+  - `docs/logs/tasks.md`
+  - `docs/logs/errors.md`
+  - `docs/sessions/2026-03-20-03-42-session-15.md` (new)
+- Inputs audited:
+  - `docs/logs/coolify/postgres-k084o4soc8gscks0o08okgw8-all-logs-2026-03-20-01-31-17.txt`
+  - `docs/logs/coolify/redis-k084o4soc8gscks0o08okgw8-all-logs-2026-03-20-01-31-14.txt`
+  - `docs/logs/coolify/twenty-k084o4soc8gscks0o08okgw8-all-logs-2026-03-20-01-31-06.txt`
+  - `docs/logs/coolify/worker-k084o4soc8gscks0o08okgw8-all-logs-2026-03-20-01-31-21.txt`
+  - `docs/logs/coolify/Variables.md`
+
+**What changed technically:**
+- Performed deep log audit across Postgres, Redis, Twenty app, and worker logs.
+- Verified all four services booted successfully in captured logs:
+  - Postgres: ready on `5432`.
+  - Redis: ready on `6379` (with overcommit warning).
+  - Twenty: migrations completed, app started.
+  - Worker: cron queues processing successfully.
+- Performed live endpoint verification and found infrastructure-level failures:
+  - `https://crm.nextacademyedu.com/healthz` returns `503` with body `no available server`.
+  - TLS certificate served is Traefik default self-signed cert (`CN=TRAEFIK DEFAULT CERT`).
+  - Node HTTPS fetch fails with `DEPTH_ZERO_SELF_SIGNED_CERT`.
+- Flagged security risk: `docs/logs/coolify/Variables.md` currently contains plaintext production secrets and must be rotated/redacted.
+
+**Reason:**
+- User reported CRM issue after completion and provided Coolify logs + variables for root-cause diagnosis.
+
+**Verification commands run:**
+- `curl -k https://crm.nextacademyedu.com/healthz` -> `503 no available server`
+- Node fetch against CRM domain -> `DEPTH_ZERO_SELF_SIGNED_CERT`
+- Raw TLS cert inspection -> `CN=TRAEFIK DEFAULT CERT`
+
+---
+
+### [2026-03-20 00:14] - Twenty CRM Full Lifecycle (Outbox + Cron + Backfill + Hardening)
+
+**Files updated (this pass):**
+- CRM core layer:
+  - `src/lib/crm/types.ts` (new)
+  - `src/lib/crm/utils.ts` (new)
+  - `src/lib/crm/dedupe.ts` (new)
+  - `src/lib/crm/stages.ts` (new)
+  - `src/lib/crm/twenty-client.ts` (new)
+  - `src/lib/crm/mappers.ts` (new)
+  - `src/lib/crm/queue.ts` (new)
+  - `src/lib/crm/processor.ts` (new)
+  - `src/lib/crm/service.ts` (new)
+- New outbox collection:
+  - `src/collections/CrmSyncEvents.ts` (new)
+  - `src/payload.config.ts` (registered in collections list)
+- Lifecycle hooks wired to outbox:
+  - `src/collections/Users.ts`
+  - `src/collections/UserProfiles.ts`
+  - `src/collections/Leads.ts`
+  - `src/collections/Companies.ts`
+  - `src/collections/Bookings.ts`
+  - `src/collections/Payments.ts`
+  - `src/collections/ConsultationBookings.ts` (+ `twentyCrmDealId` field)
+  - `src/collections/BulkSeatAllocations.ts`
+  - `src/collections/Waitlist.ts`
+- Cron processor endpoint:
+  - `src/app/api/cron/crm-sync/route.ts` (new)
+- Backfill tooling:
+  - `scripts/backfill-crm-sync.ts` (new)
+  - `package.json` (`crm:backfill` script)
+- Environment/docs:
+  - `.env.production.template`
+  - `docs/engineering/env-variables.md`
+  - `docs/logs/changelog.md`
+  - `docs/logs/tasks.md`
+  - `docs/sessions/2026-03-20-00-14-session-14.md` (new)
+
+**What changed technically:**
+- Implemented one-way CRM integration from platform to Twenty via reliable outbox (`crm-sync-events`) with dedupe and retry/backoff.
+- Added lifecycle event capture across all required entities and scenarios:
+  - users, profiles/onboarding, leads, companies
+  - bookings, payments, consultation bookings
+  - bulk seat allocations, waitlist transitions
+- Implemented CRM sync cron processor with:
+  - pending/failed processing
+  - dead-letter on max retries
+  - stale processing lock reclaim (`CRM_SYNC_STALE_LOCK_MINUTES`)
+- Added full historical backfill script with dry-run and resumable cursor.
+- Added security hardening for cron endpoint:
+  - fail-closed when `CRON_SECRET` is missing
+  - timing-safe auth comparison
+  - forced dynamic route execution
+- Kept sync best-effort so CRM failures do not block user/business flows.
+
+**Verification:**
+- TypeScript check passed:
+  - `cmd /c node_modules\\.bin\\tsc --noEmit` ✅
+- Build status:
+  - `npm run build` compiled app pages successfully but failed at standalone symlink copy on Windows (`EPERM`) — environment limitation, not app type/runtime logic.
+
+---
+
+### [2026-03-19 23:59] - Backend Closure Pass: Missing B2B/Instructor Endpoints + Contract Compatibility + Scope Hardening
+
+**Files updated (this pass):**
+- New API routes:
+  - `src/app/api/b2b/_scope.ts` (new)
+  - `src/app/api/b2b/dashboard/route.ts` (new)
+  - `src/app/api/b2b/team/route.ts` (new)
+  - `src/app/api/b2b/bookings/route.ts` (new)
+  - `src/app/api/instructor/availability/route.ts` (new)
+- Access + collection contract hardening:
+  - `src/lib/access-control.ts`
+  - `src/collections/ConsultationBookings.ts`
+  - `src/collections/ConsultationTypes.ts`
+  - `src/collections/ConsultationAvailability.ts`
+  - `src/collections/Sessions.ts`
+- Frontend compatibility client update:
+  - `src/lib/instructor-api.ts`
+- Documentation sync:
+  - `docs/logs/changelog.md`
+  - `docs/logs/tasks.md`
+  - `docs/sessions/2026-03-19-23-59-session-13.md` (new)
+
+**What changed technically:**
+- Implemented all missing routes requested by audit:
+  - `/api/b2b/dashboard`
+  - `/api/b2b/team`
+  - `/api/b2b/bookings`
+  - `/api/instructor/availability` (GET/PUT)
+- Added strict B2B company scoping (not role-only) through a shared scope resolver based on `user-profiles.company`.
+- Added instructor contract compatibility columns/hooks (additive):
+  - `consultation-types.title` + `consultation-types.description` (with localized sync/fallback hooks)
+  - `consultation-availability.dayIndex` (numeric compatibility + day mapping hooks)
+  - `sessions.status` + `sessions.attendanceCount` (legacy sync with `isCancelled` / `attendeesCount`)
+- Closed instructor booking access mismatch:
+  - `consultation-bookings` now allows instructor read/update for own records via `instructor` scope.
+- Updated instructor frontend API helper to use the new scoped availability endpoint and better title fallbacks.
+
+**Reason:**
+- User explicitly approved immediate execution of:
+  1. missing endpoints,
+  2. instructor compatibility columns/contracts,
+  3. final B2B/instructor access-scope hardening.
+
+**Verification:** `node .\\node_modules\\typescript\\bin\\tsc --noEmit` ✅
+
+---
+
+### [2026-03-19 23:34] - Full Re-Audit: Remaining Missing APIs/Columns/Tables After Home DB Wiring
+
+**Files updated (this pass):**
+- Re-audit report:
+  - `docs/engineering/full-audit-followup-2026-03-19.md` (new)
+- Documentation sync:
+  - `docs/logs/changelog.md`
+  - `docs/logs/tasks.md`
+  - `docs/sessions/2026-03-19-23-34-session-12.md` (new)
+
+**What was re-audited:**
+- Re-checked all frontend API calls against:
+  - existing `src/app/api/**` custom routes
+  - Payload auto-exposed collection endpoints
+  - collection field contracts used by UI pages/components
+
+**Confirmed still missing / unresolved:**
+- Missing routes still referenced by frontend:
+  - `/api/b2b/dashboard`, `/api/b2b/team`, `/api/b2b/bookings`, `/api/instructor/availability`
+- Remaining schema/DTO mismatches:
+  - consultation types (`title/description` vs `titleAr/titleEn`, `descriptionAr/descriptionEn`)
+  - consultation availability (numeric day index vs weekday string enum)
+  - sessions (`status`/`attendanceCount` expected vs `isCancelled`/`attendeesCount` in schema)
+- Access-control mismatches still present:
+  - instructor booking status update flow vs admin-only update access
+  - B2B role access lacking strict company-level scoping in shared access helper
+- Onboarding company payload mismatch remains (text vs relationship ID).
+
+**Also confirmed complete from prior pass:**
+- Home featured cards + home stats are now DB/API-driven.
+- Added `programs.featuredPriority` and `programs.learnersCount` columns.
+- Upcoming events response shape now matches frontend event DTO.
+
+**Verification:** `node .\\node_modules\\typescript\\bin\\tsc --noEmit` ✅ (no TypeScript errors during re-audit pass).
+
+---
+
+### [2026-03-19 23:19] - Home Data Contracts: DB-Driven Featured Cards + Auto Stats + Upcoming Events DTO Fix
+
+**Files updated (this pass):**
+- Schema (additive columns for card/ordering readiness):
+  - `src/collections/Programs.ts`
+  - Added `featuredPriority` (manual order for featured cards)
+  - Added `learnersCount` (read-only aggregate-ready counter)
+- New home APIs:
+  - `src/app/api/home/stats/route.ts` (new)
+  - `src/app/api/home/featured-programs/route.ts` (new)
+- Home sections wiring:
+  - `src/components/sections/stats.tsx` (migrated from mock to `/api/home/stats`)
+  - `src/components/sections/featured.tsx` (migrated from mock to `/api/home/featured-programs`)
+- Event contract alignment:
+  - `src/app/api/upcoming-events/route.ts`
+  - Normalized API response to the flat event DTO expected by the frontend section component
+- i18n updates:
+  - `src/messages/en.json`
+  - `src/messages/ar.json`
+  - Added featured keys: `subtitle`, `enrolled`, `noRating`
+- Documentation sync:
+  - `docs/logs/changelog.md`
+  - `docs/logs/tasks.md`
+  - `docs/sessions/2026-03-19-23-19-session-11.md` (new)
+
+**What changed technically:**
+- Featured cards now pull real data from DB-backed collections (`programs`, `rounds`, `reviews`) via a normalized API.
+- Card fields now come dynamically from DB context:
+  - title, type, category, instructor, schedule/date, price/currency, image
+  - enrolled count (from rounds enrollments)
+  - rating and rating count (approved reviews with fallback to program aggregates)
+- Stats section now computes numbers from DB (no mock constants):
+  - professionals (confirmed/completed bookings)
+  - corporate partners (companies)
+  - active instructors
+  - completion rate
+- Upcoming events route now returns the frontend-expected flat event shape (`titleAr/titleEn/startDate/...`) to remove UI/API mismatch.
+
+**Reason:**
+- User requested that variable UI data (especially card content and stats) must come from database truth, with additive schema evolution and no table deletion.
+
+**Verification:** `node .\\node_modules\\typescript\\bin\\tsc --noEmit` ✅
+
+---
+
+### [2026-03-19 23:00] - Frontend vs DB Deep Contract Audit (Additive Backend Alignment)
+
+**Files updated (this pass):**
+- Audit documentation:
+  - `docs/engineering/frontend-db-contract-audit-2026-03-19.md` (new)
+- Documentation sync:
+  - `docs/logs/changelog.md`
+  - `docs/logs/tasks.md`
+  - `docs/sessions/2026-03-19-22-52-session-10.md` (new)
+
+**What was verified:**
+- Home page data sources were mapped section-by-section:
+  - Confirmed most hero/home marketing blocks are static/mock data.
+  - Confirmed upcoming events is DB/API-backed but with response-shape mismatch.
+- Public pages were traced to Payload collections:
+  - `/courses`, `/events`, `/webinars`, `/instructors`, `/programs/[slug]`, `/blog`, `/certificates` are DB-backed.
+  - `/workshops`, `/faq`, `/for-business` remain static content.
+- Dashboard/instructor/B2B data flows were audited against API route availability and access control.
+
+**Critical contract gaps identified:**
+- Missing custom endpoints expected by frontend:
+  - `/api/b2b/dashboard`, `/api/b2b/team`, `/api/b2b/bookings`, `/api/instructor/availability`
+- Field/schema mismatches:
+  - upcoming events flat card DTO vs nested `{ program, round }` API response
+  - consultation types UI expects `title/description` while schema uses `titleAr/titleEn` and `descriptionAr/descriptionEn`
+  - instructor availability UI uses numeric day index while schema uses string weekday enum
+  - instructor sessions UI expects `status` + `attendanceCount` while schema has `isCancelled` + `attendeesCount`
+  - onboarding sends `company` as text while profile schema expects `companies` relationship ID
+- Access mismatches:
+  - instructor consultation booking status update path exists in UI but collection update is admin-only
+  - B2B manager read access is role-based without explicit company-level scoping
+
+**Decision (per user direction):**
+- Adopt additive-only backend alignment (no table drops/deletions).
+- Prioritize compatibility endpoints + response adapters first, then optional additive fields for long-term contract stability.
+
+**Verification:** Deep code-path audit completed; no runtime/build command executed in this documentation-only pass.
+
+---
+
+### [2026-03-19 22:49] - Account Entry Fix in Navbar (Role-Aware Profile Access + User Avatar)
+
+**Files updated (this pass):**
+- Navbar account access behavior:
+  - `src/components/layout/navbar.tsx`
+  - Added explicit logged-in account entry (desktop + mobile) with role-aware destination:
+    - `user` → `/${locale}/dashboard/profile`
+    - `instructor` → `/${locale}/instructor`
+    - `b2b_manager` → `/${locale}/b2b-dashboard`
+    - `admin` → `/admin`
+  - Replaced ambiguous text-only account action with clearer account button containing avatar + name
+- Navbar account visual:
+  - `src/components/layout/navbar.module.css`
+  - Added avatar image style with safe fallback to first-name initial
+- Auth user payload for avatar rendering:
+  - `src/lib/auth-api.ts`
+  - Updated `/api/users/me` fetch to `?depth=1` to reliably receive populated media object for `picture`
+  - Broadened `UserData.picture` type to handle populated/non-populated relation formats safely
+- Role redirect helper hardening:
+  - `src/lib/role-redirect.ts`
+  - Ensured admin route resolves to `/admin` without locale prefix
+
+**Reason:** User reported that logged-in users had no clear profile/account entry point in navbar, especially across roles, and requested real profile picture support instead of text-only access.
+
+**Verification:** `node .\\node_modules\\typescript\\bin\\tsc --noEmit` ✅
+
+---
+
+### [2026-03-19 22:45] - Mobile Bottom Bar Redesign (B2B + User + Instructor Portals)
+
+**Files updated (this pass):**
+- Dashboard portal bottom bar redesign:
+  - `src/components/dashboard/DashboardLayout.tsx`
+  - `src/components/dashboard/dashboard.module.css`
+- Instructor portal bottom bar redesign:
+  - `src/components/instructor/InstructorLayout.tsx`
+  - `src/components/instructor/instructor.module.css`
+- B2B portal bottom bar redesign:
+  - `src/components/b2b/B2BLayout.tsx`
+  - `src/components/b2b/b2b-layout.module.css`
+
+**What changed:**
+- Converted mobile bottom bars to rounded pill containers inspired by the provided reference.
+- Added elevated active icon bubble (floating circular active state).
+- Kept project icon set (Lucide) and applied project brand tokens/colors.
+- Hid text labels visually on mobile while keeping accessibility labels (`aria-label`).
+- Updated mobile safe-area spacing and floating back button offset to avoid overlap with the new bars.
+
+**Reason:** User requested a bottom navigation style update across B2B profile, user profile/dashboard, and instructor portal to match the shared visual reference while preserving brand identity.
+
+**Verification:** `npx tsc --noEmit` ✅
+
+---
+
+### [2026-03-19 22:35] - Portal UX/Responsive Pass: B2B Layout + User Profile + Instructor Portal
+
+**Files updated (this pass):**
+- `next.config.ts`
+  - Added `next/image` localhost patterns for Payload media in dev:
+    - `http://localhost:3000/api/media/**`
+    - `http://127.0.0.1:3000/api/media/**`
+- B2B portal shell redesign:
+  - `src/components/b2b/B2BLayout.tsx`
+  - `src/components/b2b/b2b-layout.module.css` (new)
+  - Added responsive desktop/mobile structure (sidebar, topbar, bottom nav, back-to-site CTA)
+- User dashboard shell/mobile nav polish:
+  - `src/components/dashboard/DashboardLayout.tsx`
+  - `src/components/dashboard/dashboard.module.css`
+- Instructor portal shell/mobile nav decongestion:
+  - `src/components/instructor/InstructorLayout.tsx`
+  - `src/components/instructor/instructor.module.css`
+  - Replaced cramped mobile nav behavior with horizontal scrollable nav items
+- User profile page redesign:
+  - `src/app/[locale]/(dashboard)/dashboard/profile/page.tsx`
+  - `src/app/[locale]/(dashboard)/dashboard/profile/profile.module.css`
+  - Reworked tabs/forms/toasts/cards into cleaner token-based styling and better mobile behavior
+- B2B dashboard pages responsive + visual consistency pass:
+  - `src/app/[locale]/(b2b)/b2b-dashboard/page.tsx`
+  - `src/app/[locale]/(b2b)/b2b-dashboard/bookings/page.tsx`
+  - `src/app/[locale]/(b2b)/b2b-dashboard/team/page.tsx`
+  - `src/app/[locale]/(b2b)/b2b-dashboard/bulk-seats/page.tsx`
+- Instructor portal pages responsive + palette consistency pass:
+  - `src/app/[locale]/(instructor)/instructor/page.tsx`
+  - `src/app/[locale]/(instructor)/instructor/sessions/page.tsx`
+  - `src/app/[locale]/(instructor)/instructor/bookings/page.tsx`
+  - `src/app/[locale]/(instructor)/instructor/availability/page.tsx`
+  - `src/app/[locale]/(instructor)/instructor/consultation-types/page.tsx`
+  - `src/app/[locale]/(instructor)/instructor/earnings/page.tsx`
+- User dashboard overview consistency update:
+  - `src/app/[locale]/(dashboard)/dashboard/page.tsx`
+  - Updated CTA link to `/courses` and aligned colors with core palette
+
+**Reason:** User requested targeted UI cleanup and responsiveness for B2B profile/dashboard, user profile, and instructor portal sections while preserving backend integrations.
+
+**Verification:** `npx tsc --noEmit` ✅
+
+---
+
+### [2026-03-19 22:35] - Popup Targeting Expansion + Offer-Dark Preset + Navbar Theme Toggle + Global Spacing Fix
+
+**Files updated (this pass):**
+- Popup admin schema expansion:
+  - `src/collections/Popups.ts`
+  - Added advanced targeting controls (`visitorCondition`, `purchaseCondition`, `emailCaptureCondition`, `minSessionPageViews`)
+  - Added design preset fields for promotional style (`stylePreset`, badge/subtitle/legal note, background image/overlay, border/badge colors)
+- Popup runtime + eligibility logic:
+  - `src/app/api/popups/active/route.ts`
+  - `src/components/marketing/popup-manager.tsx`
+  - `src/components/marketing/popup-modal.tsx`
+  - `src/components/marketing/popup-modal.module.css`
+  - Fixed API response parsing mismatch in popup manager (`data.popups`)
+  - Added context-aware filtering (first visit, email captured flag, session page views, purchased vs non-purchased users)
+  - Added `offer_dark` visual preset to match provided promotional modal direction
+- App-wide popup mounting:
+  - `src/app/[locale]/layout.tsx`
+  - `src/app/[locale]/page.tsx`
+  - Moved popup manager to locale layout so targeting runs across all public pages, not homepage-only
+- Navbar desktop utility fix:
+  - `src/components/layout/navbar.tsx`
+  - Restored desktop light/dark toggle visibility by rendering `ThemeToggle` in desktop actions
+- Global spacing reset fix:
+  - `src/app/globals.css`
+  - Removed browser default body/html margin/padding for frontend scope to eliminate unwanted outer gaps
+- Documentation sync:
+  - `docs/logs/changelog.md`
+  - `docs/logs/tasks.md`
+  - `docs/sessions/2026-03-19-22-35-session-6.md`
+
+**Reason:** User requested stronger admin-controlled popup conditions/design (including first-visit and no-purchase targeting), promo-modal styling closer to provided examples, missing desktop theme-toggle in navbar, and removal of global extra page spacing.
+
+**Verification:** `node .\\node_modules\\typescript\\bin\\tsc --noEmit` ✅
+
+---
+
+### [2026-03-19 22:37] - Home Hero Cleanup: Removed KPI Metrics Strip
+
+**Files updated (this pass):**
+- Hero metrics removal:
+  - `src/components/sections/hero.tsx` (removed `300+ / 80K+ / 4.8` metric cards block)
+  - `src/components/sections/hero.module.css` (removed unused `.metrics/.metric` styles)
+- Documentation sync:
+  - `docs/logs/changelog.md`
+  - `docs/logs/tasks.md`
+  - `docs/sessions/2026-03-19-22-37-session-7.md`
+
+**Reason:** User requested removing duplicate KPI cards from home hero because a dedicated stats section already exists.
+
+**Verification:** Not run (`tsc/build` not executed in this pass).
+
+---
+
+### [2026-03-19 22:03] - Courses Naming Alignment + Instructors/Profile Redesign + Full Events/Webinars Pages
+
+**Files updated (this pass):**
+- Brand color re-alignment to core palette:
+  - `src/app/globals.css` (`#c51b1b`, `#f1f6f1`, `#d6a32b`, `#020504` as base tokens)
+- Courses/Programs unification:
+  - `src/app/[locale]/courses/page.tsx` (new dynamic catalog page from real Payload data)
+  - `src/app/[locale]/courses/page.module.css` (new)
+  - `src/app/[locale]/programs/page.tsx` (alias to `/courses` page implementation)
+- Navbar/links cleanup (remove Courses/Programs duplication in primary nav):
+  - `src/components/layout/navbar.tsx`
+  - `src/components/layout/footer.tsx`
+  - `src/components/sections/hero.tsx`
+  - `src/components/sections/featured.tsx`
+  - `src/components/sections/about-cta.tsx`
+  - `src/components/pages/catalog-page.tsx`
+- Instructors listing redesign with real stats:
+  - `src/app/[locale]/instructors/page.tsx`
+  - `src/app/[locale]/instructors/page.module.css`
+- Instructor profile redesign (almentor-style structure adapted to project data):
+  - `src/app/[locale]/instructors/[slug]/page.tsx`
+  - `src/app/[locale]/instructors/[slug]/page.module.css`
+  - Added profile metrics, programs/workshops section, and available booking types from DB-backed consultation types/slots
+- Full page rebuilds for webinars/events:
+  - `src/app/[locale]/events/page.tsx`
+  - `src/app/[locale]/events/page.module.css`
+  - `src/app/[locale]/webinars/page.tsx`
+  - `src/app/[locale]/webinars/page.module.css`
+  - Added upcoming + archive + media/gallery sections
+
+**Reason:** User requested strict return to core brand colors, better structure for `/programs`, stronger `/instructors` and mentor profile experience, removal of Courses/Programs nav duplication, and full-featured `/events` + `/webinars` pages.
+
+**Verification:** `npx tsc --noEmit` ✅
+
+---
+
+### [2026-03-19 21:25] - Visual Consistency Pass: Remaining Pages + Section Background System
+
+**Files updated (this pass):**
+- Global design tokens + button baseline states:
+  - `src/app/globals.css`
+- Home sections contrast/background pass:
+  - `src/components/sections/featured.module.css`
+  - `src/components/sections/instructors-preview.module.css`
+  - `src/components/sections/blogs-preview.module.css`
+  - `src/components/sections/upcoming-events.module.css`
+  - `src/components/sections/video-testimonials.module.css`
+  - `src/components/sections/b2b-trusted.module.css`
+- About sections background alternation:
+  - `src/components/sections/about-story.module.css`
+  - `src/components/sections/about-values.module.css`
+  - `src/components/sections/about-team.module.css`
+  - `src/components/sections/about-partners.module.css`
+  - `src/components/sections/about-timeline.module.css`
+  - `src/components/sections/about-cta.module.css`
+- Remaining pages background/style alignment:
+  - `src/app/[locale]/about/page.module.css`
+  - `src/app/[locale]/blog/page.module.css`
+  - `src/app/[locale]/contact/page.module.css`
+  - `src/app/[locale]/programs/page.module.css`
+  - `src/app/[locale]/programs/[slug]/page.module.css`
+  - `src/app/[locale]/instructors/page.module.css`
+  - `src/app/[locale]/instructors/[slug]/page.module.css`
+  - `src/app/[locale]/privacy/page.module.css`
+  - `src/app/[locale]/terms/page.module.css`
+  - `src/app/[locale]/refund-policy/page.module.css`
+  - `src/components/pages/catalog-page.module.css`
+- Navbar/mobile menu polish:
+  - `src/components/layout/navbar.module.css`
+- Minor UI consistency:
+  - `src/components/layout/announcement-bar.module.css`
+  - `src/components/layout/sidebar.module.css`
+  - `src/components/search/global-search.module.css`
+- CTA route fix:
+  - `src/components/sections/hero.tsx` (`/b2b-dashboard` → `/for-business`)
+
+**Reason:** User requested redesign completion for remaining pages/sections and a full revisit of section backgrounds because the previous gray tone felt heavy.
+
+**Verification:** `npx tsc --noEmit` ✅
+
+---
+
+### [2026-03-19 21:03] - Navigation Completion Pass: Missing Pages + Navbar Decongestion
+
+**Files updated (this pass):**
+- Navbar cleanup:
+  - `src/components/layout/navbar.tsx`
+  - `src/components/layout/navbar.module.css`
+- Button visibility fix:
+  - `src/app/globals.css` (removed global button reset that overrode component button backgrounds)
+- New route pages to match navbar:
+  - `src/app/[locale]/courses/page.tsx`
+  - `src/app/[locale]/workshops/page.tsx`
+  - `src/app/[locale]/events/page.tsx`
+  - `src/app/[locale]/webinars/page.tsx`
+  - `src/app/[locale]/faq/page.tsx`
+  - `src/app/[locale]/faq/page.module.css`
+  - `src/app/[locale]/for-business/page.tsx`
+  - `src/app/[locale]/for-business/page.module.css`
+- Shared reusable catalog UI:
+  - `src/components/pages/catalog-page.tsx`
+  - `src/components/pages/catalog-page.module.css`
+- Home contrast tuning:
+  - `src/components/sections/why-choose-us.module.css`
+  - `src/components/sections/video-testimonials.module.css`
+
+**Reason:** User feedback indicated navbar crowding, missing linked pages, and normal-state buttons appearing transparent.
+
+**Verification:** `npx tsc --noEmit` ✅
+
+---
+
+### [2026-03-19 20:50] - Home UI Refactor: Navbar + Hero + Featured + Contrast Pass
+
+**Files updated (core):**
+- `src/components/layout/navbar.tsx` — full navigation rewrite (desktop mega menu + clean mobile drawer + de-duplicated auth/CTA)
+- `src/components/layout/navbar.module.css` — new responsive layout/styling and dropdown/drawer interactions
+- `src/components/sections/hero.tsx` — full-bleed hero with image, overlay, CTA links, KPI strip
+- `src/components/sections/hero.module.css` — hero visual system (overlay, grain, responsive behavior)
+- `src/components/sections/featured.tsx` — rebuilt course cards to match Figma direction (badge/meta/price/book CTA)
+- `src/components/sections/featured.module.css` — card and carousel visual rewrite
+- `src/components/ui/button.module.css` + `src/app/globals.css` — button token alignment to dark/light Figma states (fixed ghost visibility issue)
+- Home section contrast tuning:
+  - `src/components/sections/stats.module.css`
+  - `src/components/sections/upcoming-events.module.css`
+  - `src/components/sections/instructors-preview.module.css`
+  - `src/components/sections/b2b-trusted.module.css`
+  - `src/components/sections/blogs-preview.module.css`
+  - `src/components/sections/text-testimonials.module.css`
+- i18n additions for nav labels:
+  - `src/messages/en.json`
+  - `src/messages/ar.json`
+
+**Reason:** Navbar had structural duplication/UX issues, mobile menu was weak, hero was placeholder-like instead of full-bleed, ghost buttons lacked visible default state, and home sections had low visual contrast.
+
+**Verification:** `npx tsc --noEmit` ✅ (no TypeScript errors).
+
+---
+
+### [2026-03-19 13:10] - Dark/Light Mode CSS Token Audit
+
+**Files audited:**
+- All `.module.css` files across the project
+- `globals.css` — confirmed `--input-bg`, `--input-bg-hover`, `--input-bg-active`, `--overlay-bg` tokens present
+
+**Result:** Every CSS module file already uses design tokens (`var(--xxx)`) with proper fallbacks. No hardcoded rgba/hex values found that would break dark/light mode contrast. Auth pages (login, onboarding, verify-email) were already fixed in the prior WCAG session.
+
+**Build status:** ✅ Compilation + TypeScript pass. ⚠️ Pre-existing page data error for missing `/register` and `/reset-password` routes (unrelated to CSS).
+
+---
+
 ### [2026-03-19 12:35] - RTL CSS Fixes (Arabic Default Language)
 
 **Files:**

@@ -1,9 +1,21 @@
 {
   "Nav": {
+    "courses": "الدورات",
+    "allCourses": "كل الدورات",
+    "quickAccess": "روابط سريعة",
     "programs": "البرامج",
+    "workshops": "ورش العمل",
+    "events": "الفعاليات",
+    "webinars": "الندوات",
     "instructors": "المدربون",
+    "forBusiness": "للشركات",
+    "forTeams": "حلول الفرق",
+    "more": "المزيد",
     "blog": "المدونة",
     "about": "من نحن",
+    "faq": "الأسئلة الشائعة",
+    "contact": "تواصل معنا",
+    "search": "بحث",
     "login": "تسجيل الدخول",
     "register": "إنشاء حساب",
     "logout": "تسجيل الخروج",
@@ -47,8 +59,11 @@
   },
   "Featured": {
     "title": "البرامج المميزة",
+    "subtitle": "مزيج مختار من الدورات وورش العمل والمسارات المهنية الأعلى طلبًا.",
     "viewAll": "عرض جميع البرامج",
     "instructor": "المدرب",
+    "enrolled": "مسجل",
+    "noRating": "بدون تقييم",
     "date": "التاريخ",
     "bookNow": "احجز الآن"
   },
@@ -105,7 +120,6 @@
     "forgotPassword": "نسيت كلمة المرور؟",
     "noAccount": "ليس لديك حساب؟",
     "hasAccount": "لديك حساب بالفعل؟",
-
     "loginTitle": "مرحباً بعودتك!",
     "loginSubtitle": "نمكّن المحترفين والفرق التقنية من التعلّم والتنفيذ والتوسّع باستخدام أفضل أدلة العمل.",
     "signIn": "تسجيل الدخول",
@@ -115,7 +129,6 @@
     "or": "أو",
     "fillAllFields": "يرجى ملء جميع الحقول.",
     "invalidCredentials": "البريد الإلكتروني أو كلمة المرور غير صحيحة.",
-
     "firstName": "الاسم الأول",
     "firstNamePlaceholder": "أحمد",
     "lastName": "اسم العائلة",
@@ -131,13 +144,11 @@
     "registrationFailed": "فشل التسجيل.",
     "emailAlreadyExists": "يوجد حساب بهذا البريد الإلكتروني بالفعل. جرّب تسجيل الدخول بدلاً من ذلك.",
     "agreeTerms": "أوافق على الشروط والأحكام وسياسة الخصوصية",
-
     "pwdReqLength": "8 أحرف على الأقل",
     "pwdReqUpper": "حرف كبير واحد",
     "pwdReqLower": "حرف صغير واحد",
     "pwdReqNumber": "رقم واحد",
     "pwdReqSpecial": "رمز خاص واحد",
-
     "forgotPasswordTitle": "نسيت كلمة المرور",
     "forgotPasswordSubtitle": "أدخل بريدك الإلكتروني وسنرسل لك رابط إعادة التعيين",
     "sendResetLink": "إرسال رابط إعادة التعيين",
@@ -145,7 +156,6 @@
     "forgotPasswordSuccess": "إذا كان هناك حساب مرتبط بهذا البريد، ستتلقى رابط إعادة تعيين كلمة المرور قريباً.",
     "backToLogin": "العودة لتسجيل الدخول",
     "forgotPasswordError": "حدث خطأ. يرجى المحاولة مرة أخرى.",
-
     "resetPasswordTitle": "إعادة تعيين كلمة المرور",
     "resetPasswordSubtitle": "أدخل كلمة المرور الجديدة أدناه",
     "newPassword": "كلمة المرور الجديدة",
@@ -158,11 +168,9 @@
     "passwordsMustMatch": "كلمتا المرور غير متطابقتين",
     "invalidResetToken": "رابط إعادة التعيين غير صالح أو منتهي الصلاحية. يرجى طلب إعادة تعيين جديدة.",
     "resetFailed": "فشل إعادة التعيين. يرجى المحاولة مرة أخرى.",
-
     "checkEmail": "تحقق من بريدك الإلكتروني",
     "resetLinkSent": "أرسلنا رابط إعادة تعيين كلمة المرور إلى {email}. تحقق من بريدك الوارد واتبع الرابط لإعادة تعيين كلمة المرور.",
     "enterEmailError": "يُرجى إدخال عنوان البريد الإلكتروني.",
-
     "checkYourEmail": "تحقق من بريدك",
     "sentCodeTo": "أرسلنا رمزاً مكوناً من 6 أرقام إلى",
     "verifyEmailTitle": "تحقق من بريدك الإلكتروني",
@@ -178,7 +186,6 @@
     "emailMissing": "عنوان البريد الإلكتروني مفقود. يرجى العودة والمحاولة مرة أخرى.",
     "invalidCode": "رمز غير صالح. يرجى المحاولة مرة أخرى.",
     "resendFailed": "فشل إعادة إرسال الرمز. يرجى المحاولة مرة أخرى.",
-
     "onboardingTitle": "أكمل ملفك الشخصي",
     "onboardingSubtitle": "ساعدنا في تخصيص تجربة التعلم لك",
     "stepLabel": "الخطوة {current} من {total}: {name}",
@@ -191,7 +198,6 @@
     "saving": "جاري الحفظ...",
     "skipForNow": "تخطي الآن",
     "somethingWentWrong": "حدث خطأ ما. يرجى المحاولة مرة أخرى.",
-
     "titleLabel": "اللقب",
     "selectTitle": "اختر اللقب...",
     "experienceLabel": "الخبرة",
@@ -209,7 +215,6 @@
     "fieldHR": "الموارد البشرية",
     "fieldLegal": "القانون",
     "fieldOther": "أخرى",
-
     "companyName": "اسم الشركة",
     "companyPlaceholder": "مثال: شركة أكمي",
     "companySize": "حجم الشركة",
@@ -226,7 +231,6 @@
     "countryPlaceholder": "مثال: المملكة العربية السعودية",
     "city": "المدينة",
     "cityPlaceholder": "مثال: الرياض",
-
     "interests": "الاهتمامات",
     "noTagsAvailable": "لا توجد علامات متاحة بعد",
     "learningGoalsLabel": "أهداف التعلم",

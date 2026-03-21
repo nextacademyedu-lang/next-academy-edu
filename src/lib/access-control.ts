@@ -87,11 +87,77 @@ export const isAdminOrOwnInstructor: Access = ({ req: { user } }) => {
   return false;
 };
 
-// B2B Manager can read records for users in same company
-export const isAdminOrB2BManager: Access = ({ req: { user } }) => {
+// User can read own records (by user field), instructor can read own records (by instructor field), admin can read all
+export const isAdminOrOwnerOrOwnInstructor: Access = ({ req: { user } }) => {
   if (!user) return false;
   if (user.role === 'admin') return true;
-  return user.role === 'b2b_manager';
+
+  if (user.role === 'instructor' && user.instructorId) {
+    const instructorId =
+      typeof user.instructorId === 'object' ? user.instructorId.id : user.instructorId;
+    const clause: Record<string, { equals: unknown }> = {
+      instructor: { equals: instructorId },
+    };
+    return clause;
+  }
+
+  const clause: Record<string, { equals: unknown }> = {
+    user: { equals: user.id },
+  };
+  return clause;
+};
+
+// Instructor can update own records (matched by instructor field), admin can update all
+export const isAdminOrOwnInstructorForUpdate: Access = ({ req: { user } }) => {
+  if (!user) return false;
+  if (user.role === 'admin') return true;
+
+  if (user.role === 'instructor' && user.instructorId) {
+    const instructorId =
+      typeof user.instructorId === 'object' ? user.instructorId.id : user.instructorId;
+    return {
+      instructor: {
+        equals: instructorId,
+      },
+    };
+  }
+
+  return false;
+};
+
+// B2B Manager can read records for users in same company
+export const isAdminOrB2BManager: Access = async ({ req }) => {
+  const { user, payload } = req;
+  if (!user) return false;
+  if (user.role === 'admin') return true;
+
+  if (user.role !== 'b2b_manager') return false;
+
+  const profileResult = await payload.find({
+    collection: 'user-profiles',
+    where: { user: { equals: user.id } },
+    depth: 0,
+    limit: 1,
+    overrideAccess: true,
+  });
+
+  const profile = profileResult.docs[0] as { company?: unknown } | undefined;
+  const companyId =
+    typeof profile?.company === 'object' && profile?.company && 'id' in profile.company
+      ? Number((profile.company as { id?: unknown }).id)
+      : typeof profile?.company === 'number'
+        ? profile.company
+        : typeof profile?.company === 'string'
+          ? Number(profile.company)
+          : null;
+
+  if (!companyId || !Number.isFinite(companyId)) return false;
+
+  return {
+    company: {
+      equals: companyId,
+    },
+  };
 };
 
 // Field-level: Admin only

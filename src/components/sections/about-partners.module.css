@@ -1,7 +1,9 @@
 .section {
   width: 100%;
   padding: 80px 0;
-  background: var(--bg-primary, #020504);
+  background:
+    radial-gradient(circle at 84% 18%, var(--accent-gold-10), transparent 36%),
+    linear-gradient(180deg, var(--bg-surface-2) 0%, var(--bg-main) 100%);
   position: relative;
   overflow: hidden;
 }
@@ -63,7 +65,7 @@
 }
 
 .partnerChip:hover {
-  border-color: rgba(212, 175, 55, 0.2);
+  border-color: var(--accent-gold-20);
 }
 
 .partnerName {

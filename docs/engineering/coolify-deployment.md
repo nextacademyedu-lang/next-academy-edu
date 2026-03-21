@@ -26,6 +26,8 @@
 9. The `Environment Variables` file in the repo root is a REFERENCE for Coolify config.
    Do NOT commit it with real secrets to git.
 10. Port 3001 is the internal app port. Nginx proxies to it. Never expose 3001 publicly.
+11. Do NOT rely on `env_file` for Coolify deployments; map runtime env vars explicitly.
+12. Do NOT pass production secrets as Docker build args.
 ```
 
 ---
@@ -79,6 +81,8 @@ Internet
 | `certbot`       | certbot/certbot      | —       | certs                   | —                |
 | `twenty-server` | twentycrm/twenty     | 3000    | `twenty_local_data`     | postgres, redis  |
 | `twenty-worker` | twentycrm/twenty     | —       | `twenty_local_data`     | twenty-server    |
+
+> In Coolify, keep `nginx` under the optional `edge` profile disabled (Coolify/Traefik handles public ingress and TLS).
 
 ---
 
@@ -225,7 +229,9 @@ File: `nginx/nginx.conf`
 3. In Coolify dashboard:
    a. Create new service → Docker Compose
    b. Set all environment variables (§3 above, incl. Twenty CRM vars)
-   c. Deploy
+   c. Validate env set from terminal:
+      `npm run check:env`
+   d. Deploy
 4. Wait for build + healthcheck pass
 5. If DB already has data (existing pgdata volume):
    a. SSH into VPS

@@ -1,576 +1,524 @@
-# Next Academy — Corporate Design System (Almentor Reference)
+---
+description: 
+---
+
+
+# Next Academy — Visual Design System (Figma-Aligned)
 
 ## Overview
 
-This design system is strictly designed to give a premium, solid, and highly professional **Corporate Dark Mode** aesthetic, directly inspired by the Almentor reference provided. It abandons flashy neon gradients in favor of strong typography, stark contrasts, and strict grid alignments.
+This design system defines a clean, premium, education-focused visual language for Next Academy, aligned to the latest Figma direction.
+It supports both **dark mode** and **light mode**, uses semantic design tokens, and keeps accessibility, RTL, and i18n requirements as first-class rules.
 
-## 1. Color Palette (Corporate Dark)
+The visual direction is:
 
-```css
-:root {
-  /* Dark Backgrounds */
-  --bg-main: #020504; /* Deep black/dark green for main background */
-  --bg-surface: #111111; /* Slightly lighter for cards (or use a slight variation of main) */
-  --bg-surface-hover: #1a1a1a; /* Interactive state for cards */
+- Compact and polished, not bulky
+- Strong red brand accent
+- Flat, clean surfaces with subtle borders
+- Readable cards and buttons in both themes
+- Minimal shadows, minimal visual noise
+- RTL-first for Arabic, with English fully supported
 
-  /* Brand/Action Colors */
-  --brand-primary: #c51b1b; /* User red for Primary CTAs */
-  --brand-primary-hover: #a01515; /* Darker red on hover */
+---
 
-  --brand-gold: #d6a32b; /* User gold for highlights/premium indicators */
-
-  /* Text Colors */
-  --text-primary: #f1f6f1; /* User cream/off-white for headings and main text */
-  --text-secondary: #c5c5c5; /* User gray for subtitles, duration, tags */
-  --text-muted: #888888; /* Darker gray for disabled or tertiary text */
-
-  /* Borders */
-  --border-subtle: rgba(197, 197, 197, 0.2); /* Using the gray with opacity */
-}
-```
-
-## 2. Typography System (RTL / Arabic Support)
+## 1. Theme Tokens
 
 ```css
 :root {
-  /* Fonts */
-  /* Cairo or Tajawal are heavy, corporate-friendly Arabic fonts */
-  --font-family-primary: "Cairo", "Inter", -apple-system, sans-serif;
+  /* Brand */
+  --brand-primary: #c81d25;
+  --brand-primary-hover: #a9151c;
+  --brand-primary-soft: rgba(200, 29, 37, 0.10);
 
-  /* Scale */
-  --text-h1: clamp(40px, 5vw, 64px); /* Massive Hero */
-  --text-h2: clamp(28px, 3vw, 40px); /* Section Titles */
-  --text-h3: clamp(20px, 2.5vw, 24px); /* Card Titles */
-  --text-body-lg: 18px; /* Hero Subtitle */
-  --text-body: 16px; /* Standard readable text */
-  --text-small: 14px; /* Meta data (author, time) */
+  /* Typography */
+  --font-family-ar: "Cairo", "Inter", system-ui, sans-serif;
+  --font-family-en: "Montserrat", "Inter", system-ui, sans-serif;
 
-  /* Weights */
+  --text-h1: clamp(36px, 4vw, 56px);
+  --text-h2: clamp(26px, 3vw, 36px);
+  --text-h3: 20px;
+  --text-body-lg: 18px;
+  --text-body: 16px;
+  --text-small: 14px;
+  --text-xs: 12px;
+
   --font-regular: 400;
-  --font-medium: 600;
-  --font-bold: 800; /* Prominent bolding for Almentor style titles */
+  --font-medium: 500;
+  --font-semibold: 600;
+  --font-bold: 700;
+
+  /* Radius */
+  --radius-xs: 6px;
+  --radius-sm: 8px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-pill: 999px;
+
+  /* Spacing */
+  --space-2xs: 4px;
+  --space-xs: 8px;
+  --space-sm: 12px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+
+  /* Motion */
+  --duration-fast: 160ms;
+  --duration-normal: 220ms;
+  --ease-default: cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Z-index */
+  --z-dropdown: 100;
+  --z-sticky: 200;
+  --z-modal-overlay: 500;
+  --z-modal: 600;
+  --z-toast: 800;
 }
 ```
 
-## 3. UI Components
+### Dark Theme
 
-### Corporate Button (Primary)
+```css
+html[data-theme="dark"] {
+  --bg-main: #1f1f1f;
+  --bg-surface: #0f0f10;
+  --bg-surface-2: #171718;
+  --bg-surface-hover: #202022;
+
+  --text-primary: #f7f7f7;
+  --text-secondary: #d7d7d7;
+  --text-muted: #a7a7a7;
+
+  --border-subtle: rgba(255, 255, 255, 0.12);
+  --border-strong: rgba(255, 255, 255, 0.24);
+
+  --button-secondary-bg: #f5f5f2;
+  --button-secondary-text: #1a1a1a;
+  --button-secondary-hover: #e9e9e4;
+
+  --card-bg: #101010;
+  --card-text: #f5f5f5;
+  --card-meta: #cfcfcf;
+  --chip-bg: rgba(0, 0, 0, 0.55);
+  --chip-text: #ffffff;
+
+  --icon-surface: rgba(255, 255, 255, 0.10);
+  --icon-stroke: #ffffff;
+}
+```
+
+### Light Theme
+
+```css
+html[data-theme="light"] {
+  --bg-main: #f3f3ef;
+  --bg-surface: #ffffff;
+  --bg-surface-2: #faf9f6;
+  --bg-surface-hover: #f5f4f1;
+
+  --text-primary: #171717;
+  --text-secondary: #4f4f4f;
+  --text-muted: #767676;
+
+  --border-subtle: rgba(0, 0, 0, 0.10);
+  --border-strong: rgba(0, 0, 0, 0.18);
+
+  --button-secondary-bg: #181818;
+  --button-secondary-text: #ffffff;
+  --button-secondary-hover: #2a2a2a;
+
+  --card-bg: #ffffff;
+  --card-text: #181818;
+  --card-meta: #5d5d5d;
+  --chip-bg: rgba(25, 25, 25, 0.88);
+  --chip-text: #ffffff;
+
+  --icon-surface: rgba(255, 255, 255, 0.92);
+  --icon-stroke: #1b1b1b;
+}
+```
+
+---
+
+## 2. Typography
+
+```css
+html[lang="ar"] body {
+  font-family: var(--font-family-ar);
+}
+
+html[lang="en"] body {
+  font-family: var(--font-family-en);
+}
+
+body {
+  background: var(--bg-main);
+  color: var(--text-primary);
+  font-size: var(--text-body);
+  line-height: 1.5;
+}
+```
+
+Rules:
+
+- Arabic is RTL by default
+- English is LTR
+- Use `text-align: start`
+- Use logical CSS properties only
+- Keep small metadata at 12px–14px only when contrast stays compliant
+
+---
+
+## 3. Buttons
+
+### Primary Button
 
 ```css
 .btn-primary {
-  background-color: var(--brand-primary);
-  color: #ffffff;
-  border-radius: 4px; /* Sharp, professional corners instead of pills */
-  padding: 12px 32px;
-  font-weight: 800;
-  font-size: var(--text-body);
+  height: 36px;
+  padding: 0 16px;
   border: none;
-  transition: background-color 0.2s ease;
+  border-radius: var(--radius-sm);
+  background: var(--brand-primary);
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: var(--font-semibold);
+  line-height: 1;
   cursor: pointer;
+  transition:
+    background var(--duration-fast) var(--ease-default),
+    transform var(--duration-fast) var(--ease-default);
 }
 
-.btn-primary:hover {
-  background-color: var(--brand-primary-hover);
+.btn-primary:hover:not(:disabled) {
+  background: var(--brand-primary-hover);
+}
+
+.btn-primary:active:not(:disabled) {
+  transform: translateY(1px);
 }
 ```
 
-### Corporate Button (Secondary / Outline)
+### Secondary Button
 
 ```css
 .btn-secondary {
-  background-color: transparent;
-  color: var(--text-primary);
-  border: 1px solid var(--text-primary);
-  border-radius: 4px;
-  padding: 12px 32px;
-  font-weight: 600;
-  font-size: var(--text-body);
-  transition: all 0.2s ease;
+  height: 36px;
+  padding: 0 16px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: var(--button-secondary-bg);
+  color: var(--button-secondary-text);
+  font-size: 13px;
+  font-weight: var(--font-semibold);
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    background var(--duration-fast) var(--ease-default),
+    color var(--duration-fast) var(--ease-default);
 }
 
-.btn-secondary:hover {
-  background-color: rgba(255, 255, 255, 0.1);
+.btn-secondary:hover:not(:disabled) {
+  background: var(--button-secondary-hover);
 }
 ```
 
-### Clean Course Cards
+### Button Rules
+
+- Buttons are compact, not oversized
+- No pill-heavy corporate style
+- Default CTA uses red
+- Secondary CTA inverts by theme
+- Disabled state uses lower opacity but text must remain readable
+
+---
+
+## 4. Program Cards
 
 ```css
 .program-card {
-  background-color: var(--bg-surface);
-  border-radius: 8px; /* Slight rounding, not overly bubbly */
+  background: var(--card-bg);
+  color: var(--card-text);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
   overflow: hidden;
   transition:
-    transform 0.2s ease,
-    background-color 0.2s ease;
-  border: 1px solid transparent;
+    transform var(--duration-fast) var(--ease-default),
+    border-color var(--duration-fast) var(--ease-default),
+    background var(--duration-fast) var(--ease-default);
 }
 
 .program-card:hover {
-  transform: translateY(-4px);
-  background-color: var(--bg-surface-hover);
-  border-color: var(--border-subtle);
+  transform: translateY(-2px);
+  border-color: var(--border-strong);
+  background: var(--bg-surface-hover);
 }
 
-.program-card .image-wrapper {
-  aspect-ratio: 16/9;
+.program-card__image {
+  aspect-ratio: 16 / 9;
   width: 100%;
-  background-color: #222;
+  object-fit: cover;
+  display: block;
 }
 
-.program-card .content {
-  padding: 24px;
+.program-card__body {
+  padding: 10px 12px 12px;
 }
 
-.program-card .category-tag {
-  color: var(--text-secondary);
-  font-size: var(--text-small);
-  margin-bottom: 8px;
+.program-card__category {
+  font-size: 10px;
+  font-weight: var(--font-semibold);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #b89a63;
 }
 
-.program-card .title {
-  color: var(--text-primary);
-  font-size: var(--text-h3);
-  font-weight: var(--font-bold);
-  margin-bottom: 16px;
+.program-card__rating {
+  margin-top: 4px;
+  font-size: 11px;
+  color: var(--card-meta);
 }
 
-.program-card .meta {
-  color: var(--text-muted);
-  font-size: var(--text-small);
+.program-card__title {
+  margin-top: 6px;
+  font-size: 18px;
+  line-height: 1.3;
+  font-weight: var(--font-medium);
+  color: var(--card-text);
+}
+
+.program-card__meta {
+  margin-top: 10px;
+  display: grid;
+  gap: 2px;
+  font-size: 11px;
+  color: var(--card-meta);
+}
+
+.program-card__footer {
+  margin-top: 12px;
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.program-card__price {
+  font-size: 24px;
+  font-weight: var(--font-medium);
+  line-height: 1;
+  color: var(--card-text);
+}
+```
+
+### Card Extras
+
+```css
+.program-card__chip {
+  position: absolute;
+  top: 8px;
+  inset-inline-end: 8px;
+  height: 22px;
+  padding-inline: 10px;
+  border-radius: var(--radius-pill);
+  background: var(--chip-bg);
+  color: var(--chip-text);
+  font-size: 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.program-card__save {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1px solid var(--border-subtle);
+  background: var(--icon-surface);
+  color: var(--icon-stroke);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+```
+
+Card rules:
+
+- Keep the layout compact and information-dense
+- Use subtle borders instead of heavy shadows
+- Preserve the same structure in dark and light themes
+- CTA stays small and visually secondary to the card title and price
+
+---
+
+## 5. Navbar
+
+```css
+.navbar {
+  height: 52px;
+  background: #111111;
+  color: #f5f5f5;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.navbar__container {
+  max-width: 1280px;
+  height: 100%;
+  margin-inline: auto;
+  padding-inline: 16px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-}
-```
-
-## 4. Spacing System
-
-The layout requires generous "breathing room" to feel premium.
-
-- **Section Padding:** `80px` on mobile, `120px` on desktop.
-- **Container Max Width:** `1280px` (standard corporate grid).
-- **Element Gaps:**
-  - `8px` between related text elements (title and subtitle).
-  - `24px` between paragraphs and buttons.
-  - `32px` column gap in grids.
-
-## 5. Visual Effects
-
-- **No Glows:** Remove all glassmorphic cyan/purple blurs. The brand is built on stark photography and absolute darkness.
-- **Shadows:** Removed entirely. The distinction between background `(#000000)` and surface `(#111111)` is enough for hierarchy.
-- **Photography:** Images must be high-contrast, dramatic lighting, focusing on human faces looking forward.
-
-## 6. Layout Principles (RTL First)
-
-Because the reference is from a Middle Eastern product (Almentor), the UI architecture must logically flow Right-to-Left natively when Arabic is selected, with text right-aligned and icons on the right by default in RTL mode.
-
----
-
-## 7. Responsive Breakpoints (Mobile-First)
-
-```css
-:root {
-  /* Mobile-first: default styles are for mobile (< 640px) */
-  --breakpoint-sm: 640px;   /* Small tablets, large phones (landscape) */
-  --breakpoint-md: 768px;   /* Tablets */
-  --breakpoint-lg: 1024px;  /* Small desktops, landscape tablets */
-  --breakpoint-xl: 1280px;  /* Standard desktops (container max-width) */
-  --breakpoint-2xl: 1536px; /* Large screens */
+  gap: 16px;
 }
 
-/* Usage: ALWAYS mobile-first (min-width, never max-width) */
-@media (min-width: 640px) { /* sm */ }
-@media (min-width: 768px) { /* md */ }
-@media (min-width: 1024px) { /* lg */ }
-@media (min-width: 1280px) { /* xl */ }
-```
-
-### Grid Layouts
-
-```text
-Program Cards Grid:
-├── Mobile (< 640px): 1 column
-├── Tablet (640-1024px): 2 columns
-├── Desktop (1024px+): 3 columns
-└── Wide (1280px+): 4 columns (optional)
-
-Dashboard Layout:
-├── Mobile: single column, bottom nav
-├── Tablet: sidebar (240px) + content
-└── Desktop: sidebar (280px) + content
-
-Instructor Cards: Same as program cards
-Blog Grid: Same as program cards
-```
-
----
-
-## 8. Loading States
-
-### Skeleton Screens
-
-```css
-.skeleton {
-  background: linear-gradient(
-    90deg,
-    var(--bg-surface) 0%,
-    var(--bg-surface-hover) 50%,
-    var(--bg-surface) 100%
-  );
-  background-size: 200% 100%;
-  animation: skeleton-pulse 1.5s ease-in-out infinite;
-  border-radius: 4px;
-}
-
-@keyframes skeleton-pulse {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
-}
-
-/* Skeleton variants */
-.skeleton-text { height: 16px; width: 80%; margin-bottom: 8px; }
-.skeleton-title { height: 24px; width: 60%; margin-bottom: 16px; }
-.skeleton-image { aspect-ratio: 16/9; width: 100%; }
-.skeleton-avatar { width: 48px; height: 48px; border-radius: 50%; }
-.skeleton-button { height: 44px; width: 120px; border-radius: 4px; }
-```
-
-### Button Loading
-
-```css
-.btn-loading {
-  position: relative;
-  color: transparent; /* Hide text */
-  pointer-events: none;
-}
-
-.btn-loading::after {
-  content: '';
-  position: absolute;
-  width: 20px;
-  height: 20px;
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  border-top-color: #ffffff;
-  border-radius: 50%;
-  animation: spin 0.6s linear infinite;
-  inset: 0;
-  margin: auto;
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-```
-
-### Page Loading
-
-```text
-├── Top-of-page progress bar (thin, gold accent)
-├── Width: 100%, height: 3px
-├── Color: var(--brand-gold)
-├── Position: fixed top, z-index: 9999
-└── Animation: indeterminate shimmer
-```
-
----
-
-## 9. Empty States
-
-```text
-Design Pattern:
-├── Centered layout (both axes)
-├── Icon or illustration (64px, muted color)
-├── Title (text-h3, text-secondary)
-├── Description (text-body, text-muted)
-├── CTA button (if applicable)
-└── Max width: 400px
-
-Color: 
-├── Icon: var(--text-muted)
-├── Title: var(--text-secondary)
-├── Description: var(--text-muted)
-└── Background: same as page (no special container)
-```
-
----
-
-## 10. Status & Feedback States
-
-### Toast Notifications
-
-```css
-.toast {
-  position: fixed;
-  bottom: 24px;
-  left: 50%; /* RTL: will auto-flip */
-  transform: translateX(-50%);
-  padding: 12px 24px;
-  border-radius: 8px;
-  font-size: var(--text-body);
-  font-weight: var(--font-medium);
-  z-index: 9000;
-  animation: toast-slide-up 0.3s ease;
-  max-width: 400px;
-}
-
-.toast-success {
-  background-color: #1a3a1a;
-  color: #4ade80;
-  border: 1px solid rgba(74, 222, 128, 0.3);
-}
-
-.toast-error {
-  background-color: #3a1a1a;
-  color: #f87171;
-  border: 1px solid rgba(248, 113, 113, 0.3);
-}
-
-.toast-warning {
-  background-color: #3a2a1a;
-  color: #fbbf24;
-  border: 1px solid rgba(251, 191, 36, 0.3);
-}
-
-.toast-info {
-  background-color: #1a2a3a;
-  color: #60a5fa;
-  border: 1px solid rgba(96, 165, 250, 0.3);
-}
-```
-
-### Inline Status Badges
-
-```css
-:root {
-  /* Status Colors */
-  --status-success: #4ade80;      /* مؤكد، مدفوع، نشط */
-  --status-success-bg: #1a3a1a;
-  --status-warning: #fbbf24;       /* في الانتظار، قيد المراجعة */
-  --status-warning-bg: #3a2a1a;
-  --status-error: #f87171;         /* ملغي، متأخر، مرفوض */
-  --status-error-bg: #3a1a1a;
-  --status-info: #60a5fa;          /* جديد، قادم */
-  --status-info-bg: #1a2a3a;
-  --status-neutral: #a1a1aa;       /* مكتمل، مؤرشف */
-  --status-neutral-bg: #2a2a2a;
-}
-
-.badge {
-  display: inline-flex;
-  align-items: center;
-  padding: 4px 12px;
-  border-radius: 100px; /* Pill shape for badges */
-  font-size: var(--text-small);
-  font-weight: var(--font-medium);
-  gap: 6px;
-}
-
-.badge::before {
-  content: '';
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: currentColor;
-}
-```
-
----
-
-## 11. Form Field States
-
-```css
-.form-field {
+.navbar__links {
   display: flex;
-  flex-direction: column;
-  gap: 6px;
+  align-items: center;
+  gap: 16px;
 }
 
+.navbar__link {
+  color: #d8d8d8;
+  font-size: 12px;
+  font-weight: var(--font-medium);
+  text-decoration: none;
+}
+
+.navbar__link:hover {
+  color: #ffffff;
+}
+
+.navbar__actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+```
+
+Navbar rules:
+
+- Compact height
+- Low visual noise
+- Theme and language controls stay visible
+- CTA button is small and aligned with the rest of the header
+
+---
+
+## 6. Forms
+
+```css
 .form-label {
   color: var(--text-secondary);
-  font-size: var(--text-small);
+  font-size: 13px;
   font-weight: var(--font-medium);
 }
 
 .form-input {
+  min-height: 40px;
+  padding: 10px 12px;
   background: var(--bg-surface);
-  border: 1px solid var(--border-subtle);
-  border-radius: 4px;
-  padding: 12px 16px;
   color: var(--text-primary);
-  font-size: var(--text-body);
-  font-family: var(--font-family-primary);
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
 }
 
-/* Focus State */
 .form-input:focus {
   outline: none;
-  border-color: var(--brand-gold);
-  box-shadow: 0 0 0 3px rgba(214, 163, 43, 0.15);
-}
-
-/* Error State */
-.form-input[aria-invalid="true"],
-.form-input.error {
-  border-color: var(--status-error);
-  box-shadow: 0 0 0 3px rgba(248, 113, 113, 0.15);
-}
-
-/* Success State */
-.form-input.success {
-  border-color: var(--status-success);
-}
-
-/* Disabled State */
-.form-input:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  background: rgba(17, 17, 17, 0.5);
-}
-
-/* Error Message */
-.form-error {
-  color: var(--status-error);
-  font-size: 13px;
-}
-
-/* Help Text */
-.form-help {
-  color: var(--text-muted);
-  font-size: 13px;
-}
-
-/* Required Indicator */
-.form-label .required {
-  color: var(--status-error);
-  margin-inline-start: 4px;
+  border-color: var(--brand-primary);
+  box-shadow: 0 0 0 3px rgba(200, 29, 37, 0.14);
 }
 ```
 
+Rules:
+
+- Inputs should match the compact button language
+- Error and help text must remain readable in both themes
+- Never rely on color alone to communicate state
+
 ---
 
-## 12. Modal / Dialog
+## 7. Visual Effects
+
+Rules:
+
+- No glassmorphism
+- No oversized shadows
+- Use borders first, shadows second
+- Hover motion should be subtle
+- Photography can be dramatic, UI chrome should stay calm
+
+Suggested shadow:
 
 ```css
-.modal-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.7);
-  backdrop-filter: blur(4px);
-  z-index: 8000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  animation: fade-in 0.2s ease;
-}
-
-.modal {
-  background: var(--bg-surface);
-  border: 1px solid var(--border-subtle);
-  border-radius: 12px;
-  width: min(90vw, 560px);
-  max-height: 85vh;
-  overflow-y: auto;
-  padding: 32px;
-  animation: modal-scale 0.2s ease;
-}
-
-.modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 24px;
-}
-
-.modal-title {
-  font-size: var(--text-h3);
-  font-weight: var(--font-bold);
-  color: var(--text-primary);
-}
-
-.modal-close {
-  background: none;
-  border: none;
-  color: var(--text-muted);
-  cursor: pointer;
-  padding: 8px;
-  border-radius: 4px;
-}
-
-.modal-close:hover { color: var(--text-primary); }
-
-@keyframes modal-scale {
-  from { transform: scale(0.95); opacity: 0; }
-  to { transform: scale(1); opacity: 1; }
-}
-
-@keyframes fade-in {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
+--shadow-soft: 0 6px 18px rgba(0, 0, 0, 0.08);
 ```
+
+Use this only in light mode and only when separation is actually needed.
 
 ---
 
-## 13. Animation Tokens
+## 8. Accessibility Rules
 
-```css
-:root {
-  /* Duration */
-  --duration-instant: 100ms;    /* Micro-interactions (hover color) */
-  --duration-fast: 200ms;       /* Button hover, focus */
-  --duration-normal: 300ms;     /* Transitions, modals */
-  --duration-slow: 500ms;       /* Page transitions, complex animations */
-  --duration-slower: 800ms;     /* Entrance animations */
-
-  /* Easing */
-  --ease-default: cubic-bezier(0.4, 0, 0.2, 1);  /* Material standard */
-  --ease-in: cubic-bezier(0.4, 0, 1, 1);          /* Accelerate (exit) */
-  --ease-out: cubic-bezier(0, 0, 0.2, 1);         /* Decelerate (enter) */
-  --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1); /* Spring (attention) */
-}
-
-/* Respect user preferences */
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-  }
-}
-```
-
----
-
-## 14. Z-Index Scale
-
-```css
-:root {
-  --z-dropdown: 100;       /* Dropdown menus */
-  --z-sticky: 200;         /* Sticky elements (navbar) */
-  --z-fixed: 300;          /* Fixed positioned elements */
-  --z-drawer: 400;         /* Side drawers, mobile menu */
-  --z-modal-overlay: 500;  /* Modal backdrop */
-  --z-modal: 600;          /* Modal content */
-  --z-popover: 700;        /* Tooltips, popovers */
-  --z-toast: 800;          /* Toast notifications */
-  --z-loading: 900;        /* Full-page loading overlay */
-  --z-max: 9999;           /* Top progress bar */
-}
-```
-
----
-
-## 15. Dark Mode Note
+The system must stay compliant with WCAG 2.1 AA.
 
 ```text
-This is a dark-mode-ONLY design system. There is intentionally NO light mode.
-The corporate dark theme IS the brand identity.
-
-If light mode is requested in the future:
-├── Create separate set of CSS variables
-├── Use prefers-color-scheme media query
-├── Toggle via class on <html> element
-└── But for now: dark mode only, always
+Normal text: minimum 4.5:1
+Large text: minimum 3:1
+Icons and UI boundaries: minimum 3:1
+Focus indicators: visible and high-contrast
+Placeholder text: do not drop below readable contrast
 ```
+
+Additional rules:
+
+- All icon-only buttons require `aria-label`
+- Save/bookmark buttons must have focus-visible styles
+- Use real text, not text baked into images
+- Dark and light themes must both be tested separately
+
+---
+
+## 9. RTL and i18n Rules
+
+- Arabic is default and RTL
+- English is LTR
+- Use logical properties only
+- Prices, dates, phone numbers, and URLs must remain readable and direction-safe
+- Theme toggle and language switch remain available in navbar on all pages
+
+---
+
+## 10. Responsive Rules
+
+```css
+:root {
+  --breakpoint-sm: 640px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1024px;
+  --breakpoint-xl: 1280px;
+}
+```
+
+Grid behavior:
+
+- Mobile: 1 card per row
+- Tablet: 2 cards per row
+- Desktop: 3 cards per row
+- Wide desktop: 4 cards per row if content density allows
+
+---
+
+## 11. Theme Policy
+
+This system is **not dark-only anymore**.
+
+Rules:
+
+- Support both `html[data-theme="dark"]` and `html[data-theme="light"]`
+- Do not duplicate component CSS unnecessarily; rely on semantic tokens
+- Keep component structure identical across themes
+- Only tokens should change between dark and light wherever possible
+
+```
+

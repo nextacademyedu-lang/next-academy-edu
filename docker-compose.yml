@@ -40,11 +40,43 @@ services:
       dockerfile: Dockerfile
       args:
         NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL}
-        PAYLOAD_SECRET: ${PAYLOAD_SECRET}
-        DATABASE_URI: ${DATABASE_URI}
+        NEXT_PUBLIC_SERVER_URL: ${NEXT_PUBLIC_SERVER_URL}
     container_name: nextacademy-app
     restart: unless-stopped
-    env_file: .env.production
+    environment:
+      NODE_ENV: ${NODE_ENV:-production}
+      DATABASE_URI: ${DATABASE_URI}
+      PAYLOAD_SECRET: ${PAYLOAD_SECRET}
+      PAYLOAD_ADMIN_EMAIL: ${PAYLOAD_ADMIN_EMAIL}
+      PAYLOAD_ADMIN_PASSWORD: ${PAYLOAD_ADMIN_PASSWORD}
+      NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL}
+      NEXT_PUBLIC_SERVER_URL: ${NEXT_PUBLIC_SERVER_URL:-${NEXT_PUBLIC_APP_URL}}
+      REDIS_URL: ${REDIS_URL}
+      RESEND_API_KEY: ${RESEND_API_KEY}
+      RESEND_FROM_EMAIL: ${RESEND_FROM_EMAIL}
+      RESEND_FROM_NAME: ${RESEND_FROM_NAME:-Next Academy}
+      PAYMOB_API_KEY: ${PAYMOB_API_KEY}
+      PAYMOB_PUBLIC_KEY: ${PAYMOB_PUBLIC_KEY}
+      PAYMOB_INTEGRATION_ID: ${PAYMOB_INTEGRATION_ID}
+      PAYMOB_WALLET_INTEGRATION_ID: ${PAYMOB_WALLET_INTEGRATION_ID}
+      PAYMOB_IFRAME_ID: ${PAYMOB_IFRAME_ID}
+      PAYMOB_HMAC_SECRET: ${PAYMOB_HMAC_SECRET}
+      EASYKASH_API_TOKEN: ${EASYKASH_API_TOKEN}
+      EASYKASH_HMAC_SECRET: ${EASYKASH_HMAC_SECRET}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+      CRON_SECRET: ${CRON_SECRET}
+      TWENTY_CRM_URL: ${TWENTY_CRM_URL}
+      TWENTY_CRM_API_KEY: ${TWENTY_CRM_API_KEY}
+      CRM_SYNC_BATCH_SIZE: ${CRM_SYNC_BATCH_SIZE:-25}
+      CRM_SYNC_MAX_ATTEMPTS: ${CRM_SYNC_MAX_ATTEMPTS:-5}
+      CRM_SYNC_STALE_LOCK_MINUTES: ${CRM_SYNC_STALE_LOCK_MINUTES:-30}
+      TWENTY_RESOURCE_CONTACTS: ${TWENTY_RESOURCE_CONTACTS:-people}
+      TWENTY_RESOURCE_COMPANIES: ${TWENTY_RESOURCE_COMPANIES:-companies}
+      TWENTY_RESOURCE_LEADS: ${TWENTY_RESOURCE_LEADS:-leads}
+      TWENTY_RESOURCE_DEALS: ${TWENTY_RESOURCE_DEALS:-opportunities}
+    volumes:
+      - media_uploads:/app/media
     depends_on:
       postgres:
         condition: service_healthy
@@ -63,6 +95,8 @@ services:
     image: nginx:alpine
     container_name: nextacademy-nginx
     restart: unless-stopped
+    profiles:
+      - edge
     ports:
       - "80:80"
       - "443:443"
@@ -97,6 +131,7 @@ services:
       NODE_PORT: 3000
       PG_DATABASE_URL: postgres://${DB_USER}:${DB_PASSWORD}@postgres:5432/twenty
       SERVER_URL: ${TWENTY_SERVER_URL:-https://crm.nextacademyedu.com}
+      FRONT_BASE_URL: ${TWENTY_SERVER_URL:-https://crm.nextacademyedu.com}
       REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379/1
       APP_SECRET: ${TWENTY_APP_SECRET}
     depends_on:
@@ -123,6 +158,7 @@ services:
     environment:
       PG_DATABASE_URL: postgres://${DB_USER}:${DB_PASSWORD}@postgres:5432/twenty
       SERVER_URL: ${TWENTY_SERVER_URL:-https://crm.nextacademyedu.com}
+      FRONT_BASE_URL: ${TWENTY_SERVER_URL:-https://crm.nextacademyedu.com}
       REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379/1
       APP_SECRET: ${TWENTY_APP_SECRET}
       DISABLE_DB_MIGRATIONS: "true"
@@ -143,3 +179,4 @@ volumes:
   certbot_www:
   certbot_conf:
   twenty_local_data:
+  media_uploads:

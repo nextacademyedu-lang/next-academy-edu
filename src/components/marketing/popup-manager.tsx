@@ -4,6 +4,10 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { usePathname } from 'next/navigation';
 import { PopupModal, type PopupData } from './popup-modal';
 
+const VISITED_KEY = 'na-popup-has-visited';
+const EMAIL_CAPTURED_KEY = 'na-popup-email-captured';
+const SESSION_PAGE_VIEWS_KEY = 'na-popup-session-page-views';
+
 /* ── Frequency helpers ─────────────────────────────────── */
 
 function getStorageKey(id: string | number) {
@@ -94,10 +98,44 @@ interface PopupWithTargeting extends PopupData {
   };
 }
 
+type BehaviorState = {
+  firstVisit: boolean;
+  emailCaptured: boolean;
+  sessionPageViews: number;
+};
+
 export function PopupManager({ initialData }: PopupManagerProps) {
   const pathname = usePathname();
   const [popups, setPopups] = useState<PopupWithTargeting[]>([]);
   const [activePopup, setActivePopup] = useState<PopupData | null>(null);
+  const [behavior, setBehavior] = useState<BehaviorState | null>(null);
+
+  /* Track visitor behavior state used for advanced popup targeting */
+  useEffect(() => {
+    let firstVisit = false;
+    let emailCaptured = false;
+    let sessionPageViews = 1;
+
+    try {
+      const hasVisitedBefore = localStorage.getItem(VISITED_KEY) === '1';
+      firstVisit = !hasVisitedBefore;
+      if (!hasVisitedBefore) {
+        localStorage.setItem(VISITED_KEY, '1');
+      }
+
+      emailCaptured = localStorage.getItem(EMAIL_CAPTURED_KEY) === '1';
+
+      const rawViews = sessionStorage.getItem(SESSION_PAGE_VIEWS_KEY);
+      const parsedViews = rawViews ? Number.parseInt(rawViews, 10) : 0;
+      const currentViews = Number.isFinite(parsedViews) && parsedViews > 0 ? parsedViews : 0;
+      sessionPageViews = currentViews + 1;
+      sessionStorage.setItem(SESSION_PAGE_VIEWS_KEY, String(sessionPageViews));
+    } catch {
+      // Storage can fail in strict/privacy modes
+    }
+
+    setBehavior({ firstVisit, emailCaptured, sessionPageViews });
+  }, [pathname]);
 
   /* Fetch active popups */
   useEffect(() => {
@@ -105,23 +143,32 @@ export function PopupManager({ initialData }: PopupManagerProps) {
       setPopups(initialData as PopupWithTargeting[]);
       return;
     }
+    if (!behavior) return;
 
     const fetchPopups = async () => {
       try {
-        const page = encodeURIComponent(pathname);
-        const res = await fetch(`/api/popups/active?page=${page}`);
+        const params = new URLSearchParams({
+          page: pathname,
+          firstVisit: String(behavior.firstVisit),
+          emailCaptured: String(behavior.emailCaptured),
+          sessionPageViews: String(behavior.sessionPageViews),
+        });
+        const res = await fetch(`/api/popups/active?${params.toString()}`);
         if (!res.ok) return;
         const data = await res.json();
-        if (Array.isArray(data)) {
-          setPopups(data as PopupWithTargeting[]);
-        }
+        const docs = Array.isArray(data?.popups)
+          ? data.popups
+          : Array.isArray(data)
+            ? data
+            : [];
+        setPopups(docs as PopupWithTargeting[]);
       } catch {
         // Silently fail — popups are nice-to-have
       }
     };
 
     fetchPopups();
-  }, [pathname, initialData]);
+  }, [pathname, initialData, behavior]);
 
   /* Trigger logic */
   useEffect(() => {
@@ -189,7 +236,26 @@ export function PopupManager({ initialData }: PopupManagerProps) {
     setActivePopup(null);
   }, []);
 
+  const handleLeadCaptured = useCallback(() => {
+    try {
+      localStorage.setItem(EMAIL_CAPTURED_KEY, '1');
+    } catch {
+      // Ignore storage failures
+    }
+
+    setBehavior((current) => {
+      if (!current || current.emailCaptured) return current;
+      return { ...current, emailCaptured: true };
+    });
+  }, []);
+
   if (!activePopup) return null;
 
-  return <PopupModal popup={activePopup} onClose={handleClose} />;
+  return (
+    <PopupModal
+      popup={activePopup}
+      onClose={handleClose}
+      onLeadCaptured={handleLeadCaptured}
+    />
+  );
 }

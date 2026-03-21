@@ -1,7 +1,9 @@
 .section {
   width: 100%;
   padding: 100px 0;
-  background-color: var(--bg-main, #020504);
+  background:
+    radial-gradient(circle at 14% 18%, var(--accent-gold-10), transparent 34%),
+    linear-gradient(180deg, var(--bg-main) 0%, var(--bg-surface-2) 100%);
 }
 
 .container {
@@ -45,7 +47,7 @@
   height: 48px;
   border-radius: 50%;
   border: 1px solid var(--border-subtle);
-  background-color: var(--bg-surface);
+  background-color: color-mix(in srgb, var(--bg-surface) 90%, transparent);
   color: var(--text-primary);
   display: flex;
   align-items: center;
@@ -108,7 +110,7 @@
   aspect-ratio: 4 / 5;
   border-radius: var(--radius-lg, 16px);
   overflow: hidden;
-  background-color: var(--bg-surface-hover, #1a1a1a);
+  background-color: var(--bg-surface-hover);
   position: relative;
 }
 

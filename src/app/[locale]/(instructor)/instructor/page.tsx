@@ -17,7 +17,7 @@ import {
   type PayloadConsultationBooking,
 } from '@/lib/instructor-api';
 
-const STAT_COLORS = ['#00e397', '#1877F2', '#ffc107'];
+const STAT_COLORS = ['#C51B1B', '#D6A32B', '#8F9A8F'];
 
 export default function InstructorOverviewPage() {
   const { user } = useAuth();
@@ -68,9 +68,9 @@ export default function InstructorOverviewPage() {
           const Icon = stat.icon;
           return (
             <Card key={stat.title} style={{
-              background: 'linear-gradient(135deg, rgba(26,26,26,0.6) 0%, rgba(10,10,10,0.8) 100%)',
+              background: 'linear-gradient(135deg, var(--bg-elevated) 0%, var(--bg-surface) 100%)',
               backdropFilter: 'blur(12px)',
-              border: '1px solid rgba(255,255,255,0.05)',
+              border: '1px solid var(--border-subtle)',
               position: 'relative',
               overflow: 'hidden',
             }}>
@@ -94,10 +94,10 @@ export default function InstructorOverviewPage() {
       </div>
 
       {/* Main Grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '24px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '24px' }}>
 
         {/* Upcoming Sessions */}
-        <Card style={{ background: 'rgba(255,255,255,0.03)', backdropFilter: 'blur(12px)', border: '1px solid rgba(255,255,255,0.05)' }}>
+        <Card style={{ background: 'var(--bg-elevated)', backdropFilter: 'blur(12px)', border: '1px solid var(--border-subtle)' }}>
           <CardHeader style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
             <div>
               <CardTitle>Upcoming Sessions</CardTitle>
@@ -116,7 +116,7 @@ export default function InstructorOverviewPage() {
               }}>
                 <div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
-                    <span style={{ fontSize: '12px', color: 'var(--accent-primary)', backgroundColor: 'rgba(0,227,151,0.1)', padding: '4px 8px', borderRadius: '4px', fontWeight: 600 }}>
+                    <span style={{ fontSize: '12px', color: 'var(--accent-primary)', backgroundColor: 'var(--accent-primary-10)', padding: '4px 8px', borderRadius: '4px', fontWeight: 600 }}>
                       {getSessionRoundTitle(session) || 'Session'}
                     </span>
                     <span style={{ fontSize: '13px', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '4px' }}>
@@ -148,7 +148,7 @@ export default function InstructorOverviewPage() {
         </Card>
 
         {/* Recent Consultations */}
-        <Card style={{ background: 'rgba(255,255,255,0.03)', backdropFilter: 'blur(12px)', border: '1px solid rgba(255,255,255,0.05)' }}>
+        <Card style={{ background: 'var(--bg-elevated)', backdropFilter: 'blur(12px)', border: '1px solid var(--border-subtle)' }}>
           <CardHeader style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
             <div>
               <CardTitle>Recent Consultations</CardTitle>
@@ -182,8 +182,8 @@ export default function InstructorOverviewPage() {
                   </div>
                   <span style={{
                     fontSize: '12px', fontWeight: 600, padding: '4px 8px', borderRadius: '4px',
-                    color: consult.status === 'confirmed' ? '#00e397' : '#ffc107',
-                    background: consult.status === 'confirmed' ? 'rgba(0,227,151,0.1)' : 'rgba(255,193,7,0.1)',
+                    color: consult.status === 'confirmed' ? 'var(--accent-primary)' : 'var(--accent-gold)',
+                    background: consult.status === 'confirmed' ? 'var(--accent-primary-10)' : 'var(--accent-gold-15)',
                   }}>
                     {consult.status.charAt(0).toUpperCase() + consult.status.slice(1)}
                   </span>

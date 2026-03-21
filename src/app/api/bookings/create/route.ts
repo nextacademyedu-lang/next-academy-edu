@@ -60,6 +60,7 @@ export async function POST(req: NextRequest) {
         collection: 'discount-codes',
         where: { code: { equals: discountCode.toUpperCase() }, isActive: { equals: true } },
         limit: 1,
+        overrideAccess: true,
       });
       const discount = discountResult.docs[0];
       if (discount && new Date(discount.validUntil) > new Date() && (!discount.maxUses || (discount.currentUses ?? 0) < discount.maxUses)) {
@@ -73,6 +74,7 @@ export async function POST(req: NextRequest) {
           collection: 'discount-codes',
           id: discount.id,
           data: { currentUses: (discount.currentUses || 0) + 1 },
+          overrideAccess: true,
         });
       }
     }
@@ -121,6 +123,7 @@ export async function POST(req: NextRequest) {
             dueDate: dueDate.toISOString(),
             status: 'pending',
           },
+          overrideAccess: true,
         });
       }
     } else {
@@ -134,6 +137,7 @@ export async function POST(req: NextRequest) {
           dueDate: new Date(now.getTime() + 24 * 60 * 60 * 1000).toISOString(),
           status: 'pending',
         },
+        overrideAccess: true,
       });
     }
 
@@ -145,6 +149,7 @@ export async function POST(req: NextRequest) {
         currentEnrollments: (round.currentEnrollments ?? 0) + 1,
         status: (round.currentEnrollments ?? 0) + 1 >= round.maxCapacity && round.autoCloseOnFull ? 'full' : round.status,
       },
+      overrideAccess: true,
     });
 
     return NextResponse.json({ bookingId: booking.id, bookingCode: booking.bookingCode });

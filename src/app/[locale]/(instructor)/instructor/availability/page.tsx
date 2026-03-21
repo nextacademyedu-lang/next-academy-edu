@@ -98,7 +98,7 @@ export default function InstructorAvailabilityPage() {
       </div>
 
       {/* Tabs */}
-      <div style={{ display: 'flex', gap: '8px', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '16px' }}>
+      <div style={{ display: 'flex', gap: '8px', borderBottom: '1px solid var(--border-subtle)', paddingBottom: '16px', flexWrap: 'wrap' }}>
         <button style={tabStyle(activeTab === 'weekly')}   onClick={() => setActiveTab('weekly')}>
           <Repeat size={16} /> Weekly Hours
         </button>
@@ -109,7 +109,7 @@ export default function InstructorAvailabilityPage() {
 
       {/* Weekly Hours */}
       {activeTab === 'weekly' && (
-        <Card style={{ background: 'rgba(255,255,255,0.02)', backdropFilter: 'blur(12px)', border: '1px solid rgba(255,255,255,0.05)' }}>
+        <Card style={{ background: 'var(--bg-elevated)', backdropFilter: 'blur(12px)', border: '1px solid var(--border-subtle)' }}>
           <CardHeader>
             <CardTitle>Standard Weekly Hours</CardTitle>
             <CardDescription>Configure the times you are regularly available for consultations.</CardDescription>
@@ -119,7 +119,7 @@ export default function InstructorAvailabilityPage() {
               const slots = hours[day];
               const hasSlots = slots.length > 0;
               return (
-                <div key={day} style={{ display: 'flex', padding: '20px 16px', borderBottom: '1px solid rgba(255,255,255,0.02)', alignItems: hasSlots ? 'flex-start' : 'center', gap: '24px' }}>
+                <div key={day} style={{ display: 'flex', padding: '20px 16px', borderBottom: '1px solid var(--border-subtle)', alignItems: hasSlots ? 'flex-start' : 'center', gap: '24px', flexWrap: 'wrap' }}>
                   {/* Toggle */}
                   <div style={{ width: '140px', display: 'flex', alignItems: 'center', gap: '12px', marginTop: hasSlots ? '8px' : '0' }}>
                     <div
@@ -137,10 +137,10 @@ export default function InstructorAvailabilityPage() {
                     ) : (
                       <>
                         {slots.map((slot, idx) => (
-                          <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                            <Input type="time" value={slot.start} onChange={e => updateSlot(day, idx, 'start', e.target.value)} style={{ width: '120px' }} />
+                          <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+                            <Input type="time" value={slot.start} onChange={e => updateSlot(day, idx, 'start', e.target.value)} style={{ width: '120px', minWidth: '100px' }} />
                             <span style={{ color: 'var(--text-muted)' }}>-</span>
-                            <Input type="time" value={slot.end} onChange={e => updateSlot(day, idx, 'end', e.target.value)} style={{ width: '120px' }} />
+                            <Input type="time" value={slot.end} onChange={e => updateSlot(day, idx, 'end', e.target.value)} style={{ width: '120px', minWidth: '100px' }} />
                             <Button variant="ghost" size="sm" onClick={() => removeSlot(day, idx)} style={{ color: 'var(--text-muted)', padding: '0 8px' }}>
                               <Trash2 size={16} />
                             </Button>
@@ -161,7 +161,7 @@ export default function InstructorAvailabilityPage() {
 
       {/* Date Overrides */}
       {activeTab === 'overrides' && (
-        <Card style={{ background: 'rgba(255,255,255,0.02)', backdropFilter: 'blur(12px)', border: '1px solid rgba(255,255,255,0.05)' }}>
+        <Card style={{ background: 'var(--bg-elevated)', backdropFilter: 'blur(12px)', border: '1px solid var(--border-subtle)' }}>
           <CardHeader>
             <CardTitle>Date Overrides</CardTitle>
             <CardDescription>Block off entire days for vacations or holidays.</CardDescription>

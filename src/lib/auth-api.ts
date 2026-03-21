@@ -25,7 +25,7 @@ interface UserData {
   role: 'user' | 'admin' | 'instructor' | 'b2b_manager';
   emailVerified: boolean;
   preferredLanguage: 'ar' | 'en';
-  picture?: { url: string } | null;
+  picture?: { url?: string | null } | number | string | null;
   instructorId?: string | { id: string } | null;
 }
 
@@ -86,7 +86,7 @@ export async function registerUser(
 }
 
 export async function getCurrentUser(): Promise<AuthResponse<{ user: UserData | null }>> {
-  const response = await fetch('/api/users/me', {
+  const response = await fetch('/api/users/me?depth=1', {
     method: 'GET',
     credentials: 'include',
   });

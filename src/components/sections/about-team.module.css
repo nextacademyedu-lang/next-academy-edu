@@ -1,7 +1,9 @@
 .section {
   width: 100%;
   padding: 100px 0;
-  background-color: var(--bg-primary, #020504);
+  background:
+    radial-gradient(circle at 14% 18%, var(--accent-primary-05), transparent 34%),
+    linear-gradient(180deg, var(--bg-main) 0%, var(--bg-surface-2) 100%);
   position: relative;
 }
 
@@ -66,8 +68,8 @@
 }
 
 .card:hover {
-  border-color: rgba(212, 175, 55, 0.2);
-  box-shadow: 0 0 40px rgba(212, 175, 55, 0.04);
+  border-color: var(--accent-gold-20);
+  box-shadow: 0 0 40px var(--accent-gold-05);
   transform: translateY(-4px);
 }
 
@@ -93,12 +95,12 @@
   position: absolute;
   inset: -2px;
   border-radius: 50%;
-  border: 2px solid rgba(212, 175, 55, 0.15);
+  border: 2px solid var(--accent-gold-15);
   pointer-events: none;
 }
 
 .card:hover .avatarGlow {
-  border-color: rgba(212, 175, 55, 0.35);
+  border-color: var(--accent-gold-35);
 }
 
 /* ── Text ───────────────────────────────── */
@@ -149,7 +151,7 @@
 .socialLink:hover {
   border-color: var(--accent-gold, #D4AF37);
   color: var(--accent-gold, #D4AF37);
-  background: rgba(212, 175, 55, 0.06);
+  background: var(--accent-gold-05);
 }
 
 /* ── Mobile ─────────────────────────────── */

@@ -38,8 +38,14 @@ export const Popups: CollectionConfig = {
       fields: [
         { name: 'titleAr', type: 'text' },
         { name: 'titleEn', type: 'text' },
+        { name: 'badgeAr', type: 'text' },
+        { name: 'badgeEn', type: 'text' },
+        { name: 'subtitleAr', type: 'text' },
+        { name: 'subtitleEn', type: 'text' },
         { name: 'descriptionAr', type: 'richText' },
         { name: 'descriptionEn', type: 'richText' },
+        { name: 'legalNoteAr', type: 'text' },
+        { name: 'legalNoteEn', type: 'text' },
         { name: 'image', type: 'upload', relationTo: 'media' },
         {
           name: 'imagePosition',
@@ -151,6 +157,15 @@ export const Popups: CollectionConfig = {
       label: 'Appearance',
       fields: [
         {
+          name: 'stylePreset',
+          type: 'select',
+          defaultValue: 'default',
+          options: [
+            { label: 'Default', value: 'default' },
+            { label: 'Offer Dark (Promo)', value: 'offer_dark' },
+          ],
+        },
+        {
           name: 'popupType',
           type: 'select',
           defaultValue: 'modal',
@@ -184,6 +199,18 @@ export const Popups: CollectionConfig = {
         { name: 'bgColor', type: 'text', defaultValue: '#1a1a2e' },
         { name: 'textColor', type: 'text', defaultValue: '#ffffff' },
         { name: 'accentColor', type: 'text', defaultValue: '#e94560' },
+        { name: 'backgroundImage', type: 'upload', relationTo: 'media' },
+        {
+          name: 'backgroundOverlayOpacity',
+          type: 'number',
+          defaultValue: 62,
+          min: 0,
+          max: 100,
+          admin: { description: 'Background image dark overlay opacity 0-100%' },
+        },
+        { name: 'borderColor', type: 'text', defaultValue: 'rgba(255,255,255,0.16)' },
+        { name: 'badgeBgColor', type: 'text', defaultValue: '#117fb2' },
+        { name: 'badgeTextColor', type: 'text', defaultValue: '#ffffff' },
       ],
     },
 
@@ -300,6 +327,53 @@ export const Popups: CollectionConfig = {
             { label: 'Mobile Only', value: 'mobile' },
             { label: 'Desktop Only', value: 'desktop' },
           ],
+        },
+        {
+          name: 'visitorCondition',
+          type: 'select',
+          defaultValue: 'all',
+          options: [
+            { label: 'All Visitors', value: 'all' },
+            { label: 'First Visit Only', value: 'first_visit' },
+            { label: 'Returning Visitors Only', value: 'returning_visitor' },
+          ],
+          admin: {
+            description: 'Target first-time visitors or only returning visitors.',
+          },
+        },
+        {
+          name: 'purchaseCondition',
+          type: 'select',
+          defaultValue: 'all',
+          options: [
+            { label: 'All Users', value: 'all' },
+            { label: 'No Purchase Yet', value: 'no_purchase' },
+            { label: 'Has Purchased Before', value: 'has_purchase' },
+          ],
+          admin: {
+            description: 'Use this to target users who purchased or not yet purchased.',
+          },
+        },
+        {
+          name: 'emailCaptureCondition',
+          type: 'select',
+          defaultValue: 'all',
+          options: [
+            { label: 'Ignore Email Capture', value: 'all' },
+            { label: 'Email Captured', value: 'email_captured' },
+            { label: 'Email Not Captured', value: 'email_not_captured' },
+          ],
+          admin: {
+            description: 'Email capture is tracked client-side when popup forms are submitted.',
+          },
+        },
+        {
+          name: 'minSessionPageViews',
+          type: 'number',
+          min: 1,
+          admin: {
+            description: 'Minimum pages viewed in the current session before this popup can appear.',
+          },
         },
       ],
     },

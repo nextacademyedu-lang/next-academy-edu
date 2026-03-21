@@ -1,5 +1,7 @@
 import type { CollectionConfig } from 'payload';
 import { isAdmin } from '../lib/access-control.ts';
+import { createCrmDedupeKey } from '../lib/crm/dedupe.ts';
+import { enqueueCrmSyncEvent } from '../lib/crm/queue.ts';
 
 export const Leads: CollectionConfig = {
   slug: 'leads',
@@ -9,6 +11,51 @@ export const Leads: CollectionConfig = {
     create: isAdmin,
     update: isAdmin,
     delete: isAdmin,
+  },
+  hooks: {
+    afterChange: [
+      async ({ req, doc, previousDoc, operation }) => {
+        let action = operation === 'create' ? 'lead_created' : 'lead_updated';
+        if (operation === 'update') {
+          if (previousDoc?.status !== doc.status) {
+            if (doc.status === 'converted') action = 'lead_converted';
+            else if (doc.status === 'lost') action = 'lead_lost';
+            else action = 'lead_status_updated';
+          }
+        }
+
+        const fingerprint = [
+          doc.updatedAt || doc.createdAt || '',
+          doc.status || '',
+          doc.priority || '',
+          doc.convertedAt || '',
+        ].join('|');
+
+        await enqueueCrmSyncEvent({
+          payload: req.payload,
+          req,
+          entityType: 'lead',
+          entityId: String(doc.id),
+          action,
+          dedupeKey: createCrmDedupeKey({
+            entityType: 'lead',
+            entityId: String(doc.id),
+            action,
+            fingerprint,
+          }),
+          priority: 15,
+          sourceCollection: 'leads',
+          payloadSnapshot: {
+            id: doc.id,
+            status: doc.status,
+            source: doc.source,
+            priority: doc.priority,
+            convertedUser: doc.convertedUser,
+            updatedAt: doc.updatedAt,
+          },
+        });
+      },
+    ],
   },
   fields: [
     { name: 'firstName', type: 'text' },

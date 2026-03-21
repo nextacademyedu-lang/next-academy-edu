@@ -16,11 +16,11 @@ import {
 } from '@/lib/instructor-api';
 
 const STATUS_STYLE: Record<string, { color: string; bg: string }> = {
-  confirmed: { color: '#00e397', bg: 'rgba(0,227,151,0.1)'   },
-  pending:   { color: '#ffc107', bg: 'rgba(255,193,7,0.1)'   },
-  completed: { color: '#888',    bg: 'rgba(255,255,255,0.05)' },
-  cancelled: { color: '#ff4d4f', bg: 'rgba(255,77,79,0.1)'   },
-  no_show:   { color: '#ff4d4f', bg: 'rgba(255,77,79,0.1)'   },
+  confirmed: { color: '#C51B1B', bg: 'rgba(197,27,27,0.12)'  },
+  pending:   { color: '#D6A32B', bg: 'rgba(214,163,43,0.14)' },
+  completed: { color: '#8F9A8F', bg: 'rgba(143,154,143,0.16)' },
+  cancelled: { color: '#C51B1B', bg: 'rgba(197,27,27,0.12)'  },
+  no_show:   { color: '#C51B1B', bg: 'rgba(197,27,27,0.12)'  },
 };
 
 export default function InstructorConsultationBookingsPage() {
@@ -56,7 +56,7 @@ export default function InstructorConsultationBookingsPage() {
           <h1 style={{ fontSize: '28px', fontWeight: 700, marginBottom: '8px', color: 'var(--text-primary)' }}>Consultation Bookings</h1>
           <p style={{ color: 'var(--text-secondary)', fontSize: '15px' }}>Manage your 1-on-1 sessions with students.</p>
         </div>
-        <div style={{ position: 'relative', width: '250px' }}>
+        <div style={{ position: 'relative', width: 'min(100%, 280px)' }}>
           <Search size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
           <Input
             placeholder="Search students..."
@@ -78,7 +78,7 @@ export default function InstructorConsultationBookingsPage() {
             const { date, time } = getSlotDateTime(booking);
             const style = STATUS_STYLE[booking.status] ?? STATUS_STYLE.pending;
             return (
-              <Card key={booking.id} style={{ background: 'rgba(255,255,255,0.02)', backdropFilter: 'blur(12px)', border: '1px solid rgba(255,255,255,0.05)' }}>
+              <Card key={booking.id} style={{ background: 'var(--bg-elevated)', backdropFilter: 'blur(12px)', border: '1px solid var(--border-subtle)' }}>
                 <CardContent style={{ padding: '24px' }}>
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '24px' }}>
 

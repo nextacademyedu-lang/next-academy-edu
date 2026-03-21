@@ -1,12 +1,20 @@
 "use client";
 
-import React, { useCallback } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import useEmblaCarousel from 'embla-carousel-react';
 import styles from './video-testimonials.module.css';
 
+type VideoTestimonial = {
+  id: string;
+  videoUrl: string;
+  thumbnail: string | null;
+  captionTitle: string;
+  captionSubtitle: string;
+};
+
 export function VideoTestimonialsSection() {
-  const [emblaRef, emblaApi] = useEmblaCarousel({ 
+  const [emblaRef, emblaApi] = useEmblaCarousel({
     align: 'center',
     loop: true,
     startIndex: 1,
@@ -14,6 +22,30 @@ export function VideoTestimonialsSection() {
   });
 
   const [selectedIndex, setSelectedIndex] = React.useState(1);
+  const [videos, setVideos] = useState<VideoTestimonial[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchVideos = async () => {
+      try {
+        const res = await fetch('/api/home/video-testimonials');
+        if (!res.ok) return;
+        const data = await res.json();
+        const docs = Array.isArray(data?.videos) ? data.videos as VideoTestimonial[] : [];
+        setVideos(docs);
+      } catch {
+        // Keep component resilient
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchVideos();
+  }, []);
+
+  // Duplicate items for seamless looping
+  const displayVideos = videos.length > 0
+    ? [...videos, ...videos.map(v => ({ ...v, id: v.id + '-copy' }))]
+    : [];
 
   const scrollPrev = useCallback(() => {
     if (emblaApi) emblaApi.scrollPrev();
@@ -40,10 +72,13 @@ export function VideoTestimonialsSection() {
     };
   }, [emblaApi, onSelect]);
 
+  if (loading) return null;
+  if (displayVideos.length === 0) return null;
+
   return (
     <section className={styles.section}>
       <div className={styles.container}>
-        <motion.div 
+        <motion.div
           className={styles.header}
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -62,9 +97,9 @@ export function VideoTestimonialsSection() {
           <button className={`${styles.controlBtn} ${styles.prevBtn}`} onClick={scrollPrev} aria-label="Previous">
             ←
           </button>
-          
-          <motion.div 
-            className={styles.embla} 
+
+          <motion.div
+            className={styles.embla}
             ref={emblaRef}
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
@@ -72,129 +107,24 @@ export function VideoTestimonialsSection() {
             transition={{ duration: 0.5, delay: 0.2 }}
           >
             <div className={styles.embla__container}>
-              {/* Vertical Video 1 */}
-              <div className={`${styles.embla__slide} ${selectedIndex === 0 || selectedIndex === 4 ? styles.activeSlide : ''}`}>
-                <div className={styles.videoWrapper}>
-                  <div className={styles.videoPortrait}>
-                    <div className={styles.playOverlay}>
-                      <span className={styles.playIcon}>▶</span>
+              {displayVideos.map((video, index) => (
+                <div key={video.id} className={`${styles.embla__slide} ${index === selectedIndex ? styles.activeSlide : ''}`}>
+                  <div className={styles.videoWrapper}>
+                    <div className={styles.videoPortrait} style={video.thumbnail ? { backgroundImage: `url(${video.thumbnail})`, backgroundSize: 'cover', backgroundPosition: 'center' } : undefined}>
+                      <div className={styles.playOverlay}>
+                        <span className={styles.playIcon}>▶</span>
+                      </div>
+                    </div>
+                    <div className={styles.captionArea}>
+                      <h4 className={styles.captionTitle}>{video.captionTitle}</h4>
+                      <p className={styles.captionSubtitle}>{video.captionSubtitle}</p>
                     </div>
                   </div>
-                  <div className={styles.captionArea}>
-                    <h4 className={styles.captionTitle}>Scaling B2B Sales to $10M ARR</h4>
-                    <p className={styles.captionSubtitle}>Amir T., VP of Sales</p>
-                  </div>
                 </div>
-              </div>
-              
-              {/* Vertical Video 2 */}
-              <div className={`${styles.embla__slide} ${selectedIndex === 1 || selectedIndex === 5 ? styles.activeSlide : ''}`}>
-                <div className={styles.videoWrapper}>
-                   <div className={styles.videoPortrait}>
-                    <div className={styles.playOverlay}>
-                      <span className={styles.playIcon}>▶</span>
-                    </div>
-                  </div>
-                  <div className={styles.captionArea}>
-                    <h4 className={styles.captionTitle}>Building High-Velocity Product Teams</h4>
-                    <p className={styles.captionSubtitle}>Sarah M., CTO</p>
-                  </div>
-                </div>
-              </div>
-              
-              {/* Vertical Video 3 */}
-              <div className={`${styles.embla__slide} ${selectedIndex === 2 || selectedIndex === 6 ? styles.activeSlide : ''}`}>
-                <div className={styles.videoWrapper}>
-                   <div className={styles.videoPortrait}>
-                    <div className={styles.playOverlay}>
-                      <span className={styles.playIcon}>▶</span>
-                    </div>
-                  </div>
-                  <div className={styles.captionArea}>
-                    <h4 className={styles.captionTitle}>Mastering Finance & Series A Funding</h4>
-                    <p className={styles.captionSubtitle}>Omar K., Startup Founder</p>
-                  </div>
-                </div>
-              </div>
-              
-              {/* Vertical Video 4 */}
-              <div className={`${styles.embla__slide} ${selectedIndex === 3 || selectedIndex === 7 ? styles.activeSlide : ''}`}>
-                <div className={styles.videoWrapper}>
-                   <div className={styles.videoPortrait}>
-                    <div className={styles.playOverlay}>
-                      <span className={styles.playIcon}>▶</span>
-                    </div>
-                  </div>
-                  <div className={styles.captionArea}>
-                    <h4 className={styles.captionTitle}>Scaling Tech Infrastructure</h4>
-                    <p className={styles.captionSubtitle}>Yousef A., Lead Engineer</p>
-                  </div>
-                </div>
-              </div>
-              
-              {/* Duplicate content to prevent rewind glitch on loop */}
-              {/* Vertical Video 1 Copy */}
-              <div className={`${styles.embla__slide} ${selectedIndex === 0 || selectedIndex === 4 ? styles.activeSlide : ''}`}>
-                <div className={styles.videoWrapper}>
-                  <div className={styles.videoPortrait}>
-                    <div className={styles.playOverlay}>
-                      <span className={styles.playIcon}>▶</span>
-                    </div>
-                  </div>
-                  <div className={styles.captionArea}>
-                    <h4 className={styles.captionTitle}>Scaling B2B Sales to $10M ARR</h4>
-                    <p className={styles.captionSubtitle}>Amir T., VP of Sales</p>
-                  </div>
-                </div>
-              </div>
-              
-              {/* Vertical Video 2 Copy */}
-              <div className={`${styles.embla__slide} ${selectedIndex === 1 || selectedIndex === 5 ? styles.activeSlide : ''}`}>
-                <div className={styles.videoWrapper}>
-                   <div className={styles.videoPortrait}>
-                    <div className={styles.playOverlay}>
-                      <span className={styles.playIcon}>▶</span>
-                    </div>
-                  </div>
-                  <div className={styles.captionArea}>
-                    <h4 className={styles.captionTitle}>Building High-Velocity Product Teams</h4>
-                    <p className={styles.captionSubtitle}>Sarah M., CTO</p>
-                  </div>
-                </div>
-              </div>
-              
-              {/* Vertical Video 3 Copy */}
-              <div className={`${styles.embla__slide} ${selectedIndex === 2 || selectedIndex === 6 ? styles.activeSlide : ''}`}>
-                <div className={styles.videoWrapper}>
-                   <div className={styles.videoPortrait}>
-                    <div className={styles.playOverlay}>
-                      <span className={styles.playIcon}>▶</span>
-                    </div>
-                  </div>
-                  <div className={styles.captionArea}>
-                    <h4 className={styles.captionTitle}>Mastering Finance & Series A Funding</h4>
-                    <p className={styles.captionSubtitle}>Omar K., Startup Founder</p>
-                  </div>
-                </div>
-              </div>
-              
-              {/* Vertical Video 4 Copy */}
-              <div className={`${styles.embla__slide} ${selectedIndex === 3 || selectedIndex === 7 ? styles.activeSlide : ''}`}>
-                <div className={styles.videoWrapper}>
-                   <div className={styles.videoPortrait}>
-                    <div className={styles.playOverlay}>
-                      <span className={styles.playIcon}>▶</span>
-                    </div>
-                  </div>
-                  <div className={styles.captionArea}>
-                    <h4 className={styles.captionTitle}>Scaling Tech Infrastructure</h4>
-                    <p className={styles.captionSubtitle}>Yousef A., Lead Engineer</p>
-                  </div>
-                </div>
-              </div>
+              ))}
             </div>
           </motion.div>
-          
+
           <button className={`${styles.controlBtn} ${styles.nextBtn}`} onClick={scrollNext} aria-label="Next">
             →
           </button>

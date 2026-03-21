@@ -1,6 +1,6 @@
 # Next Academy — Environment Variables Reference
 
-> Last Updated: 2026-03-13 04:00
+> Last Updated: 2026-03-20 01:05
 > File: `.env.local` (development) / Vercel Environment Variables (production)
 
 ---
@@ -13,6 +13,13 @@
 3. NEVER use fallback values for secrets in production
 4. All NEXT_PUBLIC_ vars are visible to the browser — never put secrets there
 5. Rotate secrets every 6 months (or immediately on suspected compromise)
+```
+
+## Pre-Deploy Validation
+
+```bash
+# Validate required env vars before Coolify deploy
+npm run check:env
 ```
 
 ---
@@ -73,6 +80,19 @@
 |---|---|---|---|
 | `TWENTY_CRM_URL` | `https://crm.nextacademyedu.com` | ⬜ | Twenty CRM base URL |
 | `TWENTY_CRM_API_KEY` | `twenty_key_123` | ⬜ | Twenty CRM API key |
+| `CRM_SYNC_BATCH_SIZE` | `25` | ⬜ | CRM cron batch size per run |
+| `CRM_SYNC_MAX_ATTEMPTS` | `5` | ⬜ | Maximum retries before dead-letter |
+| `CRM_SYNC_STALE_LOCK_MINUTES` | `30` | ⬜ | Reclaim `processing` events stuck after worker crash |
+| `TWENTY_RESOURCE_CONTACTS` | `people` | ⬜ | Twenty contacts object name override |
+| `TWENTY_RESOURCE_COMPANIES` | `companies` | ⬜ | Twenty companies object name override |
+| `TWENTY_RESOURCE_LEADS` | `leads` | ⬜ | Twenty leads object name override |
+| `TWENTY_RESOURCE_DEALS` | `opportunities` | ⬜ | Twenty deals object name override |
+
+### Cron & Jobs
+
+| Variable | Example | Required | Description |
+|---|---|---|---|
+| `CRON_SECRET` | `f8e0...` | ✅ | Secret token for cron endpoints (`Authorization: Bearer <token>`) |
 
 ### Google Services
 

@@ -44,8 +44,8 @@
   font-size: 24px;
   font-weight: 700;
   color: var(--text-primary);
-  background-color: rgba(255, 255, 255, 0.05);
-  border: 2px solid rgba(255, 255, 255, 0.1);
+  background-color: var(--input-bg);
+  border: 2px solid var(--border);
   border-radius: var(--radius-md, 8px);
   outline: none;
   transition: border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
@@ -54,7 +54,7 @@
 
 .otpInput:focus {
   border-color: var(--accent-primary, #C9A96E);
-  background-color: rgba(255, 255, 255, 0.08);
+  background-color: var(--input-bg-hover);
   box-shadow: 0 0 0 3px rgba(201, 169, 110, 0.15);
 }
 
@@ -64,7 +64,7 @@
 }
 
 .otpInput.errorInput {
-  border-color: #ef4444;
+  border-color: var(--status-error);
   animation: shake 0.35s ease;
 }
 
@@ -83,7 +83,7 @@
 
 /* ---- Messages ---- */
 .errorText {
-  color: #ef4444;
+  color: var(--status-error);
   font-size: 14px;
   margin-bottom: 16px;
 }
@@ -98,7 +98,7 @@
 .verifyBtn {
   margin-bottom: 24px;
   background-color: var(--accent-primary, #C9A96E);
-  color: #0a0a0f;
+  color: var(--text-on-accent);
   border: none;
   padding: 14px;
   font-size: 16px;

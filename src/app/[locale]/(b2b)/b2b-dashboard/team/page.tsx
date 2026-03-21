@@ -32,7 +32,7 @@ export default function B2BTeamPage() {
           <h1 style={{ fontSize: '28px', fontWeight: 700, marginBottom: '8px', color: 'var(--text-primary)' }}>Team Members</h1>
           <p style={{ color: 'var(--text-secondary)', fontSize: '15px' }}>All employees registered under your company.</p>
         </div>
-        <div style={{ position: 'relative', width: '260px' }}>
+        <div style={{ position: 'relative', width: 'min(100%, 280px)' }}>
           <Search size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
           <Input
             placeholder="Search employees..."
@@ -44,7 +44,7 @@ export default function B2BTeamPage() {
       </div>
 
       {/* Table */}
-      <Card style={{ background: 'rgba(255,255,255,0.03)', backdropFilter: 'blur(12px)', border: '1px solid rgba(255,255,255,0.05)' }}>
+      <Card style={{ background: 'var(--bg-elevated)', backdropFilter: 'blur(12px)', border: '1px solid var(--border-subtle)' }}>
         <CardHeader>
           <CardTitle>Employees</CardTitle>
           <CardDescription>{loading ? '…' : `${filtered.length} member${filtered.length !== 1 ? 's' : ''}`}</CardDescription>
@@ -57,6 +57,8 @@ export default function B2BTeamPage() {
           ) : filtered.map((member, i) => (
             <div key={member.user.id} style={{
               display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+              flexWrap: 'wrap',
+              gap: '12px',
               padding: '16px 24px',
               borderBottom: i < filtered.length - 1 ? '1px solid rgba(255,255,255,0.04)' : 'none',
             }}>
@@ -77,7 +79,7 @@ export default function B2BTeamPage() {
                   </div>
                 </div>
               </div>
-              <div style={{ display: 'flex', gap: '24px', alignItems: 'center' }}>
+              <div style={{ display: 'flex', gap: '14px', alignItems: 'center', flexWrap: 'wrap' }}>
                 {member.profile?.jobTitle && (
                   <span style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>{member.profile.jobTitle}</span>
                 )}

@@ -103,7 +103,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
         <header className={styles.topbar}>
           <div>
             <Link href={`/${locale}`} className={styles.logo} style={{ display: 'block' }}>
-              <span className="hidden-desktop">Next Academy</span>
+              Next Academy
             </Link>
           </div>
           <div className={styles.topbarRight}>
@@ -130,7 +130,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
       </Link>
 
       {/* Mobile Bottom Bar */}
-      <nav className={styles.mobileBottomBar} style={{ display: 'none' }}>
+      <nav className={styles.mobileBottomBar}>
         {NAV_LINKS.map((link) => {
           const Icon = link.icon;
           const isDashboardRoot = link.href === '/dashboard' && pathname.endsWith('/dashboard');
@@ -142,25 +142,16 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
               key={link.name}
               href={`/${locale}${link.href}`}
               className={`${styles.mobileNavLink} ${activeClass}`}
+              aria-label={link.name}
             >
-              <Icon size={24} />
-              <span style={{ fontSize: '10px' }}>{link.name}</span>
+              <span className={styles.mobileNavIconWrap}>
+                <Icon size={20} />
+              </span>
+              <span className={styles.mobileNavLabel}>{link.name}</span>
             </Link>
           );
         })}
       </nav>
-
-      <style dangerouslySetInnerHTML={{
-        __html: `
-          @media (max-width: 900px) {
-            .${styles.mobileBottomBar} { display: flex !important; }
-            .hidden-desktop { display: inline-block; }
-          }
-          @media (min-width: 901px) {
-            .hidden-desktop { display: none; }
-          }
-        `
-      }} />
     </div>
   );
 }

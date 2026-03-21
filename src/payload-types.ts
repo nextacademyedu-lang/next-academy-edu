@@ -99,6 +99,7 @@ export interface Config {
     popups: Popup;
     'announcement-bars': AnnouncementBar;
     'upcoming-events-config': UpcomingEventsConfig;
+    'crm-sync-events': CrmSyncEvent;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -138,6 +139,7 @@ export interface Config {
     popups: PopupsSelect<false> | PopupsSelect<true>;
     'announcement-bars': AnnouncementBarsSelect<false> | AnnouncementBarsSelect<true>;
     'upcoming-events-config': UpcomingEventsConfigSelect<false> | UpcomingEventsConfigSelect<true>;
+    'crm-sync-events': CrmSyncEventsSelect<false> | CrmSyncEventsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -440,7 +442,12 @@ export interface Program {
     | null;
   tags?: (number | Tag)[] | null;
   isFeatured?: boolean | null;
+  /**
+   * Controls ordering in featured cards (lower appears first)
+   */
+  featuredPriority?: number | null;
   isActive?: boolean | null;
+  learnersCount?: number | null;
   viewCount?: number | null;
   averageRating?: number | null;
   reviewCount?: number | null;
@@ -506,8 +513,10 @@ export interface Session {
   instructor?: (number | null) | Instructor;
   recordingUrl?: string | null;
   materials?: (number | Media)[] | null;
+  status?: ('scheduled' | 'live' | 'completed' | 'cancelled') | null;
   isCancelled?: boolean | null;
   cancellationReason?: string | null;
+  attendanceCount?: number | null;
   attendeesCount?: number | null;
   updatedAt: string;
   createdAt: string;
@@ -693,8 +702,16 @@ export interface ConsultationType {
   instructor: number | Instructor;
   titleAr: string;
   titleEn?: string | null;
+  /**
+   * Compatibility field used by frontend contract.
+   */
+  title?: string | null;
   descriptionAr?: string | null;
   descriptionEn?: string | null;
+  /**
+   * Compatibility field used by frontend contract.
+   */
+  description?: string | null;
   durationMinutes: number;
   price: number;
   currency?: ('EGP' | 'USD') | null;
@@ -713,6 +730,10 @@ export interface ConsultationAvailability {
   id: number;
   instructor: number | Instructor;
   dayOfWeek: 'saturday' | 'sunday' | 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday';
+  /**
+   * Compatibility numeric day index (0=Sunday ... 6=Saturday).
+   */
+  dayIndex?: number | null;
   startTime: string;
   endTime: string;
   bufferMinutes?: number | null;
@@ -758,6 +779,7 @@ export interface ConsultationBooking {
   reminderSent?: boolean | null;
   discountCode?: string | null;
   discountAmount?: number | null;
+  twentyCrmDealId?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -822,6 +844,11 @@ export interface Review {
   isVerifiedPurchase?: boolean | null;
   adminNotes?: string | null;
   removedReason?: string | null;
+  isVideoTestimonial?: boolean | null;
+  videoUrl?: string | null;
+  videoThumbnail?: (number | null) | Media;
+  videoCaption?: string | null;
+  videoSubtitle?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -965,6 +992,10 @@ export interface Popup {
   content?: {
     titleAr?: string | null;
     titleEn?: string | null;
+    badgeAr?: string | null;
+    badgeEn?: string | null;
+    subtitleAr?: string | null;
+    subtitleEn?: string | null;
     descriptionAr?: {
       root: {
         type: string;
@@ -995,6 +1026,8 @@ export interface Popup {
       };
       [k: string]: unknown;
     } | null;
+    legalNoteAr?: string | null;
+    legalNoteEn?: string | null;
     image?: (number | null) | Media;
     imagePosition?: ('left' | 'right' | 'top' | 'none') | null;
   };
@@ -1023,6 +1056,7 @@ export interface Popup {
     redirectUrl?: string | null;
   };
   appearance?: {
+    stylePreset?: ('default' | 'offer_dark') | null;
     popupType?: ('modal' | 'slide_in' | 'bottom_bar' | 'full_screen') | null;
     animation?: ('fade' | 'slide_up' | 'slide_side' | 'zoom') | null;
     /**
@@ -1033,6 +1067,14 @@ export interface Popup {
     bgColor?: string | null;
     textColor?: string | null;
     accentColor?: string | null;
+    backgroundImage?: (number | null) | Media;
+    /**
+     * Background image dark overlay opacity 0-100%
+     */
+    backgroundOverlayOpacity?: number | null;
+    borderColor?: string | null;
+    badgeBgColor?: string | null;
+    badgeTextColor?: string | null;
   };
   countdown?: {
     hasCountdown?: boolean | null;
@@ -1059,6 +1101,22 @@ export interface Popup {
     targetAudience?: ('all' | 'guests_only' | 'logged_in' | 'specific_role') | null;
     targetRole?: ('student' | 'instructor' | 'b2b_manager') | null;
     targetDevice?: ('all' | 'mobile' | 'desktop') | null;
+    /**
+     * Target first-time visitors or only returning visitors.
+     */
+    visitorCondition?: ('all' | 'first_visit' | 'returning_visitor') | null;
+    /**
+     * Use this to target users who purchased or not yet purchased.
+     */
+    purchaseCondition?: ('all' | 'no_purchase' | 'has_purchase') | null;
+    /**
+     * Email capture is tracked client-side when popup forms are submitted.
+     */
+    emailCaptureCondition?: ('all' | 'email_captured' | 'email_not_captured') | null;
+    /**
+     * Minimum pages viewed in the current session before this popup can appear.
+     */
+    minSessionPageViews?: number | null;
   };
   startDate?: string | null;
   endDate?: string | null;
@@ -1181,6 +1239,54 @@ export interface UpcomingEventsConfig {
         id?: string | null;
       }[]
     | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "crm-sync-events".
+ */
+export interface CrmSyncEvent {
+  id: number;
+  entityType:
+    | 'user'
+    | 'user_profile'
+    | 'lead'
+    | 'company'
+    | 'booking'
+    | 'payment'
+    | 'consultation_booking'
+    | 'bulk_seat_allocation'
+    | 'waitlist';
+  entityId: string;
+  action: string;
+  dedupeKey: string;
+  status: 'pending' | 'processing' | 'done' | 'failed' | 'dead_letter';
+  priority?: number | null;
+  attempts?: number | null;
+  nextRetryAt?: string | null;
+  lastError?: string | null;
+  payloadSnapshot?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  resultSnapshot?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  sourceCollection?: string | null;
+  lockedAt?: string | null;
+  processedAt?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1335,6 +1441,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'upcoming-events-config';
         value: number | UpcomingEventsConfig;
+      } | null)
+    | ({
+        relationTo: 'crm-sync-events';
+        value: number | CrmSyncEvent;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -1572,7 +1682,9 @@ export interface ProgramsSelect<T extends boolean = true> {
       };
   tags?: T;
   isFeatured?: T;
+  featuredPriority?: T;
   isActive?: T;
+  learnersCount?: T;
   viewCount?: T;
   averageRating?: T;
   reviewCount?: T;
@@ -1636,8 +1748,10 @@ export interface SessionsSelect<T extends boolean = true> {
   instructor?: T;
   recordingUrl?: T;
   materials?: T;
+  status?: T;
   isCancelled?: T;
   cancellationReason?: T;
+  attendanceCount?: T;
   attendeesCount?: T;
   updatedAt?: T;
   createdAt?: T;
@@ -1785,8 +1899,10 @@ export interface ConsultationTypesSelect<T extends boolean = true> {
   instructor?: T;
   titleAr?: T;
   titleEn?: T;
+  title?: T;
   descriptionAr?: T;
   descriptionEn?: T;
+  description?: T;
   durationMinutes?: T;
   price?: T;
   currency?: T;
@@ -1804,6 +1920,7 @@ export interface ConsultationTypesSelect<T extends boolean = true> {
 export interface ConsultationAvailabilitySelect<T extends boolean = true> {
   instructor?: T;
   dayOfWeek?: T;
+  dayIndex?: T;
   startTime?: T;
   endTime?: T;
   bufferMinutes?: T;
@@ -1847,6 +1964,7 @@ export interface ConsultationBookingsSelect<T extends boolean = true> {
   reminderSent?: T;
   discountCode?: T;
   discountAmount?: T;
+  twentyCrmDealId?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1908,6 +2026,11 @@ export interface ReviewsSelect<T extends boolean = true> {
   isVerifiedPurchase?: T;
   adminNotes?: T;
   removedReason?: T;
+  isVideoTestimonial?: T;
+  videoUrl?: T;
+  videoThumbnail?: T;
+  videoCaption?: T;
+  videoSubtitle?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -2023,8 +2146,14 @@ export interface PopupsSelect<T extends boolean = true> {
     | {
         titleAr?: T;
         titleEn?: T;
+        badgeAr?: T;
+        badgeEn?: T;
+        subtitleAr?: T;
+        subtitleEn?: T;
         descriptionAr?: T;
         descriptionEn?: T;
+        legalNoteAr?: T;
+        legalNoteEn?: T;
         image?: T;
         imagePosition?: T;
       };
@@ -2061,6 +2190,7 @@ export interface PopupsSelect<T extends boolean = true> {
   appearance?:
     | T
     | {
+        stylePreset?: T;
         popupType?: T;
         animation?: T;
         overlayDarkness?: T;
@@ -2068,6 +2198,11 @@ export interface PopupsSelect<T extends boolean = true> {
         bgColor?: T;
         textColor?: T;
         accentColor?: T;
+        backgroundImage?: T;
+        backgroundOverlayOpacity?: T;
+        borderColor?: T;
+        badgeBgColor?: T;
+        badgeTextColor?: T;
       };
   countdown?:
     | T
@@ -2092,6 +2227,10 @@ export interface PopupsSelect<T extends boolean = true> {
         targetAudience?: T;
         targetRole?: T;
         targetDevice?: T;
+        visitorCondition?: T;
+        purchaseCondition?: T;
+        emailCaptureCondition?: T;
+        minSessionPageViews?: T;
       };
   startDate?: T;
   endDate?: T;
@@ -2204,6 +2343,28 @@ export interface UpcomingEventsConfigSelect<T extends boolean = true> {
         sortOrder?: T;
         id?: T;
       };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "crm-sync-events_select".
+ */
+export interface CrmSyncEventsSelect<T extends boolean = true> {
+  entityType?: T;
+  entityId?: T;
+  action?: T;
+  dedupeKey?: T;
+  status?: T;
+  priority?: T;
+  attempts?: T;
+  nextRetryAt?: T;
+  lastError?: T;
+  payloadSnapshot?: T;
+  resultSnapshot?: T;
+  sourceCollection?: T;
+  lockedAt?: T;
+  processedAt?: T;
   updatedAt?: T;
   createdAt?: T;
 }

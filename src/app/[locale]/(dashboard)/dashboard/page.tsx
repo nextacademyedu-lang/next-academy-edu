@@ -21,15 +21,15 @@ import {
 import styles from './overview.module.css';
 
 const NOTIFICATION_BORDER: Record<string, string> = {
-  booking_confirmed:    '#00e397',
-  payment_received:     '#00e397',
-  payment_reminder:     '#ffc107',
-  round_starting:       '#1877F2',
-  session_reminder:     '#1877F2',
-  booking_cancelled:    '#ff4d4f',
-  round_cancelled:      '#ff4d4f',
-  consultation_confirmed: '#00e397',
-  consultation_reminder:  '#1877F2',
+  booking_confirmed:      '#C51B1B',
+  payment_received:       '#C51B1B',
+  payment_reminder:       '#D6A32B',
+  round_starting:         '#D6A32B',
+  session_reminder:       '#D6A32B',
+  booking_cancelled:      '#C51B1B',
+  round_cancelled:        '#C51B1B',
+  consultation_confirmed: '#C51B1B',
+  consultation_reminder:  '#D6A32B',
 };
 
 export default function UserDashboardOverview() {
@@ -81,9 +81,9 @@ export default function UserDashboardOverview() {
   })();
 
   const stats = [
-    { title: 'Completed Programs', value: completedPrograms, icon: GraduationCap, color: '#00e397' },
-    { title: 'Active Bookings',    value: activeBookings.length, icon: Calendar,      color: '#1877F2' },
-    { title: 'Pending Payments',   value: pendingPayments,       icon: CreditCard,    color: '#ff4d4f' },
+    { title: 'Completed Programs', value: completedPrograms, icon: GraduationCap, color: '#C51B1B' },
+    { title: 'Active Bookings',    value: activeBookings.length, icon: Calendar,      color: '#D6A32B' },
+    { title: 'Pending Payments',   value: pendingPayments,       icon: CreditCard,    color: '#8F9A8F' },
   ];
 
   return (
@@ -105,9 +105,9 @@ export default function UserDashboardOverview() {
           const Icon = stat.icon;
           return (
             <Card key={stat.title} style={{
-              background: 'linear-gradient(135deg, rgba(26,26,26,0.6) 0%, rgba(10,10,10,0.8) 100%)',
+              background: 'linear-gradient(135deg, var(--bg-elevated) 0%, var(--bg-surface) 100%)',
               backdropFilter: 'blur(12px)',
-              border: '1px solid rgba(255,255,255,0.05)',
+              border: '1px solid var(--border-subtle)',
               position: 'relative',
               overflow: 'hidden',
             }}>
@@ -136,7 +136,7 @@ export default function UserDashboardOverview() {
       <div className={styles.mainGrid}>
 
         {/* Next Session */}
-        <Card style={{ background: 'rgba(255,255,255,0.03)', backdropFilter: 'blur(12px)', border: '1px solid rgba(255,255,255,0.05)' }}>
+        <Card style={{ background: 'var(--bg-elevated)', backdropFilter: 'blur(12px)', border: '1px solid var(--border-subtle)' }}>
           <CardHeader>
             <CardTitle>Next Up</CardTitle>
             <CardDescription>Your next scheduled live session</CardDescription>
@@ -146,7 +146,7 @@ export default function UserDashboardOverview() {
               <p style={{ color: 'var(--text-muted)', fontSize: '14px' }}>Loading…</p>
             ) : nextSession ? (
               <div style={{
-                background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)',
+                background: 'var(--bg-surface)', border: '1px solid var(--border-subtle)',
                 borderRadius: 'var(--radius-lg)', padding: '24px', display: 'flex', flexDirection: 'column', gap: '20px',
               }}>
                 <div>
@@ -181,8 +181,8 @@ export default function UserDashboardOverview() {
                 <p style={{ color: 'var(--text-muted)', fontSize: '14px', marginBottom: '16px' }}>
                   No upcoming sessions scheduled.
                 </p>
-                <Link href={`/${locale}/programs`} style={{ textDecoration: 'none' }}>
-                  <Button variant="outline" size="sm">Browse Programs</Button>
+                <Link href={`/${locale}/courses`} style={{ textDecoration: 'none' }}>
+                  <Button variant="outline" size="sm">Browse Courses</Button>
                 </Link>
               </div>
             )}
@@ -190,7 +190,7 @@ export default function UserDashboardOverview() {
         </Card>
 
         {/* Notifications */}
-        <Card style={{ background: 'rgba(255,255,255,0.03)', backdropFilter: 'blur(12px)', border: '1px solid rgba(255,255,255,0.05)' }}>
+        <Card style={{ background: 'var(--bg-elevated)', backdropFilter: 'blur(12px)', border: '1px solid var(--border-subtle)' }}>
           <CardHeader>
             <CardTitle>Recent Activity</CardTitle>
           </CardHeader>
@@ -201,7 +201,7 @@ export default function UserDashboardOverview() {
               <p style={{ color: 'var(--text-muted)', fontSize: '14px' }}>No recent activity.</p>
             ) : notifications.map(n => (
               <div key={n.id} style={{
-                padding: '16px', background: 'rgba(255,255,255,0.02)',
+                padding: '16px', background: 'var(--bg-surface)',
                 borderRadius: 'var(--radius-md)', display: 'flex', flexDirection: 'column', gap: '8px',
                 borderLeft: `3px solid ${NOTIFICATION_BORDER[n.type] ?? '#555'}`,
               }}>

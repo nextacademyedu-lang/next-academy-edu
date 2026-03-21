@@ -130,8 +130,8 @@ export default function BulkSeatsPage() {
       {/* Empty state */}
       {docs.length === 0 && (
         <Card style={{
-          background: 'rgba(255,255,255,0.02)', backdropFilter: 'blur(12px)',
-          border: '1px solid rgba(255,255,255,0.05)', textAlign: 'center', padding: '60px 24px',
+          background: 'var(--bg-elevated)', backdropFilter: 'blur(12px)',
+          border: '1px solid var(--border-subtle)', textAlign: 'center', padding: '60px 24px',
         }}>
           <CardContent>
             <Package size={48} color="var(--text-muted)" style={{ margin: '0 auto 16px' }} />
@@ -152,11 +152,11 @@ export default function BulkSeatsPage() {
 
         return (
           <Card key={doc.id} style={{
-            background: 'linear-gradient(135deg, rgba(26,26,26,0.6) 0%, rgba(10,10,10,0.8) 100%)',
-            backdropFilter: 'blur(12px)', border: '1px solid rgba(255,255,255,0.05)',
+            background: 'linear-gradient(135deg, var(--bg-elevated) 0%, var(--bg-surface) 100%)',
+            backdropFilter: 'blur(12px)', border: '1px solid var(--border-subtle)',
           }}>
             <CardHeader>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
                 <div>
                   <CardTitle>{getRoundLabel(doc.round)}</CardTitle>
                   <CardDescription style={{ marginTop: '4px' }}>
@@ -208,6 +208,8 @@ export default function BulkSeatsPage() {
                     return (
                       <div key={idx} style={{
                         display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                        gap: '10px',
+                        flexWrap: 'wrap',
                         padding: '14px 16px', background: 'rgba(255,255,255,0.02)', borderRadius: 'var(--radius-md)',
                       }}>
                         <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>

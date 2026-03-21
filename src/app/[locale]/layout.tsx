@@ -6,6 +6,7 @@ import { notFound } from 'next/navigation';
 import { routing } from '@/i18n/routing';
 import { AuthProvider } from '@/context/auth-context';
 import { ThemeProvider } from '@/context/theme-context';
+import { PopupManager } from '@/components/marketing/popup-manager';
 import '../globals.css';
 
 const montserrat = Montserrat({
@@ -70,6 +71,7 @@ export default async function LocaleLayout({
           <AuthProvider>
             <ThemeProvider>
               {children}
+              <PopupManager />
             </ThemeProvider>
           </AuthProvider>
         </NextIntlClientProvider>
@@ -77,4 +79,3 @@ export default async function LocaleLayout({
     </html>
   );
 }
-

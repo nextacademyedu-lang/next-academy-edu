@@ -1,7 +1,6 @@
 import { Navbar } from '@/components/layout/navbar';
 import { Footer } from '@/components/layout/footer';
 import { AnnouncementBar } from '@/components/layout/announcement-bar';
-import { PopupManager } from '@/components/marketing/popup-manager';
 import { HeroSection } from '@/components/sections/hero';
 import { StatsSection } from '@/components/sections/stats';
 import { B2BTrustedSection } from '@/components/sections/b2b-trusted';
@@ -39,7 +38,6 @@ export default async function HomePage({
       </main>
 
       <Footer />
-      <PopupManager />
     </div>
   );
 }

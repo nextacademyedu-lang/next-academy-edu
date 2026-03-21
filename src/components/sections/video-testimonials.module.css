@@ -1,7 +1,9 @@
 .section {
   width: 100%;
   padding: 100px 0;
-  background-color: var(--bg-main, #020504);
+  background:
+    radial-gradient(circle at 82% 16%, var(--accent-primary-10), transparent 36%),
+    linear-gradient(180deg, var(--bg-surface-2) 0%, var(--bg-main) 100%);
 }
 
 .container {
@@ -42,7 +44,7 @@
   height: 48px;
   border-radius: 50%;
   border: 1px solid var(--border-subtle);
-  background-color: var(--bg-surface, #111111);
+  background-color: color-mix(in srgb, var(--bg-surface) 90%, transparent);
   color: var(--text-primary);
   display: flex;
   align-items: center;
@@ -99,7 +101,7 @@
 .videoPortrait {
   width: 100%;
   aspect-ratio: 9/16; /* Portrait ratio (Shorts/Reels style) */
-  background-color: #1a1a1a;
+  background-color: var(--bg-surface);
   border-radius: var(--radius-lg);
   border: 1px solid var(--border-subtle);
   position: relative;
@@ -133,7 +135,7 @@
 .playIcon {
   font-size: 24px;
   color: var(--text-primary);
-  background-color: rgba(197, 27, 27, 0.8);
+  background-color: var(--accent-primary-80);
   width: 64px;
   height: 64px;
   display: flex;

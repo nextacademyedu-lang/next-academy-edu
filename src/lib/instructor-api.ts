@@ -63,7 +63,11 @@ export interface PayloadConsultationBooking {
 export interface PayloadConsultationType {
   id: string;
   title: string;
+  titleAr?: string;
+  titleEn?: string;
   description?: string;
+  descriptionAr?: string;
+  descriptionEn?: string;
   durationMinutes: number;
   price: number;
   isActive: boolean;
@@ -73,6 +77,7 @@ export interface PayloadConsultationType {
 export interface PayloadAvailability {
   id: string;
   dayOfWeek: 0 | 1 | 2 | 3 | 4 | 5 | 6;
+  dayIndex?: 0 | 1 | 2 | 3 | 4 | 5 | 6;
   startTime: string;
   endTime: string;
   bufferMinutes?: number;
@@ -155,7 +160,7 @@ export async function getConsultationTypes(): Promise<AuthResponse<PayloadListRe
 // ─────────────────────────────────────────────
 
 export async function getInstructorAvailability(): Promise<AuthResponse<PayloadListResponse<PayloadAvailability>>> {
-  const res = await fetch('/api/consultation-availability?depth=1&limit=7', { credentials: 'include' });
+  const res = await fetch('/api/instructor/availability?limit=50', { credentials: 'include' });
   return handleResponse<PayloadListResponse<PayloadAvailability>>(res);
 }
 
@@ -228,9 +233,11 @@ export function getConsultationStudentEmail(booking: PayloadConsultationBooking)
 }
 
 export function getConsultationTypeTitle(booking: PayloadConsultationBooking): string {
-  const type = booking.consultationType as { title: string } | null;
+  const type = booking.consultationType as
+    | { title?: string; titleAr?: string; titleEn?: string }
+    | null;
   if (!type || typeof type === 'string') return 'Consultation';
-  return type.title;
+  return type.title || type.titleEn || type.titleAr || 'Consultation';
 }
 
 export function getSlotDateTime(booking: PayloadConsultationBooking): { date: string; time: string } {
@@ -288,9 +295,11 @@ export function getEarningStudentName(e: PayloadEarning): string {
 }
 
 export function getEarningTypeTitle(e: PayloadEarning): string {
-  const t = e.consultationType as { title: string } | null;
+  const t = e.consultationType as
+    | { title?: string; titleAr?: string; titleEn?: string }
+    | null;
   if (!t || typeof t === 'string') return 'Consultation';
-  return t.title;
+  return t.title || t.titleEn || t.titleAr || 'Consultation';
 }
 
 export function getEarningDuration(e: PayloadEarning): number {

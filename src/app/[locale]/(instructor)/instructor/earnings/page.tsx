@@ -28,9 +28,9 @@ import styles from "./earnings.module.css";
 type FilterStatus = "all" | "paid" | "pending" | "refunded";
 
 const STATUS_STYLE: Record<string, { color: string; bg: string; label: string }> = {
-  paid:     { color: "#00e397", bg: "rgba(0,227,151,0.1)",   label: "Paid"     },
-  pending:  { color: "#ffc107", bg: "rgba(255,193,7,0.1)",   label: "Pending"  },
-  refunded: { color: "#888",    bg: "rgba(255,255,255,0.05)", label: "Refunded" },
+  paid:     { color: "#C51B1B", bg: "rgba(197,27,27,0.12)",   label: "Paid"     },
+  pending:  { color: "#D6A32B", bg: "rgba(214,163,43,0.14)",  label: "Pending"  },
+  refunded: { color: "#8F9A8F", bg: "rgba(143,154,143,0.16)", label: "Refunded" },
 };
 
 function formatEGP(amount: number) {
@@ -107,25 +107,25 @@ export default function InstructorEarningsPage() {
       label: "Total Earned",
       value: formatEGP(stats.totalEarned),
       icon: DollarSign,
-      color: "#00e397",
+      color: "#C51B1B",
     },
     {
       label: "This Month",
       value: formatEGP(stats.thisMonth),
       icon: TrendingUp,
-      color: "#1877F2",
+      color: "#D6A32B",
     },
     {
       label: "Pending Payout",
       value: formatEGP(stats.pendingAmount),
       icon: Clock,
-      color: "#ffc107",
+      color: "#8F9A8F",
     },
     {
       label: "Total Sessions",
       value: stats.totalSessions,
       icon: CheckCircle2,
-      color: "#a78bfa",
+      color: "#C51B1B",
     },
   ];
 
@@ -252,7 +252,7 @@ export default function InstructorEarningsPage() {
                           <td className={styles.td} style={{ fontWeight: 600, color: "var(--text-primary)", whiteSpace: "nowrap" }}>
                             {formatEGP(e.amount)}
                             {e.discountAmount > 0 && (
-                              <span style={{ fontSize: "12px", color: "#00e397", marginLeft: "6px" }}>
+                              <span style={{ fontSize: "12px", color: "var(--accent-gold)", marginLeft: "6px" }}>
                                 -{formatEGP(e.discountAmount)}
                               </span>
                             )}

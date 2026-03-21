@@ -2,6 +2,84 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getPayload } from 'payload';
 import config from '@payload-config';
 
+const PURCHASED_BOOKING_STATUSES = ['confirmed', 'completed'];
+
+type PopupTargeting = {
+  displayPages?: 'all' | 'specific' | null;
+  specificPages?: Array<{ url?: string | null }> | null;
+  targetAudience?: 'all' | 'guests_only' | 'logged_in' | 'specific_role' | null;
+  targetRole?: 'student' | 'user' | 'instructor' | 'b2b_manager' | null;
+  visitorCondition?: 'all' | 'first_visit' | 'returning_visitor' | null;
+  purchaseCondition?: 'all' | 'no_purchase' | 'has_purchase' | null;
+  emailCaptureCondition?: 'all' | 'email_captured' | 'email_not_captured' | null;
+  minSessionPageViews?: number | null;
+};
+
+type ViewerContext = {
+  isLoggedIn: boolean;
+  role?: string;
+  hasPurchase: boolean;
+  firstVisit: boolean;
+  emailCaptured: boolean;
+  sessionPageViews: number;
+};
+
+function parseBooleanParam(value: string | null): boolean {
+  return value === '1' || value === 'true';
+}
+
+function normalizeRole(role?: string): string | undefined {
+  if (!role) return undefined;
+  if (role === 'student') return 'user';
+  return role;
+}
+
+function matchesPageTargeting(page: string, targeting?: PopupTargeting): boolean {
+  if (!targeting || targeting.displayPages !== 'specific') return true;
+  if (!targeting.specificPages?.length) return false;
+
+  return targeting.specificPages.some((entry) => {
+    const url = entry?.url?.trim();
+    if (!url) return false;
+    return page === url || page.startsWith(url);
+  });
+}
+
+function matchesAudienceTargeting(targeting: PopupTargeting | undefined, viewer: ViewerContext): boolean {
+  const targetAudience = targeting?.targetAudience || 'all';
+
+  if (targetAudience === 'guests_only' && viewer.isLoggedIn) return false;
+  if (targetAudience === 'logged_in' && !viewer.isLoggedIn) return false;
+
+  if (targetAudience === 'specific_role') {
+    const targetRole = normalizeRole(targeting?.targetRole || undefined);
+    const viewerRole = normalizeRole(viewer.role);
+    if (!targetRole || !viewerRole || targetRole !== viewerRole) return false;
+  }
+
+  return true;
+}
+
+function matchesBehaviorTargeting(targeting: PopupTargeting | undefined, viewer: ViewerContext): boolean {
+  const visitorCondition = targeting?.visitorCondition || 'all';
+  const purchaseCondition = targeting?.purchaseCondition || 'all';
+  const emailCaptureCondition = targeting?.emailCaptureCondition || 'all';
+  const minSessionPageViews = Number(targeting?.minSessionPageViews || 0);
+
+  if (visitorCondition === 'first_visit' && !viewer.firstVisit) return false;
+  if (visitorCondition === 'returning_visitor' && viewer.firstVisit) return false;
+
+  if (purchaseCondition === 'no_purchase' && viewer.hasPurchase) return false;
+  if (purchaseCondition === 'has_purchase' && !viewer.hasPurchase) return false;
+
+  if (emailCaptureCondition === 'email_captured' && !viewer.emailCaptured) return false;
+  if (emailCaptureCondition === 'email_not_captured' && viewer.emailCaptured) return false;
+
+  if (minSessionPageViews > 0 && viewer.sessionPageViews < minSessionPageViews) return false;
+
+  return true;
+}
+
 /**
  * GET /api/popups/active?page=/ar/programs
  * Returns active popups matching the given page URL.
@@ -9,8 +87,38 @@ import config from '@payload-config';
 export async function GET(req: NextRequest) {
   try {
     const page = req.nextUrl.searchParams.get('page') || '/';
+    const firstVisit = parseBooleanParam(req.nextUrl.searchParams.get('firstVisit'));
+    const emailCaptured = parseBooleanParam(req.nextUrl.searchParams.get('emailCaptured'));
+    const sessionPageViews = Number.parseInt(req.nextUrl.searchParams.get('sessionPageViews') || '1', 10);
+
     const payload = await getPayload({ config });
     const now = new Date().toISOString();
+    const { user } = await payload.auth({ headers: req.headers });
+
+    let hasPurchase = false;
+    if (user?.id) {
+      const bookings = await payload.find({
+        collection: 'bookings',
+        where: {
+          and: [
+            { user: { equals: user.id } },
+            { status: { in: PURCHASED_BOOKING_STATUSES } },
+          ],
+        },
+        depth: 0,
+        limit: 1,
+      });
+      hasPurchase = bookings.totalDocs > 0;
+    }
+
+    const viewer: ViewerContext = {
+      isLoggedIn: Boolean(user),
+      role: user?.role,
+      hasPurchase,
+      firstVisit,
+      emailCaptured,
+      sessionPageViews: Number.isFinite(sessionPageViews) ? sessionPageViews : 1,
+    };
 
     const result = await payload.find({
       collection: 'popups',
@@ -36,18 +144,13 @@ export async function GET(req: NextRequest) {
       limit: 10,
     });
 
-    // Filter by page targeting
+    // Apply full targeting filters (page + audience + behavior)
     const popups = result.docs.filter((popup) => {
-      const targeting = popup.targeting as {
-        displayPages?: string;
-        specificPages?: Array<{ url: string }>;
-      } | undefined;
-
-      if (!targeting || targeting.displayPages !== 'specific') return true;
-
-      const pages = targeting.specificPages || [];
-      return pages.some(
-        (p) => page === p.url || page.startsWith(p.url),
+      const targeting = popup.targeting as PopupTargeting | undefined;
+      return (
+        matchesPageTargeting(page, targeting) &&
+        matchesAudienceTargeting(targeting, viewer) &&
+        matchesBehaviorTargeting(targeting, viewer)
       );
     });
 

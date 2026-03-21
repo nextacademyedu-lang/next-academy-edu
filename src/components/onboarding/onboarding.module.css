@@ -63,7 +63,7 @@
 .stepDot.active {
   background: var(--accent-primary, #C9A96E);
   border-color: var(--accent-primary, #C9A96E);
-  color: #0a0a0a;
+  color: var(--text-on-gold);
   box-shadow:
     0 0 12px rgba(201, 169, 110, 0.35),
     0 0 24px rgba(201, 169, 110, 0.15);
@@ -73,7 +73,7 @@
 .stepDot.completed {
   background: var(--accent-primary, #C9A96E);
   border-color: var(--accent-primary, #C9A96E);
-  color: #0a0a0a;
+  color: var(--text-on-gold);
 }
 
 /* Checkmark for completed steps */
@@ -174,7 +174,7 @@
 }
 
 .select option {
-  background: #1a1a1a;
+  background: var(--bg-elevated);
   color: var(--text-primary);
 }
 
@@ -260,10 +260,10 @@
   background: linear-gradient(
     135deg,
     var(--accent-primary, #C9A96E) 0%,
-    #b8934f 100%
+    var(--accent-deep, #b8934f) 100%
   );
   border: none;
-  color: #0a0a0a;
+  color: var(--text-on-gold);
   border-radius: var(--radius-md, 8px);
   cursor: pointer;
   transition: all 0.25s ease;
@@ -310,11 +310,11 @@
 
 /* ── Error ───────────────────────────────────────── */
 .errorMsg {
-  color: #ef4444;
+  color: var(--status-error);
   font-size: 14px;
   padding: 10px 12px;
-  background: rgba(239, 68, 68, 0.08);
-  border: 1px solid rgba(239, 68, 68, 0.2);
+  background: var(--status-error-bg);
+  border: 1px solid var(--status-error-border);
   border-radius: var(--radius-md, 8px);
 }
 

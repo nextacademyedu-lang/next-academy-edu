@@ -1,9 +1,21 @@
 {
   "Nav": {
+    "courses": "Courses",
+    "allCourses": "All Courses",
+    "quickAccess": "Quick Access",
     "programs": "Programs",
+    "workshops": "Workshops",
+    "events": "Events",
+    "webinars": "Webinars",
     "instructors": "Instructors",
+    "forBusiness": "For Business",
+    "forTeams": "For Teams",
+    "more": "More",
     "blog": "Blog",
     "about": "About",
+    "faq": "FAQ",
+    "contact": "Contact",
+    "search": "Search",
     "login": "Log In",
     "register": "Sign Up",
     "logout": "Log Out",
@@ -47,8 +59,11 @@
   },
   "Featured": {
     "title": "Featured Programs",
+    "subtitle": "A curated mix of hot courses, workshops, and career-focused tracks.",
     "viewAll": "View All Programs",
     "instructor": "Instructor",
+    "enrolled": "enrolled",
+    "noRating": "No rating",
     "date": "Date",
     "bookNow": "Book Now"
   },
@@ -105,7 +120,6 @@
     "forgotPassword": "Forgot password?",
     "noAccount": "Don't have an account?",
     "hasAccount": "Already have an account?",
-
     "loginTitle": "Welcome back!",
     "loginSubtitle": "We empower professionals and technical teams to learn, execute, and scale using top-tier business playbooks.",
     "signIn": "Sign in",
@@ -115,7 +129,6 @@
     "or": "or",
     "fillAllFields": "Please fill in all fields.",
     "invalidCredentials": "Invalid email or password.",
-
     "firstName": "First Name",
     "firstNamePlaceholder": "John",
     "lastName": "Last Name",
@@ -131,13 +144,11 @@
     "registrationFailed": "Registration failed.",
     "emailAlreadyExists": "An account with this email already exists. Try logging in instead.",
     "agreeTerms": "I agree to the Terms of Service and Privacy Policy",
-
     "pwdReqLength": "At least 8 characters",
     "pwdReqUpper": "1 uppercase letter",
     "pwdReqLower": "1 lowercase letter",
     "pwdReqNumber": "1 number",
     "pwdReqSpecial": "1 special character",
-
     "forgotPasswordTitle": "Forgot Password",
     "forgotPasswordSubtitle": "Enter your email and we'll send you a reset link",
     "sendResetLink": "Send Reset Link",
@@ -145,7 +156,6 @@
     "forgotPasswordSuccess": "If an account exists with that email, you will receive a password reset link shortly.",
     "backToLogin": "Back to Login",
     "forgotPasswordError": "Something went wrong. Please try again.",
-
     "resetPasswordTitle": "Reset Password",
     "resetPasswordSubtitle": "Enter your new password below",
     "newPassword": "New Password",
@@ -158,11 +168,9 @@
     "passwordsMustMatch": "Passwords must match",
     "invalidResetToken": "Invalid or expired reset token. Please request a new password reset.",
     "resetFailed": "Reset failed. Please try again.",
-
     "checkEmail": "Check Your Email",
     "resetLinkSent": "We sent a password reset link to {email}. Check your inbox and follow the link to reset your password.",
     "enterEmailError": "Please enter your email address.",
-
     "checkYourEmail": "Check your email",
     "sentCodeTo": "We sent a 6-digit code to",
     "verifyEmailTitle": "Verify Your Email",
@@ -178,7 +186,6 @@
     "emailMissing": "Email address is missing. Please go back and try again.",
     "invalidCode": "Invalid code. Please try again.",
     "resendFailed": "Failed to resend code. Please try again.",
-
     "onboardingTitle": "Complete Your Profile",
     "onboardingSubtitle": "Help us personalize your learning experience",
     "stepLabel": "Step {current} of {total}: {name}",
@@ -191,7 +198,6 @@
     "saving": "Saving...",
     "skipForNow": "Skip for now",
     "somethingWentWrong": "Something went wrong. Please try again.",
-
     "titleLabel": "Title",
     "selectTitle": "Select title...",
     "experienceLabel": "Experience",
@@ -209,7 +215,6 @@
     "fieldHR": "HR",
     "fieldLegal": "Legal",
     "fieldOther": "Other",
-
     "companyName": "Company Name",
     "companyPlaceholder": "e.g. Acme Corp",
     "companySize": "Company Size",
@@ -226,7 +231,6 @@
     "countryPlaceholder": "e.g. Saudi Arabia",
     "city": "City",
     "cityPlaceholder": "e.g. Riyadh",
-
     "interests": "Interests",
     "noTagsAvailable": "No tags available yet",
     "learningGoalsLabel": "Learning Goals",

@@ -26,7 +26,7 @@ export function AboutCta() {
           <p className={styles.subheading}>{t('ctaSubtitle')}</p>
 
           <div className={styles.actions}>
-            <Link href={`/${locale}/programs`} className={styles.btnPrimary}>
+            <Link href={`/${locale}/courses`} className={styles.btnPrimary}>
               {t('ctaBtnPrimary')}
             </Link>
             <Link href={`/${locale}/contact`} className={styles.btnSecondary}>

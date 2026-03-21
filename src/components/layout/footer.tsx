@@ -28,7 +28,7 @@ export async function Footer() {
           <div className={styles.linksSection}>
             <div className={styles.column}>
               <h4 className={styles.heading}>{t('pages')}</h4>
-              <Link href={`/${locale}/programs`}    className={styles.link}>{t('programs')}</Link>
+              <Link href={`/${locale}/courses`}     className={styles.link}>{t('programs')}</Link>
               <Link href={`/${locale}/instructors`} className={styles.link}>{t('instructors')}</Link>
               <Link href={`/${locale}/about`}       className={styles.link}>{t('about')}</Link>
               <Link href={`/${locale}/contact`}     className={styles.link}>{t('contact')}</Link>

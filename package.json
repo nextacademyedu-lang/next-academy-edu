@@ -6,10 +6,12 @@
   "scripts": {
     "dev": "next dev",
     "build": "payload generate:importmap && next build",
+    "check:env": "node scripts/check-coolify-env.mjs",
     "generate:importmap": "payload generate:importmap",
     "start": "next start",
     "seed:admin": "node --env-file=.env --env-file=.env.local --import tsx scripts/seed-admin.ts",
-    "seed:dev": "node --env-file=.env --env-file=.env.local --import tsx scripts/seed-dev.ts"
+    "seed:dev": "node --env-file=.env --env-file=.env.local --import tsx scripts/seed-dev.ts",
+    "crm:backfill": "node --env-file=.env --env-file=.env.local --import tsx scripts/backfill-crm-sync.ts"
   },
   "dependencies": {
     "@payloadcms/db-postgres": "^3.79.0",

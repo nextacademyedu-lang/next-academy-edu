@@ -1,14 +1,74 @@
 import type { CollectionConfig } from 'payload';
-import { isAdmin, isAdminOrOwner, isAuthenticated } from '../lib/access-control.ts';
+import {
+  isAdmin,
+  isAdminOrOwnerOrOwnInstructor,
+  isAdminOrOwnInstructorForUpdate,
+  isAuthenticated,
+} from '../lib/access-control.ts';
+import { createCrmDedupeKey } from '../lib/crm/dedupe.ts';
+import { enqueueCrmSyncEvent } from '../lib/crm/queue.ts';
 
 export const ConsultationBookings: CollectionConfig = {
   slug: 'consultation-bookings',
   admin: { useAsTitle: 'bookingCode' },
   access: {
-    read: isAdminOrOwner,
+    read: isAdminOrOwnerOrOwnInstructor,
     create: isAuthenticated,
-    update: isAdmin,
+    update: isAdminOrOwnInstructorForUpdate,
     delete: isAdmin,
+  },
+  hooks: {
+    afterChange: [
+      async ({ req, doc, previousDoc, operation }) => {
+        let action = operation === 'create'
+          ? 'consultation_booking_created'
+          : 'consultation_booking_updated';
+
+        if (operation === 'update') {
+          if (previousDoc?.paymentStatus !== doc.paymentStatus) {
+            if (doc.paymentStatus === 'paid') action = 'consultation_payment_paid';
+            else if (doc.paymentStatus === 'refunded') action = 'consultation_payment_refunded';
+            else action = 'consultation_payment_status_updated';
+          } else if (previousDoc?.status !== doc.status) {
+            action = 'consultation_status_updated';
+          }
+        }
+
+        const fingerprint = [
+          doc.updatedAt || doc.createdAt || '',
+          doc.status || '',
+          doc.paymentStatus || '',
+          doc.amount ?? '',
+        ].join('|');
+
+        await enqueueCrmSyncEvent({
+          payload: req.payload,
+          req,
+          entityType: 'consultation_booking',
+          entityId: String(doc.id),
+          action,
+          dedupeKey: createCrmDedupeKey({
+            entityType: 'consultation_booking',
+            entityId: String(doc.id),
+            action,
+            fingerprint,
+          }),
+          priority: 32,
+          sourceCollection: 'consultation-bookings',
+          payloadSnapshot: {
+            id: doc.id,
+            user: doc.user,
+            instructor: doc.instructor,
+            consultationType: doc.consultationType,
+            slot: doc.slot,
+            status: doc.status,
+            paymentStatus: doc.paymentStatus,
+            amount: doc.amount,
+            updatedAt: doc.updatedAt,
+          },
+        });
+      },
+    ],
   },
   fields: [
     { name: 'bookingCode', type: 'text', unique: true, admin: { readOnly: true } },
@@ -43,5 +103,6 @@ export const ConsultationBookings: CollectionConfig = {
     { name: 'reminderSent', type: 'checkbox', defaultValue: false },
     { name: 'discountCode', type: 'text' },
     { name: 'discountAmount', type: 'number', defaultValue: 0 },
+    { name: 'twentyCrmDealId', type: 'text', admin: { readOnly: true } },
   ],
 };

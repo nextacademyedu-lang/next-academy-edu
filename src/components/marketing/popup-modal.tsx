@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback, useRef, FormEvent } from 'react';
+import React, { useState, useEffect, useCallback, FormEvent } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLocale, useTranslations } from 'next-intl';
 import styles from './popup-modal.module.css';
@@ -10,8 +10,14 @@ import styles from './popup-modal.module.css';
 interface PopupContent {
   titleAr?: string;
   titleEn?: string;
+  badgeAr?: string;
+  badgeEn?: string;
+  subtitleAr?: string;
+  subtitleEn?: string;
   descriptionAr?: { root?: { children?: unknown[] } };
   descriptionEn?: { root?: { children?: unknown[] } };
+  legalNoteAr?: string;
+  legalNoteEn?: string;
   image?: { url?: string; alt?: string } | string;
   imagePosition?: 'top' | 'left' | 'right' | 'none';
 }
@@ -43,6 +49,7 @@ interface PopupForm {
 }
 
 interface PopupAppearance {
+  stylePreset?: 'default' | 'offer_dark';
   popupType?: 'modal' | 'slide_in' | 'bottom_bar' | 'full_screen';
   animation?: 'fade' | 'slide_up' | 'slide_side' | 'zoom';
   overlayDarkness?: number;
@@ -50,6 +57,11 @@ interface PopupAppearance {
   bgColor?: string;
   textColor?: string;
   accentColor?: string;
+  backgroundImage?: { url?: string; alt?: string } | string;
+  backgroundOverlayOpacity?: number;
+  borderColor?: string;
+  badgeBgColor?: string;
+  badgeTextColor?: string;
 }
 
 interface PopupCountdown {
@@ -71,6 +83,7 @@ export interface PopupData {
 interface PopupModalProps {
   popup: PopupData;
   onClose: () => void;
+  onLeadCaptured?: () => void;
 }
 
 /* ── Animation Variants ────────────────────────────────── */
@@ -164,22 +177,33 @@ function renderRichText(doc: { root?: { children?: unknown[] } } | undefined): R
 
 /* ── Component ─────────────────────────────────────────── */
 
-export function PopupModal({ popup, onClose }: PopupModalProps) {
+export function PopupModal({ popup, onClose, onLeadCaptured }: PopupModalProps) {
   const locale = useLocale();
   const t = useTranslations('Popup');
   const isAr = locale === 'ar';
 
   const { content, cta, promo, form, appearance, countdown } = popup;
   const popupType = appearance?.popupType || 'modal';
+  const stylePreset = appearance?.stylePreset || 'default';
   const animation = appearance?.animation || 'fade';
   const overlayDarkness = appearance?.overlayDarkness ?? 50;
   const closeOnOutside = appearance?.closeOnOutsideClick ?? true;
   const bgColor = appearance?.bgColor || '#1a1a2e';
   const textColor = appearance?.textColor || '#ffffff';
   const accentColor = appearance?.accentColor || '#e94560';
+  const borderColor = appearance?.borderColor || 'transparent';
+  const badgeBgColor = appearance?.badgeBgColor || '#117fb2';
+  const badgeTextColor = appearance?.badgeTextColor || '#ffffff';
+  const backgroundOverlayOpacity = appearance?.backgroundOverlayOpacity ?? 62;
+  const backgroundImageUrl = typeof appearance?.backgroundImage === 'object'
+    ? appearance.backgroundImage?.url
+    : undefined;
 
   const title = isAr ? content?.titleAr : content?.titleEn;
+  const badge = isAr ? content?.badgeAr : content?.badgeEn;
+  const subtitle = isAr ? content?.subtitleAr : content?.subtitleEn;
   const description = isAr ? content?.descriptionAr : content?.descriptionEn;
+  const legalNote = isAr ? content?.legalNoteAr : content?.legalNoteEn;
   const imageUrl = typeof content?.image === 'object' ? content.image?.url : undefined;
   const imageAlt = typeof content?.image === 'object' ? content.image?.alt : '';
   const imagePosition = content?.imagePosition || 'top';
@@ -188,7 +212,12 @@ export function PopupModal({ popup, onClose }: PopupModalProps) {
 
   const [copied, setCopied] = useState(false);
   const [submitted, setSubmitted] = useState(false);
-  const formRef = useRef<HTMLFormElement>(null);
+  const canShowOfferPromoBox = Boolean(
+    stylePreset === 'offer_dark' &&
+    promo?.hasPromoCode &&
+    promo?.promoCode &&
+    (promo.promoDelivery !== 'after_form' || submitted),
+  );
 
   const variants = getAnimationVariants(animation, popupType);
 
@@ -202,16 +231,22 @@ export function PopupModal({ popup, onClose }: PopupModalProps) {
   }, [promo?.promoCode]);
 
   /* Form submit */
-  const handleSubmit = useCallback((e: FormEvent) => {
+  const handleSubmit = useCallback((e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // In a real implementation, you'd POST to an API
+    const formData = new FormData(e.currentTarget);
+    const email = formData.get('popup-email');
+
+    if (typeof email === 'string' && email.trim()) {
+      onLeadCaptured?.();
+    }
+
     setSubmitted(true);
     if (form?.redirectUrl) {
       setTimeout(() => {
         window.location.href = form.redirectUrl as string;
       }, 1500);
     }
-  }, [form]);
+  }, [form?.redirectUrl, onLeadCaptured]);
 
   /* Close on Escape */
   useEffect(() => {
@@ -230,6 +265,7 @@ export function PopupModal({ popup, onClose }: PopupModalProps) {
   /* Determine modal class */
   const modalClass = [
     styles.modal,
+    stylePreset === 'offer_dark' ? styles.offerDark : '',
     popupType === 'slide_in' ? styles.slideIn : '',
     popupType === 'bottom_bar' ? styles.bottomBar : '',
     popupType === 'full_screen' ? styles.fullScreen : '',
@@ -248,7 +284,7 @@ export function PopupModal({ popup, onClose }: PopupModalProps) {
       >
         <motion.div
           className={modalClass}
-          style={{ backgroundColor: bgColor, color: textColor }}
+          style={{ backgroundColor: bgColor, color: textColor, borderColor }}
           variants={variants}
           initial="initial"
           animate="animate"
@@ -259,6 +295,21 @@ export function PopupModal({ popup, onClose }: PopupModalProps) {
           aria-modal="true"
           aria-label={title || popup.name}
         >
+          {stylePreset === 'offer_dark' && backgroundImageUrl && (
+            <>
+              <img
+                src={backgroundImageUrl}
+                alt=""
+                aria-hidden="true"
+                className={styles.offerBgImage}
+              />
+              <div
+                className={styles.offerBgOverlay}
+                style={{ background: `rgba(0, 0, 0, ${backgroundOverlayOpacity / 100})` }}
+              />
+            </>
+          )}
+
           {/* Close button */}
           <button className={styles.closeBtn} onClick={onClose} aria-label={t('close')}>
             <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="2">
@@ -282,8 +333,20 @@ export function PopupModal({ popup, onClose }: PopupModalProps) {
           )}
 
           <div className={styles.content}>
+            {stylePreset === 'offer_dark' && badge && (
+              <div
+                className={styles.offerBadge}
+                style={{ backgroundColor: badgeBgColor, color: badgeTextColor }}
+              >
+                {badge}
+              </div>
+            )}
+
             {/* Title */}
             {title && <h2 className={styles.title}>{title}</h2>}
+
+            {/* Subtitle */}
+            {subtitle && <p className={styles.subtitle}>{subtitle}</p>}
 
             {/* Description */}
             {description && (
@@ -317,7 +380,7 @@ export function PopupModal({ popup, onClose }: PopupModalProps) {
             )}
 
             {/* Promo Code */}
-            {promo?.hasPromoCode && promo.promoCode && promo.promoDelivery === 'show_directly' && !form?.hasForm && (
+            {stylePreset !== 'offer_dark' && promo?.hasPromoCode && promo.promoCode && promo.promoDelivery === 'show_directly' && !form?.hasForm && (
               <div className={styles.promoCode}>
                 <div>
                   <span className={styles.promoLabel}>{t('promoLabel')}</span>
@@ -331,11 +394,12 @@ export function PopupModal({ popup, onClose }: PopupModalProps) {
 
             {/* Form */}
             {form?.hasForm && !submitted && (
-              <form ref={formRef} className={styles.form} onSubmit={handleSubmit}>
+              <form className={styles.form} onSubmit={handleSubmit}>
                 {form.formFields?.map((field, idx) => (
                   <input
                     key={idx}
                     className={styles.input}
+                    name={field.fieldType === 'email' ? 'popup-email' : `popup-${field.fieldType}-${idx}`}
                     type={field.fieldType === 'email' ? 'email' : field.fieldType === 'phone' ? 'tel' : 'text'}
                     placeholder={field.fieldLabel}
                     required={field.isRequired}
@@ -357,7 +421,7 @@ export function PopupModal({ popup, onClose }: PopupModalProps) {
               <div className={styles.successMsg}>
                 {form.successMessage || t('thankYou')}
                 {/* Show promo code after form submit if configured */}
-                {promo?.hasPromoCode && promo.promoCode && promo.promoDelivery === 'after_form' && (
+                {stylePreset !== 'offer_dark' && promo?.hasPromoCode && promo.promoCode && promo.promoDelivery === 'after_form' && (
                   <div className={styles.promoCode} style={{ marginTop: 16 }}>
                     <div>
                       <span className={styles.promoLabel}>{t('promoLabel')}</span>
@@ -368,6 +432,14 @@ export function PopupModal({ popup, onClose }: PopupModalProps) {
                     </button>
                   </div>
                 )}
+              </div>
+            )}
+
+            {/* Promo Code Box */}
+            {canShowOfferPromoBox && (
+              <div className={styles.offerPromoBox}>
+                <span className={styles.promoLabel}>{t('promoLabel')}</span>
+                <span className={styles.offerPromoCode}>{promo?.promoCode}</span>
               </div>
             )}
 
@@ -389,6 +461,10 @@ export function PopupModal({ popup, onClose }: PopupModalProps) {
                   </a>
                 )}
               </div>
+            )}
+
+            {stylePreset === 'offer_dark' && legalNote && (
+              <p className={styles.legalNote}>{legalNote}</p>
             )}
           </div>
 

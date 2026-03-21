@@ -1,7 +1,10 @@
 .section {
   width: 100%;
   padding: 120px 0;
-  background: var(--bg-primary, #020504);
+  background:
+    radial-gradient(circle at 18% 14%, var(--accent-gold-10) 0%, transparent 34%),
+    radial-gradient(circle at 82% 86%, var(--accent-primary-10) 0%, transparent 34%),
+    linear-gradient(180deg, var(--bg-surface-2) 0%, var(--bg-main) 100%);
   position: relative;
   overflow: hidden;
 }
@@ -13,7 +16,7 @@
   width: 400px;
   height: 400px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(212, 175, 55, 0.06) 0%, transparent 70%);
+  background: radial-gradient(circle, var(--accent-gold-05) 0%, transparent 70%);
   pointer-events: none;
 }
 
@@ -84,7 +87,7 @@
 
 .btnPrimary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(212, 175, 55, 0.25);
+  box-shadow: 0 8px 24px var(--accent-gold-25);
 }
 
 .btnSecondary {
@@ -103,7 +106,7 @@
 }
 
 .btnSecondary:hover {
-  border-color: rgba(212, 175, 55, 0.3);
+  border-color: var(--accent-gold-30);
   background: var(--bg-elevated);
   transform: translateY(-2px);
 }

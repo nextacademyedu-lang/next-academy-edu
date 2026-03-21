@@ -4,8 +4,9 @@ import React, { useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useLocale } from 'next-intl';
-import { LayoutDashboard, Users, BookOpen, Package, LogOut, Building2 } from 'lucide-react';
+import { LayoutDashboard, Users, BookOpen, Package, LogOut, Building2, ArrowLeft } from 'lucide-react';
 import { useAuth } from '@/context/auth-context';
+import styles from './b2b-layout.module.css';
 
 const NAV_ITEMS = [
   { label: 'Overview',    href: '/b2b-dashboard',            icon: LayoutDashboard },
@@ -24,77 +25,105 @@ export default function B2BLayout({ children }: { children: React.ReactNode }) {
     if (!isLoading && !isAuthenticated) router.replace(`/${locale}/login`);
   }, [isLoading, isAuthenticated, router, locale]);
 
-  if (isLoading) return (
-    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg-primary)' }}>
-      <div style={{ color: 'var(--text-muted)', fontSize: '14px' }}>Loading…</div>
-    </div>
-  );
+  if (isLoading) {
+    return (
+      <div className={styles.loadingState}>
+        <div>Loading…</div>
+      </div>
+    );
+  }
+
+  const displayName = user ? `${user.firstName} ${user.lastName}`.trim() : 'Manager';
+  const avatarInitial = user?.firstName?.[0]?.toUpperCase() ?? 'M';
+  const isActive = (href: string) => {
+    const fullPath = `/${locale}${href}`;
+    if (href === '/b2b-dashboard') return pathname === fullPath;
+    return pathname === fullPath || pathname.startsWith(`${fullPath}/`);
+  };
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--bg-primary)' }}>
-
-      {/* Sidebar */}
-      <aside style={{
-        width: '240px', flexShrink: 0,
-        background: 'rgba(255,255,255,0.02)',
-        borderRight: '1px solid rgba(255,255,255,0.05)',
-        display: 'flex', flexDirection: 'column',
-        padding: '24px 0',
-      }}>
-        <div style={{ padding: '0 24px 32px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <Building2 size={22} color="var(--accent-primary)" />
+    <div className={styles.layoutContainer}>
+      <aside className={styles.sidebar}>
+        <div className={styles.sidebarHeader}>
+          <div className={styles.brandRow}>
+            <Building2 size={20} color="var(--accent-primary)" />
             <div>
-              <div style={{ fontSize: '14px', fontWeight: 700, color: 'var(--text-primary)' }}>
-                {user?.firstName ?? 'Manager'}
-              </div>
-              <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>B2B Dashboard</div>
+              <div className={styles.brandName}>{displayName}</div>
+              <div className={styles.brandSub}>B2B Dashboard</div>
             </div>
           </div>
         </div>
 
-        <nav style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '4px', padding: '0 12px' }}>
+        <nav className={styles.navLinks}>
           {NAV_ITEMS.map(item => {
-            const active = pathname === `/${locale}${item.href}` || (item.href !== '/b2b-dashboard' && pathname.includes(item.href));
+            const active = isActive(item.href);
             const Icon = item.icon;
             return (
-              <Link key={item.href} href={`/${locale}${item.href}`} style={{ textDecoration: 'none' }}>
-                <div style={{
-                  display: 'flex', alignItems: 'center', gap: '12px',
-                  padding: '10px 12px', borderRadius: 'var(--radius-md)',
-                  background: active ? 'rgba(197,27,27,0.1)' : 'transparent',
-                  color: active ? 'var(--accent-primary)' : 'var(--text-secondary)',
-                  fontSize: '14px', fontWeight: active ? 600 : 400,
-                  transition: 'all 0.2s',
-                }}>
+              <Link
+                key={item.href}
+                href={`/${locale}${item.href}`}
+                className={`${styles.navLink} ${active ? styles.navLinkActive : ''}`}
+              >
+                <div className={styles.navIconWrap}>
                   <Icon size={18} />
-                  {item.label}
                 </div>
+                {item.label}
               </Link>
             );
           })}
         </nav>
 
-        <div style={{ padding: '0 12px' }}>
-          <button
-            onClick={logout}
-            style={{
-              width: '100%', display: 'flex', alignItems: 'center', gap: '12px',
-              padding: '10px 12px', borderRadius: 'var(--radius-md)',
-              background: 'none', border: 'none', cursor: 'pointer',
-              color: 'var(--text-muted)', fontSize: '14px',
-            }}
-          >
-            <LogOut size={18} /> Sign Out
+        <div className={styles.sidebarFooter}>
+          <button onClick={logout} className={styles.logoutBtn}>
+            <LogOut size={18} />
+            Sign Out
           </button>
         </div>
       </aside>
 
-      {/* Main */}
-      <main style={{ flex: 1, padding: '40px', overflowY: 'auto' }}>
-        {children}
+      <main className={styles.mainContent}>
+        <header className={styles.topbar}>
+          <Link href={`/${locale}`} className={styles.siteLink}>
+            Next Academy
+          </Link>
+          <div className={styles.userProfile}>
+            <div className={styles.userInfo}>
+              <span className={styles.userName}>{displayName}</span>
+              <span className={styles.userRole}>B2B Manager</span>
+            </div>
+            <div className={styles.avatar}>{avatarInitial}</div>
+          </div>
+        </header>
+
+        <div className={styles.pageContainer}>
+          {children}
+        </div>
       </main>
 
+      <Link href={`/${locale}`} className={styles.floatingBackBtn}>
+        <ArrowLeft size={16} />
+        Back to Site
+      </Link>
+
+      <nav className={styles.mobileBottomBar}>
+        {NAV_ITEMS.map(item => {
+          const Icon = item.icon;
+          const active = isActive(item.href);
+          return (
+            <Link
+              key={item.href}
+              href={`/${locale}${item.href}`}
+              className={`${styles.mobileNavLink} ${active ? styles.mobileNavLinkActive : ''}`}
+              aria-label={item.label}
+            >
+              <span className={styles.mobileNavIconWrap}>
+                <Icon size={20} />
+              </span>
+              <span className={styles.mobileNavLabel}>{item.label}</span>
+            </Link>
+          );
+        })}
+      </nav>
     </div>
   );
 }

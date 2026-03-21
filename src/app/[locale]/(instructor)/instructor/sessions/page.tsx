@@ -13,10 +13,10 @@ import {
 } from '@/lib/instructor-api';
 
 const STATUS_STYLE: Record<string, { color: string; bg: string }> = {
-  scheduled: { color: '#1877F2', bg: 'rgba(24,119,242,0.1)' },
-  live:       { color: '#00e397', bg: 'rgba(0,227,151,0.1)'  },
-  completed:  { color: '#888',    bg: 'rgba(255,255,255,0.05)' },
-  cancelled:  { color: '#ff4d4f', bg: 'rgba(255,77,79,0.1)'  },
+  scheduled: { color: '#D6A32B', bg: 'rgba(214,163,43,0.14)' },
+  live:      { color: '#C51B1B', bg: 'rgba(197,27,27,0.12)'  },
+  completed: { color: '#8F9A8F', bg: 'rgba(143,154,143,0.16)' },
+  cancelled: { color: '#C51B1B', bg: 'rgba(197,27,27,0.12)'  },
 };
 
 export default function InstructorSessionsPage() {
@@ -45,7 +45,7 @@ export default function InstructorSessionsPage() {
           <h1 style={{ fontSize: '28px', fontWeight: 700, marginBottom: '8px', color: 'var(--text-primary)' }}>My Sessions</h1>
           <p style={{ color: 'var(--text-secondary)', fontSize: '15px' }}>Manage your upcoming classes, join links, and learning materials.</p>
         </div>
-        <div style={{ position: 'relative', width: '250px' }}>
+        <div style={{ position: 'relative', width: 'min(100%, 280px)' }}>
           <Search size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
           <Input
             placeholder="Search sessions..."
@@ -62,18 +62,18 @@ export default function InstructorSessionsPage() {
       ) : filtered.length === 0 ? (
         <p style={{ color: 'var(--text-muted)', fontSize: '14px' }}>No sessions found.</p>
       ) : (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))', gap: '24px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '24px' }}>
           {filtered.map(session => {
             const style = STATUS_STYLE[session.status] ?? STATUS_STYLE.completed;
             const label = session.status.charAt(0).toUpperCase() + session.status.slice(1);
             return (
               <Card key={session.id} style={{
-                background: 'rgba(255,255,255,0.03)', backdropFilter: 'blur(12px)',
-                border: '1px solid rgba(255,255,255,0.05)', display: 'flex', flexDirection: 'column',
+                background: 'var(--bg-elevated)', backdropFilter: 'blur(12px)',
+                border: '1px solid var(--border-subtle)', display: 'flex', flexDirection: 'column',
               }}>
                 <CardHeader style={{ paddingBottom: '16px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
-                    <span style={{ fontSize: '12px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--accent-primary)', backgroundColor: 'rgba(0,227,151,0.1)', padding: '4px 8px', borderRadius: '4px' }}>
+                    <span style={{ fontSize: '12px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--accent-primary)', backgroundColor: 'var(--accent-primary-10)', padding: '4px 8px', borderRadius: '4px' }}>
                       {getSessionRoundTitle(session) || 'Session'}
                     </span>
                     <span style={{ fontSize: '12px', fontWeight: 500, color: style.color, backgroundColor: style.bg, padding: '4px 8px', borderRadius: '4px' }}>
@@ -102,7 +102,7 @@ export default function InstructorSessionsPage() {
                   </div>
                 </CardContent>
 
-                <CardFooter style={{ borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '16px', display: 'flex', gap: '12px' }}>
+                <CardFooter style={{ borderTop: '1px solid var(--border-subtle)', paddingTop: '16px', display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
                   {(session.status === 'scheduled' || session.status === 'live') && session.meetingUrl && (
                     <a href={session.meetingUrl} target="_blank" rel="noreferrer" style={{ flex: 1, textDecoration: 'none' }}>
                       <Button variant="primary" style={{ width: '100%' }}>

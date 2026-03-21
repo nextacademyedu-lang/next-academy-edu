@@ -41,6 +41,7 @@ import { BulkSeatAllocations } from './collections/BulkSeatAllocations.ts';
 import { Popups } from './collections/Popups.ts';
 import { AnnouncementBars } from './collections/AnnouncementBars.ts';
 import { UpcomingEventsConfig } from './collections/UpcomingEventsConfig.ts';
+import { CrmSyncEvents } from './collections/CrmSyncEvents.ts';
 
 if (!process.env.DATABASE_URI) {
   throw new Error('DATABASE_URI environment variable is required');
@@ -196,6 +197,7 @@ export default buildConfig({
     Popups,
     AnnouncementBars,
     UpcomingEventsConfig,
+    CrmSyncEvents,
   ],
   editor: lexicalEditor({}),
   db: postgresAdapter({

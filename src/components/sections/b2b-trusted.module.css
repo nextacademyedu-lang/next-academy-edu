@@ -1,7 +1,7 @@
 .section {
   width: 100%;
   padding: 100px 0;
-  background-color: var(--bg-main, #020504); /* Match background */
+  background: linear-gradient(180deg, var(--bg-main) 0%, var(--bg-surface-2) 100%);
   overflow: hidden;
 }
 
@@ -90,7 +90,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: var(--bg-surface, #111111);
+  background-color: var(--bg-surface);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
   color: var(--text-secondary);

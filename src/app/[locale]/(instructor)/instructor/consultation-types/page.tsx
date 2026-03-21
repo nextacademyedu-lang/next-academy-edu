@@ -63,7 +63,7 @@ export default function InstructorServicesPage() {
       {loading && <p style={{ color: 'var(--text-muted)', fontSize: '14px' }}>Loading…</p>}
 
       {!loading && services.length === 0 && (
-        <Card style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.05)' }}>
+        <Card style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border-subtle)' }}>
           <CardContent style={{ padding: '48px', textAlign: 'center' }}>
             <Settings2 size={40} style={{ color: 'var(--text-muted)', margin: '0 auto 16px' }} />
             <p style={{ color: 'var(--text-secondary)', fontSize: '16px' }}>No consultation services yet.</p>
@@ -75,13 +75,13 @@ export default function InstructorServicesPage() {
       <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
         {services.map(service => (
           <Card key={service.id} style={{
-            background: 'rgba(255,255,255,0.02)',
+            background: 'var(--bg-elevated)',
             backdropFilter: 'blur(12px)',
-            border: `1px solid ${service.isActive ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.02)'}`,
+            border: `1px solid ${service.isActive ? 'var(--border-subtle)' : 'var(--border)'}`,
             opacity: service.isActive ? 1 : 0.6,
             transition: 'all 0.2s',
           }}>
-            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '24px', padding: '24px' }}>
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '24px', padding: '24px', flexWrap: 'wrap' }}>
 
               {/* Info */}
               <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '12px' }}>
@@ -111,7 +111,7 @@ export default function InstructorServicesPage() {
               </div>
 
               {/* Actions */}
-              <div style={{ display: 'flex', gap: '12px', flexShrink: 0, alignItems: 'center' }}>
+              <div style={{ display: 'flex', gap: '12px', flexShrink: 0, alignItems: 'center', flexWrap: 'wrap' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginRight: '8px' }}>
                   <Label style={{ cursor: 'pointer', color: 'var(--text-muted)', fontSize: '13px' }}>Active</Label>
                   <button

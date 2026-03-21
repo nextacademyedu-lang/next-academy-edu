@@ -12,7 +12,7 @@ import {
   type B2BDashboardData,
 } from '@/lib/b2b-api';
 
-const STAT_COLORS = ['#00e397', '#1877F2', '#ffc107', '#C51B1B'];
+const STAT_COLORS = ['#C51B1B', '#D6A32B', '#5F6F63', '#8F9A8F'];
 
 const STATUS_STYLE: Record<string, { color: string; bg: string }> = {
   confirmed:  { color: '#00e397', bg: 'rgba(0,227,151,0.1)'   },
@@ -59,8 +59,8 @@ export default function B2BOverviewPage() {
           const Icon = stat.icon;
           return (
             <Card key={stat.title} style={{
-              background: 'linear-gradient(135deg, rgba(26,26,26,0.6) 0%, rgba(10,10,10,0.8) 100%)',
-              backdropFilter: 'blur(12px)', border: '1px solid rgba(255,255,255,0.05)',
+              background: 'linear-gradient(135deg, var(--bg-elevated) 0%, var(--bg-surface) 100%)',
+              backdropFilter: 'blur(12px)', border: '1px solid var(--border-subtle)',
               position: 'relative', overflow: 'hidden',
             }}>
               <div style={{
@@ -71,7 +71,7 @@ export default function B2BOverviewPage() {
               <CardContent style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <span style={{ color: 'var(--text-secondary)', fontSize: '14px', fontWeight: 500 }}>{stat.title}</span>
-                  <div style={{ backgroundColor: `${stat.color}15`, padding: '8px', borderRadius: '8px' }}>
+                  <div style={{ backgroundColor: `${stat.color}22`, padding: '8px', borderRadius: '8px' }}>
                     <Icon size={20} color={stat.color} />
                   </div>
                 </div>
@@ -85,7 +85,7 @@ export default function B2BOverviewPage() {
       </div>
 
       {/* Main Grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '24px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '24px' }}>
 
         {/* Recent Team Members */}
         <Card style={{ background: 'rgba(255,255,255,0.03)', backdropFilter: 'blur(12px)', border: '1px solid rgba(255,255,255,0.05)' }}>

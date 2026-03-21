@@ -9,12 +9,12 @@ import styles from './instructor.module.css';
 import { useAuth } from '@/context/auth-context';
 
 const INSTRUCTOR_NAV_LINKS = [
-  { name: 'Overview',      href: '/instructor',                    icon: Home       },
-  { name: 'Sessions',      href: '/instructor/sessions',           icon: Video      },
-  { name: 'Consultations', href: '/instructor/bookings',           icon: Users      },
-  { name: 'Earnings',      href: '/instructor/earnings',           icon: DollarSign },
-  { name: 'Services',      href: '/instructor/consultation-types', icon: Settings   },
-  { name: 'Availability',  href: '/instructor/availability',       icon: Clock      },
+  { name: 'Overview',      mobileLabel: 'Home',      href: '/instructor',                    icon: Home       },
+  { name: 'Sessions',      mobileLabel: 'Sessions',  href: '/instructor/sessions',           icon: Video      },
+  { name: 'Consultations', mobileLabel: 'Bookings',  href: '/instructor/bookings',           icon: Users      },
+  { name: 'Earnings',      mobileLabel: 'Earnings',  href: '/instructor/earnings',           icon: DollarSign },
+  { name: 'Services',      mobileLabel: 'Services',  href: '/instructor/consultation-types', icon: Settings   },
+  { name: 'Availability',  mobileLabel: 'Hours',     href: '/instructor/availability',       icon: Clock      },
 ];
 
 export function InstructorLayout({ children }: { children: React.ReactNode }) {
@@ -91,7 +91,7 @@ export function InstructorLayout({ children }: { children: React.ReactNode }) {
         <header className={styles.topbar}>
           <div>
             <Link href={`/${locale}`} className={styles.logo} style={{ display: 'block' }}>
-              <span className="hidden-desktop">Next Academy</span>
+              Next Academy
             </Link>
           </div>
           <div className={styles.topbarRight}>
@@ -122,7 +122,7 @@ export function InstructorLayout({ children }: { children: React.ReactNode }) {
       </Link>
 
       {/* Mobile Bottom Bar (Hidden on Desktop via CSS) */}
-      <nav className={styles.mobileBottomBar} style={{ display: 'none' }}>
+      <nav className={styles.mobileBottomBar}>
         {INSTRUCTOR_NAV_LINKS.map((link) => {
           const Icon = link.icon;
           const isDashboardRoot = link.href === '/instructor' && pathname.endsWith('/instructor');
@@ -134,30 +134,16 @@ export function InstructorLayout({ children }: { children: React.ReactNode }) {
               key={link.name}
               href={`/${locale}${link.href}`}
               className={`${styles.mobileNavLink} ${activeClass}`}
+              aria-label={link.name}
             >
-              <Icon size={24} />
-              <span style={{ fontSize: '10px' }}>{link.name}</span>
+              <span className={styles.mobileNavIconWrap}>
+                <Icon size={20} />
+              </span>
+              <span className={styles.mobileNavLabel}>{link.mobileLabel}</span>
             </Link>
           );
         })}
       </nav>
-      <style dangerouslySetInnerHTML={{
-        __html: `
-          @media (max-width: 900px) {
-            .${styles.mobileBottomBar} {
-              display: flex !important;
-            }
-            .hidden-desktop {
-               display: inline-block;
-            }
-          }
-          @media (min-width: 901px) {
-            .hidden-desktop {
-              display: none;
-            }
-          }
-        `
-      }} />
     </div>
   );
 }

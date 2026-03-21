@@ -1,16 +1,16 @@
 "use client";
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { motion, animate, useInView } from 'framer-motion';
+import { useTranslations } from 'next-intl';
 import styles from './stats.module.css';
 
-// In reality, this will be fetched from Payload CMS / DB
-const MOCK_STATS = [
-  { value: 15000, suffix: '+', label: 'Professionals Trained' },
-  { value: 500, suffix: '+', label: 'Corporate Partners' },
-  { value: 120, suffix: '+', label: 'Expert Instructors' },
-  { value: 98, suffix: '%', label: 'Completion Rate' },
-];
+type StatsPayload = {
+  professionals: number;
+  partners: number;
+  instructors: number;
+  completionRate: number;
+};
 
 function AnimatedCounter({ from, to, suffix }: { from: number, to: number, suffix: string }) {
   const nodeRef = useRef<HTMLSpanElement>(null);
@@ -36,6 +36,45 @@ function AnimatedCounter({ from, to, suffix }: { from: number, to: number, suffi
 }
 
 export function StatsSection() {
+  const t = useTranslations('Stats');
+  const [stats, setStats] = useState<StatsPayload>({
+    professionals: 0,
+    partners: 0,
+    instructors: 0,
+    completionRate: 0,
+  });
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const res = await fetch('/api/home/stats', { cache: 'no-store' });
+        if (!res.ok) return;
+        const data = await res.json();
+        if (!data?.stats) return;
+        setStats({
+          professionals: Number(data.stats.professionals || 0),
+          partners: Number(data.stats.partners || 0),
+          instructors: Number(data.stats.instructors || 0),
+          completionRate: Number(data.stats.completionRate || 0),
+        });
+      } catch {
+        // keep safe defaults
+      }
+    };
+
+    fetchStats();
+  }, []);
+
+  const cards = useMemo(
+    () => [
+      { value: stats.professionals, suffix: '+', label: t('professionals') },
+      { value: stats.partners, suffix: '+', label: t('partners') },
+      { value: stats.instructors, suffix: '+', label: t('instructors') },
+      { value: Math.max(0, Math.min(100, stats.completionRate)), suffix: '%', label: t('completion') },
+    ],
+    [stats, t],
+  );
+
   return (
     <section className={styles.section}>
       <div className={styles.container}>
@@ -49,7 +88,7 @@ export function StatsSection() {
             hidden: {}
           }}
         >
-          {MOCK_STATS.map((stat, index) => (
+          {cards.map((stat, index) => (
             <motion.div 
               key={index} 
               className={styles.statBlock}

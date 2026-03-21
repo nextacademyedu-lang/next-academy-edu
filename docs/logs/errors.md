@@ -4,6 +4,28 @@
 
 ---
 
+### [2026-03-20 03:42] - CRM Domain Unhealthy: Self-Signed TLS + Upstream 503
+
+**Error:**
+- `https://crm.nextacademyedu.com/healthz` returns `503 Service Unavailable` with response body `no available server`.
+- HTTPS certificate is not trusted (`CN=TRAEFIK DEFAULT CERT`, self-signed).
+- Node clients fail on TLS handshake with `DEPTH_ZERO_SELF_SIGNED_CERT`.
+
+**Root Cause:**
+1. CRM domain is serving Traefik fallback/default certificate instead of valid CA-issued cert.
+2. Reverse proxy has no healthy upstream available for the Twenty app route (`no available server`).
+3. Even if route recovers, current certificate state alone will break secure API calls from strict HTTPS clients.
+
+**Fix (required):**
+1. In Coolify/Traefik, issue a valid certificate for `crm.nextacademyedu.com` (Let's Encrypt DNS/HTTP challenge).
+2. Verify Twenty service target port/router health checks and ensure at least one healthy backend instance.
+3. Re-test:
+   - `curl -I https://crm.nextacademyedu.com/healthz` should return `200`.
+   - Node `fetch('https://crm.nextacademyedu.com/healthz')` should succeed without TLS overrides.
+4. Rotate leaked credentials and redact tracked `docs/logs/coolify/Variables.md`.
+
+---
+
 ### [2026-03-16 ~20:00] - Coolify Deployment Failures (Batch)
 
 Extracted from deployment logs. See `docs/engineering/coolify-deployment.md` §6 for full table.

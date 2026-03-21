@@ -48,7 +48,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 20px 24px;
-  background: rgba(255, 255, 255, 0.05); /* Match reference subtle dark grey */
+  background: var(--input-bg);
   border: 1px solid transparent;
   border-radius: var(--radius-md);
   cursor: pointer;
@@ -56,12 +56,12 @@
 }
 
 .paymentOption:hover {
-  background: rgba(255, 255, 255, 0.08);
+  background: var(--input-bg-hover);
 }
 
 .paymentOption.selected {
-  border-color: rgba(255, 255, 255, 0.2);
-  background: rgba(255, 255, 255, 0.08);
+  border-color: var(--border-emphasis);
+  background: var(--input-bg-hover);
 }
 
 .radioGroup {
@@ -108,10 +108,10 @@
 /* Right Side: Order Summary Panel */
 .summarySection {
   width: 400px;
-  background: rgba(255, 255, 255, 0.05); /* Glass surface */
+  background: var(--input-bg);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--input-bg);
   border-radius: var(--radius-lg);
   padding: 32px;
   display: flex;
@@ -121,8 +121,8 @@
 
 /* Plan Card within Summary */
 .planCard {
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  background: var(--sidebar-bg);
+  border: 1px solid var(--input-bg);
   border-radius: var(--radius-md);
   padding: 20px;
   display: flex;
@@ -143,7 +143,7 @@
 }
 
 .changePlanBtn {
-  color: #1877F2;
+  color: var(--accent-link);
   font-size: 13px;
   background: none;
   border: none;
@@ -185,11 +185,11 @@
 }
 
 .summaryRow.discount span {
-  color: #00e397;
+  color: var(--success);
 }
 
 .removeCoupon {
-  color: #1877F2;
+  color: var(--accent-link);
   font-size: 12px;
   cursor: pointer;
   display: block;
@@ -204,7 +204,7 @@
 
 .divider {
   height: 1px;
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--border);
   margin: 8px 0;
 }
 
@@ -225,7 +225,7 @@
 
 .proceedBtn {
   background-color: var(--accent-primary); /* Uses the red from your palette "#C51B1B" or the requested red */
-  color: white;
+  color: var(--text-on-accent);
   border: none;
   border-radius: var(--radius-md);
   padding: 16px;
@@ -254,7 +254,7 @@
 
 .paymentTypeToggle {
   display: flex;
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--input-bg);
   border-radius: var(--radius-md);
   padding: 4px;
   margin-bottom: 24px;
@@ -280,8 +280,8 @@
 .installmentNotice {
   margin-top: 16px;
   padding: 16px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  background: var(--sidebar-bg);
+  border: 1px solid var(--input-bg);
   border-radius: var(--radius-md);
 }
 
@@ -320,8 +320,8 @@
 
 .discountInput {
   flex: 1;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--sidebar-bg);
+  border: 1px solid var(--border);
   padding: 12px 16px;
   border-radius: var(--radius-md);
   color: var(--text-primary);
@@ -329,7 +329,7 @@
 }
 
 .applyBtn {
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--input-bg-active);
   border: none;
   color: var(--text-primary);
   padding: 0 16px;
@@ -340,7 +340,7 @@
 }
 
 .applyBtn:hover {
-  background: rgba(255, 255, 255, 0.15);
+  background: var(--border-emphasis);
 }
 
 .securityBadge {

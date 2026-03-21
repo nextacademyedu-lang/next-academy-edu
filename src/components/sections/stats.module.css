@@ -1,7 +1,10 @@
 .section {
   width: 100%;
-  padding: 40px 0 60px;
-  background-color: var(--bg-primary, #020504); /* Matches Hero section */
+  margin-top: -52px;
+  padding: 0 0 68px;
+  background: transparent;
+  position: relative;
+  z-index: 3;
 }
 
 .container {
@@ -17,10 +20,12 @@
   flex-wrap: wrap;
   gap: var(--space-xl, 32px);
   padding: 32px;
-  background-color: var(--bg-surface);
+  background: color-mix(in srgb, var(--bg-surface) 92%, transparent);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-lg);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 20px 44px rgba(0, 0, 0, 0.24);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 }
 
 .statBlock {
@@ -49,6 +54,11 @@
 }
 
 @media (max-width: 768px) {
+  .section {
+    margin-top: -30px;
+    padding-bottom: 48px;
+  }
+
   .grid {
     grid-template-columns: repeat(2, 1fr);
     display: grid;

@@ -1,0 +1,122 @@
+.wrapper {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.main {
+  flex: 1;
+}
+
+.hero {
+  padding: 72px 0 56px;
+  background:
+    radial-gradient(circle at 20% 20%, var(--accent-primary-15), transparent 36%),
+    linear-gradient(180deg, var(--bg-surface-2) 0%, var(--bg-main) 100%);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.container {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.eyebrow {
+  margin: 0 0 10px;
+  color: var(--accent-text);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 12px;
+  font-weight: var(--font-semibold);
+}
+
+.title {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: clamp(30px, 4vw, 52px);
+  line-height: 1.08;
+  font-family: var(--font-heading-en), var(--font-heading-ar);
+}
+
+.subtitle {
+  margin: 14px 0 0;
+  color: var(--text-secondary);
+  max-width: 64ch;
+  line-height: 1.7;
+}
+
+.section {
+  padding: 44px 0 76px;
+  background: linear-gradient(180deg, var(--bg-main) 0%, var(--bg-surface-2) 100%);
+}
+
+.faqList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.item {
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  background: var(--bg-surface);
+  padding: 6px 14px;
+}
+
+.question {
+  list-style: none;
+  cursor: pointer;
+  color: var(--text-primary);
+  font-weight: var(--font-semibold);
+  padding: 14px 0;
+}
+
+.question::-webkit-details-marker {
+  display: none;
+}
+
+.answer {
+  margin: 0 0 12px;
+  color: var(--text-secondary);
+  line-height: 1.7;
+}
+
+.ctaCard {
+  margin-top: 24px;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  background: var(--bg-surface);
+  padding: 20px;
+}
+
+.ctaTitle {
+  margin: 0;
+  color: var(--text-primary);
+}
+
+.ctaText {
+  margin: 10px 0 0;
+  color: var(--text-secondary);
+}
+
+.ctaActions {
+  margin-top: 16px;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 0 16px;
+  }
+
+  .hero {
+    padding: 56px 0 44px;
+  }
+
+  .section {
+    padding: 36px 0 56px;
+  }
+}

@@ -1,7 +1,7 @@
 .section {
   width: 100%;
   padding: 120px 0;
-  background-color: var(--bg-main, #020504);
+  background: linear-gradient(180deg, var(--bg-main) 0%, var(--bg-surface-2) 100%);
   background-image: 
     linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
     linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
@@ -37,9 +37,9 @@
 .label {
   display: inline-block;
   padding: 8px 16px;
-  background-color: rgba(197, 27, 27, 0.1);
+  background-color: var(--accent-primary-10);
   color: var(--accent-primary, #646464);
-  border: 1px solid rgba(197, 27, 27, 0.2);
+  border: 1px solid var(--accent-primary-20);
   border-radius: 100px;
   font-size: var(--text-small, 14px);
   font-weight: 700;

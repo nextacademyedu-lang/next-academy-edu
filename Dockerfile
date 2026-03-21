@@ -18,10 +18,11 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-ARG NEXT_PUBLIC_APP_URL
+ARG NEXT_PUBLIC_APP_URL=https://nextacademyedu.com
 ARG NEXT_PUBLIC_SERVER_URL
-ARG PAYLOAD_SECRET
-ARG DATABASE_URI
+# Build-time placeholders are intentionally non-secret. Runtime env values override them.
+ARG PAYLOAD_SECRET=build_placeholder_payload_secret_please_override_in_runtime
+ARG DATABASE_URI=postgresql://placeholder:placeholder@127.0.0.1:5432/placeholder
 
 ENV NEXT_PUBLIC_APP_URL=$NEXT_PUBLIC_APP_URL
 ENV NEXT_PUBLIC_SERVER_URL=${NEXT_PUBLIC_SERVER_URL:-$NEXT_PUBLIC_APP_URL}

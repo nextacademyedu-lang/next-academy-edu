@@ -87,15 +87,8 @@ export default function ProfilePage() {
 
       {/* Toast */}
       {toast && (
-        <div style={{
-          position: 'fixed', bottom: '24px', left: '50%', transform: 'translateX(-50%)',
-          padding: '12px 24px', borderRadius: '8px', fontSize: '14px', fontWeight: 500,
-          zIndex: 9000, display: 'flex', alignItems: 'center', gap: '8px',
-          background: toast.type === 'success' ? '#1a3a1a' : '#3a1a1a',
-          color:      toast.type === 'success' ? '#4ade80' : '#f87171',
-          border:     `1px solid ${toast.type === 'success' ? 'rgba(74,222,128,0.3)' : 'rgba(248,113,113,0.3)'}`,
-        }}>
-          {toast.type === 'success' ? <CheckCircle2 size={16} /> : <AlertCircle size={16} />}
+        <div className={`${styles.toast} ${toast.type === 'success' ? styles.toastSuccess : styles.toastError}`}>
+          {toast.type === 'success' ? <CheckCircle2 size={16} className={styles.toastIcon} /> : <AlertCircle size={16} className={styles.toastIcon} />}
           {toast.message}
         </div>
       )}
@@ -123,36 +116,31 @@ export default function ProfilePage() {
 
           {/* General Tab */}
           {tab === 'general' && (
-            <Card style={{ background: 'rgba(255,255,255,0.03)', backdropFilter: 'blur(12px)', border: '1px solid rgba(255,255,255,0.05)' }}>
+            <Card className={styles.panelCard}>
               <CardHeader>
                 <CardTitle>General Information</CardTitle>
                 <CardDescription>Update your personal details.</CardDescription>
               </CardHeader>
               <CardContent>
-                <form onSubmit={handleSaveGeneral} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                <form onSubmit={handleSaveGeneral} className={styles.formStack}>
 
                   {/* Avatar */}
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '24px', marginBottom: '8px' }}>
-                    <div style={{
-                      width: '80px', height: '80px', borderRadius: '50%',
-                      background: 'linear-gradient(135deg, var(--accent-primary) 0%, rgba(255,255,255,0.2) 100%)',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      fontSize: '28px', fontWeight: 700, color: '#fff',
-                    }}>
+                  <div className={styles.avatarRow}>
+                    <div className={styles.avatar}>
                       {avatarInitial}
                     </div>
                     <div>
-                      <p style={{ fontSize: '16px', fontWeight: 600, color: 'var(--text-primary)' }}>
+                      <p className={styles.identityName}>
                         {user?.firstName} {user?.lastName}
                       </p>
-                      <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginTop: '4px' }}>
+                      <p className={styles.identityEmail}>
                         {user?.email}
                       </p>
                     </div>
                   </div>
 
                   <div className={styles.formGridRow}>
-                    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    <div className={styles.fieldBlock}>
                       <Label htmlFor="firstName">First Name</Label>
                       <Input
                         id="firstName"
@@ -161,7 +149,7 @@ export default function ProfilePage() {
                         required
                       />
                     </div>
-                    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    <div className={styles.fieldBlock}>
                       <Label htmlFor="lastName">Last Name</Label>
                       <Input
                         id="lastName"
@@ -172,37 +160,37 @@ export default function ProfilePage() {
                     </div>
                   </div>
 
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  <div className={styles.fieldBlock}>
                     <Label htmlFor="email">Email Address</Label>
-                    <div style={{ position: 'relative' }}>
-                      <Mail size={16} color="var(--text-muted)" style={{ position: 'absolute', left: '12px', top: '12px' }} />
+                    <div className={styles.fieldWithIcon}>
+                      <Mail size={16} color="var(--text-muted)" className={styles.inputIcon} />
                       <Input
                         id="email"
                         value={user?.email ?? ''}
-                        style={{ paddingLeft: '40px' }}
+                        className={styles.withIconInput}
                         disabled
                       />
                     </div>
-                    <p style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Email cannot be changed here.</p>
+                    <p className={styles.fieldHint}>Email cannot be changed here.</p>
                   </div>
 
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  <div className={styles.fieldBlock}>
                     <Label htmlFor="phone">Phone Number</Label>
-                    <div style={{ position: 'relative' }}>
-                      <Phone size={16} color="var(--text-muted)" style={{ position: 'absolute', left: '12px', top: '12px' }} />
+                    <div className={styles.fieldWithIcon}>
+                      <Phone size={16} color="var(--text-muted)" className={styles.inputIcon} />
                       <Input
                         id="phone"
                         value={phone}
                         onChange={e => setPhone(e.target.value)}
-                        style={{ paddingLeft: '40px' }}
+                        className={styles.withIconInput}
                         placeholder="+20 100 000 0000"
                       />
                     </div>
                   </div>
 
-                  <div style={{ marginTop: '8px' }}>
+                  <div className={styles.actionsRow}>
                     <Button type="submit" variant="primary" disabled={saving}>
-                      {saving ? <><Loader2 size={16} style={{ marginRight: '8px', animation: 'spin 1s linear infinite' }} />Saving…</> : 'Save Changes'}
+                      {saving ? <><Loader2 size={16} className={styles.spinningIcon} />Saving…</> : 'Save Changes'}
                     </Button>
                   </div>
                 </form>
@@ -212,14 +200,14 @@ export default function ProfilePage() {
 
           {/* Security Tab */}
           {tab === 'security' && (
-            <Card style={{ background: 'rgba(255,255,255,0.03)', backdropFilter: 'blur(12px)', border: '1px solid rgba(255,255,255,0.05)' }}>
+            <Card className={styles.panelCard}>
               <CardHeader>
                 <CardTitle>Change Password</CardTitle>
                 <CardDescription>Use a long, random password to stay secure.</CardDescription>
               </CardHeader>
               <CardContent>
-                <form onSubmit={handleChangePassword} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <form onSubmit={handleChangePassword} className={styles.formStack}>
+                  <div className={styles.fieldBlock}>
                     <Label htmlFor="newPassword">New Password</Label>
                     <Input
                       id="newPassword"
@@ -230,7 +218,7 @@ export default function ProfilePage() {
                       required
                     />
                   </div>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  <div className={styles.fieldBlock}>
                     <Label htmlFor="confirmPassword">Confirm Password</Label>
                     <Input
                       id="confirmPassword"
@@ -241,9 +229,9 @@ export default function ProfilePage() {
                       required
                     />
                   </div>
-                  <div style={{ marginTop: '8px' }}>
+                  <div className={styles.actionsRow}>
                     <Button type="submit" variant="primary" disabled={changingPwd}>
-                      {changingPwd ? <><Loader2 size={16} style={{ marginRight: '8px', animation: 'spin 1s linear infinite' }} />Updating…</> : 'Update Password'}
+                      {changingPwd ? <><Loader2 size={16} className={styles.spinningIcon} />Updating…</> : 'Update Password'}
                     </Button>
                   </div>
                 </form>

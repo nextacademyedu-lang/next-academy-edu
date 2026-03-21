@@ -50,7 +50,21 @@ export const Programs: CollectionConfig = {
     { name: 'targetAudience', type: 'array', fields: [{ name: 'item', type: 'text' }] },
     { name: 'tags', type: 'relationship', relationTo: 'tags', hasMany: true },
     { name: 'isFeatured', type: 'checkbox', defaultValue: false },
+    {
+      name: 'featuredPriority',
+      type: 'number',
+      defaultValue: 0,
+      admin: {
+        description: 'Controls ordering in featured cards (lower appears first)',
+      },
+    },
     { name: 'isActive', type: 'checkbox', defaultValue: true },
+    {
+      name: 'learnersCount',
+      type: 'number',
+      defaultValue: 0,
+      admin: { readOnly: true },
+    },
     { name: 'viewCount', type: 'number', defaultValue: 0, admin: { readOnly: true } },
     { name: 'averageRating', type: 'number', defaultValue: 0, admin: { readOnly: true } },
     { name: 'reviewCount', type: 'number', defaultValue: 0, admin: { readOnly: true } },

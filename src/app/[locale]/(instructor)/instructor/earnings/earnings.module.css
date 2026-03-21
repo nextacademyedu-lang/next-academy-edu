@@ -36,9 +36,9 @@
 }
 
 .statCard {
-  background: linear-gradient(135deg, rgba(26,26,26,0.6) 0%, rgba(10,10,10,0.8) 100%) !important;
+  background: var(--bg-surface-elevated) !important;
   backdrop-filter: blur(12px);
-  border: 1px solid rgba(255,255,255,0.05) !important;
+  border: 1px solid var(--border-subtle) !important;
   position: relative;
   overflow: hidden;
 }
@@ -114,7 +114,7 @@
 
 .searchInput {
   padding-left: 36px !important;
-  background: rgba(255,255,255,0.02) !important;
+  background: var(--bg-surface) !important;
 }
 
 .filterBtns {
@@ -126,7 +126,7 @@
 
 .filterBtn {
   background: transparent;
-  border: 1px solid rgba(255,255,255,0.08);
+  border: 1px solid var(--border-subtle);
   color: var(--text-muted);
   padding: 6px 14px;
   border-radius: 20px;
@@ -137,21 +137,21 @@
 }
 
 .filterBtn:hover {
-  border-color: rgba(255,255,255,0.2);
+  border-color: var(--border-default);
   color: var(--text-secondary);
 }
 
 .filterBtnActive {
-  background: rgba(255,255,255,0.08);
-  border-color: rgba(255,255,255,0.15);
+  background: var(--bg-surface-hover);
+  border-color: var(--border-default);
   color: var(--text-primary);
 }
 
 /* ── Table ──────────────────────────────────── */
 .tableCard {
-  background: rgba(255,255,255,0.03) !important;
+  background: var(--bg-surface-elevated) !important;
   backdrop-filter: blur(12px);
-  border: 1px solid rgba(255,255,255,0.05) !important;
+  border: 1px solid var(--border-subtle) !important;
 }
 
 .tableWrapper {
@@ -166,7 +166,7 @@
 }
 
 .tableHead {
-  border-bottom: 1px solid rgba(255,255,255,0.08);
+  border-bottom: 1px solid var(--border-subtle);
 }
 
 .th {
@@ -181,7 +181,7 @@
 }
 
 .tableRow {
-  border-bottom: 1px solid rgba(255,255,255,0.04);
+  border-bottom: 1px solid var(--border-subtle);
   transition: background 0.15s;
 }
 
@@ -190,7 +190,7 @@
 }
 
 .tableRow:hover {
-  background: rgba(255,255,255,0.02);
+  background: var(--bg-surface-hover);
 }
 
 .td {
@@ -216,8 +216,8 @@
 }
 
 .mobileCard {
-  background: rgba(255,255,255,0.03) !important;
-  border: 1px solid rgba(255,255,255,0.05) !important;
+  background: var(--bg-surface-elevated) !important;
+  border: 1px solid var(--border-subtle) !important;
 }
 
 .mobileCardContent {
@@ -268,8 +268,8 @@
 }
 
 .emptyCard {
-  background: rgba(255,255,255,0.03) !important;
-  border: 1px solid rgba(255,255,255,0.05) !important;
+  background: var(--bg-surface-elevated) !important;
+  border: 1px solid var(--border-subtle) !important;
 }
 
 .emptyContent {

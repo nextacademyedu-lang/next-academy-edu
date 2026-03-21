@@ -1,0 +1,134 @@
+import { getPayload } from 'payload';
+import config from '@payload-config';
+import { sendBookingConfirmation } from '@/lib/email';
+
+/**
+ * Shared post-payment logic used by all webhook handlers (Paymob, EasyKash, etc).
+ *
+ * Handles:
+ *  - Idempotency: skips if payment is already `paid`
+ *  - Amount validation: marks payment `failed` on mismatch
+ *  - Atomic `paidAmount` increment (re-reads booking inside update)
+ *  - Confirmation email dispatch (once per booking)
+ *
+ * Returns `true` if the payment was successfully processed.
+ */
+export async function processSuccessfulPayment(opts: {
+  paymentId: string | number;
+  bookingId: string | number;
+  receivedAmountCents: number;
+  transactionId: string;
+  gatewayResponse: Record<string, unknown>;
+}): Promise<boolean> {
+  const { paymentId, bookingId, receivedAmountCents, transactionId, gatewayResponse } = opts;
+  const payload = await getPayload({ config });
+
+  // ── 1. Fetch payment record ──────────────────────────────────────
+  const payment = await payload.findByID({ collection: 'payments', id: paymentId });
+  if (!payment) {
+    console.error('[payment-helper] Payment not found', paymentId);
+    return false;
+  }
+
+  // ── 2. Idempotency — already processed ───────────────────────────
+  if (payment.status === 'paid') return true;
+
+  // ── 3. Cross-validate payment belongs to booking ─────────────────
+  const paymentBookingId = typeof payment.booking === 'object'
+    ? (payment.booking as { id: string | number }).id
+    : payment.booking;
+
+  if (String(paymentBookingId) !== String(bookingId)) {
+    console.error('[payment-helper] payment.booking mismatch', {
+      paymentBookingId,
+      expectedBookingId: bookingId,
+    });
+    return false;
+  }
+
+  // ── 4. Amount validation ─────────────────────────────────────────
+  const expectedCents = Math.round(payment.amount * 100);
+  if (Math.abs(receivedAmountCents - expectedCents) > 1) {
+    console.error('[payment-helper] Amount mismatch', {
+      expected: expectedCents,
+      received: receivedAmountCents,
+    });
+    await payload.update({
+      collection: 'payments',
+      id: payment.id,
+      data: {
+        status: 'failed',
+        paymentGatewayResponse: { ...gatewayResponse, _error: 'amount_mismatch' },
+      },
+    });
+    return false;
+  }
+
+  // ── 5. Mark payment as paid ──────────────────────────────────────
+  await payload.update({
+    collection: 'payments',
+    id: payment.id,
+    data: {
+      status: 'paid',
+      transactionId,
+      paidDate: new Date().toISOString(),
+      paymentGatewayResponse: gatewayResponse,
+    },
+  });
+
+  // ── 6. Update booking — re-read to avoid stale paidAmount ────────
+  const booking = await payload.findByID({
+    collection: 'bookings',
+    id: bookingId,
+    depth: 0,
+  });
+
+  if (!booking) return true;
+
+  const newPaid = (booking.paidAmount || 0) + payment.amount;
+  const isFullyPaid = newPaid >= booking.finalAmount;
+
+  await payload.update({
+    collection: 'bookings',
+    id: bookingId,
+    data: {
+      status: isFullyPaid ? 'confirmed' : 'pending',
+      paidAmount: newPaid,
+      remainingAmount: Math.max(0, booking.finalAmount - newPaid),
+    },
+  });
+
+  // ── 7. Send confirmation email (once) ────────────────────────────
+  if (isFullyPaid && !booking.confirmationEmailSent) {
+    try {
+      const userId = typeof booking.user === 'object' ? (booking.user as unknown as { id: string | number }).id : booking.user;
+      const roundId = typeof booking.round === 'object' ? (booking.round as unknown as { id: string | number }).id : booking.round;
+
+      const user = await payload.findByID({ collection: 'users', id: userId });
+      const round = await payload.findByID({ collection: 'rounds', id: roundId, depth: 1 });
+      const program = round?.program as unknown as Record<string, string> | undefined;
+
+      await sendBookingConfirmation({
+        to: user.email,
+        userName: `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.email,
+        programTitle: program?.titleAr || program?.titleEn || 'البرنامج',
+        bookingCode: booking.bookingCode || String(booking.id),
+        amountPaid: booking.finalAmount,
+        startDate: round?.startDate
+          ? new Date(round.startDate).toLocaleDateString('ar-EG')
+          : '',
+      });
+
+      await payload.update({
+        collection: 'bookings',
+        id: bookingId,
+        data: { confirmationEmailSent: true },
+      });
+    } catch (emailErr) {
+      // Don't fail the webhook if the email fails to send
+      console.error('[payment-helper] Confirmation email failed', emailErr);
+    }
+  }
+
+  return true;
+}

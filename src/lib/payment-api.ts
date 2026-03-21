@@ -156,7 +156,11 @@ export function verifyEasyKashHmac(payload: Record<string, string>): boolean {
     .update(dataStr)
     .digest('hex');
 
-  return calculated === signatureHash;
+  try {
+    return crypto.timingSafeEqual(Buffer.from(calculated, 'hex'), Buffer.from(signatureHash, 'hex'));
+  } catch {
+    return false;
+  }
 }
 
 // ─────────────────────────────────────────────
@@ -181,7 +185,11 @@ export function verifyPaymobHmac(params: Record<string, string>, receivedHmac: s
     .update(dataStr)
     .digest('hex');
 
-  return calculated === receivedHmac;
+  try {
+    return crypto.timingSafeEqual(Buffer.from(calculated, 'hex'), Buffer.from(receivedHmac, 'hex'));
+  } catch {
+    return false;
+  }
 }
 
 // ─────────────────────────────────────────────
