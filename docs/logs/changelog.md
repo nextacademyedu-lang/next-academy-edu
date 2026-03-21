@@ -4,6 +4,39 @@
 
 ---
 
+### [2026-03-21 12:55] - CRM User Sync Fix for Twenty "people" Object
+
+**Files updated (this pass):**
+- CRM mapping/service/client:
+  - `src/lib/crm/mappers.ts`
+  - `src/lib/crm/service.ts`
+  - `src/lib/crm/twenty-client.ts`
+- Documentation:
+  - `docs/logs/changelog.md`
+  - `docs/logs/tasks.md`
+  - `docs/sessions/2026-03-21-12-55-session-18.md` (new)
+
+**What changed technically:**
+- Identified production CRM sync failure from cron response:
+  - `Object person doesn't have any "externalId" field.`
+- Root cause:
+  - Contacts sync assumed custom `externalId` field for upsert.
+  - Twenty default contacts object (`people`) in this workspace uses standard schema without that field.
+- Implemented compatibility path for `people` resource:
+  - Added `mapUserToTwentyPerson(...)` with standard fields (`name`, `emails`, `phones`, `jobTitle`, `city`).
+  - In `CRMService.syncUser`, when contacts resource is `people`:
+    - update by stored `twentyCrmContactId` if present,
+    - otherwise create a new person directly.
+  - Added public `create(...)` and `updateById(...)` methods to `TwentyClient`.
+
+**Reason:**
+- User reported newly created users were not appearing in CRM despite sync pipeline being enabled.
+
+**Verification:**
+- `node_modules\\.bin\\tsc --noEmit` ✅
+
+---
+
 ### [2026-03-21 12:49] - Checkout Access UX + Admin Password Sync Control
 
 **Files updated (this pass):**

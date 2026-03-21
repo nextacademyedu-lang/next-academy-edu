@@ -93,6 +93,46 @@ export function mapUserToCrmContact(params: {
   };
 }
 
+/**
+ * Map user/profile into Twenty standard "people" object shape.
+ * This is used when contacts resource points to the default Twenty object ("people"),
+ * which does not include custom fields like `externalId`.
+ */
+export function mapUserToTwentyPerson(params: {
+  user: Record<string, unknown>;
+  profile?: Record<string, unknown> | null;
+}) {
+  const { user, profile } = params;
+
+  const firstName = getString(user.firstName) || '';
+  const lastName = getString(user.lastName) || '';
+  const email = getString(user.email) || '';
+  const phoneRaw = getString(user.phone) || '';
+  const phoneNormalized = phoneRaw
+    .replace(/\s+/g, '')
+    .replace(/^(\+?20)/, '')
+    .replace(/^0/, '');
+
+  return {
+    name: {
+      firstName,
+      lastName,
+    },
+    emails: {
+      primaryEmail: email,
+      additionalEmails: [],
+    },
+    phones: {
+      primaryPhoneNumber: phoneNormalized,
+      primaryPhoneCountryCode: phoneNormalized ? 'EG' : '',
+      primaryPhoneCallingCode: phoneNormalized ? '+20' : '',
+      additionalPhones: [],
+    },
+    jobTitle: (profile ? getString(profile.jobTitle) : undefined) || '',
+    city: (profile ? getString(profile.city) : undefined) || '',
+  };
+}
+
 export function mapLeadToCrm(lead: Record<string, unknown>) {
   const id = normalizeId(lead.id);
   if (!id) throw new Error('Lead id is required');
@@ -273,4 +313,3 @@ export function mapBulkSeatAllocationPatch(allocation: Record<string, unknown>) 
     lastSyncedAt: new Date().toISOString(),
   };
 }
-

@@ -5,6 +5,7 @@ import {
   mapConsultationToCrmDeal,
   mapLeadToCrm,
   mapPaymentToCrmDealPatch,
+  mapUserToTwentyPerson,
   mapUserToCrmContact,
   mapWaitlistPatch,
   makeEntityExternalId,
@@ -23,6 +24,12 @@ interface ProcessEventResult {
   skipped: boolean;
   reason?: string;
   data?: unknown;
+}
+
+function getString(value: unknown): string | undefined {
+  if (typeof value === 'string') return value;
+  if (typeof value === 'number') return String(value);
+  return undefined;
 }
 
 function asRecord(value: unknown): Record<string, unknown> | null {
@@ -187,12 +194,32 @@ export class CRMService {
       });
     }
 
-    const contactPayload = mapUserToCrmContact({ user, profile, company });
-    const result = await this.client.upsert(
-      'contacts',
-      contactPayload.externalId,
-      contactPayload,
-    );
+    const contactsResourcePath = this.client.getResourcePath('contacts');
+    const existingContactId = getString(user.twentyCrmContactId);
+
+    let result: { id: string | null; raw: unknown };
+
+    if (contactsResourcePath === 'people') {
+      // Twenty default "people" object does not include custom `externalId` field.
+      // Use standard payload + local CRM ID for update path.
+      const personPayload = mapUserToTwentyPerson({ user, profile });
+      if (existingContactId) {
+        try {
+          result = await this.client.updateById('contacts', existingContactId, personPayload);
+        } catch {
+          result = await this.client.create('contacts', personPayload);
+        }
+      } else {
+        result = await this.client.create('contacts', personPayload);
+      }
+    } else {
+      const contactPayload = mapUserToCrmContact({ user, profile, company });
+      result = await this.client.upsert(
+        'contacts',
+        contactPayload.externalId,
+        contactPayload,
+      );
+    }
 
     if (result.id) {
       await this.updateLocalCrmId({

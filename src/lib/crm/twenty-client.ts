@@ -213,5 +213,21 @@ export class TwentyClient {
       throw createError;
     }
   }
-}
 
+  async create(
+    resource: TwentyResourceKey,
+    payload: Record<string, unknown>,
+  ): Promise<TwentyUpsertResult> {
+    const resourcePath = this.getResourcePath(resource);
+    return this.createRecord(resourcePath, payload);
+  }
+
+  async updateById(
+    resource: TwentyResourceKey,
+    id: string,
+    payload: Record<string, unknown>,
+  ): Promise<TwentyUpsertResult> {
+    const resourcePath = this.getResourcePath(resource);
+    return this.updateRecord(resourcePath, id, payload);
+  }
+}

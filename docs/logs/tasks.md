@@ -6,6 +6,26 @@
 
 ## Session Log
 
+### Session 2026-03-21 (12:55) — CRM Sync: Users Not Appearing in Twenty
+
+- [x] Reproduced CRM sync failure through cron endpoint output:
+  - [x] `Object person doesn't have any "externalId" field`
+- [x] Confirmed Twenty workspace contacts object is standard `people` schema
+- [x] Added standard person mapper for user sync:
+  - [x] `mapUserToTwentyPerson` (`name`, `emails`, `phones`, `jobTitle`, `city`)
+- [x] Updated CRM service flow:
+  - [x] detect contacts resource path `people`
+  - [x] use create/update-by-id flow (no `externalId` dependency)
+  - [x] keep old externalId-based path for non-standard/custom contacts resources
+- [x] Extended Twenty client with:
+  - [x] `create(resource, payload)`
+  - [x] `updateById(resource, id, payload)`
+- [x] Verified TypeScript compile:
+  - [x] `node_modules\\.bin\\tsc --noEmit` ✅
+- [ ] Deploy latest commit
+- [ ] Trigger `/api/cron/crm-sync` and verify `succeeded > 0` and `failed = 0` for user events
+- [ ] Confirm new user appears under CRM `people`
+
 ### Session 2026-03-21 (12:49) — Checkout Recovery UX + Admin Env Password Sync
 
 - [x] Investigated checkout "الحجز مش موجود أو مش ليك" behavior under API `403`
