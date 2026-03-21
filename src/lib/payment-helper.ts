@@ -19,12 +19,26 @@ export async function processSuccessfulPayment(opts: {
   receivedAmountCents: number;
   transactionId: string;
   gatewayResponse: Record<string, unknown>;
+  req?: unknown;
 }): Promise<boolean> {
-  const { paymentId, bookingId, receivedAmountCents, transactionId, gatewayResponse } = opts;
+  const {
+    paymentId,
+    bookingId,
+    receivedAmountCents,
+    transactionId,
+    gatewayResponse,
+    req,
+  } = opts;
   const payload = await getPayload({ config });
+  const reqForHooks = req as any;
 
   // ── 1. Fetch payment record ──────────────────────────────────────
-  const payment = await payload.findByID({ collection: 'payments', id: paymentId });
+  const payment = await payload.findByID({
+    collection: 'payments',
+    id: paymentId,
+    overrideAccess: true,
+    req: reqForHooks,
+  });
   if (!payment) {
     console.error('[payment-helper] Payment not found', paymentId);
     return false;
@@ -60,6 +74,8 @@ export async function processSuccessfulPayment(opts: {
         status: 'failed',
         paymentGatewayResponse: { ...gatewayResponse, _error: 'amount_mismatch' },
       },
+      overrideAccess: true,
+      req: reqForHooks,
     });
     return false;
   }
@@ -74,6 +90,8 @@ export async function processSuccessfulPayment(opts: {
       paidDate: new Date().toISOString(),
       paymentGatewayResponse: gatewayResponse,
     },
+    overrideAccess: true,
+    req: reqForHooks,
   });
 
   // ── 6. Update booking — re-read to avoid stale paidAmount ────────
@@ -81,6 +99,8 @@ export async function processSuccessfulPayment(opts: {
     collection: 'bookings',
     id: bookingId,
     depth: 0,
+    overrideAccess: true,
+    req: reqForHooks,
   });
 
   if (!booking) return true;
@@ -96,6 +116,8 @@ export async function processSuccessfulPayment(opts: {
       paidAmount: newPaid,
       remainingAmount: Math.max(0, booking.finalAmount - newPaid),
     },
+    overrideAccess: true,
+    req: reqForHooks,
   });
 
   // ── 7. Send confirmation email (once) ────────────────────────────
@@ -104,8 +126,19 @@ export async function processSuccessfulPayment(opts: {
       const userId = typeof booking.user === 'object' ? (booking.user as unknown as { id: string | number }).id : booking.user;
       const roundId = typeof booking.round === 'object' ? (booking.round as unknown as { id: string | number }).id : booking.round;
 
-      const user = await payload.findByID({ collection: 'users', id: userId });
-      const round = await payload.findByID({ collection: 'rounds', id: roundId, depth: 1 });
+      const user = await payload.findByID({
+        collection: 'users',
+        id: userId,
+        overrideAccess: true,
+        req: reqForHooks,
+      });
+      const round = await payload.findByID({
+        collection: 'rounds',
+        id: roundId,
+        depth: 1,
+        overrideAccess: true,
+        req: reqForHooks,
+      });
       const program = round?.program as unknown as Record<string, string> | undefined;
 
       await sendBookingConfirmation({
@@ -123,6 +156,8 @@ export async function processSuccessfulPayment(opts: {
         collection: 'bookings',
         id: bookingId,
         data: { confirmationEmailSent: true },
+        overrideAccess: true,
+        req: reqForHooks,
       });
     } catch (emailErr) {
       // Don't fail the webhook if the email fails to send

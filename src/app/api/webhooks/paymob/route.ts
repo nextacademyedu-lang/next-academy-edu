@@ -39,6 +39,8 @@ export async function POST(req: NextRequest) {
             transactionId,
             paymentGatewayResponse: obj,
           },
+          overrideAccess: true,
+          req: req as any,
         });
       }
       return NextResponse.json({ received: true });
@@ -52,6 +54,8 @@ export async function POST(req: NextRequest) {
         collection: 'payments',
         where: { transactionId: { equals: transactionId } },
         limit: 1,
+        overrideAccess: true,
+        req: req as any,
       });
       resolvedPaymentId = existing.docs[0]?.id != null ? String(existing.docs[0].id) : undefined;
     }
@@ -68,6 +72,7 @@ export async function POST(req: NextRequest) {
       receivedAmountCents: amountCents,
       transactionId,
       gatewayResponse: obj,
+      req: req as any,
     });
 
     return NextResponse.json({ received: true });

@@ -67,6 +67,7 @@ export async function POST(req: NextRequest) {
         paymentMethod: 'paymob',
         paymentGatewayResponse: { client_secret: intention.client_secret },
       },
+      req: req as any,
     });
 
     return NextResponse.json({

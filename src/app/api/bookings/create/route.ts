@@ -6,15 +6,32 @@ function generateCode(prefix: string): string {
   return `${prefix}-${Date.now().toString(36).toUpperCase()}-${Math.random().toString(36).slice(2, 6).toUpperCase()}`;
 }
 
+function normalizeNumericId(value: unknown): number | null {
+  if (value === null || value === undefined || value === '') return null;
+  if (typeof value === 'number') return Number.isFinite(value) ? value : null;
+  if (typeof value === 'string') {
+    const trimmed = value.trim();
+    if (!trimmed) return null;
+    const asNumber = Number(trimmed);
+    if (Number.isFinite(asNumber)) return asNumber;
+  }
+  return null;
+}
+
 export async function POST(req: NextRequest) {
   try {
     const { roundId, paymentPlanId, discountCode } = await req.json() as {
-      roundId: string;
-      paymentPlanId?: string;
+      roundId: string | number;
+      paymentPlanId?: string | number;
       discountCode?: string;
     };
 
-    if (!roundId) return NextResponse.json({ error: 'roundId مطلوب' }, { status: 400 });
+    const normalizedRoundId = normalizeNumericId(roundId);
+    if (normalizedRoundId == null) {
+      return NextResponse.json({ error: 'roundId مطلوب' }, { status: 400 });
+    }
+
+    const normalizedPaymentPlanId = normalizeNumericId(paymentPlanId ?? null);
 
     const payload = await getPayload({ config });
 
@@ -23,7 +40,11 @@ export async function POST(req: NextRequest) {
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
     // ── Fetch round ───────────────────────────────────────────────────────
-    const round = await payload.findByID({ collection: 'rounds', id: roundId, depth: 1 });
+    const round = await payload.findByID({
+      collection: 'rounds',
+      id: normalizedRoundId,
+      depth: 1,
+    });
     if (!round) return NextResponse.json({ error: 'الراوند مش موجود' }, { status: 404 });
     if (!['open', 'upcoming'].includes(round.status ?? '')) {
       return NextResponse.json({ error: 'الراوند مش متاح للحجز' }, { status: 400 });
@@ -37,7 +58,7 @@ export async function POST(req: NextRequest) {
       collection: 'bookings',
       where: {
         user: { equals: user.id },
-        round: { equals: roundId },
+        round: { equals: normalizedRoundId },
         status: { not_in: ['cancelled', 'refunded'] },
       },
       limit: 1,
@@ -75,6 +96,7 @@ export async function POST(req: NextRequest) {
           id: discount.id,
           data: { currentUses: (discount.currentUses || 0) + 1 },
           overrideAccess: true,
+          req: req as any,
         });
       }
     }
@@ -84,12 +106,11 @@ export async function POST(req: NextRequest) {
     // ── Create booking ────────────────────────────────────────────────────
     const booking = await payload.create({
       collection: 'bookings',
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       data: {
         bookingCode: generateCode('BK'),
         user: user.id,
-        round: roundId as unknown as number,
-        paymentPlan: (paymentPlanId || null) as unknown as number | null,
+        round: normalizedRoundId,
+        paymentPlan: normalizedPaymentPlanId,
         status: 'pending' as const,
         totalAmount: basePrice,
         paidAmount: 0,
@@ -99,14 +120,18 @@ export async function POST(req: NextRequest) {
         finalAmount,
         bookingSource: 'website' as const,
       },
+      req: req as any,
     });
 
     // ── Create payment records ────────────────────────────────────────────
     const now = new Date();
 
-    if (paymentPlanId) {
+    if (normalizedPaymentPlanId != null) {
       // Installment plan — create N payment records
-      const plan = await payload.findByID({ collection: 'payment-plans', id: paymentPlanId });
+      const plan = await payload.findByID({
+        collection: 'payment-plans',
+        id: normalizedPaymentPlanId,
+      });
       if (!plan) return NextResponse.json({ error: 'خطة الدفع مش موجودة' }, { status: 404 });
 
       for (const installment of plan.installments) {
@@ -124,6 +149,7 @@ export async function POST(req: NextRequest) {
             status: 'pending',
           },
           overrideAccess: true,
+          req: req as any,
         });
       }
     } else {
@@ -138,18 +164,20 @@ export async function POST(req: NextRequest) {
           status: 'pending',
         },
         overrideAccess: true,
+        req: req as any,
       });
     }
 
     // ── Increment round enrollments ───────────────────────────────────────
     await payload.update({
       collection: 'rounds',
-      id: roundId,
+      id: normalizedRoundId,
       data: {
         currentEnrollments: (round.currentEnrollments ?? 0) + 1,
         status: (round.currentEnrollments ?? 0) + 1 >= round.maxCapacity && round.autoCloseOnFull ? 'full' : round.status,
       },
       overrideAccess: true,
+      req: req as any,
     });
 
     return NextResponse.json({ bookingId: booking.id, bookingCode: booking.bookingCode });

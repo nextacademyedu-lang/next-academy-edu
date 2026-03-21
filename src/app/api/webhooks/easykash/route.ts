@@ -28,6 +28,8 @@ export async function POST(req: NextRequest) {
       where: { transactionId: { equals: easykashRef } },
       depth: 1,
       limit: 1,
+      overrideAccess: true,
+      req: req as any,
     });
 
     const payment = result.docs[0];
@@ -49,6 +51,7 @@ export async function POST(req: NextRequest) {
       receivedAmountCents: receivedCents,
       transactionId: easykashRef,
       gatewayResponse: body as unknown as Record<string, unknown>,
+      req: req as any,
     });
 
     return NextResponse.json({ received: true });

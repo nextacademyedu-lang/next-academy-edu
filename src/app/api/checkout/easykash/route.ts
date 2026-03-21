@@ -67,6 +67,7 @@ export async function POST(req: NextRequest) {
         paymentGatewayResponse: cashResult as unknown as Record<string, unknown>,
         notes: `Voucher: ${cashResult.voucher} | Provider: ${cashResult.provider} | Expires: ${cashResult.expiryDate}`,
       },
+      req: req as any,
     });
 
     return NextResponse.json({
