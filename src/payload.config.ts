@@ -135,12 +135,14 @@ export default buildConfig({
     // Seed first admin user from env vars so there's always a way to bootstrap
     const adminEmail = process.env.PAYLOAD_ADMIN_EMAIL;
     const adminPassword = process.env.PAYLOAD_ADMIN_PASSWORD;
+    const syncAdminPassword = process.env.PAYLOAD_ADMIN_SYNC_PASSWORD === 'true';
     if (!adminEmail || !adminPassword) return;
 
     const existing = await payload.find({
       collection: 'users',
       where: { email: { equals: adminEmail } },
       limit: 1,
+      overrideAccess: true,
     });
 
     if (existing.docs.length === 0) {
@@ -156,13 +158,33 @@ export default buildConfig({
         },
       });
       payload.logger.info(`[onInit] Created admin user: ${adminEmail}`);
-    } else if (existing.docs[0].role !== 'admin') {
+    } else {
+      const existingUser = existing.docs[0];
+      const shouldPromote = existingUser.role !== 'admin';
+      const shouldVerifyEmail = existingUser.emailVerified !== true;
+
+      if (!shouldPromote && !shouldVerifyEmail && !syncAdminPassword) return;
+
       await payload.update({
         collection: 'users',
-        id: existing.docs[0].id,
-        data: { role: 'admin' },
+        id: existingUser.id,
+        data: {
+          role: 'admin',
+          emailVerified: true,
+          ...(syncAdminPassword ? { password: adminPassword } : {}),
+        },
+        overrideAccess: true,
       });
-      payload.logger.info(`[onInit] Promoted to admin: ${adminEmail}`);
+
+      const notes = [
+        shouldPromote ? 'role=admin' : null,
+        shouldVerifyEmail ? 'emailVerified=true' : null,
+        syncAdminPassword ? 'password synced from env' : null,
+      ]
+        .filter(Boolean)
+        .join(', ');
+
+      payload.logger.info(`[onInit] Admin sync for ${adminEmail}: ${notes}`);
     }
   },
   collections: [

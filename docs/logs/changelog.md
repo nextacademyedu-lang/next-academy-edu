@@ -4,6 +4,47 @@
 
 ---
 
+### [2026-03-21 12:49] - Checkout Access UX + Admin Password Sync Control
+
+**Files updated (this pass):**
+- Checkout flow UX:
+  - `src/app/[locale]/(checkout)/checkout/[bookingId]/page.tsx`
+  - `src/app/[locale]/(checkout)/checkout/[bookingId]/checkout.module.css`
+- Admin bootstrap reliability:
+  - `src/payload.config.ts`
+  - `.env.production.template`
+  - `docs/engineering/env-variables.md`
+- Documentation:
+  - `docs/logs/changelog.md`
+  - `docs/logs/tasks.md`
+  - `docs/sessions/2026-03-21-12-49-session-17.md` (new)
+
+**What changed technically:**
+- Reworked checkout booking loader:
+  - switched from listing all bookings (`/api/bookings?limit=50`) to direct booking fetch (`/api/bookings/:id?depth=2`)
+  - explicit handling for `401/403/404` states
+- Added user-facing recovery actions when booking cannot be accessed:
+  - Login button (with redirect back to checkout)
+  - "My Bookings" button
+  - "Back to site" button
+- Added production-safe admin sync option:
+  - new env flag `PAYLOAD_ADMIN_SYNC_PASSWORD`
+  - when `true`, app boot forces admin role + email verified + password sync from env for `PAYLOAD_ADMIN_EMAIL`
+  - when `false`, no password override (default behavior preserved)
+- Updated env docs to clarify:
+  - `PAYMOB_API_KEY` should be `egy_sk_*` secret key (not JWT/base64 API token form)
+
+**Reason:**
+- User reported:
+  - no usable action buttons on "booking not found / not yours" screen
+  - inability to access admin account configured in env
+  - recurring 403 booking fetch confusion
+
+**Verification:**
+- `node_modules\\.bin\\tsc --noEmit` ✅
+
+---
+
 ### [2026-03-21 12:06] - Production Schema Auto-Migration Fix (Payload + Coolify)
 
 **Files updated (this pass):**

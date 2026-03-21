@@ -6,6 +6,27 @@
 
 ## Session Log
 
+### Session 2026-03-21 (12:49) — Checkout Recovery UX + Admin Env Password Sync
+
+- [x] Investigated checkout "الحجز مش موجود أو مش ليك" behavior under API `403`
+- [x] Refactored checkout booking loader:
+  - [x] replaced list fetch (`/api/bookings?depth=2...`) with direct fetch (`/api/bookings/:id?depth=2`)
+  - [x] added explicit `401/403/404` handling
+- [x] Added visible recovery actions on empty/forbidden state:
+  - [x] login with redirect back to checkout
+  - [x] go to my bookings
+  - [x] return to site
+- [x] Added env-controlled admin password sync on boot:
+  - [x] `PAYLOAD_ADMIN_SYNC_PASSWORD=true` forces password sync from env
+  - [x] keeps default non-forcing behavior when unset/false
+- [x] Updated env docs and production template:
+  - [x] `.env.production.template`
+  - [x] `docs/engineering/env-variables.md`
+- [x] Verified TypeScript compile:
+  - [x] `node_modules\\.bin\\tsc --noEmit` ✅
+- [ ] Deploy latest commit on Coolify
+- [ ] Set `PAYLOAD_ADMIN_SYNC_PASSWORD=true` once, restart app, login with env admin credentials, then set it back to `false`
+
 ### Session 2026-03-21 (12:06) — Production Schema Auto-Migration Fix
 
 - [x] Audited latest Coolify runtime logs in `docs/logs/coolify/logs.txt`

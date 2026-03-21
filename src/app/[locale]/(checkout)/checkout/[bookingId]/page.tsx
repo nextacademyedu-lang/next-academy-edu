@@ -5,7 +5,7 @@ import { ShieldCheck } from 'lucide-react';
 import { useRouter, useParams } from 'next/navigation';
 import { useLocale } from 'next-intl';
 import styles from './checkout.module.css';
-import { getUserBookings, getProgramTitle as getProgramTitleFromBooking, formatCurrency } from '@/lib/dashboard-api';
+import { getProgramTitle as getProgramTitleFromBooking, formatCurrency } from '@/lib/dashboard-api';
 import type { PayloadBooking } from '@/lib/dashboard-api';
 
 const PAYMENT_OPTIONS = [
@@ -28,16 +28,53 @@ export default function CheckoutPage() {
   const [discountLoading, setDiscountLoading] = useState(false);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [accessDenied, setAccessDenied] = useState(false);
   const [error, setError] = useState('');
 
   useEffect(() => {
-    getUserBookings().then((res) => {
-      if (res.success && res.data) {
-        const found = res.data.docs.find((b) => String(b.id) === String(bookingId));
-        setBooking(found ?? null);
+    let isMounted = true;
+
+    const loadBooking = async () => {
+      try {
+        const res = await fetch(`/api/bookings/${bookingId}?depth=2`, {
+          credentials: 'include',
+        });
+
+        if (!isMounted) return;
+
+        if (res.status === 401 || res.status === 403) {
+          setAccessDenied(true);
+          setBooking(null);
+          return;
+        }
+
+        if (res.status === 404) {
+          setBooking(null);
+          return;
+        }
+
+        const data = await res.json();
+        if (!res.ok) {
+          setError(data?.error || 'تعذر تحميل بيانات الحجز.');
+          setBooking(null);
+          return;
+        }
+
+        setBooking(data as PayloadBooking);
+      } catch {
+        if (!isMounted) return;
+        setError('تعذر تحميل بيانات الحجز. حاول مرة أخرى.');
+        setBooking(null);
+      } finally {
+        if (isMounted) setLoading(false);
       }
-      setLoading(false);
-    });
+    };
+
+    void loadBooking();
+
+    return () => {
+      isMounted = false;
+    };
   }, [bookingId]);
 
   async function handleApplyDiscount() {
@@ -110,9 +147,39 @@ export default function CheckoutPage() {
   }
 
   if (!booking) {
+    const checkoutPath = `/${locale}/checkout/${bookingId}`;
+    const loginPath = `/${locale}/login?redirect=${encodeURIComponent(checkoutPath)}`;
+
     return (
-      <div className={styles.container} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <p style={{ color: 'var(--accent-primary)' }}>الحجز مش موجود أو مش ليك.</p>
+      <div className={styles.container}>
+        <div className={styles.emptyState}>
+          <p className={styles.emptyTitle}>الحجز مش موجود أو مش ليك.</p>
+          <p className={styles.emptyHint}>
+            {accessDenied
+              ? 'يبدو إن الجلسة انتهت أو مش متسجل دخول.'
+              : error || 'تأكد إنك فاتح الرابط من نفس الحساب اللي عمل الحجز.'}
+          </p>
+          <div className={styles.emptyActions}>
+            <button
+              className={styles.proceedBtn}
+              onClick={() => router.push(loginPath)}
+            >
+              تسجيل الدخول
+            </button>
+            <button
+              className={styles.secondaryBtn}
+              onClick={() => router.push(`/${locale}/dashboard/bookings`)}
+            >
+              حجوزاتي
+            </button>
+            <button
+              className={styles.ghostBtn}
+              onClick={() => router.push(`/${locale}`)}
+            >
+              العودة للموقع
+            </button>
+          </div>
+        </div>
       </div>
     );
   }
