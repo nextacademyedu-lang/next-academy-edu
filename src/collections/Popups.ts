@@ -7,6 +7,10 @@ export const Popups: CollectionConfig = {
     useAsTitle: 'name',
     defaultColumns: ['name', 'status', 'popupType', 'startDate', 'endDate'],
     group: 'Marketing',
+    preview: (doc) => {
+      const baseUrl = (process.env.NEXT_PUBLIC_APP_URL || process.env.SERVER_URL || '').replace(/\/+$/, '');
+      return `${baseUrl}/ar?previewPopupId=${String(doc.id)}`;
+    },
   },
   access: {
     read: isPublic,

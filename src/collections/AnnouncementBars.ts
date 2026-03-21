@@ -7,6 +7,10 @@ export const AnnouncementBars: CollectionConfig = {
     useAsTitle: 'name',
     defaultColumns: ['name', 'status', 'position', 'startDate', 'endDate'],
     group: 'Marketing',
+    preview: (doc) => {
+      const baseUrl = (process.env.NEXT_PUBLIC_APP_URL || process.env.SERVER_URL || '').replace(/\/+$/, '');
+      return `${baseUrl}/ar?previewAnnouncementId=${String(doc.id)}`;
+    },
   },
   access: {
     read: isPublic,

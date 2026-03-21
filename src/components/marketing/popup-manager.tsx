@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState, useCallback } from 'react';
-import { usePathname } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
 import { PopupModal, type PopupData } from './popup-modal';
 
 const VISITED_KEY = 'na-popup-has-visited';
@@ -106,6 +106,8 @@ type BehaviorState = {
 
 export function PopupManager({ initialData }: PopupManagerProps) {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const previewPopupId = searchParams?.get('previewPopupId') || '';
   const [popups, setPopups] = useState<PopupWithTargeting[]>([]);
   const [activePopup, setActivePopup] = useState<PopupData | null>(null);
   const [behavior, setBehavior] = useState<BehaviorState | null>(null);
@@ -153,6 +155,9 @@ export function PopupManager({ initialData }: PopupManagerProps) {
           emailCaptured: String(behavior.emailCaptured),
           sessionPageViews: String(behavior.sessionPageViews),
         });
+        if (previewPopupId) {
+          params.set('previewPopupId', previewPopupId);
+        }
         const res = await fetch(`/api/popups/active?${params.toString()}`);
         if (!res.ok) return;
         const data = await res.json();
@@ -168,11 +173,18 @@ export function PopupManager({ initialData }: PopupManagerProps) {
     };
 
     fetchPopups();
-  }, [pathname, initialData, behavior]);
+  }, [pathname, initialData, behavior, previewPopupId]);
 
   /* Trigger logic */
   useEffect(() => {
     if (!popups.length || activePopup) return;
+
+    if (previewPopupId) {
+      const previewPopup =
+        popups.find((popup) => String(popup.id) === previewPopupId) || popups[0];
+      setActivePopup(previewPopup);
+      return;
+    }
 
     // Find first eligible popup
     const eligible = popups.find((p) => {
@@ -230,7 +242,7 @@ export function PopupManager({ initialData }: PopupManagerProps) {
     return () => {
       if (timer) clearTimeout(timer);
     };
-  }, [popups, pathname, activePopup]);
+  }, [popups, pathname, activePopup, previewPopupId]);
 
   const handleClose = useCallback(() => {
     setActivePopup(null);

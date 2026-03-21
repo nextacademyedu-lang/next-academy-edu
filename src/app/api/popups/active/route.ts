@@ -34,6 +34,18 @@ function normalizeRole(role?: string): string | undefined {
   return role;
 }
 
+function isAdminViewer(user: { role?: unknown; email?: unknown } | null | undefined): boolean {
+  if (!user) return false;
+  if (user.role === 'admin') return true;
+
+  const configured = (process.env.PAYLOAD_ADMIN_EMAIL || '')
+    .split(',')
+    .map((email) => email.trim().toLowerCase())
+    .filter(Boolean);
+  const userEmail = typeof user.email === 'string' ? user.email.trim().toLowerCase() : '';
+  return Boolean(userEmail && configured.includes(userEmail));
+}
+
 function matchesPageTargeting(page: string, targeting?: PopupTargeting): boolean {
   if (!targeting || targeting.displayPages !== 'specific') return true;
   if (!targeting.specificPages?.length) return false;
@@ -87,13 +99,35 @@ function matchesBehaviorTargeting(targeting: PopupTargeting | undefined, viewer:
 export async function GET(req: NextRequest) {
   try {
     const page = req.nextUrl.searchParams.get('page') || '/';
+    const previewPopupId = req.nextUrl.searchParams.get('previewPopupId');
     const firstVisit = parseBooleanParam(req.nextUrl.searchParams.get('firstVisit'));
     const emailCaptured = parseBooleanParam(req.nextUrl.searchParams.get('emailCaptured'));
     const sessionPageViews = Number.parseInt(req.nextUrl.searchParams.get('sessionPageViews') || '1', 10);
 
     const payload = await getPayload({ config });
-    const now = new Date().toISOString();
     const { user } = await payload.auth({ headers: req.headers });
+
+    if (previewPopupId) {
+      if (!isAdminViewer(user)) {
+        return NextResponse.json({ error: 'Unauthorized preview access' }, { status: 403 });
+      }
+
+      let popup: unknown = null;
+      try {
+        popup = await payload.findByID({
+          collection: 'popups',
+          id: previewPopupId,
+          depth: 1,
+          overrideAccess: true,
+        });
+      } catch {
+        popup = null;
+      }
+
+      return NextResponse.json({ popups: popup ? [popup] : [] });
+    }
+
+    const now = new Date().toISOString();
 
     let hasPurchase = false;
     if (user?.id) {

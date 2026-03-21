@@ -4,6 +4,53 @@
 
 ---
 
+### [2026-03-22 01:06] - CRM Opportunities Compatibility + Admin Access Fallback + Marketing Preview
+
+**Files updated (this pass):**
+- CRM compatibility:
+  - `src/lib/crm/mappers.ts`
+  - `src/lib/crm/service.ts`
+- Access control/admin reliability:
+  - `src/lib/access-control.ts`
+  - `src/collections/Users.ts`
+- Marketing preview + runtime mapping:
+  - `src/collections/Popups.ts`
+  - `src/collections/AnnouncementBars.ts`
+  - `src/app/api/popups/active/route.ts`
+  - `src/app/api/announcement-bars/active/route.ts`
+  - `src/components/marketing/popup-manager.tsx`
+  - `src/components/layout/announcement-bar.tsx`
+- Documentation:
+  - `docs/logs/changelog.md`
+  - `docs/logs/tasks.md`
+  - `docs/sessions/2026-03-22-01-06-session-19.md` (new)
+
+**What changed technically:**
+- Fixed CRM pipeline gap with default Twenty schema:
+  - Removed skip behavior for deals when `TWENTY_RESOURCE_DEALS=opportunities`.
+  - Added opportunities-safe payload mappers and local-id based create/update flow via `twentyCrmDealId`.
+  - Booking/payment/consultation sync now creates/updates opportunities instead of silently skipping.
+- Fixed admin permission false negatives:
+  - Added `isAdminUser(...)` helper that treats configured `PAYLOAD_ADMIN_EMAIL` as admin fallback.
+  - Reused helper across access guards and `Users` collection admin access / role-write checks.
+- Added preview support for marketing collections:
+  - Collection-level admin preview URLs for `popups` and `announcement-bars`.
+  - API routes accept secure preview params (`previewPopupId`, `previewAnnouncementId`) with admin-only checks.
+  - Frontend managers now read preview params and render selected draft item.
+- Aligned Announcement Bar frontend with actual collection schema:
+  - switched rendering to `messages` / `appearance` / `behavior` / `countdown` structure.
+
+**Reason:**
+- User reported:
+  - CRM data mismatch and missing sales pipeline flow.
+  - Admin account receiving `You are not allowed to perform this action`.
+  - No working preview flow for Popups and Announcement Bars.
+
+**Verification:**
+- `pnpm.cmd exec tsc --noEmit` ✅
+
+---
+
 ### [2026-03-21 19:13] - Logs Refresh: Final API Audit Snapshot + Traceability
 
 **Files updated (this pass):**

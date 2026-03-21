@@ -31,6 +31,15 @@ function extractProgramTitle(round: unknown): string | undefined {
   return getString(programObj.titleAr) || getString(programObj.titleEn);
 }
 
+function buildUserDisplayName(user?: Record<string, unknown> | null): string | undefined {
+  if (!user) return undefined;
+  const firstName = getString(user.firstName) || '';
+  const lastName = getString(user.lastName) || '';
+  const fullName = `${firstName} ${lastName}`.trim();
+  if (fullName) return fullName;
+  return getString(user.email);
+}
+
 export function makeEntityExternalId(entityType: CrmEntityType, entityId: string | number): string {
   return buildExternalId(entityType, entityId);
 }
@@ -211,6 +220,29 @@ export function mapBookingToCrmDeal(params: {
   };
 }
 
+/**
+ * Minimal payload compatible with Twenty default `opportunities` object.
+ * We avoid custom fields and keep to a stable baseline so pipeline cards are created.
+ */
+export function mapBookingToTwentyOpportunity(params: {
+  booking: Record<string, unknown>;
+  user?: Record<string, unknown> | null;
+}) {
+  const { booking, user } = params;
+  const id = normalizeId(booking.id);
+  if (!id) throw new Error('Booking id is required');
+
+  const bookingCode = getString(booking.bookingCode) || `B-${id}`;
+  const round = booking.round as Record<string, unknown> | undefined;
+  const programTitle = extractProgramTitle(round) || 'Program';
+  const userName = buildUserDisplayName(user) || 'User';
+  const status = getString(booking.status) || 'pending';
+
+  return {
+    name: `${programTitle} | ${userName} | ${bookingCode} | ${status}`,
+  };
+}
+
 export function mapPaymentToCrmDealPatch(params: {
   payment: Record<string, unknown>;
   booking?: Record<string, unknown> | null;
@@ -234,6 +266,21 @@ export function mapPaymentToCrmDealPatch(params: {
     bookingRemainingAmount: booking ? getNumber(booking.remainingAmount) : undefined,
     sourceSystem: 'nextacademy',
     lastSyncedAt: new Date().toISOString(),
+  };
+}
+
+export function mapPaymentToTwentyOpportunityPatch(params: {
+  payment: Record<string, unknown>;
+  booking?: Record<string, unknown> | null;
+}) {
+  const { payment, booking } = params;
+  const paymentStatus = getString(payment.status) || 'pending';
+  const bookingCode = booking ? getString(booking.bookingCode) : undefined;
+
+  return {
+    name: bookingCode
+      ? `${bookingCode} | payment:${paymentStatus}`
+      : `payment:${paymentStatus}`,
   };
 }
 
@@ -282,6 +329,29 @@ export function mapConsultationToCrmDeal(params: {
         : undefined,
     sourceSystem: 'nextacademy',
     lastSyncedAt: new Date().toISOString(),
+  };
+}
+
+export function mapConsultationToTwentyOpportunity(params: {
+  consultation: Record<string, unknown>;
+  user?: Record<string, unknown> | null;
+  consultationType?: Record<string, unknown> | null;
+}) {
+  const { consultation, user, consultationType } = params;
+  const id = normalizeId(consultation.id);
+  if (!id) throw new Error('Consultation booking id is required');
+
+  const bookingCode = getString(consultation.bookingCode) || `C-${id}`;
+  const userName = buildUserDisplayName(user) || 'User';
+  const typeTitle =
+    getString(consultationType?.titleAr) ||
+    getString(consultationType?.titleEn) ||
+    getString(consultationType?.title) ||
+    'Consultation';
+  const status = getString(consultation.status) || 'pending';
+
+  return {
+    name: `${typeTitle} | ${userName} | ${bookingCode} | ${status}`,
   };
 }
 

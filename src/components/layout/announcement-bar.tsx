@@ -1,25 +1,38 @@
 'use client';
 
 import React, { useEffect, useState, useCallback } from 'react';
-import { usePathname } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import styles from './announcement-bar.module.css';
 
-interface BarData {
-  id: string | number;
-  textAr: string;
-  textEn: string;
-  barType: string;
-  isDismissible: boolean;
+interface AnnouncementMessage {
+  textAr?: string;
+  textEn?: string;
+  linkUrl?: string;
   icon?: string;
-  link?: {
-    url?: string;
-    textAr?: string;
-    textEn?: string;
+}
+
+interface AnnouncementBarData {
+  id: string | number;
+  messages?: AnnouncementMessage[];
+  appearance?: {
+    bgColor?: string;
+    bgGradient?: string;
+    textColor?: string;
+    fontSize?: 'sm' | 'md' | 'lg';
+  };
+  ctaButton?: {
+    hasCtaButton?: boolean;
+    ctaText?: string;
+    ctaLink?: string;
   };
   countdown?: {
-    enabled?: boolean;
-    endDate?: string;
+    hasCountdown?: boolean;
+    countdownTarget?: string;
+  };
+  behavior?: {
+    isDismissible?: boolean;
+    rememberDismiss?: boolean;
   };
 }
 
@@ -53,9 +66,17 @@ function useBarCountdown(endDate: string | undefined) {
   return remaining;
 }
 
+function getFontSize(fontSize?: 'sm' | 'md' | 'lg'): string {
+  if (fontSize === 'sm') return '12px';
+  if (fontSize === 'lg') return '16px';
+  return '14px';
+}
+
 export function AnnouncementBar({ locale }: AnnouncementBarProps) {
   const pathname = usePathname();
-  const [bar, setBar] = useState<BarData | null>(null);
+  const searchParams = useSearchParams();
+  const previewAnnouncementId = searchParams?.get('previewAnnouncementId') || '';
+  const [bar, setBar] = useState<AnnouncementBarData | null>(null);
   const [dismissed, setDismissed] = useState(false);
 
   const isAr = locale === 'ar';
@@ -63,10 +84,15 @@ export function AnnouncementBar({ locale }: AnnouncementBarProps) {
   useEffect(() => {
     const fetchBar = async () => {
       try {
-        const res = await fetch(`/api/announcement-bars/active?page=${encodeURIComponent(pathname)}`);
+        const params = new URLSearchParams({ page: pathname });
+        if (previewAnnouncementId) {
+          params.set('previewAnnouncementId', previewAnnouncementId);
+        }
+
+        const res = await fetch(`/api/announcement-bars/active?${params.toString()}`);
         if (!res.ok) return;
         const data = await res.json();
-        const barData = data.bar as BarData | null;
+        const barData = data.bar as AnnouncementBarData | null;
         if (!barData) return;
 
         // Check if already dismissed this session
@@ -79,14 +105,14 @@ export function AnnouncementBar({ locale }: AnnouncementBarProps) {
       }
     };
     fetchBar();
-  }, [pathname]);
+  }, [pathname, previewAnnouncementId]);
 
   const countdown = useBarCountdown(
-    bar?.countdown?.enabled ? bar.countdown.endDate : undefined,
+    bar?.countdown?.hasCountdown ? bar.countdown.countdownTarget : undefined,
   );
 
   const handleDismiss = useCallback(() => {
-    if (bar) {
+    if (bar && bar.behavior?.rememberDismiss !== false) {
       sessionStorage.setItem(`${BAR_DISMISS_KEY}${bar.id}`, '1');
     }
     setDismissed(true);
@@ -94,22 +120,30 @@ export function AnnouncementBar({ locale }: AnnouncementBarProps) {
 
   if (!bar || dismissed) return null;
 
-  const text = isAr ? bar.textAr : bar.textEn;
-  const linkText = isAr ? bar.link?.textAr : bar.link?.textEn;
-
-  const typeClass =
-    bar.barType === 'warning'
-      ? styles.barWarning
-      : bar.barType === 'success'
-        ? styles.barSuccess
-        : bar.barType === 'promo'
-          ? styles.barPromo
-          : styles.barInfo;
+  const firstMessage = bar.messages?.[0];
+  const text = isAr ? firstMessage?.textAr : firstMessage?.textEn;
+  const icon = firstMessage?.icon;
+  const linkUrl = bar.ctaButton?.hasCtaButton ? bar.ctaButton.ctaLink : firstMessage?.linkUrl;
+  const linkText = bar.ctaButton?.hasCtaButton
+    ? bar.ctaButton.ctaText || (isAr ? 'تفاصيل' : 'Details')
+    : isAr
+      ? 'اعرف أكثر'
+      : 'Learn more';
+  const isDismissible = bar.behavior?.isDismissible !== false;
+  const appearance = bar.appearance;
+  const barStyle: React.CSSProperties = {
+    background: appearance?.bgGradient || appearance?.bgColor || undefined,
+    color: appearance?.textColor || undefined,
+  };
+  const textStyle: React.CSSProperties = {
+    fontSize: getFontSize(appearance?.fontSize),
+  };
 
   return (
     <AnimatePresence>
       <motion.div
-        className={`${styles.bar} ${typeClass}`}
+        className={`${styles.bar} ${styles.barInfo}`}
+        style={barStyle}
         initial={{ height: 0, opacity: 0 }}
         animate={{ height: 'auto', opacity: 1 }}
         exit={{ height: 0, opacity: 0 }}
@@ -117,9 +151,9 @@ export function AnnouncementBar({ locale }: AnnouncementBarProps) {
         role="alert"
       >
         <div className={styles.inner}>
-          {bar.icon && <span className={styles.icon}>{bar.icon}</span>}
+          {icon && <span className={styles.icon}>{icon}</span>}
 
-          <span className={styles.text}>
+          <span className={styles.text} style={textStyle}>
             {text}
             {countdown && (
               <>
@@ -127,17 +161,17 @@ export function AnnouncementBar({ locale }: AnnouncementBarProps) {
                 <span className={styles.countdown}>{countdown}</span>
               </>
             )}
-            {bar.link?.url && linkText && (
+            {linkUrl && linkText && (
               <>
                 {' '}
-                <a href={bar.link.url} className={styles.link}>
+                <a href={linkUrl} className={styles.link}>
                   {linkText}
                 </a>
               </>
             )}
           </span>
 
-          {bar.isDismissible && (
+          {isDismissible && (
             <button
               className={styles.dismissBtn}
               onClick={handleDismiss}

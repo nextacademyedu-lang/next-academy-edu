@@ -1,10 +1,13 @@
 import {
   mapBookingToCrmDeal,
+  mapBookingToTwentyOpportunity,
   mapBulkSeatAllocationPatch,
   mapCompanyToCrm,
   mapConsultationToCrmDeal,
+  mapConsultationToTwentyOpportunity,
   mapLeadToCrm,
   mapPaymentToCrmDealPatch,
+  mapPaymentToTwentyOpportunityPatch,
   mapUserToTwentyPerson,
   mapUserToCrmContact,
   mapWaitlistPatch,
@@ -112,6 +115,23 @@ export class CRMService {
         isCrmSyncWorker: true,
       },
     });
+  }
+
+  private async upsertOpportunityByLocalId(params: {
+    existingId?: string | null;
+    payload: Record<string, unknown>;
+  }): Promise<{ id: string | null; raw: unknown }> {
+    const { existingId, payload } = params;
+
+    if (existingId) {
+      try {
+        return await this.client.updateById('deals', existingId, payload);
+      } catch {
+        // If record was deleted remotely, fall through to create a fresh one.
+      }
+    }
+
+    return this.client.create('deals', payload);
   }
 
   private async resolveUserProfile(userId: string): Promise<Record<string, unknown> | null> {
@@ -334,15 +354,18 @@ export class CRMService {
     const profile = await this.resolveUserProfile(userId);
     const company = await this.resolveCompanyFromProfile(profile);
     const dealsResourcePath = this.client.getResourcePath('deals');
-    if (dealsResourcePath === 'opportunities') {
-      return {
-        skipped: true,
-        reason: 'Deal sync is disabled for default opportunities schema (no externalId)',
-      };
-    }
+    const existingDealId = getString(booking.twentyCrmDealId);
+    let result: { id: string | null; raw: unknown };
 
-    const dealPayload = mapBookingToCrmDeal({ booking, user, company });
-    const result = await this.client.upsert('deals', dealPayload.externalId, dealPayload);
+    if (dealsResourcePath === 'opportunities') {
+      result = await this.upsertOpportunityByLocalId({
+        existingId: existingDealId,
+        payload: mapBookingToTwentyOpportunity({ booking, user }),
+      });
+    } else {
+      const dealPayload = mapBookingToCrmDeal({ booking, user, company });
+      result = await this.client.upsert('deals', dealPayload.externalId, dealPayload);
+    }
 
     if (result.id) {
       await this.updateLocalCrmId({
@@ -382,19 +405,27 @@ export class CRMService {
     });
     if (!booking) return { skipped: true, reason: 'Booking not found for payment sync' };
     const dealsResourcePath = this.client.getResourcePath('deals');
-    if (dealsResourcePath === 'opportunities') {
-      return {
-        skipped: true,
-        reason: 'Deal sync is disabled for default opportunities schema (no externalId)',
-      };
-    }
+    const existingDealId = getString(booking.twentyCrmDealId);
+    let result: { id: string | null; raw: unknown };
 
-    const dealPatch = mapPaymentToCrmDealPatch({ payment, booking });
-    const externalId = makeEntityExternalId('booking', bookingId);
-    const result = await this.client.upsert('deals', externalId, {
-      externalId,
-      ...dealPatch,
-    });
+    if (dealsResourcePath === 'opportunities') {
+      const bookingUser = asRecord(booking.user);
+      const opportunityPayload = {
+        ...mapBookingToTwentyOpportunity({ booking, user: bookingUser }),
+        ...mapPaymentToTwentyOpportunityPatch({ payment, booking }),
+      };
+      result = await this.upsertOpportunityByLocalId({
+        existingId: existingDealId,
+        payload: opportunityPayload,
+      });
+    } else {
+      const dealPatch = mapPaymentToCrmDealPatch({ payment, booking });
+      const externalId = makeEntityExternalId('booking', bookingId);
+      result = await this.client.upsert('deals', externalId, {
+        externalId,
+        ...dealPatch,
+      });
+    }
 
     if (result.id) {
       await this.updateLocalCrmId({
@@ -437,21 +468,28 @@ export class CRMService {
     const consultationType = asRecord(consultation.consultationType);
     const slot = asRecord(consultation.slot);
     const dealsResourcePath = this.client.getResourcePath('deals');
-    if (dealsResourcePath === 'opportunities') {
-      return {
-        skipped: true,
-        reason: 'Deal sync is disabled for default opportunities schema (no externalId)',
-      };
-    }
+    const existingDealId = getString(consultation.twentyCrmDealId);
+    let result: { id: string | null; raw: unknown };
 
-    const dealPayload = mapConsultationToCrmDeal({
-      consultation,
-      user,
-      instructor,
-      consultationType,
-      slot,
-    });
-    const result = await this.client.upsert('deals', dealPayload.externalId, dealPayload);
+    if (dealsResourcePath === 'opportunities') {
+      result = await this.upsertOpportunityByLocalId({
+        existingId: existingDealId,
+        payload: mapConsultationToTwentyOpportunity({
+          consultation,
+          user,
+          consultationType,
+        }),
+      });
+    } else {
+      const dealPayload = mapConsultationToCrmDeal({
+        consultation,
+        user,
+        instructor,
+        consultationType,
+        slot,
+      });
+      result = await this.client.upsert('deals', dealPayload.externalId, dealPayload);
+    }
 
     if (result.id) {
       await this.updateLocalCrmId({

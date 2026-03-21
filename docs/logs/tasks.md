@@ -6,6 +6,29 @@
 
 ## Session Log
 
+### Session 2026-03-22 (01:06) — CRM/Admin/Preview Stabilization
+
+- [x] Investigated CRM sales pipeline mismatch with Twenty default schema
+- [x] Removed `opportunities` skip behavior in CRM service and enabled create/update compatibility flow
+- [x] Added lightweight opportunities-safe mappers for:
+  - [x] booking
+  - [x] payment patch context
+  - [x] consultation booking
+- [x] Hardened admin access reliability:
+  - [x] introduced `isAdminUser(...)` with `PAYLOAD_ADMIN_EMAIL` fallback
+  - [x] applied to access-control guards and `users` admin gate/hook checks
+- [x] Added preview support:
+  - [x] collection admin preview URLs for `popups` and `announcement-bars`
+  - [x] API preview parameters with admin-only access checks
+  - [x] frontend preview rendering in popup manager + announcement bar
+- [x] Re-mapped announcement bar UI to actual collection schema fields
+- [x] Verified TypeScript compile:
+  - [x] `pnpm.cmd exec tsc --noEmit` ✅
+- [ ] Deploy and validate production scenarios:
+  - [ ] admin can create/update Popups and Announcement Bars without access errors
+  - [ ] preview links display draft content correctly
+  - [ ] `/api/cron/crm-sync` creates/updates opportunities in Twenty pipeline
+
 ### Session 2026-03-21 (19:13) — Docs Logs Refresh
 
 - [x] Updated `docs/logs/api-audit-latest.md` to reflect final post-fix audit state

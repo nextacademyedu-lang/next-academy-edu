@@ -2,6 +2,18 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getPayload } from 'payload';
 import config from '@payload-config';
 
+function isAdminViewer(user: { role?: unknown; email?: unknown } | null | undefined): boolean {
+  if (!user) return false;
+  if (user.role === 'admin') return true;
+
+  const configured = (process.env.PAYLOAD_ADMIN_EMAIL || '')
+    .split(',')
+    .map((email) => email.trim().toLowerCase())
+    .filter(Boolean);
+  const userEmail = typeof user.email === 'string' ? user.email.trim().toLowerCase() : '';
+  return Boolean(userEmail && configured.includes(userEmail));
+}
+
 /**
  * GET /api/announcement-bars/active?page=/ar
  * Returns the highest-priority active announcement bar for the given page.
@@ -9,7 +21,30 @@ import config from '@payload-config';
 export async function GET(req: NextRequest) {
   try {
     const page = req.nextUrl.searchParams.get('page') || '/';
+    const previewAnnouncementId = req.nextUrl.searchParams.get('previewAnnouncementId');
     const payload = await getPayload({ config });
+    const { user } = await payload.auth({ headers: req.headers });
+
+    if (previewAnnouncementId) {
+      if (!isAdminViewer(user)) {
+        return NextResponse.json({ error: 'Unauthorized preview access' }, { status: 403 });
+      }
+
+      let bar: unknown = null;
+      try {
+        bar = await payload.findByID({
+          collection: 'announcement-bars',
+          id: previewAnnouncementId,
+          depth: 0,
+          overrideAccess: true,
+        });
+      } catch {
+        bar = null;
+      }
+
+      return NextResponse.json({ bar });
+    }
+
     const now = new Date().toISOString();
 
     const result = await payload.find({

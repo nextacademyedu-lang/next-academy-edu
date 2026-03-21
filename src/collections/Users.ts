@@ -1,5 +1,5 @@
 import type { CollectionConfig } from 'payload';
-import { isAdmin, isAdminOrSelf } from '../lib/access-control.ts';
+import { isAdmin, isAdminOrSelf, isAdminUser } from '../lib/access-control.ts';
 import { createCrmDedupeKey } from '../lib/crm/dedupe.ts';
 import { enqueueCrmSyncEvent } from '../lib/crm/queue.ts';
 
@@ -17,13 +17,12 @@ export const Users: CollectionConfig = {
     update: isAdminOrSelf,
     delete: isAdmin,
     // Only admins can access the admin panel for this collection
-    admin: ({ req: { user } }) => Boolean(user && user.role === 'admin'),
+    admin: ({ req: { user } }) => isAdminUser(user),
   },
   hooks: {
     beforeChange: [
       ({ req, data, originalDoc, operation, context }) => {
-        const actorRole = req.user?.role;
-        const isAdminActor = actorRole === 'admin';
+        const isAdminActor = isAdminUser(req.user);
         const hasPrivilegedRoleWriteBypass =
           Boolean((context as { allowPrivilegedRoleWrite?: boolean } | undefined)?.allowPrivilegedRoleWrite);
         const canWritePrivilegedRole = isAdminActor || hasPrivilegedRoleWriteBypass;

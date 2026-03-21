@@ -15,6 +15,32 @@ import type { Access, FieldAccess } from 'payload';
 // Anyone (no authentication required)
 export const isPublic: Access = () => true;
 
+type AccessUser = {
+  id?: string | number;
+  role?: string | null;
+  email?: string | null;
+  instructorId?: unknown;
+};
+
+function parseConfiguredAdminEmails(): string[] {
+  const raw = process.env.PAYLOAD_ADMIN_EMAIL || '';
+  return raw
+    .split(',')
+    .map((email) => email.trim().toLowerCase())
+    .filter(Boolean);
+}
+
+export function isAdminUser(user: AccessUser | null | undefined): boolean {
+  if (!user) return false;
+  if (user.role === 'admin') return true;
+
+  const userEmail = typeof user.email === 'string' ? user.email.trim().toLowerCase() : '';
+  if (!userEmail) return false;
+
+  const adminEmails = parseConfiguredAdminEmails();
+  return adminEmails.includes(userEmail);
+}
+
 // Must be logged in
 export const isAuthenticated: Access = ({ req: { user } }) => {
   return Boolean(user);
@@ -22,14 +48,13 @@ export const isAuthenticated: Access = ({ req: { user } }) => {
 
 // Admin role only
 export const isAdmin: Access = ({ req: { user } }) => {
-  if (!user) return false;
-  return user.role === 'admin';
+  return isAdminUser(user as AccessUser | undefined);
 };
 
 // User can only access their own record; Admin can access all
 export const isAdminOrSelf: Access = ({ req: { user } }) => {
   if (!user) return false;
-  if (user.role === 'admin') return true;
+  if (isAdminUser(user as AccessUser | undefined)) return true;
 
   return {
     id: {
@@ -41,13 +66,13 @@ export const isAdminOrSelf: Access = ({ req: { user } }) => {
 // Admin or Instructor role
 export const isAdminOrInstructor: Access = ({ req: { user } }) => {
   if (!user) return false;
-  return user.role === 'admin' || user.role === 'instructor';
+  return isAdminUser(user as AccessUser | undefined) || user.role === 'instructor';
 };
 
 // Owner of the record (uses 'user' field) or Admin
 export const isAdminOrOwner: Access = ({ req: { user } }) => {
   if (!user) return false;
-  if (user.role === 'admin') return true;
+  if (isAdminUser(user as AccessUser | undefined)) return true;
 
   // Return a query constraint: Payload will filter to records where user field matches
   return {
@@ -61,7 +86,7 @@ export const isAdminOrOwner: Access = ({ req: { user } }) => {
 export const isAdminOrOwnerByField = (fieldName: string): Access => {
   return ({ req: { user } }) => {
     if (!user) return false;
-    if (user.role === 'admin') return true;
+    if (isAdminUser(user as AccessUser | undefined)) return true;
 
     return {
       [fieldName]: {
@@ -74,7 +99,7 @@ export const isAdminOrOwnerByField = (fieldName: string): Access => {
 // Instructor can only access own records (matched by instructor relationship)
 export const isAdminOrOwnInstructor: Access = ({ req: { user } }) => {
   if (!user) return false;
-  if (user.role === 'admin') return true;
+  if (isAdminUser(user as AccessUser | undefined)) return true;
 
   if (user.role === 'instructor' && user.instructorId) {
     return {
@@ -90,7 +115,7 @@ export const isAdminOrOwnInstructor: Access = ({ req: { user } }) => {
 // User can read own records (by user field), instructor can read own records (by instructor field), admin can read all
 export const isAdminOrOwnerOrOwnInstructor: Access = ({ req: { user } }) => {
   if (!user) return false;
-  if (user.role === 'admin') return true;
+  if (isAdminUser(user as AccessUser | undefined)) return true;
 
   if (user.role === 'instructor' && user.instructorId) {
     const instructorId =
@@ -110,7 +135,7 @@ export const isAdminOrOwnerOrOwnInstructor: Access = ({ req: { user } }) => {
 // Instructor can update own records (matched by instructor field), admin can update all
 export const isAdminOrOwnInstructorForUpdate: Access = ({ req: { user } }) => {
   if (!user) return false;
-  if (user.role === 'admin') return true;
+  if (isAdminUser(user as AccessUser | undefined)) return true;
 
   if (user.role === 'instructor' && user.instructorId) {
     const instructorId =
@@ -129,7 +154,7 @@ export const isAdminOrOwnInstructorForUpdate: Access = ({ req: { user } }) => {
 export const isAdminOrB2BManager: Access = async ({ req }) => {
   const { user, payload } = req;
   if (!user) return false;
-  if (user.role === 'admin') return true;
+  if (isAdminUser(user as AccessUser | undefined)) return true;
 
   if (user.role !== 'b2b_manager') return false;
 
@@ -162,5 +187,5 @@ export const isAdminOrB2BManager: Access = async ({ req }) => {
 
 // Field-level: Admin only
 export const adminOnlyField: FieldAccess = ({ req: { user } }) => {
-  return Boolean(user && user.role === 'admin');
+  return isAdminUser(user as AccessUser | undefined);
 };
