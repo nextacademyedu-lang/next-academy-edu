@@ -478,6 +478,28 @@ export class CRMService {
       entityId: userId,
     });
 
+    const contactsResourcePath = this.client.getResourcePath('contacts');
+    if (contactsResourcePath === 'people') {
+      // Default Twenty "people" does not include externalId/custom waitlist fields.
+      // User sync above already creates/updates the person record.
+      const user = await this.payload.findByID({
+        collection: 'users',
+        id: userId,
+        depth: 0,
+        overrideAccess: true,
+        showHiddenFields: true,
+      });
+
+      return {
+        skipped: false,
+        data: {
+          userId,
+          contactId: getString(user?.twentyCrmContactId) ?? null,
+          note: 'Waitlist patch skipped for default people schema',
+        },
+      };
+    }
+
     const patch = mapWaitlistPatch(waitlist);
     const externalId = makeEntityExternalId('user', userId);
     const result = await this.client.upsert('contacts', externalId, {
