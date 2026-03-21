@@ -4,6 +4,39 @@
 
 ---
 
+### [2026-03-21 12:06] - Production Schema Auto-Migration Fix (Payload + Coolify)
+
+**Files updated (this pass):**
+- Runtime config:
+  - `src/payload.config.ts`
+- DB migrations:
+  - `src/migrations/20260321_100401.ts` (new)
+  - `src/migrations/20260321_100401.json` (new)
+  - `src/migrations/index.ts` (updated)
+- Documentation:
+  - `docs/logs/changelog.md`
+  - `docs/logs/tasks.md`
+  - `docs/logs/errors.md`
+  - `docs/sessions/2026-03-21-12-06-session-16.md` (new)
+
+**What changed technically:**
+- Confirmed root cause from production logs:
+  - Production Postgres adapter does not run schema `push` automatically.
+  - New collections/fields existed in code, but DB schema was behind (`programs.featured_priority`, `announcement_bars`, `popups`, `upcoming_events_config`, `crm_sync_events`).
+- Generated a new migration that includes the missing schema delta (tables, enums, indexes, and additive columns).
+- Wired production migrations in Payload config:
+  - Added `prodMigrations: migrations` to `postgresAdapter(...)`.
+  - Kept `push: true` for non-production/dev behavior.
+
+**Reason:**
+- User provided production env + Coolify logs showing runtime 500s after successful build/deploy.
+- Goal was to make production schema updates deterministic on app boot without manual DB patching each deploy.
+
+**Verification:**
+- `node_modules\\.bin\\tsc --noEmit` ✅
+
+---
+
 ### [2026-03-20 03:42] - CRM Production Incident Audit (Coolify Logs + Live Endpoint Checks)
 
 **Files updated (this pass):**

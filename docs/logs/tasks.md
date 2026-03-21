@@ -6,6 +6,33 @@
 
 ## Session Log
 
+### Session 2026-03-21 (12:06) — Production Schema Auto-Migration Fix
+
+- [x] Audited latest Coolify runtime logs in `docs/logs/coolify/logs.txt`
+- [x] Confirmed schema drift errors causing runtime 500:
+  - [x] `programs.featured_priority` missing
+  - [x] relation `announcement_bars` missing
+  - [x] relation `popups` missing
+  - [x] relation `upcoming_events_config` missing
+  - [x] relation `crm_sync_events` missing / sync endpoint failure
+- [x] Generated fresh Payload migration snapshot + SQL delta:
+  - [x] `src/migrations/20260321_100401.ts`
+  - [x] `src/migrations/20260321_100401.json`
+  - [x] registered in `src/migrations/index.ts`
+- [x] Fixed production migration execution path:
+  - [x] `src/payload.config.ts` now sets `prodMigrations: migrations`
+- [x] Verified TypeScript compile:
+  - [x] `node_modules\\.bin\\tsc --noEmit` ✅
+- [ ] Re-deploy app on Coolify with latest commit
+- [ ] Validate post-deploy endpoints:
+  - [ ] `GET /api/programs`
+  - [ ] `GET /api/home/featured-programs`
+  - [ ] `GET /api/announcement-bars/active`
+  - [ ] `GET /api/popups/active`
+  - [ ] `GET /api/upcoming-events`
+  - [ ] `GET /api/cron/crm-sync` (with `CRON_SECRET`)
+- [ ] Security follow-up: rotate all secrets that were pasted in chat/logs and remove plaintext from tracked docs/env exports
+
 ### Session 2026-03-20 (03:42) — CRM Production Incident Audit (Logs + Live Health Checks)
 
 - [x] Audited provided Coolify logs:

@@ -4,6 +4,43 @@
 
 ---
 
+### [2026-03-21 12:06] - Runtime 500 After Deploy: Production Schema Drift (Payload Postgres)
+
+**Error:**
+- Public/site APIs returned 500 in production despite successful build:
+  - `/api/programs`, `/api/home/featured-programs`, `/api/announcement-bars/active`, `/api/popups/active`, `/api/upcoming-events`, `/api/cron/crm-sync`
+- Log signatures:
+  - `column "featured_priority" of relation "programs" does not exist`
+  - `relation "announcement_bars" does not exist`
+  - `relation "popups" does not exist`
+  - `relation "upcoming_events_config" does not exist`
+  - relation errors around `crm_sync_events`
+
+**Root Cause:**
+1. `postgresAdapter` in Payload only performs schema `push` in non-production.
+2. Production config was missing `prodMigrations`, so new schema changes were never applied at runtime.
+3. App code expected new collections/fields immediately, causing query failures.
+
+**Fix:**
+1. Generated new migration delta:
+   - `src/migrations/20260321_100401.ts`
+   - `src/migrations/20260321_100401.json`
+2. Registered it in `src/migrations/index.ts`.
+3. Updated `src/payload.config.ts`:
+   - Added `prodMigrations: migrations` to `postgresAdapter(...)`.
+4. Re-deploy required so app boots and executes pending migrations in production.
+
+**Post-fix validation required:**
+- Confirm 200 responses for:
+  - `/api/programs`
+  - `/api/home/featured-programs`
+  - `/api/announcement-bars/active`
+  - `/api/popups/active`
+  - `/api/upcoming-events`
+  - `/api/cron/crm-sync`
+
+---
+
 ### [2026-03-20 03:42] - CRM Domain Unhealthy: Self-Signed TLS + Upstream 503
 
 **Error:**

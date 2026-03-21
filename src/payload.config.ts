@@ -42,6 +42,7 @@ import { Popups } from './collections/Popups.ts';
 import { AnnouncementBars } from './collections/AnnouncementBars.ts';
 import { UpcomingEventsConfig } from './collections/UpcomingEventsConfig.ts';
 import { CrmSyncEvents } from './collections/CrmSyncEvents.ts';
+import { migrations } from './migrations/index.ts';
 
 if (!process.env.DATABASE_URI) {
   throw new Error('DATABASE_URI environment variable is required');
@@ -204,6 +205,9 @@ export default buildConfig({
     pool: {
       connectionString: process.env.DATABASE_URI,
     },
+    // In production, postgresAdapter does not run schema push.
+    // Wire generated migrations so schema evolves automatically on boot.
+    prodMigrations: migrations,
     push: true,
   }),
   typescript: {
