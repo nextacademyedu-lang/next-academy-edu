@@ -10,15 +10,31 @@ const WINDOW_MS = 60_000;
 function parseConfiguredAdminEmails(): string[] {
   const raw = process.env.PAYLOAD_ADMIN_EMAIL || '';
   return raw
-    .split(',')
+    .split(/[,\s;]+/)
     .map((email) => email.trim().toLowerCase())
     .filter(Boolean);
 }
 
+function isConfiguredAdminEmail(email: string): boolean {
+  const normalizedEmail = email.trim().toLowerCase();
+  if (!normalizedEmail) return false;
+  return parseConfiguredAdminEmails().includes(normalizedEmail);
+}
+
+function resolveCookieDomain(hostname: string): string | undefined {
+  if (
+    hostname === 'nextacademyedu.com' ||
+    hostname === 'www.nextacademyedu.com'
+  ) {
+    return '.nextacademyedu.com';
+  }
+
+  return undefined;
+}
+
 async function syncConfiguredAdminBeforeLogin(payload: any, email: string): Promise<void> {
   const normalizedEmail = email.trim().toLowerCase();
-  const adminEmails = parseConfiguredAdminEmails();
-  if (!normalizedEmail || adminEmails.length === 0 || !adminEmails.includes(normalizedEmail)) {
+  if (!isConfiguredAdminEmail(normalizedEmail)) {
     return;
   }
 
@@ -45,6 +61,45 @@ async function syncConfiguredAdminBeforeLogin(payload: any, email: string): Prom
     overrideAccess: true,
     context: { allowPrivilegedRoleWrite: true },
   });
+}
+
+async function ensureConfiguredAdminAfterLogin(params: {
+  payload: any;
+  result: any;
+  email: string;
+  password: string;
+  req: NextRequest;
+}): Promise<any> {
+  const { payload, result, email, password, req } = params;
+  if (!isConfiguredAdminEmail(email)) return result;
+
+  const loggedInUser = result?.user;
+  const userId = loggedInUser?.id;
+  if (!userId) return result;
+
+  const alreadyAdmin = loggedInUser?.role === 'admin';
+  const alreadyVerified = loggedInUser?.emailVerified === true;
+  if (alreadyAdmin && alreadyVerified) return result;
+
+  await payload.update({
+    collection: 'users',
+    id: userId,
+    data: {
+      role: 'admin',
+      emailVerified: true,
+    },
+    overrideAccess: true,
+    context: { allowPrivilegedRoleWrite: true },
+  });
+
+  // Re-login to issue a fresh token that contains the up-to-date admin role.
+  const refreshed = await payload.login({
+    collection: 'users',
+    data: { email, password },
+    req: req as any,
+  });
+
+  return refreshed;
 }
 
 export async function POST(req: NextRequest) {
@@ -99,10 +154,17 @@ export async function POST(req: NextRequest) {
 
     const payload = await getPayload({ config });
     await syncConfiguredAdminBeforeLogin(payload, email);
-    const result = await payload.login({
+    let result = await payload.login({
       collection: 'users',
       data: { email: email as string, password: password as string },
       req: req as any,
+    });
+    result = await ensureConfiguredAdminAfterLogin({
+      payload,
+      result,
+      email: email as string,
+      password: password as string,
+      req,
     });
 
     const response = NextResponse.json(result, { status: 200 });
@@ -115,6 +177,7 @@ export async function POST(req: NextRequest) {
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'lax',
         path: '/',
+        domain: resolveCookieDomain(req.nextUrl.hostname),
         maxAge: 7200, // 2 hours
       });
     }
