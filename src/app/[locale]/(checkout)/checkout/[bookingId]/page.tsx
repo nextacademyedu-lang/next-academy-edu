@@ -14,6 +14,8 @@ const PAYMENT_OPTIONS = [
   { id: 'fawry',  label: 'فوري / أمان (كاش)',          provider: 'EasyKash', type: 'easykash' },
 ];
 
+const IS_PAYMOB_ENABLED = process.env.NEXT_PUBLIC_ENABLE_PAYMOB === 'true';
+
 export default function CheckoutPage() {
   const locale = useLocale();
   const router = useRouter();
@@ -21,7 +23,13 @@ export default function CheckoutPage() {
   const bookingId = params.bookingId as string;
 
   const [booking, setBooking] = useState<PayloadBooking | null>(null);
-  const [selectedMethod, setSelectedMethod] = useState('card');
+  const availablePaymentOptions = IS_PAYMOB_ENABLED
+    ? PAYMENT_OPTIONS
+    : PAYMENT_OPTIONS.filter((option) => option.type === 'easykash');
+
+  const [selectedMethod, setSelectedMethod] = useState(
+    availablePaymentOptions[0]?.id ?? 'fawry',
+  );
   const [discountCode, setDiscountCode] = useState('');
   const [discountApplied, setDiscountApplied] = useState<{ amount: number; newTotal: number } | null>(null);
   const [discountError, setDiscountError] = useState('');
@@ -205,7 +213,7 @@ export default function CheckoutPage() {
 
           <h2 className={styles.subHeader}>اختار طريقة الدفع</h2>
           <div className={styles.paymentOptions}>
-            {PAYMENT_OPTIONS.map((opt) => (
+            {availablePaymentOptions.map((opt) => (
               <div
                 key={opt.id}
                 className={`${styles.paymentOption} ${selectedMethod === opt.id ? styles.selected : ''}`}
@@ -221,6 +229,14 @@ export default function CheckoutPage() {
               </div>
             ))}
           </div>
+
+          {!IS_PAYMOB_ENABLED && (
+            <div className={styles.installmentNotice} style={{ marginTop: '12px' }}>
+              <p style={{ fontSize: '13px', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
+                تم إيقاف Paymob مؤقتًا. الدفع المتاح حاليًا عبر EasyKash (فوري/أمان).
+              </p>
+            </div>
+          )}
 
           {selectedMethod === 'fawry' && (
             <div className={styles.installmentNotice} style={{ marginTop: '16px' }}>

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getPayload } from 'payload';
 import config from '@payload-config';
+import { authenticateRequestUser } from '@/lib/server-auth';
 
 const PURCHASED_BOOKING_STATUSES = ['confirmed', 'completed'];
 
@@ -105,7 +106,7 @@ export async function GET(req: NextRequest) {
     const sessionPageViews = Number.parseInt(req.nextUrl.searchParams.get('sessionPageViews') || '1', 10);
 
     const payload = await getPayload({ config });
-    const { user } = await payload.auth({ headers: req.headers });
+    const user = await authenticateRequestUser(payload, req);
 
     if (previewPopupId) {
       if (!isAdminViewer(user)) {

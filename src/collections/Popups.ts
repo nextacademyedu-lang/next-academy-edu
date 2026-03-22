@@ -11,6 +11,15 @@ export const Popups: CollectionConfig = {
       const baseUrl = (process.env.NEXT_PUBLIC_APP_URL || process.env.SERVER_URL || '').replace(/\/+$/, '');
       return `${baseUrl}/ar?previewPopupId=${String(doc.id)}`;
     },
+    livePreview: {
+      url: ({ data }) => {
+        const baseUrl = (process.env.NEXT_PUBLIC_APP_URL || process.env.SERVER_URL || '').replace(/\/+$/, '');
+        const normalizedLocale = 'ar';
+        const id = (data as { id?: string | number | null } | undefined)?.id;
+        if (id == null) return `${baseUrl}/${normalizedLocale}`;
+        return `${baseUrl}/${normalizedLocale}?previewPopupId=${String(id)}`;
+      },
+    },
   },
   access: {
     read: isPublic,

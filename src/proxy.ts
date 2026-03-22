@@ -42,6 +42,14 @@ function applySecurityHeaders(response: NextResponse): NextResponse {
 
 export default function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
+  const hostname = request.nextUrl.hostname.toLowerCase();
+
+  // Canonical host to avoid auth cookie split between apex/www.
+  if (hostname === 'www.nextacademyedu.com') {
+    const canonical = request.nextUrl.clone();
+    canonical.hostname = 'nextacademyedu.com';
+    return NextResponse.redirect(canonical, 308);
+  }
 
   // Skip API routes, admin, static assets, and legal pages (direct access for Google verification)
   if (

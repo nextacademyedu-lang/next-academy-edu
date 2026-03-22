@@ -3,9 +3,17 @@ import { getPayload } from 'payload';
 import config from '@payload-config';
 import { createPaymobIntention, getPaymobCheckoutUrl, getBookingProgramTitle } from '@/lib/payment-api';
 import type { CheckoutSession } from '@/lib/payment-api';
+import { authenticateRequestUser } from '@/lib/server-auth';
 
 export async function POST(req: NextRequest) {
   try {
+    if (process.env.ENABLE_PAYMOB !== 'true') {
+      return NextResponse.json(
+        { error: 'Paymob is temporarily disabled. Please use EasyKash / Fawry.' },
+        { status: 503 },
+      );
+    }
+
     const { bookingId, method } = await req.json() as { bookingId: string; method: 'card' | 'wallet' };
 
     if (!bookingId || !['card', 'wallet'].includes(method)) {
@@ -15,7 +23,7 @@ export async function POST(req: NextRequest) {
     const payload = await getPayload({ config });
 
     // ── 1. Auth check ──────────────────────────────────────────────
-    const { user } = await payload.auth({ headers: req.headers });
+    const user = await authenticateRequestUser(payload, req);
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
     // ── 2. Fetch booking ───────────────────────────────────────────

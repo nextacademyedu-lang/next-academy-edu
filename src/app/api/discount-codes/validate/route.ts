@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getPayload } from 'payload';
 import config from '@payload-config';
 import { isAdminUser } from '@/lib/access-control';
+import { authenticateRequestUser } from '@/lib/server-auth';
 
 function normalizeCode(value: unknown): string {
   if (typeof value !== 'string') return '';
@@ -24,7 +25,7 @@ export async function POST(req: NextRequest) {
     const payload = await getPayload({ config });
 
     // Auth check
-    const { user } = await payload.auth({ headers: req.headers });
+    const user = await authenticateRequestUser(payload, req);
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
     // Fetch booking to get the amount + round

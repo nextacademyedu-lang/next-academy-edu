@@ -172,7 +172,19 @@ export function PopupManager({ initialData }: PopupManagerProps) {
       }
     };
 
-    fetchPopups();
+    void fetchPopups();
+
+    // In admin preview mode, refresh frequently so updates appear almost live.
+    let interval: ReturnType<typeof setInterval> | null = null;
+    if (previewPopupId) {
+      interval = setInterval(() => {
+        void fetchPopups();
+      }, 2000);
+    }
+
+    return () => {
+      if (interval) clearInterval(interval);
+    };
   }, [pathname, initialData, behavior, previewPopupId]);
 
   /* Trigger logic */

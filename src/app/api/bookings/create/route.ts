@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getPayload } from 'payload';
 import config from '@payload-config';
+import { authenticateRequestUser } from '@/lib/server-auth';
 
 function generateCode(prefix: string): string {
   return `${prefix}-${Date.now().toString(36).toUpperCase()}-${Math.random().toString(36).slice(2, 6).toUpperCase()}`;
@@ -40,7 +41,7 @@ export async function POST(req: NextRequest) {
 
     // ── Auth ──────────────────────────────────────────────────────────────
     stage = 'auth';
-    const { user } = await payload.auth({ headers: req.headers });
+    const user = await authenticateRequestUser(payload, req);
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
     // ── Fetch round ───────────────────────────────────────────────────────

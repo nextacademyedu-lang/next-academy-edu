@@ -3,6 +3,7 @@ import { getPayload } from 'payload';
 import config from '@payload-config';
 import { createEasyKashPayment, getBookingProgramTitle } from '@/lib/payment-api';
 import type { CheckoutSession } from '@/lib/payment-api';
+import { authenticateRequestUser } from '@/lib/server-auth';
 
 export async function POST(req: NextRequest) {
   try {
@@ -13,7 +14,7 @@ export async function POST(req: NextRequest) {
     const payload = await getPayload({ config });
 
     // ── 1. Auth check ──────────────────────────────────────────────
-    const { user } = await payload.auth({ headers: req.headers });
+    const user = await authenticateRequestUser(payload, req);
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
     // ── 2. Fetch booking ───────────────────────────────────────────
