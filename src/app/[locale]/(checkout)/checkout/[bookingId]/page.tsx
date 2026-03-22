@@ -93,7 +93,11 @@ export default function CheckoutPage() {
       if (!res.ok) throw new Error(data.error || 'كود غير صالح');
       setDiscountApplied({ amount: data.discountAmount, newTotal: data.newAmount });
     } catch (err: any) {
-      setDiscountError(err.message);
+      const errorMessage =
+        typeof err?.message === 'string' && err.message.trim().length > 0
+          ? err.message
+          : 'كود غير صالح';
+      setDiscountError(errorMessage);
     } finally {
       setDiscountLoading(false);
     }
@@ -185,6 +189,7 @@ export default function CheckoutPage() {
   }
 
   const programTitle = getProgramTitleFromBooking(booking);
+  const hasPersistedDiscount = (booking.discountAmount ?? 0) > 0;
   const amount = discountApplied ? discountApplied.newTotal : booking.finalAmount;
 
   return (
@@ -257,16 +262,21 @@ export default function CheckoutPage() {
                 className={styles.discountInput}
                 value={discountCode}
                 onChange={(e) => { setDiscountCode(e.target.value); setDiscountApplied(null); setDiscountError(''); }}
-                disabled={!!discountApplied}
+                disabled={!!discountApplied || hasPersistedDiscount}
               />
               <button
                 className={styles.applyBtn}
                 onClick={handleApplyDiscount}
-                disabled={discountLoading || !!discountApplied}
+                disabled={discountLoading || !!discountApplied || hasPersistedDiscount}
               >
                 {discountLoading ? '…' : discountApplied ? '✓' : 'تطبيق'}
               </button>
             </div>
+            {hasPersistedDiscount && !discountApplied && (
+              <p style={{ color: '#00e397', fontSize: '12px', marginTop: '4px' }}>
+                ✓ الخصم مطبق مسبقًا على هذا الحجز.
+              </p>
+            )}
             {discountError && (
               <p style={{ color: 'var(--accent-primary)', fontSize: '12px', marginTop: '4px' }}>{discountError}</p>
             )}

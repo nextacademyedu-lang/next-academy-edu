@@ -1,6 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getPayload } from 'payload';
 import config from '@payload-config';
+import { isAdminUser } from '@/lib/access-control';
+
+function normalizeCode(value: unknown): string {
+  if (typeof value !== 'string') return '';
+  return value.trim().toUpperCase();
+}
 
 export async function POST(req: NextRequest) {
   try {
@@ -8,6 +14,11 @@ export async function POST(req: NextRequest) {
 
     if (!code || !bookingId) {
       return NextResponse.json({ error: 'بيانات ناقصة' }, { status: 400 });
+    }
+
+    const normalizedCode = normalizeCode(code);
+    if (!normalizedCode) {
+      return NextResponse.json({ error: 'كود الخصم غير صالح' }, { status: 400 });
     }
 
     const payload = await getPayload({ config });
@@ -22,18 +33,49 @@ export async function POST(req: NextRequest) {
 
     // Verify ownership
     const ownerId = typeof booking.user === 'object' ? booking.user.id : booking.user;
-    if (String(ownerId) !== String(user.id)) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    const isOwner = String(ownerId) === String(user.id);
+    const isAdmin = isAdminUser(user as { role?: string | null; email?: string | null });
+    if (!isOwner && !isAdmin) {
+      return NextResponse.json(
+        { error: 'غير مسموح لك بتعديل خصم هذا الحجز.' },
+        { status: 403 },
+      );
     }
 
     // Fetch discount code from DB — never trust client
     const result = await payload.find({
       collection: 'discount-codes',
-      where: { code: { equals: code.toUpperCase().trim() } },
-      limit: 1,
+      where: {
+        or: [
+          { code: { equals: normalizedCode } },
+          { code: { equals: code.trim() } },
+          { code: { equals: code.trim().toLowerCase() } },
+        ],
+      },
+      depth: 0,
+      limit: 10,
+      overrideAccess: true,
+      req: req as any,
     });
 
-    const discount = result.docs[0];
+    let discount = result.docs.find((doc: { code?: string | null }) => {
+      return normalizeCode(doc.code) === normalizedCode;
+    });
+
+    // Fallback: tolerate legacy codes saved with extra spaces/casing
+    if (!discount) {
+      const fallback = await payload.find({
+        collection: 'discount-codes',
+        where: { isActive: { equals: true } },
+        depth: 0,
+        limit: 200,
+        overrideAccess: true,
+        req: req as any,
+      });
+      discount = fallback.docs.find((doc: { code?: string | null }) => {
+        return normalizeCode(doc.code) === normalizedCode;
+      });
+    }
 
     if (!discount || !discount.isActive) {
       return NextResponse.json({ error: 'كود الخصم غير صالح' }, { status: 400 });

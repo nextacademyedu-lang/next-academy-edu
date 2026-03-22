@@ -31,6 +31,86 @@ function normalizeAttendanceCount(session: SessionLike): number {
   return 0;
 }
 
+function normalizeRelationId(value: unknown): number | string | null {
+  if (typeof value === 'number' && Number.isFinite(value)) return value;
+  if (typeof value === 'string' && value.trim().length > 0) {
+    const numeric = Number(value);
+    return Number.isFinite(numeric) ? numeric : value.trim();
+  }
+  if (value && typeof value === 'object' && 'id' in value) {
+    const nested = (value as { id?: unknown }).id;
+    if (typeof nested === 'number' && Number.isFinite(nested)) return nested;
+    if (typeof nested === 'string' && nested.trim().length > 0) {
+      const numeric = Number(nested);
+      return Number.isFinite(numeric) ? numeric : nested.trim();
+    }
+  }
+  return null;
+}
+
+function parseDateMs(value: unknown): number | null {
+  if (typeof value !== 'string' || value.trim().length === 0) return null;
+  const ms = new Date(value).getTime();
+  return Number.isFinite(ms) ? ms : null;
+}
+
+async function syncRoundDateRange(params: {
+  payload: any;
+  roundId: number | string;
+  req?: unknown;
+}) {
+  const { payload, roundId, req } = params;
+
+  const sessionsResult = await payload.find({
+    collection: 'sessions',
+    where: { round: { equals: roundId } },
+    depth: 0,
+    sort: 'date',
+    limit: 500,
+    overrideAccess: true,
+    req: req as any,
+  });
+
+  const timestamps = (sessionsResult.docs as Array<{ date?: string | null }>)
+    .map((doc) => parseDateMs(doc.date))
+    .filter((value): value is number => value !== null)
+    .sort((a, b) => a - b);
+
+  if (timestamps.length === 0) return;
+
+  const earliestIso = new Date(timestamps[0]).toISOString();
+  const latestIso = new Date(timestamps[timestamps.length - 1]).toISOString();
+
+  const round = await payload.findByID({
+    collection: 'rounds',
+    id: roundId,
+    depth: 0,
+    overrideAccess: true,
+    req: req as any,
+  });
+
+  if (!round) return;
+
+  const roundStartMs = parseDateMs((round as { startDate?: string | null }).startDate);
+  const roundEndMs = parseDateMs((round as { endDate?: string | null }).endDate);
+  const needsUpdate =
+    roundStartMs !== timestamps[0] ||
+    roundEndMs !== timestamps[timestamps.length - 1];
+
+  if (!needsUpdate) return;
+
+  await payload.update({
+    collection: 'rounds',
+    id: roundId,
+    data: {
+      startDate: earliestIso,
+      endDate: latestIso,
+    },
+    overrideAccess: true,
+    req: req as any,
+  });
+}
+
 export const Sessions: CollectionConfig = {
   slug: 'sessions',
   admin: { useAsTitle: 'title' },
@@ -61,6 +141,30 @@ export const Sessions: CollectionConfig = {
         next.attendeesCount = attendanceCount;
 
         return next;
+      },
+    ],
+    afterChange: [
+      async ({ req, doc, previousDoc }) => {
+        const payload = req.payload;
+        const affectedRoundIds = new Set<number | string>();
+
+        const currentRoundId = normalizeRelationId((doc as { round?: unknown })?.round);
+        if (currentRoundId !== null) affectedRoundIds.add(currentRoundId);
+
+        const previousRoundId = normalizeRelationId((previousDoc as { round?: unknown } | undefined)?.round);
+        if (previousRoundId !== null) affectedRoundIds.add(previousRoundId);
+
+        for (const roundId of affectedRoundIds) {
+          await syncRoundDateRange({ payload, roundId, req });
+        }
+      },
+    ],
+    afterDelete: [
+      async ({ req, doc }) => {
+        const payload = req.payload;
+        const roundId = normalizeRelationId((doc as { round?: unknown } | undefined)?.round);
+        if (roundId === null) return;
+        await syncRoundDateRange({ payload, roundId, req });
       },
     ],
     afterRead: [
