@@ -10,13 +10,14 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Loader2 } from 'lucide-react';
 import { useAuth } from '@/context/auth-context';
+import { getCurrentUser } from '@/lib/auth-api';
 import { getDashboardPath, getSafeRedirectPath } from '@/lib/role-redirect';
 import styles from './login.module.css';
 
 export default function LoginPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { login, user, isAuthenticated, isLoading: authLoading } = useAuth();
+  const { login, user, isAuthenticated, isLoading: authLoading, refreshUser } = useAuth();
   const t = useTranslations('Auth');
   const locale = useLocale();
   const redirectParam = searchParams.get('redirect');
@@ -29,17 +30,35 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  // If already authenticated, redirect to dashboard
+  // If already authenticated in client state, validate server session first.
   useEffect(() => {
-    if (!authLoading && isAuthenticated && user) {
-      const fallbackPath = getDashboardPath(user.role, locale);
+    let isCancelled = false;
+
+    const validateAndRedirect = async () => {
+      if (authLoading || !isAuthenticated || !user) return;
+
+      const session = await getCurrentUser();
+      if (isCancelled) return;
+
+      const serverUser = session.success ? session.data?.user : null;
+      if (!serverUser) {
+        await refreshUser();
+        return;
+      }
+
+      const fallbackPath = getDashboardPath(serverUser.role, locale);
       const redirectPath = getSafeRedirectPath(
         redirectParam,
         fallbackPath,
       );
       router.push(redirectPath);
-    }
-  }, [isAuthenticated, authLoading, router, locale, user, redirectParam]);
+    };
+
+    void validateAndRedirect();
+    return () => {
+      isCancelled = true;
+    };
+  }, [isAuthenticated, authLoading, router, locale, user, redirectParam, refreshUser]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -69,6 +88,8 @@ export default function LoginPage() {
           verifyParams.set('redirect', redirectParam);
         }
         router.push(`/${locale}/verify-email?${verifyParams.toString()}`);
+      } else if (result.error === 'SESSION_NOT_ESTABLISHED') {
+        setError('تم تسجيل الدخول لكن تعذر تثبيت الجلسة. امسح الكوكيز للموقع ثم أعد المحاولة.');
       } else {
         setError(t('invalidCredentials'));
       }

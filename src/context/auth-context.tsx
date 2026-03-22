@@ -71,7 +71,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           };
         }
 
-        setUser(userData);
+        // Confirm that the server session/cookie was actually established.
+        // This prevents false "logged-in" client state when cookie write fails.
+        let serverUser: UserData | null = null;
+        for (let attempt = 0; attempt < 3; attempt += 1) {
+          const me = await getCurrentUser();
+          if (me.success && me.data?.user) {
+            serverUser = me.data.user;
+            break;
+          }
+          await new Promise((resolve) => setTimeout(resolve, 120));
+        }
+
+        if (!serverUser) {
+          setUser(null);
+          return {
+            success: false,
+            error: 'SESSION_NOT_ESTABLISHED',
+          };
+        }
+
+        setUser(serverUser);
       }
 
       return result;

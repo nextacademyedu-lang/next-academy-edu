@@ -17,16 +17,33 @@ function addAuthHeaders(base: AuthCandidateHeaders, token: string): AuthCandidat
   ];
 }
 
-function getTokenFromCookieHeader(cookieHeader: string): string | null {
+function getTokensFromCookieHeader(cookieHeader: string): string[] {
+  const tokens: string[] = [];
   const parts = cookieHeader.split(';');
   for (const part of parts) {
     const [rawKey, ...rawValue] = part.trim().split('=');
     if (rawKey !== 'payload-token') continue;
     const joined = rawValue.join('=').trim();
-    if (!joined) return null;
-    return decodeURIComponent(joined);
+    if (!joined) continue;
+    try {
+      tokens.push(decodeURIComponent(joined));
+    } catch {
+      tokens.push(joined);
+    }
   }
-  return null;
+  return tokens;
+}
+
+function dedupeTokens(tokens: string[]): string[] {
+  const seen = new Set<string>();
+  const unique: string[] = [];
+  for (const token of tokens) {
+    const normalized = token.trim();
+    if (!normalized || seen.has(normalized)) continue;
+    seen.add(normalized);
+    unique.push(normalized);
+  }
+  return unique;
 }
 
 /**
@@ -36,18 +53,20 @@ function getTokenFromCookieHeader(cookieHeader: string): string | null {
 export async function authenticateRequestUser(payload: any, req: NextRequest): Promise<any | null> {
   const baseHeaders = buildBaseHeaders(req);
   const cookieHeader = req.headers.get('cookie') || '';
-  const cookieToken =
-    req.cookies.get('payload-token')?.value ||
-    (cookieHeader ? getTokenFromCookieHeader(cookieHeader) : null) ||
-    null;
+  const requestCookieTokens = (req.cookies.getAll?.('payload-token') || [])
+    .map((cookie) => cookie.value)
+    .filter(Boolean);
+  const headerCookieTokens = cookieHeader ? getTokensFromCookieHeader(cookieHeader) : [];
+  const cookieTokens = dedupeTokens([...requestCookieTokens, ...headerCookieTokens]);
 
   const candidates: AuthCandidateHeaders[] = [baseHeaders];
 
-  if (cookieToken) {
+  for (const cookieToken of cookieTokens) {
     candidates.unshift(...addAuthHeaders(baseHeaders, cookieToken));
-
-    // Last-resort minimal headers with token + cookie only
     candidates.push(
+      // Cookie only
+      { ...baseHeaders, cookie: `payload-token=${cookieToken}` },
+      // Header + cookie
       { authorization: `JWT ${cookieToken}`, cookie: `payload-token=${cookieToken}` },
       { authorization: `Bearer ${cookieToken}`, cookie: `payload-token=${cookieToken}` },
     );

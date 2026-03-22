@@ -32,6 +32,10 @@ function findActiveBookingId(payload: ExistingBookingsResponse): string | null {
   return String(active.id);
 }
 
+function autoSkipKey(roundId: string | number): string {
+  return `na_skip_auto_checkout_${String(roundId)}`;
+}
+
 export function BookRoundButton({
   locale,
   roundId,
@@ -66,6 +70,9 @@ export function BookRoundButton({
       const createData = await createRes.json().catch(() => ({}));
 
       if (createRes.status === 401) {
+        if (typeof window !== 'undefined') {
+          window.sessionStorage.setItem(autoSkipKey(roundId), '1');
+        }
         router.push(loginPath);
         return;
       }
@@ -108,6 +115,13 @@ export function BookRoundButton({
     const requestedRound = searchParams.get('bookRound');
     if (requestedRound !== String(roundId)) return;
     if (autoTriggeredRef.current) return;
+    if (typeof window !== 'undefined') {
+      const key = autoSkipKey(roundId);
+      if (window.sessionStorage.getItem(key) === '1') {
+        window.sessionStorage.removeItem(key);
+        return;
+      }
+    }
 
     autoTriggeredRef.current = true;
     void startCheckout();
