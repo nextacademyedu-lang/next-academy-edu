@@ -22,6 +22,18 @@ type AccessUser = {
   instructorId?: unknown;
 };
 
+function normalizeUserId(value: unknown): string | number | null {
+  if (typeof value === 'number' && Number.isFinite(value)) return value;
+  if (typeof value === 'string') {
+    const trimmed = value.trim();
+    if (!trimmed) return null;
+    const asNumber = Number(trimmed);
+    if (Number.isFinite(asNumber)) return asNumber;
+    return trimmed;
+  }
+  return null;
+}
+
 function parseConfiguredAdminEmails(): string[] {
   const raw = process.env.PAYLOAD_ADMIN_EMAIL || '';
   return raw
@@ -42,7 +54,7 @@ export function isAdminUser(user: AccessUser | null | undefined): boolean {
 }
 
 async function fetchPersistedUser(req: { user?: AccessUser | null; payload?: any }): Promise<AccessUser | null> {
-  const userId = req.user?.id;
+  const userId = normalizeUserId(req.user?.id);
   if (!userId || !req.payload?.findByID) return null;
 
   try {
@@ -54,7 +66,19 @@ async function fetchPersistedUser(req: { user?: AccessUser | null; payload?: any
     });
     return (user || null) as AccessUser | null;
   } catch {
-    return null;
+    try {
+      if (!req.payload?.find) return null;
+      const fallback = await req.payload.find({
+        collection: 'users',
+        where: { id: { equals: userId } },
+        depth: 0,
+        limit: 1,
+        overrideAccess: true,
+      });
+      return ((fallback?.docs?.[0] as AccessUser | undefined) || null) as AccessUser | null;
+    } catch {
+      return null;
+    }
   }
 }
 

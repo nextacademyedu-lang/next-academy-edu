@@ -172,14 +172,25 @@ export async function POST(req: NextRequest) {
 
     // Set the auth cookie from Payload's response
     if (result.token) {
-      response.cookies.set('payload-token', result.token, {
+      const cookieOptions = {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'lax',
         path: '/',
-        domain: resolveCookieDomain(req.nextUrl.hostname),
         maxAge: 7200, // 2 hours
-      });
+      } as const;
+
+      // Host-only cookie (covers current host and avoids stale host cookie conflicts).
+      response.cookies.set('payload-token', result.token, cookieOptions);
+
+      // Cross-subdomain cookie for apex/www consistency.
+      const rootDomain = resolveCookieDomain(req.nextUrl.hostname);
+      if (rootDomain) {
+        response.cookies.set('payload-token', result.token, {
+          ...cookieOptions,
+          domain: rootDomain,
+        });
+      }
     }
 
     return response;

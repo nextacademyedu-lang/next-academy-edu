@@ -4,6 +4,36 @@
 
 ---
 
+### [2026-03-22 14:14] - Admin 403 Stabilization (Role Guard + Cookie Conflict Fix)
+
+**Files updated (this pass):**
+- `src/lib/access-control.ts`
+- `src/app/api/users/login/route.ts`
+- `src/collections/Users.ts`
+- `docs/logs/changelog.md`
+- `docs/logs/tasks.md`
+- `docs/sessions/2026-03-22-14-14-session-21.md` (new)
+
+**What changed technically:**
+- Hardened admin role resolution:
+  - normalized `req.user.id` before DB lookup in access-control.
+  - added fallback `find` lookup when `findByID` fails.
+- Fixed possible auth cookie conflict between host-only and root-domain cookies:
+  - login now sets `payload-token` as host-only cookie,
+  - and also sets root-domain cookie (`.nextacademyedu.com`) when applicable.
+- Pinned configured admin email(s) from env:
+  - users matching `PAYLOAD_ADMIN_EMAIL` are forced to remain `role=admin`,
+  - and `emailVerified=true` during create/update,
+  - preventing accidental admin downgrade that leads to `403` in admin actions.
+
+**Reason:**
+- User reported recurring `You are not allowed to perform this action` with `PATCH /api/users/:id` returning `403` for admin account.
+
+**Verification:**
+- `pnpm.cmd exec tsc --noEmit` ✅
+
+---
+
 ### [2026-03-22 13:40] - Round Session Planner (Per-Session Date/Time داخل الراوند)
 
 **Files updated (this pass):**

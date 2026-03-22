@@ -6,6 +6,25 @@
 
 ## Session Log
 
+### Session 2026-03-22 (14:14) — Admin 403 Recurrence Fix
+
+- [x] Investigated recurring admin `403` on `PATCH /api/users/:id`
+- [x] Hardened admin access lookup in access control:
+  - [x] normalized request user ID type
+  - [x] added fallback query when `findByID` path fails
+- [x] Fixed potential auth cookie precedence issue:
+  - [x] set host-only `payload-token` on login
+  - [x] set root-domain `payload-token` for apex/www consistency
+- [x] Added admin pin protection in `users` collection:
+  - [x] configured admin email(s) cannot be downgraded from admin role
+  - [x] configured admin email(s) are auto-verified
+- [x] Verified TypeScript compile:
+  - [x] `pnpm.cmd exec tsc --noEmit` ✅
+- [ ] Deploy and validate:
+  - [ ] login with configured admin email
+  - [ ] update another user from admin panel without `403`
+  - [ ] verify token refresh by full logout/login once
+
 ### Session 2026-03-22 (13:40) — Round Session Planner UX
 
 - [x] Investigated rounds/sessions schema to validate current admin behavior

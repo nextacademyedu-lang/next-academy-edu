@@ -3,6 +3,21 @@ import { isAdmin, isAdminOrSelf, isAdminRequest } from '../lib/access-control.ts
 import { createCrmDedupeKey } from '../lib/crm/dedupe.ts';
 import { enqueueCrmSyncEvent } from '../lib/crm/queue.ts';
 
+function parseConfiguredAdminEmails(): string[] {
+  const raw = process.env.PAYLOAD_ADMIN_EMAIL || '';
+  return raw
+    .split(/[,\s;]+/)
+    .map((email) => email.trim().toLowerCase())
+    .filter(Boolean);
+}
+
+function isConfiguredAdminEmail(value: unknown): boolean {
+  if (typeof value !== 'string') return false;
+  const email = value.trim().toLowerCase();
+  if (!email) return false;
+  return parseConfiguredAdminEmails().includes(email);
+}
+
 export const Users: CollectionConfig = {
   slug: 'users',
   auth: {
@@ -27,6 +42,12 @@ export const Users: CollectionConfig = {
           Boolean((context as { allowPrivilegedRoleWrite?: boolean } | undefined)?.allowPrivilegedRoleWrite);
         const canWritePrivilegedRole = isAdminActor || hasPrivilegedRoleWriteBypass;
 
+        const targetEmail =
+          (typeof data.email === 'string' && data.email.trim()) ||
+          (typeof originalDoc?.email === 'string' && originalDoc.email.trim()) ||
+          '';
+        const isPinnedAdmin = isConfiguredAdminEmail(targetEmail);
+
         // Public/self-service create must never be allowed to assign privileged roles.
         if (operation === 'create') {
           if (!canWritePrivilegedRole) {
@@ -34,6 +55,11 @@ export const Users: CollectionConfig = {
             data.instructorId = null;
           } else if (!data.role) {
             data.role = 'user';
+          }
+
+          if (isPinnedAdmin) {
+            data.role = 'admin';
+            data.emailVerified = true;
           }
         }
 
@@ -46,6 +72,12 @@ export const Users: CollectionConfig = {
           if (data.instructorId !== undefined) {
             data.instructorId = originalDoc.instructorId ?? null;
           }
+        }
+
+        // Configured admin emails are pinned to admin and cannot be downgraded.
+        if (isPinnedAdmin) {
+          data.role = 'admin';
+          data.emailVerified = true;
         }
 
         return data;
