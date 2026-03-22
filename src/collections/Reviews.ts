@@ -1,5 +1,5 @@
 import type { CollectionConfig } from 'payload';
-import { isPublic, isAuthenticated, isAdminOrOwner, isAdmin } from '../lib/access-control.ts';
+import { isPublic, isAuthenticated, isAdminOrOwner, isAdmin, adminOnlyField } from '../lib/access-control.ts';
 
 export const Reviews: CollectionConfig = {
   slug: 'reviews',
@@ -24,6 +24,10 @@ export const Reviews: CollectionConfig = {
       options: ['pending', 'approved', 'flagged', 'removed'],
       defaultValue: 'pending',
       required: true,
+      access: {
+        create: adminOnlyField,
+        update: adminOnlyField,
+      },
     },
     { name: 'helpfulCount', type: 'number', defaultValue: 0, admin: { readOnly: true } },
     { name: 'isVerifiedPurchase', type: 'checkbox', defaultValue: true },

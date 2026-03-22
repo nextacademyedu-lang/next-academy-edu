@@ -2,6 +2,28 @@ import { NextResponse } from 'next/server';
 import { getPayload } from 'payload';
 import config from '@payload-config';
 
+type RelatedUser = {
+  name?: string | null;
+  firstName?: string | null;
+  lastName?: string | null;
+  email?: string | null;
+};
+
+function buildDisplayName(user?: RelatedUser): string {
+  if (!user) return 'Anonymous';
+
+  const explicitName = user.name?.trim();
+  if (explicitName) return explicitName;
+
+  const fullName = [user.firstName, user.lastName].filter(Boolean).join(' ').trim();
+  if (fullName) return fullName;
+
+  const emailName = user.email?.split('@')[0]?.trim();
+  if (emailName) return emailName;
+
+  return 'Anonymous';
+}
+
 function getInitials(name: string): string {
   return name
     .split(/\s+/)
@@ -24,13 +46,17 @@ export async function GET() {
     });
 
     const testimonials = docs.map((doc) => {
-      const user = doc.user as { name?: string; email?: string } | undefined;
-      const name = user?.name || user?.email?.split('@')[0] || 'Anonymous';
+      const user = typeof doc.user === 'object' && doc.user !== null
+        ? doc.user as RelatedUser
+        : undefined;
+      const name = buildDisplayName(user);
+      const rating = Math.max(1, Math.min(5, Number(doc.rating) || 5));
+
       return {
         text: doc.comment,
         name,
         avatar: getInitials(name),
-        rating: doc.rating,
+        rating,
       };
     });
 

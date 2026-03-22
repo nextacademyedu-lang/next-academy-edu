@@ -55,30 +55,44 @@ export function isAdminUser(user: AccessUser | null | undefined): boolean {
 
 async function fetchPersistedUser(req: { user?: AccessUser | null; payload?: any }): Promise<AccessUser | null> {
   const userId = normalizeUserId(req.user?.id);
-  if (!userId || !req.payload?.findByID) return null;
+  const userEmail =
+    typeof req.user?.email === 'string' ? req.user.email.trim().toLowerCase() : '';
 
-  try {
-    const user = await req.payload.findByID({
-      collection: 'users',
-      id: userId,
-      depth: 0,
-      overrideAccess: true,
-    });
-    return (user || null) as AccessUser | null;
-  } catch {
+  if (userId && req.payload?.findByID) {
     try {
-      if (!req.payload?.find) return null;
-      const fallback = await req.payload.find({
+      const user = await req.payload.findByID({
         collection: 'users',
-        where: { id: { equals: userId } },
+        id: userId,
         depth: 0,
-        limit: 1,
         overrideAccess: true,
       });
-      return ((fallback?.docs?.[0] as AccessUser | undefined) || null) as AccessUser | null;
+      if (user) return user as AccessUser;
     } catch {
-      return null;
+      // Continue to fallback query below
     }
+  }
+
+  if (!req.payload?.find) return null;
+
+  try {
+    const where = userId
+      ? { id: { equals: userId } }
+      : userEmail
+        ? { email: { equals: userEmail } }
+        : null;
+
+    if (!where) return null;
+
+    const fallback = await req.payload.find({
+      collection: 'users',
+      where,
+      depth: 0,
+      limit: 1,
+      overrideAccess: true,
+    });
+    return ((fallback?.docs?.[0] as AccessUser | undefined) || null) as AccessUser | null;
+  } catch {
+    return null;
   }
 }
 
