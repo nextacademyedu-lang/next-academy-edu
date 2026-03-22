@@ -6,6 +6,31 @@
 
 ## Session Log
 
+### Session 2026-03-22 (17:09) — Program/Round/Session Alignment
+
+- [x] Added `roundsCount` in `programs` schema
+- [x] Implemented auto round generation:
+  - [x] when `roundsCount` > existing rounds, missing rounds are auto-created as drafts
+  - [x] each generated round has required placeholder fields (editable later in admin)
+- [x] Kept booking behavior at round level (no session-level booking)
+- [x] Enhanced program page to show sessions per round:
+  - [x] fetch sessions by round IDs
+  - [x] render session date/time/title list under each round
+- [x] Clarified round/session admin UX text:
+  - [x] `sessionPlan` renamed to `Quick Session Planner`
+  - [x] description now states Sessions tab remains the source of full details
+- [x] Added i18n keys for new round/session labels
+- [x] Added Docker runtime fix for media uploads:
+  - [x] ensured `/app/media` exists and is writable by `nextjs` user
+- [x] Generated and registered migration:
+  - [x] `20260322_150750_add_program_rounds_count`
+- [x] Verified TypeScript compile:
+  - [x] `pnpm.cmd exec tsc --noEmit` ✅
+- [ ] Deploy and validate end-to-end:
+  - [ ] set `roundsCount` on a program and confirm missing rounds auto-created
+  - [ ] confirm each round shows session details on `/programs/[slug]`
+  - [ ] confirm booking still creates one booking per round
+
 ### Session 2026-03-22 (14:14) — Admin 403 Recurrence Fix
 
 - [x] Investigated recurring admin `403` on `PATCH /api/users/:id`

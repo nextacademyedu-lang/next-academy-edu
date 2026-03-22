@@ -4,6 +4,52 @@
 
 ---
 
+### [2026-03-22 17:09] - Program/Round/Session Model Alignment + Auto Round Generation
+
+**Files updated (this pass):**
+- `Dockerfile`
+- `src/collections/Programs.ts`
+- `src/collections/Rounds.ts`
+- `src/app/[locale]/programs/[slug]/page.tsx`
+- `src/app/[locale]/programs/[slug]/page.module.css`
+- `src/messages/ar.json`
+- `src/messages/en.json`
+- `src/migrations/20260322_150750_add_program_rounds_count.ts` (new)
+- `src/migrations/20260322_150750_add_program_rounds_count.json` (new)
+- `src/migrations/index.ts`
+- `src/payload-types.ts`
+- `docs/logs/changelog.md`
+- `docs/logs/tasks.md`
+- `docs/sessions/2026-03-22-17-09-session-22.md` (new)
+
+**What changed technically:**
+- Added `programs.roundsCount` field.
+- Added `Programs.afterChange` hook to auto-create missing rounds as drafts up to `roundsCount`:
+  - creates `roundNumber` 1..N if missing,
+  - creates placeholders with required fields (`startDate/endDate`, `maxCapacity`, `price`, ...),
+  - does not delete existing rounds automatically.
+- Clarified `rounds.sessionPlan` label/description to avoid confusion:
+  - now explicitly a quick planner that syncs into real `sessions` collection.
+- Updated Program Details page:
+  - still booking at **round** level,
+  - now shows sessions list for each round so users can inspect schedule before booking.
+- Added i18n keys for sessions count/list labels.
+- Added container upload-path permission fix:
+  - pre-created `/app/media` and assigned ownership to `nextjs` user to prevent local media upload hangs in production containers.
+- Generated migration for `programs.rounds_count`.
+
+**Reason:**
+- User requested explicit model behavior:
+  - Program contains multiple rounds,
+  - each round contains sessions,
+  - booking must remain on round level,
+  - and wanted automatic round creation when defining planned rounds count at program level.
+
+**Verification:**
+- `pnpm.cmd exec tsc --noEmit` ✅
+
+---
+
 ### [2026-03-22 14:14] - Admin 403 Stabilization (Role Guard + Cookie Conflict Fix)
 
 **Files updated (this pass):**

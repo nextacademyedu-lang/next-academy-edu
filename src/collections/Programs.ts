@@ -1,6 +1,88 @@
 import type { CollectionConfig } from 'payload';
 import { isAdmin, isPublic } from '../lib/access-control.ts';
 
+type ProgramLike = {
+  id?: number | string;
+  titleAr?: string | null;
+  titleEn?: string | null;
+  roundsCount?: number | null;
+};
+
+function normalizeRoundsCount(value: unknown): number {
+  if (typeof value === 'number' && Number.isFinite(value)) {
+    return Math.max(0, Math.min(200, Math.floor(value)));
+  }
+  if (typeof value === 'string' && value.trim().length > 0) {
+    const asNumber = Number(value);
+    if (Number.isFinite(asNumber)) {
+      return Math.max(0, Math.min(200, Math.floor(asNumber)));
+    }
+  }
+  return 0;
+}
+
+function buildRoundPlaceholderWindow(roundNumber: number): { startDate: string; endDate: string } {
+  const now = new Date();
+  const start = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + (roundNumber - 1), 1, 9, 0, 0, 0));
+  const end = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + (roundNumber + 1), 1, 17, 0, 0, 0));
+  return {
+    startDate: start.toISOString(),
+    endDate: end.toISOString(),
+  };
+}
+
+async function ensureProgramRounds(params: { payload: any; req: unknown; program: ProgramLike }) {
+  const { payload, req, program } = params;
+  if (!program.id) return;
+
+  const targetCount = normalizeRoundsCount(program.roundsCount);
+  if (targetCount <= 0) return;
+
+  const existingRounds = await payload.find({
+    collection: 'rounds',
+    where: { program: { equals: program.id } },
+    depth: 0,
+    limit: 500,
+    sort: 'roundNumber',
+    overrideAccess: true,
+    req: req as any,
+  });
+
+  const existingRoundNumbers = new Set<number>();
+  for (const round of existingRounds.docs as Array<{ roundNumber?: number | null }>) {
+    if (typeof round.roundNumber === 'number' && Number.isFinite(round.roundNumber)) {
+      existingRoundNumbers.add(round.roundNumber);
+    }
+  }
+
+  const programTitle = (program.titleEn || program.titleAr || 'Program').trim();
+  for (let roundNumber = 1; roundNumber <= targetCount; roundNumber += 1) {
+    if (existingRoundNumbers.has(roundNumber)) continue;
+
+    const { startDate, endDate } = buildRoundPlaceholderWindow(roundNumber);
+
+    await payload.create({
+      collection: 'rounds',
+      data: {
+        program: program.id,
+        roundNumber,
+        title: `${programTitle} - Round ${roundNumber}`,
+        startDate,
+        endDate,
+        timezone: 'Africa/Cairo',
+        locationType: 'online',
+        maxCapacity: 100,
+        price: 0,
+        currency: 'EGP',
+        status: 'draft',
+        isActive: true,
+      },
+      overrideAccess: true,
+      req: req as any,
+    });
+  }
+}
+
 export const Programs: CollectionConfig = {
   slug: 'programs',
   admin: { useAsTitle: 'titleAr' },
@@ -9,6 +91,17 @@ export const Programs: CollectionConfig = {
     create: isAdmin,
     update: isAdmin,
     delete: isAdmin,
+  },
+  hooks: {
+    afterChange: [
+      async ({ req, doc }) => {
+        await ensureProgramRounds({
+          payload: req.payload,
+          req,
+          program: doc as ProgramLike,
+        });
+      },
+    ],
   },
   fields: [
     {
@@ -33,6 +126,15 @@ export const Programs: CollectionConfig = {
     { name: 'thumbnail', type: 'upload', relationTo: 'media' },
     { name: 'coverImage', type: 'upload', relationTo: 'media' },
     { name: 'durationHours', type: 'number' },
+    {
+      name: 'roundsCount',
+      type: 'number',
+      defaultValue: 0,
+      admin: {
+        description:
+          'Total rounds planned for this program. Missing rounds are auto-created as drafts with placeholder values.',
+      },
+    },
     { name: 'sessionsCount', type: 'number' },
     {
       name: 'level',

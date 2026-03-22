@@ -419,6 +419,10 @@ export interface Program {
   thumbnail?: (number | null) | Media;
   coverImage?: (number | null) | Media;
   durationHours?: number | null;
+  /**
+   * Total rounds planned for this program. Missing rounds are auto-created as drafts with placeholder values.
+   */
+  roundsCount?: number | null;
   sessionsCount?: number | null;
   level?: ('beginner' | 'intermediate' | 'advanced') | null;
   language?: ('ar' | 'en' | 'both') | null;
@@ -475,7 +479,7 @@ export interface Round {
   roundNumber: number;
   title?: string | null;
   /**
-   * Add one row per session. Each session has its own date/time, and round start/end dates are synced automatically.
+   * Add one row per session to auto-create/update docs in the Sessions collection. You can still edit full session details from the Sessions tab.
    */
   sessionPlan?:
     | {
@@ -1684,6 +1688,7 @@ export interface ProgramsSelect<T extends boolean = true> {
   thumbnail?: T;
   coverImage?: T;
   durationHours?: T;
+  roundsCount?: T;
   sessionsCount?: T;
   level?: T;
   language?: T;

@@ -253,6 +253,8 @@
     "noRounds": "No rounds available yet.",
     "seatsLeft": "{count} Seats Left",
     "format": "Format:",
+    "sessionsCount": "Sessions:",
+    "roundSessionsTitle": "Sessions in this round",
     "price": "Price:",
     "currency": "EGP",
     "bookRound": "Book This Round"

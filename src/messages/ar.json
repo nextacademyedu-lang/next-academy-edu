@@ -253,6 +253,8 @@
     "noRounds": "لا توجد جولات متاحة بعد.",
     "seatsLeft": "{count} مقاعد متبقية",
     "format": "الصيغة:",
+    "sessionsCount": "عدد الجلسات:",
+    "roundSessionsTitle": "تفاصيل الجلسات داخل هذه الجولة",
     "price": "السعر:",
     "currency": "ج.م",
     "bookRound": "احجز هذه الجولة"

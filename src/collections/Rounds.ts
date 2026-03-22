@@ -197,7 +197,7 @@ export const Rounds: CollectionConfig = {
     { name: 'title', type: 'text' },
     {
       name: 'sessionPlan',
-      label: 'Sessions In This Round',
+      label: 'Quick Session Planner',
       type: 'array',
       fields: [
         { name: 'title', type: 'text' },
@@ -215,7 +215,7 @@ export const Rounds: CollectionConfig = {
       ],
       admin: {
         description:
-          'Add one row per session. Each session has its own date/time, and round start/end dates are synced automatically.',
+          'Add one row per session to auto-create/update docs in the Sessions collection. You can still edit full session details from the Sessions tab.',
       },
     },
     {

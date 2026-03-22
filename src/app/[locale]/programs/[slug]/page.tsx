@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation';
 import { getLocale, getTranslations } from 'next-intl/server';
 import { getPayload } from 'payload';
 import config from '@payload-config';
-import type { Program, Round, Instructor } from '@/payload-types';
+import type { Program, Round, Instructor, Session } from '@/payload-types';
 import { Navbar } from '@/components/layout/navbar';
 import { Footer } from '@/components/layout/footer';
 import { Card, CardHeader, CardContent } from '@/components/ui/card';
@@ -56,6 +56,27 @@ export default async function ProgramDetailsPage({
     sort: 'startDate',
   });
   const rounds: Round[] = roundDocs;
+
+  const roundIds = rounds.map((round) => round.id);
+  let sessionsByRound = new Map<number, Session[]>();
+  if (roundIds.length > 0) {
+    const { docs: sessionDocs } = await payload.find({
+      collection: 'sessions',
+      where: { round: { in: roundIds } },
+      depth: 0,
+      limit: 500,
+      sort: 'date',
+    });
+
+    sessionsByRound = (sessionDocs as Session[]).reduce((acc, session) => {
+      const roundId = typeof session.round === 'number' ? session.round : session.round?.id;
+      if (!roundId) return acc;
+      const current = acc.get(roundId) || [];
+      current.push(session);
+      acc.set(roundId, current);
+      return acc;
+    }, new Map<number, Session[]>());
+  }
 
   const dateLocale = locale === 'ar' ? 'ar-EG' : 'en-US';
 
@@ -117,6 +138,7 @@ export default async function ProgramDetailsPage({
                     : '';
                   const seatsLeft = round.maxCapacity - (round.currentEnrollments ?? 0);
                   const price = round.price ?? 0;
+                  const roundSessions = sessionsByRound.get(round.id) || [];
 
                   return (
                     <Card key={round.id} className={styles.roundCard}>
@@ -136,9 +158,34 @@ export default async function ProgramDetailsPage({
                           </div>
                         )}
                         <div className={styles.roundInfo}>
+                          <span className={styles.label}>{t('sessionsCount')}</span>
+                          <span className={styles.value}>{roundSessions.length}</span>
+                        </div>
+                        <div className={styles.roundInfo}>
                           <span className={styles.label}>{t('price')}</span>
                           <span className={styles.price}>{price.toLocaleString()} {t('currency')}</span>
                         </div>
+                        {roundSessions.length > 0 && (
+                          <div className={styles.roundSessions}>
+                            <p className={styles.roundSessionsTitle}>{t('roundSessionsTitle')}</p>
+                            <ul className={styles.roundSessionsList}>
+                              {roundSessions.map((session) => (
+                                <li key={session.id} className={styles.roundSessionItem}>
+                                  <span className={styles.roundSessionDate}>
+                                    {new Date(session.date).toLocaleDateString(dateLocale, {
+                                      day: '2-digit',
+                                      month: 'short',
+                                    })}
+                                  </span>
+                                  <span className={styles.roundSessionTime}>
+                                    {session.startTime} - {session.endTime}
+                                  </span>
+                                  <span className={styles.roundSessionTitle}>{session.title}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
                         <BookRoundButton
                           locale={locale}
                           roundId={round.id}
