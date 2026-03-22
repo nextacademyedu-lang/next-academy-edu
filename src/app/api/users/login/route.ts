@@ -7,6 +7,46 @@ import { rateLimit } from '@/lib/rate-limit';
 const LIMIT = 10;
 const WINDOW_MS = 60_000;
 
+function parseConfiguredAdminEmails(): string[] {
+  const raw = process.env.PAYLOAD_ADMIN_EMAIL || '';
+  return raw
+    .split(',')
+    .map((email) => email.trim().toLowerCase())
+    .filter(Boolean);
+}
+
+async function syncConfiguredAdminBeforeLogin(payload: any, email: string): Promise<void> {
+  const normalizedEmail = email.trim().toLowerCase();
+  const adminEmails = parseConfiguredAdminEmails();
+  if (!normalizedEmail || adminEmails.length === 0 || !adminEmails.includes(normalizedEmail)) {
+    return;
+  }
+
+  const existing = await payload.find({
+    collection: 'users',
+    where: { email: { equals: normalizedEmail } },
+    limit: 1,
+    overrideAccess: true,
+  });
+
+  if (!existing.docs?.length) return;
+  const user = existing.docs[0];
+  const shouldPromote = user.role !== 'admin';
+  const shouldVerifyEmail = user.emailVerified !== true;
+  if (!shouldPromote && !shouldVerifyEmail) return;
+
+  await payload.update({
+    collection: 'users',
+    id: user.id,
+    data: {
+      role: 'admin',
+      emailVerified: true,
+    },
+    overrideAccess: true,
+    context: { allowPrivilegedRoleWrite: true },
+  });
+}
+
 export async function POST(req: NextRequest) {
   const ip =
     req.headers.get('x-forwarded-for')?.split(',')[0].trim() ??
@@ -58,6 +98,7 @@ export async function POST(req: NextRequest) {
     }
 
     const payload = await getPayload({ config });
+    await syncConfiguredAdminBeforeLogin(payload, email);
     const result = await payload.login({
       collection: 'users',
       data: { email: email as string, password: password as string },
