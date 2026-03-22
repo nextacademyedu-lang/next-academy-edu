@@ -6,6 +6,25 @@
 
 ## Session Log
 
+### Session 2026-03-22 (13:40) — Round Session Planner UX
+
+- [x] Investigated rounds/sessions schema to validate current admin behavior
+- [x] Added per-session planning array in `rounds`:
+  - [x] `sessionPlan[].date`
+  - [x] `sessionPlan[].startTime`
+  - [x] `sessionPlan[].endTime`
+  - [x] optional `title/location` fields per session row
+- [x] Added `rounds` hook to auto-sync `startDate/endDate` from session plan range
+- [x] Added `rounds` hook to create/update `sessions` records from `sessionPlan`
+- [x] Generated DB migration and registered it in migrations index
+- [x] Regenerated Payload types
+- [x] Verified TypeScript compile:
+  - [x] `pnpm.cmd exec tsc --noEmit` ✅
+- [ ] Deploy and verify in admin UI:
+  - [ ] Create round with multiple `sessionPlan` rows and confirm separate date/time inputs
+  - [ ] Confirm generated sessions appear in `Sessions` collection
+  - [ ] Confirm round `startDate/endDate` updates automatically
+
 ### Session 2026-03-22 (01:06) — CRM/Admin/Preview Stabilization
 
 - [x] Investigated CRM sales pipeline mismatch with Twenty default schema

@@ -469,9 +469,34 @@ export interface Program {
 export interface Round {
   id: number;
   program: number | Program;
+  /**
+   * Round index inside the same program (1, 2, 3...). Create a separate Round record for each round.
+   */
   roundNumber: number;
   title?: string | null;
+  /**
+   * Add one row per session. Each session has its own date/time, and round start/end dates are synced automatically.
+   */
+  sessionPlan?:
+    | {
+        title?: string | null;
+        date: string;
+        startTime: string;
+        endTime: string;
+        locationType?: ('online' | 'in-person' | 'hybrid') | null;
+        locationName?: string | null;
+        locationAddress?: string | null;
+        meetingUrl?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Auto-synced from the earliest session date when Session Plan is filled.
+   */
   startDate: string;
+  /**
+   * Auto-synced from the latest session date when Session Plan is filled.
+   */
   endDate?: string | null;
   timezone?: string | null;
   locationType?: ('online' | 'in-person' | 'hybrid') | null;
@@ -1707,6 +1732,19 @@ export interface RoundsSelect<T extends boolean = true> {
   program?: T;
   roundNumber?: T;
   title?: T;
+  sessionPlan?:
+    | T
+    | {
+        title?: T;
+        date?: T;
+        startTime?: T;
+        endTime?: T;
+        locationType?: T;
+        locationName?: T;
+        locationAddress?: T;
+        meetingUrl?: T;
+        id?: T;
+      };
   startDate?: T;
   endDate?: T;
   timezone?: T;

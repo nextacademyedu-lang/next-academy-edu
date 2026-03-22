@@ -1,6 +1,157 @@
 import type { CollectionConfig } from 'payload';
 import { isAdmin, isPublic } from '../lib/access-control.ts';
 
+type SessionPlanInput = {
+  title?: string | null;
+  date?: string | null;
+  startTime?: string | null;
+  endTime?: string | null;
+  locationType?: 'online' | 'in-person' | 'hybrid' | null;
+  locationName?: string | null;
+  locationAddress?: string | null;
+  meetingUrl?: string | null;
+};
+
+type RoundLike = {
+  id?: number | string;
+  roundNumber?: number | null;
+  title?: string | null;
+  locationType?: 'online' | 'in-person' | 'hybrid' | null;
+  locationName?: string | null;
+  locationAddress?: string | null;
+  meetingUrl?: string | null;
+  sessionPlan?: SessionPlanInput[] | null;
+};
+
+function normalizeSessionPlan(value: unknown): SessionPlanInput[] {
+  if (!Array.isArray(value)) return [];
+  return value
+    .filter((entry) => entry && typeof entry === 'object')
+    .map((entry) => {
+      const record = entry as Record<string, unknown>;
+      const date = typeof record.date === 'string' && record.date.trim().length > 0 ? record.date : null;
+      if (!date) return null;
+
+      const title = typeof record.title === 'string' ? record.title.trim() : '';
+      const startTime = typeof record.startTime === 'string' && record.startTime.trim().length > 0
+        ? record.startTime.trim()
+        : '10:00';
+      const endTime = typeof record.endTime === 'string' && record.endTime.trim().length > 0
+        ? record.endTime.trim()
+        : '12:00';
+      const locationType =
+        record.locationType === 'online' || record.locationType === 'in-person' || record.locationType === 'hybrid'
+          ? record.locationType
+          : null;
+      const locationName = typeof record.locationName === 'string' ? record.locationName.trim() : '';
+      const locationAddress = typeof record.locationAddress === 'string' ? record.locationAddress.trim() : '';
+      const meetingUrl = typeof record.meetingUrl === 'string' ? record.meetingUrl.trim() : '';
+
+      return {
+        title: title || null,
+        date,
+        startTime,
+        endTime,
+        locationType,
+        locationName: locationName || null,
+        locationAddress: locationAddress || null,
+        meetingUrl: meetingUrl || null,
+      } as SessionPlanInput;
+    })
+    .filter((entry): entry is SessionPlanInput => entry !== null);
+}
+
+function getDateRangeFromPlan(sessionPlan: SessionPlanInput[]): { startDate: string; endDate: string } | null {
+  if (sessionPlan.length === 0) return null;
+  const timestamps = sessionPlan
+    .map((entry) => (entry.date ? new Date(entry.date).getTime() : Number.NaN))
+    .filter((value) => Number.isFinite(value))
+    .sort((a, b) => a - b);
+
+  if (timestamps.length === 0) return null;
+
+  return {
+    startDate: new Date(timestamps[0]).toISOString(),
+    endDate: new Date(timestamps[timestamps.length - 1]).toISOString(),
+  };
+}
+
+async function syncSessionsFromRoundPlan(params: { payload: any; req: unknown; round: RoundLike }) {
+  const { payload, req, round } = params;
+  if (!round.id) return;
+
+  const sessionPlan = normalizeSessionPlan(round.sessionPlan);
+  if (sessionPlan.length === 0) return;
+
+  const existingSessions = await payload.find({
+    collection: 'sessions',
+    where: { round: { equals: round.id } },
+    depth: 0,
+    sort: 'sessionNumber',
+    limit: 500,
+    overrideAccess: true,
+    req: req as any,
+  });
+
+  const existingByNumber = new Map<number, any>();
+  for (const session of existingSessions.docs as Array<{ id: number | string; sessionNumber?: number | null; title?: string | null }>) {
+    if (typeof session.sessionNumber === 'number' && Number.isFinite(session.sessionNumber)) {
+      existingByNumber.set(session.sessionNumber, session);
+    }
+  }
+
+  for (let index = 0; index < sessionPlan.length; index += 1) {
+    const sessionNumber = index + 1;
+    const plan = sessionPlan[index];
+    if (!plan.date) continue;
+
+    const existing = existingByNumber.get(sessionNumber);
+    const fallbackRoundLabel =
+      typeof round.roundNumber === 'number' && Number.isFinite(round.roundNumber)
+        ? `Round ${round.roundNumber}`
+        : 'Round';
+    const normalizedTitle =
+      (plan.title && plan.title.trim()) ||
+      (typeof existing?.title === 'string' && existing.title.trim()) ||
+      round.title ||
+      `${fallbackRoundLabel} - Session ${sessionNumber}`;
+
+    const nextSessionData = {
+      round: round.id,
+      sessionNumber,
+      title: normalizedTitle,
+      date: plan.date,
+      startTime: plan.startTime || '10:00',
+      endTime: plan.endTime || '12:00',
+      locationType: plan.locationType || round.locationType || 'online',
+      locationName: plan.locationName || round.locationName || null,
+      locationAddress: plan.locationAddress || round.locationAddress || null,
+      meetingUrl: plan.meetingUrl || round.meetingUrl || null,
+    };
+
+    if (existing) {
+      await payload.update({
+        collection: 'sessions',
+        id: existing.id,
+        data: nextSessionData,
+        overrideAccess: true,
+        req: req as any,
+      });
+      continue;
+    }
+
+    await payload.create({
+      collection: 'sessions',
+      data: {
+        ...nextSessionData,
+        status: 'scheduled',
+      },
+      overrideAccess: true,
+      req: req as any,
+    });
+  }
+}
+
 export const Rounds: CollectionConfig = {
   slug: 'rounds',
   admin: { useAsTitle: 'title' },
@@ -10,12 +161,78 @@ export const Rounds: CollectionConfig = {
     update: isAdmin,
     delete: isAdmin,
   },
+  hooks: {
+    beforeChange: [
+      ({ data, originalDoc }) => {
+        const next = { ...(data || {}) } as RoundLike & Record<string, unknown>;
+        const currentPlan = normalizeSessionPlan(next.sessionPlan ?? (originalDoc as RoundLike | undefined)?.sessionPlan);
+        const dateRange = getDateRangeFromPlan(currentPlan);
+        if (!dateRange) return next;
+
+        next.startDate = dateRange.startDate;
+        next.endDate = dateRange.endDate;
+        return next;
+      },
+    ],
+    afterChange: [
+      async ({ req, doc }) => {
+        await syncSessionsFromRoundPlan({
+          payload: req.payload,
+          req,
+          round: doc as RoundLike,
+        });
+      },
+    ],
+  },
   fields: [
     { name: 'program', type: 'relationship', relationTo: 'programs', required: true },
-    { name: 'roundNumber', type: 'number', required: true },
+    {
+      name: 'roundNumber',
+      type: 'number',
+      required: true,
+      admin: {
+        description: 'Round index inside the same program (1, 2, 3...). Create a separate Round record for each round.',
+      },
+    },
     { name: 'title', type: 'text' },
-    { name: 'startDate', type: 'date', required: true },
-    { name: 'endDate', type: 'date' },
+    {
+      name: 'sessionPlan',
+      label: 'Sessions In This Round',
+      type: 'array',
+      fields: [
+        { name: 'title', type: 'text' },
+        { name: 'date', type: 'date', required: true },
+        { name: 'startTime', type: 'text', required: true, defaultValue: '10:00' },
+        { name: 'endTime', type: 'text', required: true, defaultValue: '12:00' },
+        {
+          name: 'locationType',
+          type: 'select',
+          options: ['online', 'in-person', 'hybrid'],
+        },
+        { name: 'locationName', type: 'text' },
+        { name: 'locationAddress', type: 'text' },
+        { name: 'meetingUrl', type: 'text' },
+      ],
+      admin: {
+        description:
+          'Add one row per session. Each session has its own date/time, and round start/end dates are synced automatically.',
+      },
+    },
+    {
+      name: 'startDate',
+      type: 'date',
+      required: true,
+      admin: {
+        description: 'Auto-synced from the earliest session date when Session Plan is filled.',
+      },
+    },
+    {
+      name: 'endDate',
+      type: 'date',
+      admin: {
+        description: 'Auto-synced from the latest session date when Session Plan is filled.',
+      },
+    },
     { name: 'timezone', type: 'text', defaultValue: 'Africa/Cairo' },
     {
       name: 'locationType',

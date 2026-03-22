@@ -4,6 +4,40 @@
 
 ---
 
+### [2026-03-22 13:40] - Round Session Planner (Per-Session Date/Time داخل الراوند)
+
+**Files updated (this pass):**
+- `src/collections/Rounds.ts`
+- `src/migrations/20260322_113423_add_round_session_plan.ts` (new)
+- `src/migrations/20260322_113423_add_round_session_plan.json` (new)
+- `src/migrations/index.ts`
+- `src/payload-types.ts`
+- `docs/logs/changelog.md`
+- `docs/logs/tasks.md`
+- `docs/sessions/2026-03-22-13-40-session-20.md` (new)
+
+**What changed technically:**
+- Added `sessionPlan` array inside `rounds` admin form, so each session has its own:
+  - `date`
+  - `startTime`
+  - `endTime`
+  - optional per-session title/location fields
+- Added `beforeChange` hook on `rounds` to auto-sync:
+  - `startDate` from earliest session date
+  - `endDate` from latest session date
+- Added `afterChange` hook on `rounds` to create/update `sessions` docs from `sessionPlan` (one session row per plan row).
+- Kept existing `sessions` collection model intact; this is additive admin UX + sync layer.
+- Generated and registered migration for new `rounds_session_plan` table.
+- Regenerated Payload types.
+
+**Reason:**
+- User requested that when a round contains multiple sessions, admin must be able to set date/time for each session (instead of one generic date range only).
+
+**Verification:**
+- `pnpm.cmd exec tsc --noEmit` ✅
+
+---
+
 ### [2026-03-22 01:06] - CRM Opportunities Compatibility + Admin Access Fallback + Marketing Preview
 
 **Files updated (this pass):**
