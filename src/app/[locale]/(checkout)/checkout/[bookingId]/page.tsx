@@ -9,12 +9,19 @@ import { getProgramTitle as getProgramTitleFromBooking, formatCurrency } from '@
 import type { PayloadBooking } from '@/lib/dashboard-api';
 
 const PAYMENT_OPTIONS = [
-  { id: 'card',   label: 'كارت كريدت / ديبت',         provider: 'Paymob',   type: 'paymob' },
-  { id: 'wallet', label: 'محفظة إلكترونية (فودافون كاش، إتصالات، أورنج)', provider: 'Paymob', type: 'paymob' },
-  { id: 'fawry',  label: 'فوري / أمان (كاش)',          provider: 'EasyKash', type: 'easykash' },
+  { id: 'card',   label: 'كارت كريدت / ديبت (داخل وخارج مصر)', provider: 'EasyKash', type: 'easykash' },
+  { id: 'wallet', label: 'محفظة إلكترونية (فودافون كاش، إتصالات، أورنج)', provider: 'EasyKash', type: 'easykash' },
+  { id: 'fawry',  label: 'فوري / أمان (كاش)', provider: 'EasyKash', type: 'easykash' },
 ];
 
-const IS_PAYMOB_ENABLED = process.env.NEXT_PUBLIC_ENABLE_PAYMOB === 'true';
+function formatAmountByCurrency(amount: number, currency: string, locale: string): string {
+  const normalized = (currency || 'EGP').toUpperCase();
+  if (normalized === 'EGP') {
+    return formatCurrency(amount);
+  }
+  const localeCode = locale === 'ar' ? 'ar-EG' : 'en-US';
+  return `${new Intl.NumberFormat(localeCode, { maximumFractionDigits: 2 }).format(amount)} ${normalized}`;
+}
 
 export default function CheckoutPage() {
   const locale = useLocale();
@@ -23,9 +30,7 @@ export default function CheckoutPage() {
   const bookingId = params.bookingId as string;
 
   const [booking, setBooking] = useState<PayloadBooking | null>(null);
-  const availablePaymentOptions = IS_PAYMOB_ENABLED
-    ? PAYMENT_OPTIONS
-    : PAYMENT_OPTIONS.filter((option) => option.type === 'easykash');
+  const availablePaymentOptions = PAYMENT_OPTIONS;
 
   const [selectedMethod, setSelectedMethod] = useState(
     availablePaymentOptions[0]?.id ?? 'fawry',
@@ -117,31 +122,20 @@ export default function CheckoutPage() {
     setError('');
 
     try {
-      if (selectedMethod === 'fawry') {
-        // ── EasyKash Cash ──────────────────────────────────────────
-        const res = await fetch('/api/checkout/easykash', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          credentials: 'include',
-          body: JSON.stringify({ bookingId }),
-        });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error || 'فشل إنشاء الدفع');
+      const res = await fetch('/api/checkout/easykash', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ bookingId, method: selectedMethod, locale }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'فشل إنشاء الدفع');
 
+      if (selectedMethod === 'fawry') {
         router.push(
           `/${locale}/checkout/pending?bookingId=${bookingId}&voucher=${data.voucher}&provider=${data.provider}&expiryDate=${encodeURIComponent(data.expiryDate)}`,
         );
       } else {
-        // ── Paymob Card / Wallet ───────────────────────────────────
-        const res = await fetch('/api/checkout/paymob', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          credentials: 'include',
-          body: JSON.stringify({ bookingId, method: selectedMethod }),
-        });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error || 'فشل إنشاء الدفع');
-
         window.location.href = data.redirectUrl;
       }
     } catch (err: any) {
@@ -199,6 +193,10 @@ export default function CheckoutPage() {
   const programTitle = getProgramTitleFromBooking(booking);
   const hasPersistedDiscount = (booking.discountAmount ?? 0) > 0;
   const amount = discountApplied ? discountApplied.newTotal : booking.finalAmount;
+  const bookingCurrency =
+    booking.round && typeof booking.round === 'object'
+      ? String((booking.round as { currency?: string | null }).currency || 'EGP')
+      : 'EGP';
 
   return (
     <div className={styles.container}>
@@ -230,14 +228,6 @@ export default function CheckoutPage() {
             ))}
           </div>
 
-          {!IS_PAYMOB_ENABLED && (
-            <div className={styles.installmentNotice} style={{ marginTop: '12px' }}>
-              <p style={{ fontSize: '13px', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
-                تم إيقاف Paymob مؤقتًا. الدفع المتاح حاليًا عبر EasyKash (فوري/أمان).
-              </p>
-            </div>
-          )}
-
           {selectedMethod === 'fawry' && (
             <div className={styles.installmentNotice} style={{ marginTop: '16px' }}>
               <p style={{ fontSize: '14px', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
@@ -261,13 +251,15 @@ export default function CheckoutPage() {
 
             <div className={styles.summaryRow}>
               <span>السعر الأصلي</span>
-              <span>{formatCurrency(booking.totalAmount)}</span>
+              <span>{formatAmountByCurrency(booking.totalAmount, bookingCurrency, locale)}</span>
             </div>
 
             {(booking.discountAmount > 0 || discountApplied) && (
               <div className={styles.summaryRow}>
                 <span style={{ color: '#00e397' }}>خصم</span>
-                <span style={{ color: '#00e397' }}>- {formatCurrency(discountApplied?.amount ?? booking.discountAmount)}</span>
+                <span style={{ color: '#00e397' }}>
+                  - {formatAmountByCurrency(discountApplied?.amount ?? booking.discountAmount, bookingCurrency, locale)}
+                </span>
               </div>
             )}
 
@@ -304,7 +296,9 @@ export default function CheckoutPage() {
 
             <div className={styles.totalRow}>
               <span>الإجمالي</span>
-              <span style={{ fontSize: '24px', color: 'var(--text-primary)' }}>{formatCurrency(amount)}</span>
+              <span style={{ fontSize: '24px', color: 'var(--text-primary)' }}>
+                {formatAmountByCurrency(amount, bookingCurrency, locale)}
+              </span>
             </div>
           </div>
 

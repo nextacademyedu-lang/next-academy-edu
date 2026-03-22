@@ -11,12 +11,13 @@ import crypto from 'crypto';
 // ─────────────────────────────────────────────
 
 export type PaymentMethod = 'card' | 'wallet' | 'fawry' | 'aman';
+export type EasyKashCurrency = 'EGP' | 'USD' | 'EUR' | 'GBP' | 'SAR' | 'QAR' | 'AED';
 
 export interface CheckoutSession {
   bookingId: string;
   paymentId: string;
   method: PaymentMethod;
-  amount: number; // in EGP
+  amount: number; // in booking currency (EGP / USD / EUR currently in app)
   programTitle: string;
   userEmail: string;
   userName: string;
@@ -33,6 +34,70 @@ export interface EasyKashCashResponse {
   expiryDate: string;
   provider: string;      // "Fawry" or "Aman"
   easykashRef: string;
+}
+
+export interface EasyKashDirectPayResponse {
+  redirectUrl: string;
+}
+
+const EASYKASH_DIRECT_PAY_OPTIONS: Record<'card' | 'wallet' | 'fawry' | 'aman', number> = {
+  aman: 1,
+  card: 2,
+  wallet: 4,
+  fawry: 5,
+};
+
+function resolveAppBaseUrl(): string {
+  return (
+    process.env.NEXT_PUBLIC_APP_URL ||
+    process.env.NEXT_PUBLIC_SERVER_URL ||
+    process.env.SERVER_URL ||
+    'http://localhost:3000'
+  );
+}
+
+function normalizeEasyKashCurrency(value?: string | null): EasyKashCurrency {
+  const normalized = (value || 'EGP').toUpperCase();
+  if (normalized === 'USD') return 'USD';
+  if (normalized === 'EUR') return 'EUR';
+  if (normalized === 'GBP') return 'GBP';
+  if (normalized === 'SAR') return 'SAR';
+  if (normalized === 'QAR') return 'QAR';
+  if (normalized === 'AED') return 'AED';
+  return 'EGP';
+}
+
+function normalizeEasyKashPhone(phone: string): string {
+  const trimmed = phone.trim();
+  if (!trimmed) return '01000000000';
+  return trimmed;
+}
+
+function buildEasyKashRedirectUrl(params: { bookingId: string; locale?: string }): string {
+  const locale = (params.locale || 'ar').trim() || 'ar';
+  const url = new URL('/api/webhooks/easykash/redirect', resolveAppBaseUrl());
+  url.searchParams.set('bookingId', String(params.bookingId));
+  url.searchParams.set('locale', locale);
+  return url.toString();
+}
+
+function asMoney(value: number): number {
+  return Math.round(value * 100) / 100;
+}
+
+function asString(value: unknown): string {
+  if (value == null) return '';
+  return String(value);
+}
+
+export function extractEasyKashProductCode(redirectUrl: string): string | null {
+  try {
+    const parsed = new URL(redirectUrl);
+    const parts = parsed.pathname.split('/').filter(Boolean);
+    return parts.length > 0 ? parts[parts.length - 1] : null;
+  } catch {
+    return null;
+  }
 }
 
 // ─────────────────────────────────────────────
@@ -119,9 +184,9 @@ export async function createEasyKashPayment(
 ): Promise<EasyKashCashResponse> {
   const body = {
     payerEmail: session.userEmail,
-    payerMobile: session.userPhone || '01000000000',
+    payerMobile: normalizeEasyKashPhone(session.userPhone),
     payerName: session.userName,
-    amount: session.amount,
+    amount: asMoney(session.amount),
     expiryDuration: 48,
     apiKey: process.env.EASYKASH_API_TOKEN!,
     VoucherData: session.programTitle,
@@ -143,18 +208,98 @@ export async function createEasyKashPayment(
 }
 
 // ─────────────────────────────────────────────
+// EasyKash — Direct Pay (Card / Wallet / etc)
+// ─────────────────────────────────────────────
+
+export async function createEasyKashDirectPay(
+  session: CheckoutSession,
+  options?: {
+    currency?: string | null;
+    locale?: string;
+    customerReference?: string | number;
+    paymentOptionsOverride?: number[];
+  },
+): Promise<EasyKashDirectPayResponse> {
+  const apiKey = process.env.EASYKASH_API_TOKEN;
+  if (!apiKey) {
+    throw new Error('Missing EASYKASH_API_TOKEN');
+  }
+
+  const normalizedCurrency = normalizeEasyKashCurrency(options?.currency);
+  const fallbackMethod = session.method === 'wallet' ? 'wallet' : 'card';
+  const optionFromMethod = EASYKASH_DIRECT_PAY_OPTIONS[fallbackMethod];
+  const requestedOptions = options?.paymentOptionsOverride?.length
+    ? options.paymentOptionsOverride
+    : [optionFromMethod];
+
+  const rawReference = options?.customerReference ?? session.paymentId;
+  const numericReference = Number(rawReference);
+  const customerReference = Number.isFinite(numericReference)
+    ? numericReference
+    : asString(rawReference);
+
+  const body = {
+    amount: asMoney(session.amount),
+    currency: normalizedCurrency,
+    paymentOptions: requestedOptions,
+    cashExpiry: 48,
+    name: session.userName || 'Customer',
+    email: session.userEmail || 'customer@example.com',
+    mobile: normalizeEasyKashPhone(session.userPhone),
+    redirectUrl: buildEasyKashRedirectUrl({
+      bookingId: session.bookingId,
+      locale: options?.locale,
+    }),
+    customerReference,
+  };
+
+  const res = await fetch('https://back.easykash.net/api/directpayv1/pay', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      authorization: apiKey,
+    },
+    body: JSON.stringify(body),
+  });
+
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(`EasyKash direct pay failed: ${err}`);
+  }
+
+  const data = await res.json() as Partial<EasyKashDirectPayResponse>;
+  if (!data.redirectUrl || typeof data.redirectUrl !== 'string') {
+    throw new Error('EasyKash direct pay failed: missing redirectUrl');
+  }
+
+  return { redirectUrl: data.redirectUrl };
+}
+
+// ─────────────────────────────────────────────
 // EasyKash — HMAC Verification
 // ─────────────────────────────────────────────
 
-export function verifyEasyKashHmac(payload: Record<string, string>): boolean {
-  const { ProductCode, Amount, ProductType, PaymentMethod, status, easykashRef, customerReference, signatureHash } = payload;
+export function verifyEasyKashHmac(payload: Record<string, unknown>): boolean {
+  const ProductCode = asString(payload.ProductCode);
+  const Amount = asString(payload.Amount);
+  const ProductType = asString(payload.ProductType);
+  const PaymentMethod = asString(payload.PaymentMethod);
+  const status = asString(payload.status);
+  const easykashRef = asString(payload.easykashRef);
+  const customerReference = asString(payload.customerReference);
+  const signatureHash = asString(payload.signatureHash).trim().toLowerCase();
+
+  if (!signatureHash || !/^[0-9a-f]{128}$/.test(signatureHash)) {
+    return false;
+  }
 
   const dataStr = [ProductCode, Amount, ProductType, PaymentMethod, status, easykashRef, customerReference].join('');
 
   const calculated = crypto
     .createHmac('sha512', process.env.EASYKASH_HMAC_SECRET!)
     .update(dataStr)
-    .digest('hex');
+    .digest('hex')
+    .toLowerCase();
 
   try {
     return crypto.timingSafeEqual(Buffer.from(calculated, 'hex'), Buffer.from(signatureHash, 'hex'));
@@ -202,4 +347,14 @@ export function getBookingProgramTitle(booking: PayloadBooking): string {
   const program = round.program as PayloadProgram;
   if (!program || typeof program === 'string') return round.title || 'Program';
   return program.titleAr || program.titleEn || 'Program';
+}
+
+export function getBookingCurrency(booking: PayloadBooking): EasyKashCurrency {
+  const round = booking.round as PayloadRound;
+  if (!round || typeof round === 'string') return 'EGP';
+  const currency =
+    (round as PayloadRound & { currency?: string | null }).currency ||
+    (round as unknown as { currency?: string | null }).currency ||
+    null;
+  return normalizeEasyKashCurrency(currency);
 }

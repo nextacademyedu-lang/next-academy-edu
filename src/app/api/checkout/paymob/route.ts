@@ -1,20 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getPayload } from 'payload';
 import config from '@payload-config';
-import { createPaymobIntention, getPaymobCheckoutUrl, getBookingProgramTitle } from '@/lib/payment-api';
+import {
+  createEasyKashDirectPay,
+  createPaymobIntention,
+  extractEasyKashProductCode,
+  getBookingCurrency,
+  getBookingProgramTitle,
+  getPaymobCheckoutUrl,
+} from '@/lib/payment-api';
 import type { CheckoutSession } from '@/lib/payment-api';
 import { authenticateRequestUser } from '@/lib/server-auth';
 
 export async function POST(req: NextRequest) {
   try {
-    if (process.env.ENABLE_PAYMOB !== 'true') {
-      return NextResponse.json(
-        { error: 'Paymob is temporarily disabled. Please use EasyKash / Fawry.' },
-        { status: 503 },
-      );
-    }
-
-    const { bookingId, method } = await req.json() as { bookingId: string; method: 'card' | 'wallet' };
+    const { bookingId, method, locale } = await req.json() as {
+      bookingId: string;
+      method: 'card' | 'wallet';
+      locale?: string;
+    };
 
     if (!bookingId || !['card', 'wallet'].includes(method)) {
       return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
@@ -64,23 +68,70 @@ export async function POST(req: NextRequest) {
       userPhone: (user as any).phone || '',
     };
 
-    // ── 5. Create Paymob intention ─────────────────────────────────
+    const previousGatewayResponse =
+      payment.paymentGatewayResponse && typeof payment.paymentGatewayResponse === 'object'
+        ? (payment.paymentGatewayResponse as Record<string, unknown>)
+        : {};
+
+    // ── 5A. Compatibility fallback to EasyKash when Paymob is disabled ──
+    if (process.env.ENABLE_PAYMOB !== 'true') {
+      const currency = getBookingCurrency(booking as any);
+      const directPay = await createEasyKashDirectPay(session, {
+        currency,
+        locale: typeof locale === 'string' ? locale : undefined,
+        customerReference: String(payment.id),
+      });
+      const productCode = extractEasyKashProductCode(directPay.redirectUrl);
+
+      await payload.update({
+        collection: 'payments',
+        id: payment.id,
+        data: {
+          paymentMethod: 'paymob',
+          transactionId: productCode || undefined,
+          paymentGatewayResponse: {
+            ...previousGatewayResponse,
+            gateway: 'easykash',
+            flow: 'directpay',
+            method,
+            currency,
+            customerReference: String(payment.id),
+            redirectUrl: directPay.redirectUrl,
+            productCode,
+          },
+          notes: productCode
+            ? `EasyKash DirectPay (${method}) | ProductCode: ${productCode}`
+            : `EasyKash DirectPay (${method})`,
+        },
+        req: req as any,
+      });
+
+      return NextResponse.json({
+        redirectUrl: directPay.redirectUrl,
+        gateway: 'easykash',
+        method,
+        currency,
+      });
+    }
+
+    // ── 5B. Native Paymob flow (if explicitly enabled) ─────────────
     const intention = await createPaymobIntention(session, method);
 
-    // ── 6. Store client_secret on payment record ───────────────────
     await payload.update({
       collection: 'payments',
       id: payment.id,
       data: {
         paymentMethod: 'paymob',
-        paymentGatewayResponse: { client_secret: intention.client_secret },
+        paymentGatewayResponse: {
+          ...previousGatewayResponse,
+          gateway: 'paymob',
+          client_secret: intention.client_secret,
+        },
       },
       req: req as any,
     });
 
-    return NextResponse.json({
-      redirectUrl: getPaymobCheckoutUrl(intention.client_secret),
-    });
+    return NextResponse.json({ redirectUrl: getPaymobCheckoutUrl(intention.client_secret) });
   } catch (err) {
     console.error('[paymob/checkout]', err);
     return NextResponse.json({ error: 'Payment initiation failed' }, { status: 500 });

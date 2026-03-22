@@ -1,15 +1,28 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getPayload } from 'payload';
 import config from '@payload-config';
-import { createEasyKashPayment, getBookingProgramTitle } from '@/lib/payment-api';
+import {
+  createEasyKashDirectPay,
+  createEasyKashPayment,
+  extractEasyKashProductCode,
+  getBookingCurrency,
+  getBookingProgramTitle,
+} from '@/lib/payment-api';
 import type { CheckoutSession } from '@/lib/payment-api';
 import { authenticateRequestUser } from '@/lib/server-auth';
 
 export async function POST(req: NextRequest) {
   try {
-    const { bookingId } = await req.json() as { bookingId: string };
+    const { bookingId, method, locale } = await req.json() as {
+      bookingId: string;
+      method?: 'card' | 'wallet' | 'fawry' | 'aman';
+      locale?: string;
+    };
+    const selectedMethod = method ?? 'fawry';
 
-    if (!bookingId) return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
+    if (!bookingId || !['card', 'wallet', 'fawry', 'aman'].includes(selectedMethod)) {
+      return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
+    }
 
     const payload = await getPayload({ config });
 
@@ -47,7 +60,7 @@ export async function POST(req: NextRequest) {
     const session: CheckoutSession = {
       bookingId,
       paymentId: String(payment.id),
-      method: 'fawry',
+      method: selectedMethod,
       amount: payment.amount,
       programTitle: getBookingProgramTitle(booking as any),
       userEmail: user.email ?? '',
@@ -55,17 +68,71 @@ export async function POST(req: NextRequest) {
       userPhone: (user as any).phone || '01000000000',
     };
 
-    // ── 5. Create EasyKash cash payment ────────────────────────────
+    const previousGatewayResponse =
+      payment.paymentGatewayResponse && typeof payment.paymentGatewayResponse === 'object'
+        ? (payment.paymentGatewayResponse as Record<string, unknown>)
+        : {};
+
+    // ── 5. Card/Wallet via EasyKash Direct Pay ─────────────────────
+    if (selectedMethod === 'card' || selectedMethod === 'wallet') {
+      const currency = getBookingCurrency(booking as any);
+      const directPay = await createEasyKashDirectPay(session, {
+        currency,
+        locale: typeof locale === 'string' ? locale : undefined,
+        customerReference: String(payment.id),
+      });
+      const productCode = extractEasyKashProductCode(directPay.redirectUrl);
+
+      await payload.update({
+        collection: 'payments',
+        id: payment.id,
+        data: {
+          // Keeping existing enum compatibility: card/wallet had been represented as "paymob".
+          paymentMethod: 'paymob',
+          transactionId: productCode || undefined,
+          paymentGatewayResponse: {
+            ...previousGatewayResponse,
+            gateway: 'easykash',
+            flow: 'directpay',
+            method: selectedMethod,
+            currency,
+            customerReference: String(payment.id),
+            redirectUrl: directPay.redirectUrl,
+            productCode,
+          },
+          notes: productCode
+            ? `EasyKash DirectPay (${selectedMethod}) | ProductCode: ${productCode}`
+            : `EasyKash DirectPay (${selectedMethod})`,
+        },
+        req: req as any,
+      });
+
+      return NextResponse.json({
+        redirectUrl: directPay.redirectUrl,
+        bookingId,
+        gateway: 'easykash',
+        method: selectedMethod,
+        currency,
+      });
+    }
+
+    // ── 6. Cash voucher via EasyKash Cash API (Fawry/Aman) ─────────
     const cashResult = await createEasyKashPayment(session);
 
-    // ── 6. Store voucher on payment record ─────────────────────────
+    // ── 7. Store voucher on payment record ─────────────────────────
     await payload.update({
       collection: 'payments',
       id: payment.id,
       data: {
         paymentMethod: 'fawry',
         transactionId: cashResult.easykashRef,
-        paymentGatewayResponse: cashResult as unknown as Record<string, unknown>,
+        paymentGatewayResponse: {
+          ...previousGatewayResponse,
+          gateway: 'easykash',
+          flow: 'cash-api',
+          method: selectedMethod,
+          ...cashResult,
+        },
         notes: `Voucher: ${cashResult.voucher} | Provider: ${cashResult.provider} | Expires: ${cashResult.expiryDate}`,
       },
       req: req as any,
@@ -77,6 +144,8 @@ export async function POST(req: NextRequest) {
       expiryDate: cashResult.expiryDate,
       easykashRef: cashResult.easykashRef,
       bookingId,
+      gateway: 'easykash',
+      method: selectedMethod,
     });
   } catch (err) {
     console.error('[easykash/checkout]', err);
