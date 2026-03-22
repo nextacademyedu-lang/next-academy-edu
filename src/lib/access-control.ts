@@ -25,7 +25,7 @@ type AccessUser = {
 function parseConfiguredAdminEmails(): string[] {
   const raw = process.env.PAYLOAD_ADMIN_EMAIL || '';
   return raw
-    .split(',')
+    .split(/[,\s;]+/)
     .map((email) => email.trim().toLowerCase())
     .filter(Boolean);
 }
@@ -41,20 +41,45 @@ export function isAdminUser(user: AccessUser | null | undefined): boolean {
   return adminEmails.includes(userEmail);
 }
 
+async function fetchPersistedUser(req: { user?: AccessUser | null; payload?: any }): Promise<AccessUser | null> {
+  const userId = req.user?.id;
+  if (!userId || !req.payload?.findByID) return null;
+
+  try {
+    const user = await req.payload.findByID({
+      collection: 'users',
+      id: userId,
+      depth: 0,
+      overrideAccess: true,
+    });
+    return (user || null) as AccessUser | null;
+  } catch {
+    return null;
+  }
+}
+
+export async function isAdminRequest(req: { user?: AccessUser | null; payload?: any }): Promise<boolean> {
+  if (isAdminUser(req.user)) return true;
+
+  const persisted = await fetchPersistedUser(req);
+  return isAdminUser(persisted);
+}
+
 // Must be logged in
 export const isAuthenticated: Access = ({ req: { user } }) => {
   return Boolean(user);
 };
 
 // Admin role only
-export const isAdmin: Access = ({ req: { user } }) => {
-  return isAdminUser(user as AccessUser | undefined);
+export const isAdmin: Access = async ({ req }) => {
+  return isAdminRequest(req);
 };
 
 // User can only access their own record; Admin can access all
-export const isAdminOrSelf: Access = ({ req: { user } }) => {
+export const isAdminOrSelf: Access = async ({ req }) => {
+  const { user } = req;
   if (!user) return false;
-  if (isAdminUser(user as AccessUser | undefined)) return true;
+  if (await isAdminRequest(req)) return true;
 
   return {
     id: {
@@ -64,15 +89,18 @@ export const isAdminOrSelf: Access = ({ req: { user } }) => {
 };
 
 // Admin or Instructor role
-export const isAdminOrInstructor: Access = ({ req: { user } }) => {
+export const isAdminOrInstructor: Access = async ({ req }) => {
+  const { user } = req;
   if (!user) return false;
-  return isAdminUser(user as AccessUser | undefined) || user.role === 'instructor';
+  if (await isAdminRequest(req)) return true;
+  return user.role === 'instructor';
 };
 
 // Owner of the record (uses 'user' field) or Admin
-export const isAdminOrOwner: Access = ({ req: { user } }) => {
+export const isAdminOrOwner: Access = async ({ req }) => {
+  const { user } = req;
   if (!user) return false;
-  if (isAdminUser(user as AccessUser | undefined)) return true;
+  if (await isAdminRequest(req)) return true;
 
   // Return a query constraint: Payload will filter to records where user field matches
   return {
@@ -84,9 +112,10 @@ export const isAdminOrOwner: Access = ({ req: { user } }) => {
 
 // Owner based on a custom field name
 export const isAdminOrOwnerByField = (fieldName: string): Access => {
-  return ({ req: { user } }) => {
+  return async ({ req }) => {
+    const { user } = req;
     if (!user) return false;
-    if (isAdminUser(user as AccessUser | undefined)) return true;
+    if (await isAdminRequest(req)) return true;
 
     return {
       [fieldName]: {
@@ -97,9 +126,10 @@ export const isAdminOrOwnerByField = (fieldName: string): Access => {
 };
 
 // Instructor can only access own records (matched by instructor relationship)
-export const isAdminOrOwnInstructor: Access = ({ req: { user } }) => {
+export const isAdminOrOwnInstructor: Access = async ({ req }) => {
+  const { user } = req;
   if (!user) return false;
-  if (isAdminUser(user as AccessUser | undefined)) return true;
+  if (await isAdminRequest(req)) return true;
 
   if (user.role === 'instructor' && user.instructorId) {
     return {
@@ -113,9 +143,10 @@ export const isAdminOrOwnInstructor: Access = ({ req: { user } }) => {
 };
 
 // User can read own records (by user field), instructor can read own records (by instructor field), admin can read all
-export const isAdminOrOwnerOrOwnInstructor: Access = ({ req: { user } }) => {
+export const isAdminOrOwnerOrOwnInstructor: Access = async ({ req }) => {
+  const { user } = req;
   if (!user) return false;
-  if (isAdminUser(user as AccessUser | undefined)) return true;
+  if (await isAdminRequest(req)) return true;
 
   if (user.role === 'instructor' && user.instructorId) {
     const instructorId =
@@ -133,9 +164,10 @@ export const isAdminOrOwnerOrOwnInstructor: Access = ({ req: { user } }) => {
 };
 
 // Instructor can update own records (matched by instructor field), admin can update all
-export const isAdminOrOwnInstructorForUpdate: Access = ({ req: { user } }) => {
+export const isAdminOrOwnInstructorForUpdate: Access = async ({ req }) => {
+  const { user } = req;
   if (!user) return false;
-  if (isAdminUser(user as AccessUser | undefined)) return true;
+  if (await isAdminRequest(req)) return true;
 
   if (user.role === 'instructor' && user.instructorId) {
     const instructorId =
@@ -154,7 +186,7 @@ export const isAdminOrOwnInstructorForUpdate: Access = ({ req: { user } }) => {
 export const isAdminOrB2BManager: Access = async ({ req }) => {
   const { user, payload } = req;
   if (!user) return false;
-  if (isAdminUser(user as AccessUser | undefined)) return true;
+  if (await isAdminRequest(req)) return true;
 
   if (user.role !== 'b2b_manager') return false;
 
@@ -186,6 +218,6 @@ export const isAdminOrB2BManager: Access = async ({ req }) => {
 };
 
 // Field-level: Admin only
-export const adminOnlyField: FieldAccess = ({ req: { user } }) => {
-  return isAdminUser(user as AccessUser | undefined);
+export const adminOnlyField: FieldAccess = async ({ req }) => {
+  return isAdminRequest(req);
 };
