@@ -133,6 +133,14 @@ async function resolveUserFromVerifiedToken(payload: any, token: string): Promis
  * so we try all token candidates and include a cryptographic fallback verifier.
  */
 export async function authenticateRequestUser(payload: any, req: NextRequest): Promise<any | null> {
+  // Fast path: let Payload parse the original request headers first.
+  try {
+    const { user } = await payload.auth({ headers: req.headers });
+    if (user) return user;
+  } catch {
+    // Continue with normalized header candidates.
+  }
+
   const baseHeaders = buildBaseHeaders(req);
   const cookieHeader = req.headers.get('cookie') || '';
   const authHeader = req.headers.get('authorization') || '';
