@@ -80,10 +80,12 @@ export async function POST(req: NextRequest) {
     // ── 5A. Compatibility fallback to EasyKash when Paymob is disabled ──
     if (process.env.ENABLE_PAYMOB !== 'true') {
       const currency = getBookingCurrency(booking as any);
+      // EasyKash rejects duplicate customerReference — append timestamp to make it unique per attempt
+      const custRef = `${payment.id}-${Date.now()}`;
       const directPay = await createEasyKashDirectPay(session, {
         currency,
         locale: typeof locale === 'string' ? locale : undefined,
-        customerReference: String(payment.id),
+        customerReference: custRef,
       });
       const productCode = extractEasyKashProductCode(directPay.redirectUrl);
 
@@ -99,7 +101,7 @@ export async function POST(req: NextRequest) {
             flow: 'directpay',
             method,
             currency,
-            customerReference: String(payment.id),
+            customerReference: custRef,
             redirectUrl: directPay.redirectUrl,
             productCode,
           },

@@ -80,10 +80,12 @@ export async function POST(req: NextRequest) {
     // ── 5. Card/Wallet via EasyKash Direct Pay ─────────────────────
     if (selectedMethod === 'card' || selectedMethod === 'wallet') {
       const currency = getBookingCurrency(booking as any);
+      // EasyKash rejects duplicate customerReference — append timestamp to make it unique per attempt
+      const custRef = `${payment.id}-${Date.now()}`;
       const directPay = await createEasyKashDirectPay(session, {
         currency,
         locale: typeof locale === 'string' ? locale : undefined,
-        customerReference: String(payment.id),
+        customerReference: custRef,
       });
       const productCode = extractEasyKashProductCode(directPay.redirectUrl);
 
@@ -100,7 +102,7 @@ export async function POST(req: NextRequest) {
             flow: 'directpay',
             method: selectedMethod,
             currency,
-            customerReference: String(payment.id),
+            customerReference: custRef,
             redirectUrl: directPay.redirectUrl,
             productCode,
           },
