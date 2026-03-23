@@ -57,6 +57,14 @@ function dedupeTokens(tokens: string[]): string[] {
   return unique;
 }
 
+function toHeaders(record: AuthCandidateHeaders): Headers {
+  const headers = new Headers();
+  for (const [key, value] of Object.entries(record)) {
+    headers.set(key, value);
+  }
+  return headers;
+}
+
 function safeEqualBase64Url(a: string, b: string): boolean {
   const aBuf = Buffer.from(a);
   const bBuf = Buffer.from(b);
@@ -159,7 +167,7 @@ export async function authenticateRequestUser(payload: any, req: NextRequest): P
 
   for (const headers of candidates) {
     try {
-      const { user } = await payload.auth({ headers });
+      const { user } = await payload.auth({ headers: toHeaders(headers) });
       if (user) return user;
     } catch {
       // Continue trying other candidates.
