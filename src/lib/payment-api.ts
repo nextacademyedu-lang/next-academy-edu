@@ -116,11 +116,15 @@ export function getPaymobCheckoutUrl(clientSecret: string): string {
 export async function createPaymobIntention(
   session: CheckoutSession,
   method: 'card' | 'wallet',
+  locale?: string,
 ): Promise<PaymobIntentionResponse> {
   const integrationId =
     method === 'wallet'
       ? process.env.PAYMOB_WALLET_INTEGRATION_ID!
       : process.env.PAYMOB_INTEGRATION_ID!;
+
+  const redirectBase = `${process.env.NEXT_PUBLIC_APP_URL}/api/webhooks/paymob/redirect`;
+  const redirectUrl = locale ? `${redirectBase}?locale=${locale}` : redirectBase;
 
   const body = {
     amount: Math.round(session.amount * 100), // Paymob uses cents (piastres)
@@ -155,7 +159,7 @@ export async function createPaymobIntention(
     },
     special_reference: session.bookingId,
     notification_url: `${process.env.NEXT_PUBLIC_APP_URL}/api/webhooks/paymob`,
-    redirection_url: `${process.env.NEXT_PUBLIC_APP_URL}/api/webhooks/paymob/redirect`,
+    redirection_url: redirectUrl,
   };
 
   const res = await fetch('https://accept.paymob.com/v1/intention/', {

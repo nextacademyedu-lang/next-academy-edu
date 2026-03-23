@@ -9,9 +9,11 @@ import { getProgramTitle as getProgramTitleFromBooking, formatCurrency } from '@
 import type { PayloadBooking } from '@/lib/dashboard-api';
 
 const PAYMENT_OPTIONS = [
-  { id: 'card',   label: 'كارت كريدت / ديبت (داخل وخارج مصر)', provider: 'EasyKash', type: 'easykash' },
-  { id: 'wallet', label: 'محفظة إلكترونية (فودافون كاش، إتصالات، أورنج)', provider: 'EasyKash', type: 'easykash' },
-  { id: 'fawry',  label: 'فوري / أمان (كاش)', provider: 'EasyKash', type: 'easykash' },
+  { id: 'paymob-card',   label: 'كارت كريدت / ديبت (Paymob)', provider: 'Paymob', type: 'paymob', method: 'card' as const },
+  { id: 'paymob-wallet', label: 'محفظة إلكترونية (Paymob)', provider: 'Paymob', type: 'paymob', method: 'wallet' as const },
+  { id: 'card',   label: 'كارت كريدت / ديبت (داخل وخارج مصر)', provider: 'EasyKash', type: 'easykash', method: 'card' as const },
+  { id: 'wallet', label: 'محفظة إلكترونية (فودافون كاش، إتصالات، أورنج)', provider: 'EasyKash', type: 'easykash', method: 'wallet' as const },
+  { id: 'fawry',  label: 'فوري / أمان (كاش)', provider: 'EasyKash', type: 'easykash', method: 'fawry' as const },
 ];
 
 function formatAmountByCurrency(amount: number, currency: string, locale: string): string {
@@ -32,7 +34,7 @@ export default function CheckoutPage() {
   const [booking, setBooking] = useState<PayloadBooking | null>(null);
   const availablePaymentOptions = PAYMENT_OPTIONS;
 
-  const [selectedMethod, setSelectedMethod] = useState(
+  const [selectedOptionId, setSelectedOptionId] = useState(
     availablePaymentOptions[0]?.id ?? 'fawry',
   );
   const [discountCode, setDiscountCode] = useState('');
@@ -121,17 +123,21 @@ export default function CheckoutPage() {
     setSubmitting(true);
     setError('');
 
+    const selectedOption = availablePaymentOptions.find((o) => o.id === selectedOptionId);
+    if (!selectedOption) { setSubmitting(false); return; }
+
     try {
-      const res = await fetch('/api/checkout/easykash', {
+      const apiPath = selectedOption.type === 'paymob' ? '/api/checkout/paymob' : '/api/checkout/easykash';
+      const res = await fetch(apiPath, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
-        body: JSON.stringify({ bookingId, method: selectedMethod, locale }),
+        body: JSON.stringify({ bookingId, method: selectedOption.method, locale }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'فشل إنشاء الدفع');
 
-      if (selectedMethod === 'fawry') {
+      if (selectedOption.method === 'fawry') {
         router.push(
           `/${locale}/checkout/pending?bookingId=${bookingId}&voucher=${data.voucher}&provider=${data.provider}&expiryDate=${encodeURIComponent(data.expiryDate)}`,
         );
@@ -214,8 +220,8 @@ export default function CheckoutPage() {
             {availablePaymentOptions.map((opt) => (
               <div
                 key={opt.id}
-                className={`${styles.paymentOption} ${selectedMethod === opt.id ? styles.selected : ''}`}
-                onClick={() => setSelectedMethod(opt.id)}
+                className={`${styles.paymentOption} ${selectedOptionId === opt.id ? styles.selected : ''}`}
+                onClick={() => setSelectedOptionId(opt.id)}
               >
                 <div className={styles.radioGroup}>
                   <div className={styles.radioCustom} />
@@ -228,7 +234,7 @@ export default function CheckoutPage() {
             ))}
           </div>
 
-          {selectedMethod === 'fawry' && (
+          {selectedOptionId === 'fawry' && (
             <div className={styles.installmentNotice} style={{ marginTop: '16px' }}>
               <p style={{ fontSize: '14px', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
                 هتاخد رقم مرجعي تدفع بيه في أي فرع فوري أو أمان. الحجز بيتأكد بعد الدفع تلقائياً (ممكن تاخد من دقايق لـ 48 ساعة).
@@ -314,7 +320,7 @@ export default function CheckoutPage() {
             disabled={submitting}
             style={{ opacity: submitting ? 0.7 : 1, cursor: submitting ? 'not-allowed' : 'pointer' }}
           >
-            {submitting ? 'جاري التحويل…' : selectedMethod === 'fawry' ? 'احصل على رقم الدفع' : 'انتقل للدفع الآمن'}
+            {submitting ? 'جاري التحويل…' : selectedOptionId === 'fawry' ? 'احصل على رقم الدفع' : 'انتقل للدفع الآمن'}
           </button>
 
           <div className={styles.securityBadge}>

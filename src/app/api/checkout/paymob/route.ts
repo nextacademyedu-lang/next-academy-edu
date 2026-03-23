@@ -119,7 +119,7 @@ export async function POST(req: NextRequest) {
     }
 
     // ── 5B. Native Paymob flow (if explicitly enabled) ─────────────
-    const intention = await createPaymobIntention(session, method);
+    const intention = await createPaymobIntention(session, method, typeof locale === 'string' ? locale : undefined);
 
     await payload.update({
       collection: 'payments',
