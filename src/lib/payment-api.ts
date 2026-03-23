@@ -68,9 +68,21 @@ function normalizeEasyKashCurrency(value?: string | null): EasyKashCurrency {
 }
 
 function normalizeEasyKashPhone(phone: string): string {
-  const trimmed = phone.trim();
-  if (!trimmed) return '01000000000';
-  return trimmed;
+  const raw = phone.trim();
+  if (!raw) return '01000000000';
+  // Remove all non-digits
+  let normalized = raw.replace(/\D/g, '');
+  // Strip Egypt country code: 20xxxxxxxxx → 0xxxxxxxxx
+  if (normalized.startsWith('20')) {
+    normalized = '0' + normalized.substring(2);
+  } else if (!normalized.startsWith('0')) {
+    normalized = '0' + normalized;
+  }
+  // Ensure exactly 11 digits for Egyptian mobile numbers
+  if (normalized.length > 11 && normalized.startsWith('0')) {
+    normalized = normalized.substring(0, 11);
+  }
+  return normalized;
 }
 
 function buildEasyKashRedirectUrl(params: { bookingId: string; locale?: string }): string {
@@ -230,23 +242,19 @@ export async function createEasyKashDirectPay(
   }
 
   const normalizedCurrency = normalizeEasyKashCurrency(options?.currency);
-  const fallbackMethod = session.method === 'wallet' ? 'wallet' : 'card';
-  const optionFromMethod = EASYKASH_DIRECT_PAY_OPTIONS[fallbackMethod];
   const requestedOptions = options?.paymentOptionsOverride?.length
     ? options.paymentOptionsOverride
-    : [optionFromMethod];
+    : [2, 3, 4, 5, 6]; // All payment options like the working ramadan-event code
 
-  const rawReference = options?.customerReference ?? session.paymentId;
-  const numericReference = Number(rawReference);
-  const customerReference = Number.isFinite(numericReference)
-    ? numericReference
-    : asString(rawReference);
+  const rawReference = asString(options?.customerReference ?? session.paymentId);
+  // Remove dashes from UUID — EasyKash rejects special characters
+  const customerReference = rawReference.replace(/-/g, '');
 
   const body = {
     amount: asMoney(session.amount),
     currency: normalizedCurrency,
     paymentOptions: requestedOptions,
-    cashExpiry: 48,
+    cashExpiry: 24,
     name: session.userName || 'Customer',
     email: session.userEmail || 'customer@example.com',
     mobile: normalizeEasyKashPhone(session.userPhone),
@@ -257,6 +265,8 @@ export async function createEasyKashDirectPay(
     customerReference,
   };
 
+  console.log(`[EasyKash] Sending Payload for Booking ${session.bookingId}:`, JSON.stringify(body, null, 2));
+
   const res = await fetch('https://back.easykash.net/api/directpayv1/pay', {
     method: 'POST',
     headers: {
@@ -266,17 +276,14 @@ export async function createEasyKashDirectPay(
     body: JSON.stringify(body),
   });
 
-  if (!res.ok) {
-    const err = await res.text();
-    throw new Error(`EasyKash direct pay failed: ${err}`);
+  const data = await res.json();
+  console.log(`[EasyKash] Response for ${session.bookingId}:`, JSON.stringify(data, null, 2));
+
+  if (data.redirectUrl) {
+    return { redirectUrl: data.redirectUrl as string };
   }
 
-  const data = await res.json() as Partial<EasyKashDirectPayResponse>;
-  if (!data.redirectUrl || typeof data.redirectUrl !== 'string') {
-    throw new Error('EasyKash direct pay failed: missing redirectUrl');
-  }
-
-  return { redirectUrl: data.redirectUrl };
+  throw new Error(`EasyKash direct pay failed: ${data.message || JSON.stringify(data)}`);
 }
 
 // ─────────────────────────────────────────────

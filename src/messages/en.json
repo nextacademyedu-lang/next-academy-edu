@@ -307,7 +307,9 @@
     "online": "Online",
     "offline": "In Person",
     "hybrid": "Hybrid",
-    "noEvents": "No upcoming events at this time"
+    "noEvents": "No upcoming events at this time",
+    "previous": "Previous",
+    "next": "Next"
   },
   "About": {
     "heroEyebrow": "About Us",
