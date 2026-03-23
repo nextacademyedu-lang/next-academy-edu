@@ -2,6 +2,10 @@ import { NextResponse } from 'next/server';
 import { getPayload } from 'payload';
 import config from '@payload-config';
 
+const PUBLIC_CACHE_HEADERS = {
+  'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=60',
+};
+
 type StatsResponse = {
   professionals: number;
   partners: number;
@@ -58,7 +62,7 @@ export async function GET() {
       completionRate,
     };
 
-    return NextResponse.json({ stats });
+    return NextResponse.json({ stats }, { headers: PUBLIC_CACHE_HEADERS });
   } catch (error) {
     console.error('[api/home/stats] Failed to build home stats:', error);
     return NextResponse.json(

@@ -4,6 +4,10 @@ import type { Where } from 'payload';
 import config from '@payload-config';
 import type { Media, Program, Round } from '@/payload-types';
 
+const PUBLIC_CACHE_HEADERS = {
+  'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=60',
+};
+
 type EventCard = {
   id: string | number;
   titleAr: string;
@@ -72,7 +76,7 @@ export async function GET() {
     const eventsConfig = configResult.docs[0];
 
     if (!eventsConfig || !eventsConfig.isEnabled) {
-      return NextResponse.json({ events: [], config: null });
+      return NextResponse.json({ events: [], config: null }, { headers: PUBLIC_CACHE_HEADERS });
     }
 
     const maxItems = (eventsConfig.maxItems as number) || 6;
@@ -139,7 +143,7 @@ export async function GET() {
           emptyMessageAr: eventsConfig.emptyMessageAr,
           emptyMessageEn: eventsConfig.emptyMessageEn,
         },
-      });
+      }, { headers: PUBLIC_CACHE_HEADERS });
     }
 
     // Automatic mode: query rounds starting in the future
@@ -190,7 +194,7 @@ export async function GET() {
         emptyMessageAr: eventsConfig.emptyMessageAr,
         emptyMessageEn: eventsConfig.emptyMessageEn,
       },
-    });
+    }, { headers: PUBLIC_CACHE_HEADERS });
   } catch (error) {
     console.error('[api/upcoming-events]', error);
     return NextResponse.json(

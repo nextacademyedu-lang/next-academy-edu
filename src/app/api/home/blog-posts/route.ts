@@ -2,6 +2,10 @@ import { NextResponse } from 'next/server';
 import { getPayload } from 'payload';
 import config from '@payload-config';
 
+const PUBLIC_CACHE_HEADERS = {
+  'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=60',
+};
+
 export async function GET() {
   try {
     const payload = await getPayload({ config });
@@ -27,8 +31,8 @@ export async function GET() {
       };
     });
 
-    return NextResponse.json({ posts });
+    return NextResponse.json({ posts }, { headers: PUBLIC_CACHE_HEADERS });
   } catch {
-    return NextResponse.json({ posts: [] });
+    return NextResponse.json({ posts: [] }, { headers: PUBLIC_CACHE_HEADERS });
   }
 }

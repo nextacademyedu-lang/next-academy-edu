@@ -218,3 +218,37 @@
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
 }
+
+/* BUG-005: prevent cramped labels on very small screens */
+@media (max-width: 400px) {
+  .header {
+    margin-bottom: 20px;
+  }
+
+  .title {
+    font-size: 26px;
+  }
+
+  .subtitle {
+    font-size: 14px;
+    max-width: 100%;
+  }
+
+  .form {
+    gap: 14px;
+  }
+
+  .input {
+    padding: 10px 12px;
+    font-size: 15px;
+  }
+
+  .label {
+    font-size: 13px;
+  }
+
+  .pwdReqs {
+    padding: 8px;
+    gap: 2px;
+  }
+}

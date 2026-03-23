@@ -2,6 +2,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getPayload } from 'payload';
 import config from '@payload-config';
 
+const PUBLIC_CACHE_HEADERS = {
+  'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=30',
+};
+
 function isAdminViewer(user: { role?: unknown; email?: unknown } | null | undefined): boolean {
   if (!user) return false;
   if (user.role === 'admin') return true;
@@ -89,7 +93,7 @@ export async function GET(req: NextRequest) {
     // Return only the top-priority bar
     const bar = bars[0] || null;
 
-    return NextResponse.json({ bar });
+    return NextResponse.json({ bar }, { headers: PUBLIC_CACHE_HEADERS });
   } catch (error) {
     console.error('[api/announcement-bars/active]', error);
     return NextResponse.json(
