@@ -1,15 +1,29 @@
-// ⚠️ TEMPORARY ROUTE — DELETE AFTER USE
-// Seeds test data for payment testing via Payload Local API
 import { NextResponse } from 'next/server';
 import { getPayload } from 'payload';
 import config from '@payload-config';
+import crypto from 'node:crypto';
+
+function timingSafeEqualString(a: string, b: string): boolean {
+  const aBuf = Buffer.from(a);
+  const bBuf = Buffer.from(b);
+  if (aBuf.length !== bBuf.length) return false;
+  return crypto.timingSafeEqual(aBuf, bBuf);
+}
 
 export async function POST(req: Request) {
   try {
-    const { secret } = await req.json();
+    if (process.env.ENABLE_TEST_SEED_ENDPOINT !== 'true') {
+      return NextResponse.json({ error: 'Not found' }, { status: 404 });
+    }
 
-    // Simple protection — must pass the correct secret
-    if (secret !== 'seed-test-2026') {
+    const configuredSecret = process.env.CRON_SECRET?.trim();
+    if (!configuredSecret) {
+      return NextResponse.json({ error: 'Server misconfigured' }, { status: 503 });
+    }
+
+    const incomingAuth = req.headers.get('authorization') || '';
+    const expectedAuth = `Bearer ${configuredSecret}`;
+    if (!timingSafeEqualString(incomingAuth, expectedAuth)) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 

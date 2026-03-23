@@ -3,6 +3,7 @@ import { getPayload } from 'payload';
 import config from '@payload-config';
 import { isAdminUser } from '@/lib/access-control';
 import { authenticateRequestUser } from '@/lib/server-auth';
+import { assertTrustedWriteRequest } from '@/lib/csrf';
 
 function normalizeCode(value: unknown): string {
   if (typeof value !== 'string') return '';
@@ -11,6 +12,9 @@ function normalizeCode(value: unknown): string {
 
 export async function POST(req: NextRequest) {
   try {
+    const csrfError = assertTrustedWriteRequest(req);
+    if (csrfError) return csrfError;
+
     const { code, bookingId } = await req.json() as { code: string; bookingId: string };
 
     if (!code || !bookingId) {

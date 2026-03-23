@@ -66,26 +66,47 @@ interface GoogleUserInfo {
   picture: string;
 }
 
+type OAuthState = {
+  redirect?: string;
+  nonce?: string;
+};
+
+function isSameNonce(expected: string, actual: string): boolean {
+  const expectedBuf = Buffer.from(expected);
+  const actualBuf = Buffer.from(actual);
+  if (expectedBuf.length !== actualBuf.length) return false;
+  return crypto.timingSafeEqual(expectedBuf, actualBuf);
+}
+
+function resolveCookieDomain(hostname: string): string | undefined {
+  if (hostname === 'nextacademyedu.com' || hostname.endsWith('.nextacademyedu.com')) {
+    return '.nextacademyedu.com';
+  }
+  return undefined;
+}
+
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const code = searchParams.get('code');
   const stateRaw = searchParams.get('state');
   const errorParam = searchParams.get('error');
 
-  // Parse redirect from state
-  let redirect = '/dashboard';
-  if (stateRaw) {
-    try {
-      const parsed = JSON.parse(Buffer.from(stateRaw, 'base64url').toString());
-      if (parsed.redirect) redirect = parsed.redirect;
-    } catch {
-      // ignore bad state
-    }
-  }
-
   const origin = process.env.NEXT_PUBLIC_SERVER_URL || req.nextUrl.origin;
   const errorUrl = (msg: string) =>
     `${origin}/ar/login?error=${encodeURIComponent(msg)}`;
+
+  // Parse redirect + one-time nonce from state
+  let redirect = '/dashboard';
+  let stateNonce = '';
+  if (stateRaw) {
+    try {
+      const parsed = JSON.parse(Buffer.from(stateRaw, 'base64url').toString()) as OAuthState;
+      if (parsed.redirect) redirect = parsed.redirect;
+      if (parsed.nonce) stateNonce = parsed.nonce;
+    } catch {
+      return NextResponse.redirect(errorUrl('invalid_state'));
+    }
+  }
 
   if (errorParam) {
     return NextResponse.redirect(errorUrl(errorParam));
@@ -93,6 +114,15 @@ export async function GET(req: NextRequest) {
 
   if (!code) {
     return NextResponse.redirect(errorUrl('missing_code'));
+  }
+
+  const nonceCookie = req.cookies.get('oauth-nonce')?.value || '';
+  const pkceVerifier = req.cookies.get('oauth-pkce')?.value || '';
+  if (!stateNonce || !nonceCookie || !isSameNonce(stateNonce, nonceCookie)) {
+    return NextResponse.redirect(errorUrl('csrf_validation_failed'));
+  }
+  if (!pkceVerifier) {
+    return NextResponse.redirect(errorUrl('invalid_pkce_verifier'));
   }
 
   const clientId = process.env.GOOGLE_CLIENT_ID;
@@ -120,6 +150,7 @@ export async function GET(req: NextRequest) {
         client_id: clientId,
         client_secret: clientSecret,
         redirect_uri: callbackUrl,
+        code_verifier: pkceVerifier,
         grant_type: 'authorization_code',
       }),
     });
@@ -216,16 +247,43 @@ export async function GET(req: NextRequest) {
 
   // 5. Redirect to target with payload-token cookie
   const safeRedirect = redirect.startsWith('/') ? redirect : '/dashboard';
-  const finalUrl = `${origin}/ar${safeRedirect}`;
+  const finalUrl = safeRedirect.startsWith('/ar/') || safeRedirect.startsWith('/en/')
+    ? `${origin}${safeRedirect}`
+    : `${origin}/ar${safeRedirect}`;
 
   const response = NextResponse.redirect(finalUrl);
-
-  response.cookies.set('payload-token', token, {
+  const cookieOptions = {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     path: '/',
-    sameSite: 'lax',
+    sameSite: 'lax' as const,
     maxAge: tokenExpiry,
+  };
+
+  response.cookies.set('payload-token', token, cookieOptions);
+
+  const rootDomain = resolveCookieDomain(req.nextUrl.hostname);
+  if (rootDomain) {
+    response.cookies.set('payload-token', token, {
+      ...cookieOptions,
+      domain: rootDomain,
+    });
+  }
+
+  // One-time nonce cookie: always clear after callback processing.
+  response.cookies.set('oauth-nonce', '', {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+    path: '/api/auth/google/callback',
+    maxAge: 0,
+  });
+  response.cookies.set('oauth-pkce', '', {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+    path: '/api/auth/google/callback',
+    maxAge: 0,
   });
 
   return response;

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getPayload } from 'payload';
 import config from '@payload-config';
 import { Resend } from 'resend';
+import crypto from 'node:crypto';
 
 // Simple in-memory rate limiter (per-process)
 const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
@@ -26,7 +27,7 @@ function checkRateLimit(email: string): boolean {
 }
 
 function generateOtp(): string {
-  return Math.floor(100000 + Math.random() * 900000).toString();
+  return crypto.randomInt(100000, 1000000).toString();
 }
 
 export async function POST(request: NextRequest) {

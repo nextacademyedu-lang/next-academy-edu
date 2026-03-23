@@ -3,9 +3,12 @@ import { getPayload } from 'payload';
 import config from '@payload-config';
 import { rateLimit } from '@/lib/rate-limit';
 
-// 10 requests per minute per IP, then lockout
-const LIMIT = 10;
+// 5 requests per minute per IP.
+const LIMIT = 5;
 const WINDOW_MS = 60_000;
+// Defense-in-depth: limit attempts against the same email across IPs.
+const EMAIL_LIMIT = 8;
+const EMAIL_WINDOW_MS = 10 * 60_000;
 
 function parseConfiguredAdminEmails(): string[] {
   const raw = process.env.PAYLOAD_ADMIN_EMAIL || '';
@@ -22,10 +25,7 @@ function isConfiguredAdminEmail(email: string): boolean {
 }
 
 function resolveCookieDomain(hostname: string): string | undefined {
-  if (
-    hostname === 'nextacademyedu.com' ||
-    hostname === 'www.nextacademyedu.com'
-  ) {
+  if (hostname === 'nextacademyedu.com' || hostname.endsWith('.nextacademyedu.com')) {
     return '.nextacademyedu.com';
   }
 
@@ -152,17 +152,36 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    const normalizedEmail = String(email).trim().toLowerCase();
+    const emailLimitResult = await rateLimit(
+      `login:email:${normalizedEmail}`,
+      EMAIL_LIMIT,
+      EMAIL_WINDOW_MS,
+    );
+    if (!emailLimitResult.success) {
+      return NextResponse.json(
+        { errors: [{ message: 'محاولات كثيرة. حاول لاحقًا.' }] },
+        {
+          status: 429,
+          headers: {
+            'Retry-After': String(Math.ceil(emailLimitResult.resetInMs / 1000)),
+            'X-RateLimit-Remaining': '0',
+          },
+        },
+      );
+    }
+
     const payload = await getPayload({ config });
-    await syncConfiguredAdminBeforeLogin(payload, email);
+    await syncConfiguredAdminBeforeLogin(payload, normalizedEmail);
     let result = await payload.login({
       collection: 'users',
-      data: { email: email as string, password: password as string },
+      data: { email: normalizedEmail as string, password: password as string },
       req: req as any,
     });
     result = await ensureConfiguredAdminAfterLogin({
       payload,
       result,
-      email: email as string,
+      email: normalizedEmail,
       password: password as string,
       req,
     });

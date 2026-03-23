@@ -22,6 +22,10 @@ type ProgramWithDerived = Program & {
   learnersCount?: number | null;
 };
 
+const PUBLIC_CACHE_HEADERS = {
+  'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=60',
+};
+
 function mediaUrl(value: Program['thumbnail'] | Program['coverImage']): string | null {
   if (!value || typeof value === 'number') return null;
   return (value as Media).url || null;
@@ -143,7 +147,7 @@ export async function GET(req: NextRequest) {
     }
 
     if (programs.length === 0) {
-      return NextResponse.json({ programs: [] });
+      return NextResponse.json({ programs: [] }, { headers: PUBLIC_CACHE_HEADERS });
     }
 
     const programIds = programs.map((program) => program.id);
@@ -228,7 +232,7 @@ export async function GET(req: NextRequest) {
       };
     });
 
-    return NextResponse.json({ programs: mapped });
+    return NextResponse.json({ programs: mapped }, { headers: PUBLIC_CACHE_HEADERS });
   } catch (error) {
     console.error('[api/home/featured-programs] Failed to fetch cards:', error);
     return NextResponse.json(

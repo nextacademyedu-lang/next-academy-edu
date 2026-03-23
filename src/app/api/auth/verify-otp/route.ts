@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getPayload } from 'payload';
 import config from '@payload-config';
+import { rateLimit } from '@/lib/rate-limit';
+
+const VERIFY_LIMIT = 5;
+const VERIFY_WINDOW_MS = 15 * 60 * 1000;
 
 export async function POST(request: NextRequest) {
   try {
@@ -16,12 +20,35 @@ export async function POST(request: NextRequest) {
 
     const normalizedEmail = email.toLowerCase().trim();
     const normalizedCode = code.trim();
+    const ip =
+      request.headers.get('x-forwarded-for')?.split(',')[0].trim() ??
+      request.headers.get('x-real-ip') ??
+      'anonymous';
 
     // Validate code format (6 digits)
     if (!/^\d{6}$/.test(normalizedCode)) {
       return NextResponse.json(
         { error: 'Invalid verification code format' },
         { status: 400 },
+      );
+    }
+
+    const {
+      success: verifyAllowed,
+      remaining,
+      resetInMs,
+    } = await rateLimit(`verify-otp:${normalizedEmail}:${ip}`, VERIFY_LIMIT, VERIFY_WINDOW_MS);
+
+    if (!verifyAllowed) {
+      return NextResponse.json(
+        { error: 'Too many verification attempts. Please try again later.' },
+        {
+          status: 429,
+          headers: {
+            'Retry-After': String(Math.ceil(resetInMs / 1000)),
+            'X-RateLimit-Remaining': '0',
+          },
+        },
       );
     }
 
@@ -81,7 +108,12 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(
       { verified: true, message: 'Email verified successfully' },
-      { status: 200 },
+      {
+        status: 200,
+        headers: {
+          'X-RateLimit-Remaining': String(remaining),
+        },
+      },
     );
   } catch (error) {
     console.error('Verify OTP error:', error);

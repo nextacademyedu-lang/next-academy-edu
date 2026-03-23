@@ -2,9 +2,12 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getPayload } from 'payload';
 import config from '@payload-config';
 import { authenticateRequestUser } from '@/lib/server-auth';
+import crypto from 'node:crypto';
+import { assertTrustedWriteRequest } from '@/lib/csrf';
 
 function generateCode(prefix: string): string {
-  return `${prefix}-${Date.now().toString(36).toUpperCase()}-${Math.random().toString(36).slice(2, 6).toUpperCase()}`;
+  const random = crypto.randomBytes(3).toString('hex').toUpperCase();
+  return `${prefix}-${Date.now().toString(36).toUpperCase()}-${random}`;
 }
 
 function normalizeNumericId(value: unknown): number | null {
@@ -22,6 +25,9 @@ function normalizeNumericId(value: unknown): number | null {
 export async function POST(req: NextRequest) {
   let stage = 'init';
   try {
+    const csrfError = assertTrustedWriteRequest(req);
+    if (csrfError) return csrfError;
+
     stage = 'parse_request';
     const { roundId, paymentPlanId, discountCode } = await req.json() as {
       roundId: string | number;
@@ -199,7 +205,7 @@ export async function POST(req: NextRequest) {
     stage = 'done';
     return NextResponse.json({ bookingId: booking.id, bookingCode: booking.bookingCode });
   } catch (err) {
-    console.error('[bookings/create]', err);
-    return NextResponse.json({ error: 'حصلت مشكلة', stage }, { status: 500 });
+    console.error('[bookings/create]', { stage, err });
+    return NextResponse.json({ error: 'حصلت مشكلة' }, { status: 500 });
   }
 }

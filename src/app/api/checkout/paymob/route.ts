@@ -11,9 +11,13 @@ import {
 } from '@/lib/payment-api';
 import type { CheckoutSession } from '@/lib/payment-api';
 import { authenticateRequestUser } from '@/lib/server-auth';
+import { assertTrustedWriteRequest } from '@/lib/csrf';
 
 export async function POST(req: NextRequest) {
   try {
+    const csrfError = assertTrustedWriteRequest(req);
+    if (csrfError) return csrfError;
+
     const { bookingId, method, locale } = await req.json() as {
       bookingId: string;
       method: 'card' | 'wallet';
