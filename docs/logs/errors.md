@@ -4,6 +4,33 @@
 
 ---
 
+### [2026-03-23 01:30] - Duplicate `About` Key in `en.json` — Raw i18n Keys on English About Page
+
+**Error:** `/en/about` hero section displays raw keys like `About.heroHighlight`, `About.stat1` instead of translated text. Arabic version `/ar/about` works correctly.
+
+**Root Cause:** `src/messages/en.json` contains two `"About"` top-level objects (lines ~281 and ~346). JSON spec causes the second to overwrite the first. The component `about-hero.tsx` references keys from the first block (`heroHighlight`, `stat1`–`stat4`), which don't exist in the second (winning) block that uses different key names (`heroEyebrow`, `heroStat1Value`).
+
+**Fix:** Merge both `About` blocks into a single object. Keep all unique keys from both blocks.
+
+**Files:** `src/messages/en.json`
+
+---
+
+### [2026-03-23 01:45] - Booking Flow Returns 401 for Authenticated Users
+
+**Error:** After successful login, clicking "Book Now" on any program triggers `POST /api/bookings/create` which returns `401 Unauthorized` despite active session.
+
+**Root Cause (suspected):** `server-auth.ts` checks 3 token strategies: `payload-token` cookie → JWT header → Bearer token. All 3 fail, suggesting cookie misconfiguration (`Domain`, `SameSite`, `Secure`, `Path`) between login response and API request origin.
+
+**Investigation needed:**
+1. Check browser DevTools → Application → Cookies for `payload-token` after login
+2. Verify cookie `Domain` and `Path` attributes match API endpoint origin
+3. Check `NEXT_PUBLIC_SERVER_URL` vs actual domain
+
+**Files:** `src/lib/server-auth.ts`, `src/components/checkout/book-round-button.tsx`
+
+---
+
 ### [2026-03-21 12:06] - Runtime 500 After Deploy: Production Schema Drift (Payload Postgres)
 
 **Error:**

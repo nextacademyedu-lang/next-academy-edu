@@ -1,0 +1,63 @@
+TestCaseID,Area,Scenario,Role,Locale,Result,Notes,DefectID
+TC-001,Smoke,Health endpoint returns 200,Anonymous,N/A,Pass,GET /api/health → 200 {"status":"ok"},
+TC-002,Smoke,Homepage loads above fold,Anonymous,ar,Pass,Hero + CTA + programs section render correctly,
+TC-003,Smoke,Homepage loads above fold,Anonymous,en,Pass,All sections render including testimonials,
+TC-004,Auth,Login page renders,Anonymous,ar,Pass,Form fields + logo + RTL layout correct,
+TC-005,Auth,Login page renders,Anonymous,en,Pass,Form fields + logo + LTR layout correct,
+TC-006,Auth,Admin login with valid credentials,Admin,en,Pass,Redirects to admin dashboard after login,
+TC-007,Auth,Student login with valid credentials,Student,en,Pass,Redirects to /en/dashboard,
+TC-008,Auth,Register page renders,Anonymous,en,Pass,All form fields present and functional,
+TC-009,Auth,Forgot password page renders,Anonymous,en,Pass,Email field + submit button render,
+TC-010,Auth,OTP verification page accessible,Anonymous,en,Pass,Page renders after forgot-password submission,
+TC-011,Dashboard,Dashboard overview loads,Student,en,Pass,User name + stats + sections all render,
+TC-012,Dashboard,Dashboard bookings page loads,Student,en,Pass,Table renders with empty state (no bookings),
+TC-013,Dashboard,Dashboard payments page loads,Student,en,Pass,Payment history page loads correctly,
+TC-014,Dashboard,Dashboard notifications page loads,Student,en,Pass,Notifications list renders,
+TC-015,Dashboard,Dashboard profile page loads,Student,en,Pass,Profile form pre-filled with user data,
+TC-016,Programs,Programs listing loads,Anonymous,en,Pass,Grid renders with program cards,
+TC-017,Programs,Program detail page loads,Anonymous,en,Pass,/en/programs/medical-nutrition-therapy renders fully,
+TC-018,Programs,Test program visible in listing,Anonymous,en,Fail,Program 'sad' with no data visible in grid,BUG-004
+TC-019,Booking,Book Now button triggers booking API,Student,en,Fail,POST /api/bookings/create returns 401,BUG-002
+TC-020,Checkout,Checkout flow completes,Student,en,Blocked,Blocked by BUG-002 (booking 401),BUG-002
+TC-021,Checkout,Discount code validation,Student,en,Blocked,Blocked by BUG-002,BUG-002
+TC-022,Checkout,Payment redirect to Paymob,Student,en,Blocked,Blocked by BUG-002,BUG-002
+TC-023,Webhook,Paymob success webhook,System,N/A,Blocked,Requires payment gateway test tokens,
+TC-024,Webhook,Paymob failure webhook,System,N/A,Blocked,Requires payment gateway test tokens,
+TC-025,Webhook,HMAC validation rejects tampered payload,System,N/A,Blocked,Requires payment gateway test tokens,
+TC-026,B2B,B2B dashboard loads,B2B Manager,en,Pass,Admin panel renders with company data,
+TC-027,B2B,B2B company info displayed,B2B Manager,en,Pass,Company name and details visible,
+TC-028,B2B,B2B employee management,B2B Manager,en,Pass,Employee section accessible,
+TC-029,Instructor,Instructor dashboard loads,Instructor,en,Pass,Instructor overview page renders,
+TC-030,Instructor,Instructor availability calendar,Instructor,en,Pass,Availability calendar renders,
+TC-031,Instructor,Instructor sessions view,Instructor,en,Pass,Sessions list accessible,
+TC-032,Public,About page EN,Anonymous,en,Fail,Raw i18n keys visible in hero section,BUG-001
+TC-033,Public,About page AR,Anonymous,ar,Pass,Arabic version renders correctly,
+TC-034,Public,Instructors page loads,Anonymous,en,Pass,Instructor grid loads with photos,
+TC-035,Public,Blog listing loads,Anonymous,en,Pass,Blog cards render,
+TC-036,Public,FAQ page loads,Anonymous,en,Pass,Accordions functional expand/collapse,
+TC-037,Public,Contact page loads,Anonymous,en,Pass,Contact form renders,
+TC-038,Public,For Business page loads,Anonymous,en,Pass,B2B landing page renders fully,
+TC-039,Public,Terms page loads,Anonymous,en,Fail,Popup with test data appears over content,BUG-003
+TC-040,Public,Privacy page loads,Anonymous,en,Pass,Renders correctly,
+TC-041,Public,Refund policy page loads,Anonymous,en,Pass,Renders correctly,
+TC-042,Security,Cron waitlist endpoint requires auth,Anonymous,N/A,Pass,GET /api/cron/waitlist → 401,
+TC-043,Security,Cron check-overdue endpoint requires auth,Anonymous,N/A,Pass,GET /api/cron/check-overdue → 401,
+TC-044,Security,Cron crm-sync endpoint requires auth,Anonymous,N/A,Pass,GET /api/cron/crm-sync → 401,
+TC-045,Security,CSRF check on booking POST,Student,en,Blocked,Booking returns 401 before CSRF can be tested,BUG-008
+TC-046,Security,Rate limiting on login endpoint,Anonymous,en,Fail,No rate limiting observed,BUG-010
+TC-047,Security,Error response sanitization,Anonymous,en,Fail,Internal details may leak in error responses,BUG-009
+TC-048,i18n,RTL layout on Arabic pages,Anonymous,ar,Pass,CSS direction and layout correct,
+TC-049,i18n,LTR layout on English pages,Anonymous,en,Pass,CSS direction and layout correct,
+TC-050,i18n,Language switcher works,Anonymous,en,Pass,Switches between EN/AR correctly,
+TC-051,API,GET /api/programs returns data,Anonymous,en,Pass,JSON array of programs returned,
+TC-052,API,GET /api/instructors returns data,Anonymous,en,Pass,Instructor data returned,
+TC-053,API,GET /api/home/featured-programs,Anonymous,en,Pass,Featured programs returned,
+TC-054,API,Cache-Control headers on public APIs,Anonymous,N/A,Fail,No Cache-Control header present,BUG-011
+TC-055,DevOps,CRM domain health check,System,N/A,Fail,503 + self-signed cert,BUG-006
+TC-056,DevOps,Main domain SSL valid,System,N/A,Pass,Valid Let's Encrypt cert for nextacademyedu.com,
+TC-057,DevOps,Docker health check passes,System,N/A,Pass,/api/health returns 200,
+TC-058,Webhook,Paymob HMAC with wrong secret,System,N/A,Blocked,Requires payment gateway test tokens,
+TC-059,Checkout,Paymob checkout redirect URL,Student,en,Blocked,Blocked by BUG-002,BUG-002
+TC-060,Checkout,Post-payment booking status update,Student,en,Blocked,Blocked by BUG-002,BUG-002
+TC-061,Security,Cookie attributes audit,Student,en,Fail,SameSite/Domain suspected mismatch,BUG-007
+TC-062,Responsive,Registration form on mobile viewport,Anonymous,en,Fail,Labels slightly crowded on narrow screens,BUG-005

@@ -1,0 +1,26 @@
+Endpoint,Method,AuthMode,ExpectedStatus,ActualStatus,ContractMatch,Notes,DefectID
+/api/health,GET,None,200,200,Yes,Returns {"status":"ok","timestamp":"..."},
+/api/users/login,POST,None (credentials in body),200,200,Yes,Sets payload-token cookie on success,
+/api/users/me,GET,Cookie (payload-token),200,200,Yes,Returns current user object,
+/api/users/forgot-password,POST,None,200,200,Yes,Sends OTP email,
+/api/users/register,POST,None,201,Not tested,N/A,Registration not tested with real data,
+/api/bookings/create,POST,Cookie (payload-token),201,401,No,Returns 401 even with valid session — core booking flow broken,BUG-002
+/api/bookings/user,GET,Cookie (payload-token),200,200,Yes,Returns user bookings array (empty),
+/api/payments/user,GET,Cookie (payload-token),200,200,Yes,Returns payment history,
+/api/checkout/create-session,POST,Cookie (payload-token),200,Not tested,N/A,Blocked by BUG-002,BUG-002
+/api/checkout/validate-discount,POST,Cookie (payload-token),200,Not tested,N/A,Blocked by BUG-002,BUG-002
+/api/webhooks/paymob,POST,HMAC signature,200,Not tested,N/A,Cannot test against production without real tokens,
+/api/webhooks/paymob-callback,GET,Query params,302,Not tested,N/A,Cannot test against production,
+/api/programs,GET,None,200,200,Yes,Returns array of published programs,
+/api/programs/[slug],GET,None,200,200,Yes,Returns single program detail,
+/api/instructors,GET,None,200,200,Yes,Returns instructors array,
+/api/home/featured-programs,GET,None,200,200,Yes,Returns featured programs for homepage,
+/api/home/testimonials,GET,None,200,200,Yes,Returns testimonials array,
+/api/cron/waitlist,GET,Bearer (CRON_SECRET),200,401,Yes,Correctly rejects unauthenticated request,
+/api/cron/check-overdue,GET,Bearer (CRON_SECRET),200,401,Yes,Correctly rejects unauthenticated request,
+/api/cron/crm-sync,GET,Bearer (CRON_SECRET),200,401,Yes,Correctly rejects unauthenticated request,
+/api/dashboard/stats,GET,Cookie (payload-token),200,200,Yes,Returns dashboard statistics,
+/api/dashboard/notifications,GET,Cookie (payload-token),200,200,Yes,Returns notifications list,
+/api/b2b/dashboard,GET,Cookie (payload-token) + role:b2b_manager,200,200,Yes,B2B dashboard data loads,
+/api/instructor/dashboard,GET,Cookie (payload-token) + role:instructor,200,200,Yes,Instructor dashboard data loads,
+/api/instructor/availability,GET,Cookie (payload-token) + role:instructor,200,200,Yes,Availability calendar data loads,

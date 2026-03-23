@@ -54,6 +54,17 @@
   margin-bottom: 24px;
 }
 
+.nameRow {
+  display: flex;
+  gap: 16px;
+}
+
+@media (max-width: 480px) {
+  .nameRow {
+    flex-direction: column;
+  }
+}
+
 .inputGroup {
   display: flex;
   flex-direction: column;
@@ -175,15 +186,7 @@
   margin-top: -10px;
 }
 
-.pwdReqs {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  background: var(--sidebar-bg);
-  padding: 12px;
-  border-radius: var(--radius-md);
-  margin-top: -10px;
-}
+
 
 .errorMsg {
   color: var(--status-error);

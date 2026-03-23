@@ -106,7 +106,7 @@ export default function RegisterPage() {
       </div>
 
       <form className={styles.form} onSubmit={handleSubmit}>
-        <div style={{ display: 'flex', gap: '16px' }}>
+        <div className={styles.nameRow}>
           <div className={styles.inputGroup} style={{ flex: 1 }}>
             <Label htmlFor="firstName" className={styles.label}>{t('firstName')}</Label>
             <Input
