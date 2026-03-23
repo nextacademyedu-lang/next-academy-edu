@@ -39,18 +39,38 @@ export async function POST(req: NextRequest) {
       payment = result.docs[0];
     }
 
-    // Direct Pay flow stores customerReference as payment.id.
+    // Direct Pay flow stores customerReference as `paymentId-timestamp` in
+    // paymentGatewayResponse — query by that stored value first.
     if (!payment && customerReference) {
-      try {
-        payment = await payload.findByID({
-          collection: 'payments',
-          id: customerReference,
-          depth: 1,
-          overrideAccess: true,
-          req: req as any,
-        });
-      } catch {
-        payment = null;
+      const byCustRef = await payload.find({
+        collection: 'payments',
+        where: {
+          'paymentGatewayResponse.customerReference': { equals: customerReference },
+        },
+        depth: 1,
+        limit: 1,
+        overrideAccess: true,
+        req: req as any,
+      });
+      payment = byCustRef.docs[0] ?? null;
+    }
+
+    // Fallback: extract the Payload payment ID from the prefix of the
+    // composite customerReference (e.g. "68-1719500000000" → "68").
+    if (!payment && customerReference) {
+      const idPrefix = customerReference.split('-')[0];
+      if (idPrefix) {
+        try {
+          payment = await payload.findByID({
+            collection: 'payments',
+            id: idPrefix,
+            depth: 1,
+            overrideAccess: true,
+            req: req as any,
+          });
+        } catch {
+          payment = null;
+        }
       }
     }
 

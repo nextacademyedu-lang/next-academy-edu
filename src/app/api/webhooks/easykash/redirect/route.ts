@@ -20,13 +20,38 @@ function normalizeStatus(value: string | null): 'success' | 'pending' | 'failed'
 async function resolveBookingIdByPaymentRef(paymentRef: string, req: NextRequest): Promise<string | null> {
   try {
     const payload = await getPayload({ config });
-    const payment = await payload.findByID({
+
+    // customerReference is stored as `paymentId-timestamp` — query the stored value first
+    const results = await payload.find({
       collection: 'payments',
-      id: paymentRef,
+      where: {
+        'paymentGatewayResponse.customerReference': { equals: paymentRef },
+      },
       depth: 0,
+      limit: 1,
       overrideAccess: true,
       req: req as any,
     });
+    let payment: any = results.docs[0] ?? null;
+
+    // Fallback: extract the Payload payment ID from the prefix (e.g. "68-1719500000000" → "68")
+    if (!payment) {
+      const idPrefix = paymentRef.split('-')[0];
+      if (idPrefix) {
+        try {
+          payment = await payload.findByID({
+            collection: 'payments',
+            id: idPrefix,
+            depth: 0,
+            overrideAccess: true,
+            req: req as any,
+          });
+        } catch {
+          payment = null;
+        }
+      }
+    }
+
     if (!payment?.booking) return null;
     if (typeof payment.booking === 'object') return String((payment.booking as { id: string | number }).id);
     return String(payment.booking);
