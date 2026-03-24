@@ -9,11 +9,18 @@ import { getProgramTitle as getProgramTitleFromBooking, formatCurrency } from '@
 import type { PayloadBooking } from '@/lib/dashboard-api';
 
 const PAYMENT_OPTIONS = [
-  { id: 'paymob-card',   label: 'كارت كريدت / ديبت (Paymob)', provider: 'Paymob', type: 'paymob', method: 'card' as const },
-  { id: 'paymob-wallet', label: 'محفظة إلكترونية (Paymob)', provider: 'Paymob', type: 'paymob', method: 'wallet' as const },
-  { id: 'card',   label: 'كارت كريدت / ديبت (داخل وخارج مصر)', provider: 'EasyKash', type: 'easykash', method: 'card' as const },
-  { id: 'wallet', label: 'محفظة إلكترونية (فودافون كاش، إتصالات، أورنج)', provider: 'EasyKash', type: 'easykash', method: 'wallet' as const },
-  { id: 'fawry',  label: 'فوري / أمان (كاش)', provider: 'EasyKash', type: 'easykash', method: 'fawry' as const },
+  {
+    id: 'card-wallet',
+    label: 'كارت كريدت / ديبت / محفظة إلكترونية',
+    subtitle: 'Visa, Mastercard, فودافون كاش، إتصالات، أورنج',
+    method: 'card' as const,
+  },
+  {
+    id: 'fawry',
+    label: 'فوري / أمان (كاش)',
+    subtitle: 'ادفع كاش في أي فرع فوري أو أمان',
+    method: 'fawry' as const,
+  },
 ];
 
 function formatAmountByCurrency(amount: number, currency: string, locale: string): string {
@@ -35,7 +42,7 @@ export default function CheckoutPage() {
   const availablePaymentOptions = PAYMENT_OPTIONS;
 
   const [selectedOptionId, setSelectedOptionId] = useState(
-    availablePaymentOptions[0]?.id ?? 'fawry',
+    availablePaymentOptions[0]?.id ?? 'card-wallet',
   );
   const [discountCode, setDiscountCode] = useState('');
   const [discountApplied, setDiscountApplied] = useState<{ amount: number; newTotal: number } | null>(null);
@@ -107,6 +114,13 @@ export default function CheckoutPage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'كود غير صالح');
       setDiscountApplied({ amount: data.discountAmount, newTotal: data.newAmount });
+
+      // Refetch booking so payment records reflect the persisted discounted amount
+      const refreshRes = await fetch(`/api/bookings/${bookingId}?depth=2`, { credentials: 'include' });
+      if (refreshRes.ok) {
+        const refreshedBooking = await refreshRes.json();
+        setBooking(refreshedBooking as PayloadBooking);
+      }
     } catch (err: any) {
       const errorMessage =
         typeof err?.message === 'string' && err.message.trim().length > 0
@@ -127,7 +141,7 @@ export default function CheckoutPage() {
     if (!selectedOption) { setSubmitting(false); return; }
 
     try {
-      const apiPath = selectedOption.type === 'paymob' ? '/api/checkout/paymob' : '/api/checkout/easykash';
+      const apiPath = '/api/checkout/easykash';
       const res = await fetch(apiPath, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -227,7 +241,7 @@ export default function CheckoutPage() {
                   <div className={styles.radioCustom} />
                   <div style={{ display: 'flex', flexDirection: 'column' }}>
                     <span>{opt.label}</span>
-                    <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Powered by {opt.provider}</span>
+                    <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{opt.subtitle}</span>
                   </div>
                 </div>
               </div>
