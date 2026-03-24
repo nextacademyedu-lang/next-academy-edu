@@ -78,7 +78,9 @@ export async function POST(req: NextRequest) {
         : {};
 
     // ── 5A. Compatibility fallback to EasyKash when Paymob is disabled ──
-    if (process.env.ENABLE_PAYMOB !== 'true') {
+    const paymobEnabled = process.env.ENABLE_PAYMOB === 'true';
+    console.log(`[paymob/checkout] ENABLE_PAYMOB=${process.env.ENABLE_PAYMOB}, paymobEnabled=${paymobEnabled}, method=${method}`);
+    if (!paymobEnabled) {
       const currency = getBookingCurrency(booking as any);
       // EasyKash rejects duplicate customerReference — append timestamp to make it unique per attempt
       const custRef = `${payment.id}-${Date.now()}`;
@@ -121,6 +123,13 @@ export async function POST(req: NextRequest) {
     }
 
     // ── 5B. Native Paymob flow (if explicitly enabled) ─────────────
+    const integrationId = method === 'wallet'
+      ? process.env.PAYMOB_WALLET_INTEGRATION_ID
+      : process.env.PAYMOB_INTEGRATION_ID;
+    if (!process.env.PAYMOB_API_KEY || !integrationId) {
+      console.error('[paymob/checkout] Missing env vars: PAYMOB_API_KEY=', !!process.env.PAYMOB_API_KEY, 'integrationId=', integrationId);
+      return NextResponse.json({ error: 'Payment gateway not configured' }, { status: 503 });
+    }
     const intention = await createPaymobIntention(session, method, typeof locale === 'string' ? locale : undefined);
 
     await payload.update({
@@ -139,7 +148,11 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ redirectUrl: getPaymobCheckoutUrl(intention.client_secret) });
   } catch (err) {
-    console.error('[paymob/checkout]', err);
-    return NextResponse.json({ error: 'Payment initiation failed' }, { status: 500 });
+    const errorMessage = err instanceof Error ? err.message : String(err);
+    console.error('[paymob/checkout] Error:', errorMessage, err instanceof Error ? err.stack : '');
+    return NextResponse.json(
+      { error: 'Payment initiation failed', details: process.env.NODE_ENV === 'development' ? errorMessage : undefined },
+      { status: 500 },
+    );
   }
 }
