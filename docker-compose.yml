@@ -11,6 +11,8 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
       - ./docker/init-twenty-db.sh:/docker-entrypoint-initdb.d/init-twenty-db.sh:ro
+    ports:
+      - "5432:5432"
     networks:
       - internal
     healthcheck:
@@ -24,6 +26,8 @@ services:
     container_name: nextacademy-redis
     restart: unless-stopped
     command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD}
+    ports:
+      - "6379:6379"
     volumes:
       - redisdata:/data
     networks:
@@ -126,6 +130,8 @@ services:
     image: twentycrm/twenty:${TWENTY_TAG:-latest}
     container_name: nextacademy-twenty-server
     restart: unless-stopped
+    ports:
+      - "3001:3000"
     volumes:
       - twenty_local_data:/app/packages/twenty-server/.local-storage
     environment:
