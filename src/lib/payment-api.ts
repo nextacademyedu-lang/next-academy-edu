@@ -178,7 +178,7 @@ export async function createPaymobIntention(
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${process.env.PAYMOB_API_KEY}`,
+      Authorization: `Token ${process.env.PAYMOB_API_KEY}`,
     },
     body: JSON.stringify(body),
   });
@@ -323,9 +323,34 @@ export function verifyEasyKashHmac(payload: Record<string, unknown>): boolean {
 // Paymob — HMAC Verification
 // ─────────────────────────────────────────────
 
-export function verifyPaymobHmac(params: Record<string, string>, receivedHmac: string): boolean {
+export function verifyPaymobHmac(obj: Record<string, unknown>, receivedHmac: string): boolean {
 
-  // Paymob HMAC: sort keys alphabetically, concat values, SHA512
+  // Paymob HMAC: extract 20 fields in alphabetical order, concat values, SHA512.
+  // Some fields are nested (source_data.pan, order.id) — extract them properly.
+  const getValue = (key: string): string => {
+    switch (key) {
+      case 'source_data_pan': {
+        const sd = obj.source_data as Record<string, unknown> | undefined;
+        return String(sd?.pan ?? '');
+      }
+      case 'source_data_sub_type': {
+        const sd = obj.source_data as Record<string, unknown> | undefined;
+        return String(sd?.sub_type ?? '');
+      }
+      case 'source_data_type': {
+        const sd = obj.source_data as Record<string, unknown> | undefined;
+        return String(sd?.type ?? '');
+      }
+      case 'order': {
+        const order = obj.order;
+        if (order && typeof order === 'object') return String((order as Record<string, unknown>).id ?? '');
+        return String(order ?? '');
+      }
+      default:
+        return String(obj[key] ?? '');
+    }
+  };
+
   const hmacKeys = [
     'amount_cents', 'created_at', 'currency', 'error_occured',
     'has_parent_transaction', 'id', 'integration_id', 'is_3d_secure',
@@ -334,7 +359,7 @@ export function verifyPaymobHmac(params: Record<string, string>, receivedHmac: s
     'source_data_pan', 'source_data_sub_type', 'source_data_type', 'success',
   ];
 
-  const dataStr = hmacKeys.map((k) => params[k] ?? '').join('');
+  const dataStr = hmacKeys.map(getValue).join('');
 
   const calculated = crypto
     .createHmac('sha512', process.env.PAYMOB_HMAC_SECRET!)
