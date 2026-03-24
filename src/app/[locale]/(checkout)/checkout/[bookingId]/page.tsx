@@ -172,7 +172,7 @@ export default function CheckoutPage() {
     if (!selectedOption) { setSubmitting(false); return; }
 
     try {
-      const apiPath = selectedOption.method === 'fawry' ? '/api/checkout/easykash' : '/api/checkout/paymob';
+      const apiPath = '/api/checkout/easykash';
       const res = await fetch(apiPath, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
