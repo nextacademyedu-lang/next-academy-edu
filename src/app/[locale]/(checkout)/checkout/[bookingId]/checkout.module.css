@@ -343,6 +343,28 @@
   background: var(--border-emphasis);
 }
 
+.removeCoupon {
+  background: rgba(255, 60, 60, 0.12);
+  border: none;
+  color: #ff5c5c;
+  padding: 0 12px;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+
+.removeCoupon:hover {
+  background: rgba(255, 60, 60, 0.22);
+}
+
+.removeCoupon:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .securityBadge {
   display: flex;
   align-items: center;

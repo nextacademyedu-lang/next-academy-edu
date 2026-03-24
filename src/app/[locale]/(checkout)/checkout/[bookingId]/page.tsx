@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { ShieldCheck } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { ShieldCheck, X } from 'lucide-react';
 import { useRouter, useParams } from 'next/navigation';
 import { useLocale } from 'next-intl';
 import styles from './checkout.module.css';
@@ -10,10 +10,16 @@ import type { PayloadBooking } from '@/lib/dashboard-api';
 
 const PAYMENT_OPTIONS = [
   {
-    id: 'card-wallet',
-    label: 'كارت كريدت / ديبت / محفظة إلكترونية',
-    subtitle: 'Visa, Mastercard, فودافون كاش، إتصالات، أورنج',
+    id: 'card',
+    label: 'كارت كريدت / ديبت',
+    subtitle: 'Visa, Mastercard',
     method: 'card' as const,
+  },
+  {
+    id: 'wallet',
+    label: 'محفظة إلكترونية',
+    subtitle: 'فودافون كاش، إتصالات كاش، أورنج كاش',
+    method: 'wallet' as const,
   },
   {
     id: 'fawry',
@@ -42,12 +48,13 @@ export default function CheckoutPage() {
   const availablePaymentOptions = PAYMENT_OPTIONS;
 
   const [selectedOptionId, setSelectedOptionId] = useState(
-    availablePaymentOptions[0]?.id ?? 'card-wallet',
+    availablePaymentOptions[0]?.id ?? 'card',
   );
   const [discountCode, setDiscountCode] = useState('');
   const [discountApplied, setDiscountApplied] = useState<{ amount: number; newTotal: number } | null>(null);
   const [discountError, setDiscountError] = useState('');
   const [discountLoading, setDiscountLoading] = useState(false);
+  const [removeDiscountLoading, setRemoveDiscountLoading] = useState(false);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [accessDenied, setAccessDenied] = useState(false);
@@ -132,6 +139,36 @@ export default function CheckoutPage() {
     }
   }
 
+  const handleRemoveDiscount = useCallback(async () => {
+    if (!booking || removeDiscountLoading) return;
+    setRemoveDiscountLoading(true);
+    setDiscountError('');
+    try {
+      const res = await fetch('/api/discount-codes/remove', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ bookingId }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'فشل إزالة الخصم');
+
+      // Reset discount state
+      setDiscountApplied(null);
+      setDiscountCode('');
+
+      // Refetch booking to get restored amounts
+      const refreshRes = await fetch(`/api/bookings/${bookingId}?depth=2`, { credentials: 'include' });
+      if (refreshRes.ok) {
+        setBooking(await refreshRes.json() as PayloadBooking);
+      }
+    } catch (err: any) {
+      setDiscountError(err.message || 'حصلت مشكلة أثناء إزالة الخصم');
+    } finally {
+      setRemoveDiscountLoading(false);
+    }
+  }, [booking, bookingId, removeDiscountLoading]);
+
   async function handleProceed() {
     if (!booking || submitting) return;
     setSubmitting(true);
@@ -141,7 +178,7 @@ export default function CheckoutPage() {
     if (!selectedOption) { setSubmitting(false); return; }
 
     try {
-      const apiPath = '/api/checkout/easykash';
+      const apiPath = selectedOption.method === 'fawry' ? '/api/checkout/easykash' : '/api/checkout/paymob';
       const res = await fetch(apiPath, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -292,13 +329,24 @@ export default function CheckoutPage() {
                 onChange={(e) => { setDiscountCode(e.target.value); setDiscountApplied(null); setDiscountError(''); }}
                 disabled={!!discountApplied || hasPersistedDiscount}
               />
-              <button
-                className={styles.applyBtn}
-                onClick={handleApplyDiscount}
-                disabled={discountLoading || !!discountApplied || hasPersistedDiscount}
-              >
-                {discountLoading ? '…' : discountApplied ? '✓' : 'تطبيق'}
-              </button>
+              {(discountApplied || hasPersistedDiscount) ? (
+                <button
+                  className={styles.removeCoupon}
+                  onClick={handleRemoveDiscount}
+                  disabled={removeDiscountLoading}
+                  title="إزالة الخصم"
+                >
+                  {removeDiscountLoading ? '…' : <X size={16} />}
+                </button>
+              ) : (
+                <button
+                  className={styles.applyBtn}
+                  onClick={handleApplyDiscount}
+                  disabled={discountLoading}
+                >
+                  {discountLoading ? '…' : 'تطبيق'}
+                </button>
+              )}
             </div>
             {hasPersistedDiscount && !discountApplied && (
               <p style={{ color: '#00e397', fontSize: '12px', marginTop: '4px' }}>
