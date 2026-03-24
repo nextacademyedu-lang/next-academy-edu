@@ -4,6 +4,7 @@ import config from '@payload-config';
 import { authenticateRequestUser } from '@/lib/server-auth';
 import crypto from 'node:crypto';
 import { assertTrustedWriteRequest } from '@/lib/csrf';
+import { atomicIncrement, atomicIncrementWithLimit, atomicIncrementWithCeiling } from '@/lib/atomic-db';
 
 function generateCode(prefix: string): string {
   const random = crypto.randomBytes(3).toString('hex').toUpperCase();
@@ -106,15 +107,21 @@ export async function POST(req: NextRequest) {
           : Math.min(discount.value, basePrice);
         appliedDiscountCode = discount.code;
 
-        // Increment usage
+        // Atomically increment currentUses — returns null if maxUses ceiling reached
         stage = 'increment_discount_uses';
-        await payload.update({
-          collection: 'discount-codes',
-          id: discount.id,
-          data: { currentUses: (discount.currentUses || 0) + 1 },
-          overrideAccess: true,
-          req: req as any,
-        });
+        if (discount.maxUses) {
+          const newUses = await atomicIncrementWithLimit(
+            'discount_codes', discount.id, 'current_uses', 1, discount.maxUses,
+          );
+          if (newUses === null) {
+            // Another request used the last slot — discard the discount
+            discountAmount = 0;
+            appliedDiscountCode = undefined;
+          }
+        } else {
+          // No limit — just increment
+          await atomicIncrement('discount_codes', discount.id, 'current_uses', 1);
+        }
       }
     }
 
@@ -189,18 +196,49 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // ── Increment round enrollments ───────────────────────────────────────
+    // ── Atomically increment enrollments (single SQL statement) ────────────
+    // Returns null if current_enrollments + 1 would exceed max_capacity.
     stage = 'increment_round_enrollments';
-    await payload.update({
-      collection: 'rounds',
-      id: normalizedRoundId,
-      data: {
-        currentEnrollments: (round.currentEnrollments ?? 0) + 1,
-        status: (round.currentEnrollments ?? 0) + 1 >= round.maxCapacity && round.autoCloseOnFull ? 'full' : round.status,
-      },
-      overrideAccess: true,
-      req: req as any,
-    });
+    const newEnrollments = await atomicIncrementWithCeiling(
+      'rounds', normalizedRoundId, 'current_enrollments', 1, 'max_capacity',
+    );
+
+    if (newEnrollments === null) {
+      // Capacity filled by a concurrent request — abort gracefully
+      // Roll back discount usage atomically if it was incremented
+      if (appliedDiscountCode) {
+        const dcResult = await payload.find({
+          collection: 'discount-codes',
+          where: { code: { equals: appliedDiscountCode } },
+          limit: 1,
+          overrideAccess: true,
+        });
+        const dc = dcResult.docs[0];
+        if (dc) {
+          await atomicIncrement('discount_codes', dc.id, 'current_uses', -1);
+        }
+      }
+      // Mark the booking as cancelled since we can't actually enroll
+      await payload.update({
+        collection: 'bookings',
+        id: booking.id,
+        data: { status: 'cancelled' as const },
+        overrideAccess: true,
+        req: req as any,
+      });
+      return NextResponse.json({ error: 'الراوند ممتلئ' }, { status: 400 });
+    }
+
+    // Auto-close round if now full
+    if (round.autoCloseOnFull && newEnrollments >= round.maxCapacity) {
+      await payload.update({
+        collection: 'rounds',
+        id: normalizedRoundId,
+        data: { status: 'full' },
+        overrideAccess: true,
+        req: req as any,
+      });
+    }
 
     stage = 'done';
     return NextResponse.json({ bookingId: booking.id, bookingCode: booking.bookingCode });

@@ -1,6 +1,7 @@
 import { getPayload } from 'payload';
 import config from '@payload-config';
 import { sendBookingConfirmation } from '@/lib/email';
+import { atomicIncrement } from '@/lib/atomic-db';
 
 /**
  * Shared post-payment logic used by all webhook handlers (Paymob, EasyKash, etc).
@@ -94,7 +95,17 @@ export async function processSuccessfulPayment(opts: {
     req: reqForHooks,
   });
 
-  // ── 6. Update booking — re-read to avoid stale paidAmount ────────
+  // ── 6. Atomically increment paidAmount ─────────────────────────────────
+  // Uses SQL `SET paid_amount = paid_amount + X` to prevent two concurrent
+  // webhooks from double-crediting the same payment amount.
+  const newPaid = await atomicIncrement(
+    'bookings', bookingId, 'paid_amount', payment.amount,
+  );
+
+  // If the booking row doesn't exist, atomicIncrement returns null
+  if (newPaid === null) return true;
+
+  // Re-read to get finalAmount for status calculation
   const booking = await payload.findByID({
     collection: 'bookings',
     id: bookingId,
@@ -105,7 +116,6 @@ export async function processSuccessfulPayment(opts: {
 
   if (!booking) return true;
 
-  const newPaid = (booking.paidAmount || 0) + payment.amount;
   const isFullyPaid = newPaid >= booking.finalAmount;
 
   await payload.update({
@@ -113,7 +123,6 @@ export async function processSuccessfulPayment(opts: {
     id: bookingId,
     data: {
       status: isFullyPaid ? 'confirmed' : 'pending',
-      paidAmount: newPaid,
       remainingAmount: Math.max(0, booking.finalAmount - newPaid),
     },
     overrideAccess: true,

@@ -4,6 +4,7 @@ import config from '@payload-config';
 import { isAdminUser } from '@/lib/access-control';
 import { authenticateRequestUser } from '@/lib/server-auth';
 import { assertTrustedWriteRequest } from '@/lib/csrf';
+import { atomicIncrement, atomicIncrementWithLimit } from '@/lib/atomic-db';
 
 function normalizeCode(value: unknown): string {
   if (typeof value !== 'string') return '';
@@ -116,6 +117,11 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    // Guard: prevent double-discount
+    if ((booking.discountAmount ?? 0) > 0) {
+      return NextResponse.json({ error: 'تم تطبيق خصم مسبقًا على هذا الحجز' }, { status: 400 });
+    }
+
     // Calculate discount amount server-side
     const originalAmount = booking.finalAmount;
     let discountAmount = 0;
@@ -127,6 +133,54 @@ export async function POST(req: NextRequest) {
     }
 
     const newAmount = originalAmount - discountAmount;
+
+    // ── Persist discount to booking ────────────────────────────
+    await payload.update({
+      collection: 'bookings',
+      id: bookingId,
+      data: {
+        discountCode: String(discount.id),
+        discountAmount,
+        finalAmount: newAmount,
+        remainingAmount: Math.max(0, newAmount - (booking.paidAmount || 0)),
+      },
+      overrideAccess: true,
+    });
+
+    // ── Recalculate pending payment amounts ────────────────────
+    const pendingPayments = await payload.find({
+      collection: 'payments',
+      where: { booking: { equals: bookingId }, status: { equals: 'pending' } },
+      sort: 'installmentNumber',
+      limit: 50,
+      overrideAccess: true,
+    });
+
+    for (const pmt of pendingPayments.docs) {
+      const pct = originalAmount > 0 ? pmt.amount / originalAmount : 1;
+      const recalculated = Math.round(newAmount * pct);
+      await payload.update({
+        collection: 'payments',
+        id: pmt.id,
+        data: { amount: recalculated },
+        overrideAccess: true,
+      });
+    }
+
+    // ── Atomically increment discount code usage ──────────────
+    if (discount.maxUses) {
+      const newUses = await atomicIncrementWithLimit(
+        'discount_codes', discount.id, 'current_uses', 1, discount.maxUses,
+      );
+      if (newUses === null) {
+        return NextResponse.json(
+          { error: 'كود الخصم وصل للحد الأقصى من الاستخدام' },
+          { status: 400 },
+        );
+      }
+    } else {
+      await atomicIncrement('discount_codes', discount.id, 'current_uses', 1);
+    }
 
     return NextResponse.json({
       valid: true,
