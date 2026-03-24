@@ -10,16 +10,10 @@ import type { PayloadBooking } from '@/lib/dashboard-api';
 
 const PAYMENT_OPTIONS = [
   {
-    id: 'card',
-    label: 'كارت كريدت / ديبت',
-    subtitle: 'Visa, Mastercard',
+    id: 'card-wallet',
+    label: 'كارت / محفظة إلكترونية',
+    subtitle: 'Visa, Mastercard, فودافون كاش، أورنج كاش',
     method: 'card' as const,
-  },
-  {
-    id: 'wallet',
-    label: 'محفظة إلكترونية',
-    subtitle: 'فودافون كاش، إتصالات كاش، أورنج كاش',
-    method: 'wallet' as const,
   },
   {
     id: 'fawry',
@@ -48,7 +42,7 @@ export default function CheckoutPage() {
   const availablePaymentOptions = PAYMENT_OPTIONS;
 
   const [selectedOptionId, setSelectedOptionId] = useState(
-    availablePaymentOptions[0]?.id ?? 'card',
+    availablePaymentOptions[0]?.id ?? 'card-wallet',
   );
   const [discountCode, setDiscountCode] = useState('');
   const [discountApplied, setDiscountApplied] = useState<{ amount: number; newTotal: number } | null>(null);
