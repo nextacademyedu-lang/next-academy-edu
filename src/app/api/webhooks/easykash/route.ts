@@ -59,7 +59,10 @@ export async function POST(req: NextRequest) {
     // composite customerReference (e.g. "68-1719500000000" → "68").
     if (!payment && customerReference) {
       const idPrefix = customerReference.split('-')[0];
-      if (idPrefix) {
+      // Guard: only attempt lookup if the prefix looks like a reasonable
+      // integer payment ID (safe for a 32-bit int column).
+      const prefixNum = Number(idPrefix);
+      if (idPrefix && Number.isInteger(prefixNum) && prefixNum > 0 && prefixNum <= 2_147_483_647) {
         try {
           payment = await payload.findByID({
             collection: 'payments',
@@ -75,21 +78,26 @@ export async function POST(req: NextRequest) {
     }
 
     // Fallback: some integrations send booking id as customerReference.
+    // Only attempt if customerReference is a safe 32-bit integer to avoid
+    // PostgreSQL "value out of range for type integer" errors.
     if (!payment && customerReference) {
-      const byBooking = await payload.find({
-        collection: 'payments',
-        where: {
-          and: [
-            { booking: { equals: customerReference } },
-            { status: { in: ['pending', 'overdue'] } },
-          ],
-        },
-        sort: '-createdAt',
-        limit: 1,
-        overrideAccess: true,
-        req: req as any,
-      });
-      payment = byBooking.docs[0];
+      const refNum = Number(customerReference);
+      if (Number.isInteger(refNum) && refNum > 0 && refNum <= 2_147_483_647) {
+        const byBooking = await payload.find({
+          collection: 'payments',
+          where: {
+            and: [
+              { booking: { equals: customerReference } },
+              { status: { in: ['pending', 'overdue'] } },
+            ],
+          },
+          sort: '-createdAt',
+          limit: 1,
+          overrideAccess: true,
+          req: req as any,
+        });
+        payment = byBooking.docs[0];
+      }
     }
 
     if (!payment) {

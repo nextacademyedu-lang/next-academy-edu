@@ -82,6 +82,9 @@ export async function POST(req: NextRequest) {
       const currency = getBookingCurrency(booking as any);
       // EasyKash rejects duplicate customerReference — append timestamp to make it unique per attempt
       const custRef = `${payment.id}-${Date.now()}`;
+      // EasyKash strips dashes internally, so store the stripped version in the DB
+      // so the webhook lookup by paymentGatewayResponse.customerReference matches.
+      const custRefStripped = custRef.replace(/-/g, '');
       const directPay = await createEasyKashDirectPay(session, {
         currency,
         locale: typeof locale === 'string' ? locale : undefined,
@@ -102,7 +105,7 @@ export async function POST(req: NextRequest) {
             flow: 'directpay',
             method: selectedMethod,
             currency,
-            customerReference: custRef,
+            customerReference: custRefStripped,
             redirectUrl: directPay.redirectUrl,
             productCode,
           },
