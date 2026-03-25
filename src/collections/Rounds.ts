@@ -186,6 +186,27 @@ export const Rounds: CollectionConfig = {
         return next;
       },
     ],
+    beforeDelete: [
+      async ({ req, id }) => {
+        // Delete all sessions belonging to this round first to avoid FK constraint violations.
+        const existingSessions = await req.payload.find({
+          collection: 'sessions',
+          where: { round: { equals: id } },
+          depth: 0,
+          limit: 500,
+          overrideAccess: true,
+          req,
+        });
+        for (const session of existingSessions.docs) {
+          await req.payload.delete({
+            collection: 'sessions',
+            id: (session as { id: number | string }).id,
+            overrideAccess: true,
+            req,
+          });
+        }
+      },
+    ],
     afterChange: [
       async ({ req, doc }) => {
         await syncSessionsFromRoundPlan({
@@ -196,6 +217,7 @@ export const Rounds: CollectionConfig = {
       },
     ],
   },
+
   fields: [
     { name: 'program', type: 'relationship', relationTo: 'programs', required: true },
     {
