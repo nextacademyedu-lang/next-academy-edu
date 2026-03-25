@@ -221,7 +221,6 @@ export const Rounds: CollectionConfig = {
     {
       name: 'startDate',
       type: 'date',
-      required: true,
       admin: {
         description: 'Auto-synced from the earliest session date when Session Plan is filled.',
       },
