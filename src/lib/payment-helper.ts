@@ -62,9 +62,13 @@ export async function processSuccessfulPayment(opts: {
   }
 
   // ── 4. Amount validation ─────────────────────────────────────────
+  // EasyKash (and some gateways) return the Amount *inclusive* of
+  // processing fees.  We must only reject genuine underpayments;
+  // overpayments are expected and safe to accept.
   const expectedCents = Math.round(payment.amount * 100);
-  if (Math.abs(receivedAmountCents - expectedCents) > 1) {
-    console.error('[payment-helper] Amount mismatch', {
+  if (receivedAmountCents < expectedCents - 1) {
+    // Genuine underpayment → reject
+    console.error('[payment-helper] Amount underpaid', {
       expected: expectedCents,
       received: receivedAmountCents,
     });
@@ -73,12 +77,20 @@ export async function processSuccessfulPayment(opts: {
       id: payment.id,
       data: {
         status: 'failed',
-        paymentGatewayResponse: { ...gatewayResponse, _error: 'amount_mismatch' },
+        paymentGatewayResponse: { ...gatewayResponse, _error: 'amount_underpaid' },
       },
       overrideAccess: true,
       req: reqForHooks,
     });
     return false;
+  }
+  if (receivedAmountCents > expectedCents + 1) {
+    // Overpayment (gateway fees) — log but continue
+    console.warn('[payment-helper] Amount includes gateway fees', {
+      expected: expectedCents,
+      received: receivedAmountCents,
+      diff: receivedAmountCents - expectedCents,
+    });
   }
 
   // ── 5. Mark payment as paid ──────────────────────────────────────
