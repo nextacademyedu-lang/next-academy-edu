@@ -201,7 +201,7 @@ export const Rounds: CollectionConfig = {
       type: 'array',
       fields: [
         { name: 'title', type: 'text' },
-        { name: 'date', type: 'date', required: true },
+        { name: 'date', type: 'date' },
         { name: 'startTime', type: 'text', required: true, defaultValue: '10:00' },
         { name: 'endTime', type: 'text', required: true, defaultValue: '12:00' },
         {
