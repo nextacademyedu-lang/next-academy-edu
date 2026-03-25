@@ -152,7 +152,7 @@ export async function GET(req: NextRequest) {
 
     const programIds = programs.map((program) => program.id);
 
-    const [roundsResult, reviewsResult] = await Promise.all([
+    const [roundsSettled, reviewsSettled] = await Promise.allSettled([
       payload.find({
         collection: 'rounds',
         where: { program: { in: programIds } },
@@ -172,6 +172,13 @@ export async function GET(req: NextRequest) {
         limit: 2000,
       }),
     ]);
+
+    const roundsResult = roundsSettled.status === 'fulfilled'
+      ? roundsSettled.value
+      : { docs: [] as Round[] };
+    const reviewsResult = reviewsSettled.status === 'fulfilled'
+      ? reviewsSettled.value
+      : { docs: [] as Review[] };
 
     const roundsByProgram = new Map<number, Round[]>();
     for (const roundDoc of roundsResult.docs as Round[]) {

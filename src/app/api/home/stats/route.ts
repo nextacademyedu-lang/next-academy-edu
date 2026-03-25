@@ -17,12 +17,7 @@ export async function GET() {
   try {
     const payload = await getPayload({ config });
 
-    const [
-      completedBookings,
-      successfulBookings,
-      companies,
-      activeInstructors,
-    ] = await Promise.all([
+    const results = await Promise.allSettled([
       payload.find({
         collection: 'bookings',
         where: { status: { equals: 'completed' } },
@@ -48,11 +43,22 @@ export async function GET() {
       }),
     ]);
 
-    const professionals = successfulBookings.totalDocs || 0;
-    const partners = companies.totalDocs || 0;
-    const instructors = activeInstructors.totalDocs || 0;
+    const safeTotal = (r: PromiseSettledResult<{ totalDocs: number }>) =>
+      r.status === 'fulfilled' ? r.value.totalDocs : 0;
+
+    // Log any individual failures without breaking the whole response
+    results.forEach((r, i) => {
+      if (r.status === 'rejected') {
+        const labels = ['completedBookings', 'successfulBookings', 'companies', 'instructors'];
+        console.error(`[api/home/stats] ${labels[i]} query failed:`, r.reason);
+      }
+    });
+
+    const professionals = safeTotal(results[1]);
+    const partners = safeTotal(results[2]);
+    const instructors = safeTotal(results[3]);
     const completionRate = professionals > 0
-      ? Math.round(((completedBookings.totalDocs || 0) / professionals) * 100)
+      ? Math.round((safeTotal(results[0]) / professionals) * 100)
       : 0;
 
     const stats: StatsResponse = {

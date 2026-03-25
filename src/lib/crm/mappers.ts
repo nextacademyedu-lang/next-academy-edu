@@ -31,6 +31,18 @@ function extractProgramTitle(round: unknown): string | undefined {
   return getString(programObj.titleAr) || getString(programObj.titleEn);
 }
 
+function extractInterestedInPrograms(value: unknown): string | undefined {
+  if (!Array.isArray(value) || value.length === 0) return undefined;
+  const titles = value
+    .map((item) => {
+      if (!item || typeof item !== 'object') return null;
+      const obj = item as Record<string, unknown>;
+      return getString(obj.titleAr) || getString(obj.titleEn) || getString(obj.title) || null;
+    })
+    .filter(Boolean) as string[];
+  return titles.length > 0 ? titles.join(', ') : undefined;
+}
+
 function buildUserDisplayName(user?: Record<string, unknown> | null): string | undefined {
   if (!user) return undefined;
   const firstName = getString(user.firstName) || '';
@@ -57,6 +69,7 @@ export function mapCompanyToCrm(company: Record<string, unknown>) {
     website: getString(company.website),
     country: getString(company.country),
     city: getString(company.city),
+    logo: getString(company.logo),
     sourceSystem: 'nextacademy',
     lastSyncedAt: new Date().toISOString(),
   };
@@ -86,6 +99,7 @@ export function mapUserToCrmContact(params: {
     preferredLanguage: getString(user.preferredLanguage) || 'ar',
     emailVerified: Boolean(user.emailVerified),
     lastLogin: toIso(user.lastLogin),
+    createdAt: toIso(user.createdAt),
     newsletterOptIn: Boolean(user.newsletterOptIn),
     whatsappOptIn: Boolean(user.whatsappOptIn),
     instructorExternalId: normalizeId(user.instructorId)
@@ -139,6 +153,7 @@ export function mapUserToTwentyPerson(params: {
     },
     jobTitle: (profile ? getString(profile.jobTitle) : undefined) || '',
     city: (profile ? getString(profile.city) : undefined) || '',
+    createdAt: toIso(user.createdAt) || '',
   };
 }
 
@@ -160,6 +175,7 @@ export function mapLeadToCrm(lead: Record<string, unknown>) {
     status: getString(lead.status) || 'new',
     priority: getString(lead.priority) || 'medium',
     lostReason: getString(lead.lostReason),
+    interestedInPrograms: extractInterestedInPrograms(lead.interestedIn),
     convertedAt: toIso(lead.convertedAt),
     convertedUserExternalId: normalizeId(lead.convertedUser)
       ? makeEntityExternalId('user', normalizeId(lead.convertedUser)!)

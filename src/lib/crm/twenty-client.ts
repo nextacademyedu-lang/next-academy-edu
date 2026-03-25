@@ -266,14 +266,64 @@ export class TwentyClient {
     if (!normalized) return null;
     if (this.getResourcePath('contacts') !== 'people') return null;
 
-    const raw = await this.request('GET', '/rest/people?limit=200');
-    const people = extractListFromResponse(raw);
-    for (const person of people) {
-      const primary = extractPrimaryEmail(person)?.trim().toLowerCase();
-      if (primary && primary === normalized) {
-        const id = extractRecordId(person);
-        if (id) return id;
+    const encoded = encodeURIComponent(normalized);
+
+    // Try server-side filter queries first (avoids fetching all records)
+    const filterPaths = [
+      `/rest/people?filter[emails][primaryEmail][eq]=${encoded}&limit=5`,
+      `/rest/people?where[emails][primaryEmail][equals]=${encoded}&limit=5`,
+    ];
+
+    for (const path of filterPaths) {
+      try {
+        const result = await this.request('GET', path);
+        const list = extractListFromResponse(result);
+        for (const person of list) {
+          const primary = extractPrimaryEmail(person)?.trim().toLowerCase();
+          if (primary && primary === normalized) {
+            const id = extractRecordId(person);
+            if (id) return id;
+          }
+        }
+        // If the filter was accepted (no error) but returned no match, we're done
+        if (list.length === 0) continue;
+        return null;
+      } catch (error) {
+        const msg = safeErrorMessage(error);
+        if (msg.includes('404') || msg.includes('400') || msg.includes('not found')) {
+          continue;
+        }
+        throw error;
       }
+    }
+
+    // Fallback: paginated client-side scan (only when filter syntax unsupported)
+    let cursor: string | undefined;
+    const pageSize = 50;
+    const maxPages = 20; // Safety cap: 1000 records max
+
+    for (let page = 0; page < maxPages; page++) {
+      const qs = cursor
+        ? `/rest/people?limit=${pageSize}&after=${encodeURIComponent(cursor)}`
+        : `/rest/people?limit=${pageSize}`;
+
+      const raw = await this.request('GET', qs);
+      const people = extractListFromResponse(raw);
+      if (people.length === 0) break;
+
+      for (const person of people) {
+        const primary = extractPrimaryEmail(person)?.trim().toLowerCase();
+        if (primary && primary === normalized) {
+          const id = extractRecordId(person);
+          if (id) return id;
+        }
+      }
+
+      // Extract cursor for next page
+      const lastPerson = people[people.length - 1];
+      const lastId = extractRecordId(lastPerson);
+      if (!lastId || people.length < pageSize) break;
+      cursor = lastId;
     }
 
     return null;
