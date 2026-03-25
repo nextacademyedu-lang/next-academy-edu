@@ -143,30 +143,9 @@ export const Sessions: CollectionConfig = {
         return next;
       },
     ],
-    afterChange: [
-      async ({ req, doc, previousDoc }) => {
-        const payload = req.payload;
-        const affectedRoundIds = new Set<number | string>();
+    afterChange: [],
+    afterDelete: [],
 
-        const currentRoundId = normalizeRelationId((doc as { round?: unknown })?.round);
-        if (currentRoundId !== null) affectedRoundIds.add(currentRoundId);
-
-        const previousRoundId = normalizeRelationId((previousDoc as { round?: unknown } | undefined)?.round);
-        if (previousRoundId !== null) affectedRoundIds.add(previousRoundId);
-
-        for (const roundId of affectedRoundIds) {
-          await syncRoundDateRange({ payload, roundId, req });
-        }
-      },
-    ],
-    afterDelete: [
-      async ({ req, doc }) => {
-        const payload = req.payload;
-        const roundId = normalizeRelationId((doc as { round?: unknown } | undefined)?.round);
-        if (roundId === null) return;
-        await syncRoundDateRange({ payload, roundId, req });
-      },
-    ],
     afterRead: [
       ({ doc }) => {
         const current = (doc || {}) as SessionLike;
