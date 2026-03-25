@@ -42,6 +42,30 @@ export const Bookings: CollectionConfig = {
     delete: isAdmin,
   },
   hooks: {
+    beforeDelete: [
+      async ({ req, id }) => {
+        const deleteByBooking = async (collection: string) => {
+          const found = await req.payload.find({
+            collection: collection as any,
+            where: { booking: { equals: id } },
+            depth: 0,
+            limit: 500,
+            overrideAccess: true,
+            req,
+          });
+          for (const doc of found.docs) {
+            await req.payload.delete({
+              collection: collection as any,
+              id: (doc as { id: number | string }).id,
+              overrideAccess: true,
+              req,
+            });
+          }
+        };
+        await deleteByBooking('reviews');
+        await deleteByBooking('payments');
+      },
+    ],
     afterChange: [
       async ({ req, doc, previousDoc, operation }) => {
         const action = resolveBookingAction({

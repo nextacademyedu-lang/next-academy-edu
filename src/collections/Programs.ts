@@ -93,6 +93,44 @@ export const Programs: CollectionConfig = {
     delete: isAdmin,
   },
   hooks: {
+    beforeDelete: [
+      async ({ req, id }) => {
+        // Delete all rounds first (each round's beforeDelete will cascade to its sessions).
+        const existingRounds = await req.payload.find({
+          collection: 'rounds',
+          where: { program: { equals: id } },
+          depth: 0,
+          limit: 500,
+          overrideAccess: true,
+          req,
+        });
+        for (const round of existingRounds.docs) {
+          await req.payload.delete({
+            collection: 'rounds',
+            id: (round as { id: number | string }).id,
+            overrideAccess: true,
+            req,
+          });
+        }
+        // Clean up reviews referencing this program.
+        const reviews = await req.payload.find({
+          collection: 'reviews',
+          where: { program: { equals: id } },
+          depth: 0,
+          limit: 500,
+          overrideAccess: true,
+          req,
+        });
+        for (const review of reviews.docs) {
+          await req.payload.delete({
+            collection: 'reviews',
+            id: (review as { id: number | string }).id,
+            overrideAccess: true,
+            req,
+          });
+        }
+      },
+    ],
     afterChange: [
       async ({ req, doc }) => {
         await ensureProgramRounds({

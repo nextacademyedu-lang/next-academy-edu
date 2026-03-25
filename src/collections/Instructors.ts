@@ -10,6 +10,34 @@ export const Instructors: CollectionConfig = {
     update: isAdmin,
     delete: isAdmin,
   },
+  hooks: {
+    beforeDelete: [
+      async ({ req, id }) => {
+        const deleteByInstructor = async (collection: string) => {
+          const found = await req.payload.find({
+            collection: collection as any,
+            where: { instructor: { equals: id } },
+            depth: 0,
+            limit: 500,
+            overrideAccess: true,
+            req,
+          });
+          for (const doc of found.docs) {
+            await req.payload.delete({
+              collection: collection as any,
+              id: (doc as { id: number | string }).id,
+              overrideAccess: true,
+              req,
+            });
+          }
+        };
+        await deleteByInstructor('instructor-blocked-dates');
+        await deleteByInstructor('consultation-slots');
+        // Delete consultation types last (slots reference them)
+        await deleteByInstructor('consultation-types');
+      },
+    ],
+  },
   fields: [
     { name: 'firstName', type: 'text', required: true },
     { name: 'lastName', type: 'text', required: true },

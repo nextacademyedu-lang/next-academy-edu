@@ -35,6 +35,36 @@ export const Users: CollectionConfig = {
     admin: async ({ req }) => isAdminRequest(req),
   },
   hooks: {
+    beforeDelete: [
+      async ({ req, id }) => {
+        const deleteByUser = async (collection: string, field = 'user') => {
+          const found = await req.payload.find({
+            collection: collection as any,
+            where: { [field]: { equals: id } },
+            depth: 0,
+            limit: 1000,
+            overrideAccess: true,
+            req,
+          });
+          for (const doc of found.docs) {
+            await req.payload.delete({
+              collection: collection as any,
+              id: (doc as { id: number | string }).id,
+              overrideAccess: true,
+              req,
+            });
+          }
+        };
+        // Order matters: bookings → reviews/payments (handled by Bookings beforeDelete)
+        await deleteByUser('bookings');
+        await deleteByUser('user-profiles');
+        await deleteByUser('notifications');
+        await deleteByUser('waitlist');
+        await deleteByUser('installment-requests');
+        await deleteByUser('verification-codes');
+        await deleteByUser('consultation-bookings');
+      },
+    ],
     beforeChange: [
       async ({ req, data, originalDoc, operation, context }) => {
         const isAdminActor = await isAdminRequest(req);

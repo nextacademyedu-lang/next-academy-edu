@@ -188,25 +188,37 @@ export const Rounds: CollectionConfig = {
     ],
     beforeDelete: [
       async ({ req, id }) => {
-        // Delete all sessions belonging to this round first to avoid FK constraint violations.
-        const existingSessions = await req.payload.find({
-          collection: 'sessions',
-          where: { round: { equals: id } },
-          depth: 0,
-          limit: 500,
-          overrideAccess: true,
-          req,
-        });
-        for (const session of existingSessions.docs) {
-          await req.payload.delete({
-            collection: 'sessions',
-            id: (session as { id: number | string }).id,
+        // Helper to bulk-delete a collection filtered by round
+        const deleteByRound = async (collection: string) => {
+          const found = await req.payload.find({
+            collection: collection as any,
+            where: { round: { equals: id } },
+            depth: 0,
+            limit: 1000,
             overrideAccess: true,
             req,
           });
-        }
+          for (const doc of found.docs) {
+            await req.payload.delete({
+              collection: collection as any,
+              id: (doc as { id: number | string }).id,
+              overrideAccess: true,
+              req,
+            });
+          }
+        };
+
+        // Delete children that reference this round (order matters for nested FKs)
+        await deleteByRound('sessions');
+        await deleteByRound('waitlist');
+        await deleteByRound('payment-plans');
+        await deleteByRound('payment-links');
+        await deleteByRound('installment-requests');
+        await deleteByRound('reviews');
+        await deleteByRound('bookings');
       },
     ],
+
     afterChange: [
       async ({ req, doc }) => {
         await syncSessionsFromRoundPlan({
