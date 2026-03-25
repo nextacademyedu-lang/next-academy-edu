@@ -95,6 +95,7 @@ export async function POST(req: NextRequest) {
       await payload.update({
         collection: 'payments',
         id: payment.id,
+        overrideAccess: true,
         data: {
           // Keeping existing enum compatibility: card/wallet had been represented as "paymob".
           paymentMethod: 'paymob',
@@ -113,7 +114,6 @@ export async function POST(req: NextRequest) {
             ? `EasyKash DirectPay (${selectedMethod}) | ProductCode: ${productCode}`
             : `EasyKash DirectPay (${selectedMethod})`,
         },
-        req: req as any,
       });
 
       return NextResponse.json({
@@ -132,6 +132,7 @@ export async function POST(req: NextRequest) {
     await payload.update({
       collection: 'payments',
       id: payment.id,
+      overrideAccess: true,
       data: {
         paymentMethod: 'fawry',
         transactionId: cashResult.easykashRef,
@@ -144,7 +145,6 @@ export async function POST(req: NextRequest) {
         },
         notes: `Voucher: ${cashResult.voucher} | Provider: ${cashResult.provider} | Expires: ${cashResult.expiryDate}`,
       },
-      req: req as any,
     });
 
     return NextResponse.json({
