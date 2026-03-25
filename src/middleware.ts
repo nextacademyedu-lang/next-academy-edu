@@ -18,9 +18,11 @@ export default function middleware(request: NextRequest) {
 
 export const config = {
   // Match all pathnames except:
+  // - /api (API routes — must not be locale-redirected)
+  // - /admin (Payload CMS admin panel)
   // - /_next (Next.js internals)
   // - /favicon.ico, /robots.txt, etc.
   matcher: [
-    '/((?!_next|_vercel|favicon\\.ico|robots\\.txt|sitemap\\.xml|.*\\..*).*)',
+    '/((?!api|admin|_next|_vercel|favicon\\.ico|robots\\.txt|sitemap\\.xml|.*\\..*).*)',
   ],
 };
