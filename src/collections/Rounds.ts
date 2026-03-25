@@ -165,7 +165,19 @@ export const Rounds: CollectionConfig = {
     beforeChange: [
       ({ data, originalDoc }) => {
         const next = { ...(data || {}) } as RoundLike & Record<string, unknown>;
-        const currentPlan = normalizeSessionPlan(next.sessionPlan ?? (originalDoc as RoundLike | undefined)?.sessionPlan);
+
+        // Only auto-sync dates when sessionPlan was explicitly changed by the user.
+        // If the user is editing other fields (e.g. endDate manually), preserve their value.
+        const incomingPlan = next.sessionPlan;
+        const originalPlan = (originalDoc as RoundLike | undefined)?.sessionPlan;
+
+        const planChanged =
+          incomingPlan !== undefined &&
+          JSON.stringify(incomingPlan) !== JSON.stringify(originalPlan);
+
+        if (!planChanged) return next;
+
+        const currentPlan = normalizeSessionPlan(incomingPlan);
         const dateRange = getDateRangeFromPlan(currentPlan);
         if (!dateRange) return next;
 
