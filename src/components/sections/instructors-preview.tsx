@@ -3,7 +3,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import useEmblaCarousel from 'embla-carousel-react';
 import { Button } from '@/components/ui/button';
 import styles from './instructors-preview.module.css';
@@ -18,6 +18,7 @@ type Instructor = {
 
 export function InstructorsPreview() {
   const t = useTranslations('Instructors');
+  const locale = useLocale();
   const [emblaRef, emblaApi] = useEmblaCarousel({ align: 'center', loop: true, startIndex: 1, dragFree: true });
   const [selectedIndex, setSelectedIndex] = React.useState(1);
   const [instructors, setInstructors] = useState<Instructor[]>([]);
@@ -79,21 +80,23 @@ export function InstructorsPreview() {
             <div className={styles.embla__container}>
               {displayInstructors.map((instructor, index) => (
                 <div key={instructor.id} className={`${styles.embla__slide} ${index === selectedIndex ? styles.activeSlide : ''}`}>
-                  <div className={styles.minimalCard}>
-                    <div className={styles.imageContainer}>
-                      {instructor.image ? (
-                        <img src={instructor.image} alt={instructor.name} className={styles.instructorImage} />
-                      ) : (
-                        <div className={styles.instructorImage} style={{ background: 'var(--bg-muted)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '2rem', color: 'var(--text-secondary)' }}>
-                          {instructor.name.charAt(0)}
-                        </div>
-                      )}
+                  <Link href={`/${locale}/instructors/${instructor.slug}`} className={styles.cardLink}>
+                    <div className={styles.minimalCard}>
+                      <div className={styles.imageContainer}>
+                        {instructor.image ? (
+                          <img src={instructor.image} alt={instructor.name} className={styles.instructorImage} />
+                        ) : (
+                          <div className={styles.instructorImage} style={{ background: 'var(--bg-muted)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '2rem', color: 'var(--text-secondary)' }}>
+                            {instructor.name.charAt(0)}
+                          </div>
+                        )}
+                      </div>
+                      <div className={styles.infoContainer}>
+                        <h3 className={styles.minimalName}>{instructor.name}</h3>
+                        <p className={styles.minimalRole}>{instructor.title}</p>
+                      </div>
                     </div>
-                    <div className={styles.infoContainer}>
-                      <h3 className={styles.minimalName}>{instructor.name}</h3>
-                      <p className={styles.minimalRole}>{instructor.title}</p>
-                    </div>
-                  </div>
+                  </Link>
                 </div>
               ))}
             </div>

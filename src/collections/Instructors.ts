@@ -19,6 +19,7 @@ export const Instructors: CollectionConfig = {
     { name: 'jobTitle', type: 'text' },
     { name: 'tagline', type: 'text' },
     { name: 'picture', type: 'upload', relationTo: 'media' },
+    { name: 'coverImage', type: 'upload', relationTo: 'media' },
     { name: 'linkedinUrl', type: 'text' },
     { name: 'twitterUrl', type: 'text' },
     { name: 'email', type: 'email' },

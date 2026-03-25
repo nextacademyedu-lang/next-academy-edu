@@ -9,6 +9,8 @@
 }
 
 .hero {
+  position: relative;
+  overflow: hidden;
   border-bottom: 1px solid var(--border-subtle);
   background:
     radial-gradient(circle at 14% 16%, var(--accent-gold-15), transparent 34%),
@@ -16,7 +18,29 @@
     linear-gradient(180deg, var(--bg-surface-2) 0%, var(--bg-main) 100%);
 }
 
+.coverImageWrap {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.coverImage {
+  object-fit: cover;
+}
+
+.coverOverlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(2, 5, 4, 0.55) 0%,
+    rgba(2, 5, 4, 0.85) 100%
+  );
+}
+
 .heroContainer {
+  position: relative;
+  z-index: 1;
   max-width: 1280px;
   margin: 0 auto;
   padding: 62px 24px 44px;

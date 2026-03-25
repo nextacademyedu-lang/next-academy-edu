@@ -287,6 +287,7 @@ export interface Instructor {
   jobTitle?: string | null;
   tagline?: string | null;
   picture?: (number | null) | Media;
+  coverImage?: (number | null) | Media;
   linkedinUrl?: string | null;
   twitterUrl?: string | null;
   email?: string | null;
@@ -1662,6 +1663,7 @@ export interface InstructorsSelect<T extends boolean = true> {
   jobTitle?: T;
   tagline?: T;
   picture?: T;
+  coverImage?: T;
   linkedinUrl?: T;
   twitterUrl?: T;
   email?: T;

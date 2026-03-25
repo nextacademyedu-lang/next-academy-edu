@@ -87,6 +87,13 @@
   z-index: 10;
 }
 
+.cardLink {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+  height: 100%;
+}
+
 .minimalCard {
   text-align: start;
   background-color: transparent;

@@ -156,6 +156,7 @@ export default async function InstructorProfilePage({
   const totalCompletedRounds = rounds.filter((round) => new Date(round.startDate) < now).length;
   const totalAvailableSlots = availableSlots.length;
   const profileImage = getMediaUrl(instructor.picture);
+  const coverImageUrl = getMediaUrl(instructor.coverImage);
 
   const fullName = `${instructor.firstName} ${instructor.lastName}`.trim();
   const bioText = locale === 'ar'
@@ -168,6 +169,19 @@ export default async function InstructorProfilePage({
 
       <main className={styles.main}>
         <section className={styles.hero}>
+          {coverImageUrl && (
+            <div className={styles.coverImageWrap}>
+              <Image
+                src={coverImageUrl}
+                alt=""
+                fill
+                className={styles.coverImage}
+                sizes="100vw"
+                priority
+              />
+              <div className={styles.coverOverlay} />
+            </div>
+          )}
           <div className={styles.heroContainer}>
             <div className={styles.profileBlock}>
               <div className={styles.avatarWrap}>
@@ -178,6 +192,7 @@ export default async function InstructorProfilePage({
                     fill
                     className={styles.avatar}
                     sizes="(max-width: 768px) 180px, 220px"
+                    priority
                   />
                 ) : (
                   <div className={styles.avatarFallback}>{fullName[0]?.toUpperCase() || '?'}</div>
