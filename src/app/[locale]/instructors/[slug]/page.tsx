@@ -190,6 +190,7 @@ export default async function InstructorProfilePage({
                     src={profileImage}
                     alt={fullName}
                     fill
+                    unoptimized
                     className={styles.avatar}
                     sizes="(max-width: 768px) 180px, 220px"
                     priority

@@ -135,6 +135,7 @@ export default async function InstructorsPage() {
                           src={imageUrl}
                           alt={fullName}
                           fill
+                          unoptimized
                           className={styles.avatar}
                           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                         />
