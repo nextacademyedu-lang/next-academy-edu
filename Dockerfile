@@ -40,6 +40,8 @@ WORKDIR /app
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 
+# Coolify overrides the Dockerfile HEALTHCHECK with its own curl-based probe
+RUN apk add --no-cache curl
 RUN addgroup -g 1001 -S nodejs && adduser -S nextjs -u 1001
 
 COPY --from=builder /app/public ./public
