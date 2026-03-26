@@ -146,7 +146,7 @@ export default async function CoursesPage({
     return `/${locale}/courses${query ? `?${query}` : ''}`;
   };
 
-  const upcomingRoundsCount = rounds.filter((round) => new Date(round.startDate) >= now).length;
+  const upcomingRoundsCount = rounds.filter((round) => round.startDate && new Date(round.startDate) >= now).length;
   const totalLearners = rounds.reduce((sum, round) => sum + (round.currentEnrollments || 0), 0);
 
   return (
@@ -277,7 +277,7 @@ export default async function CoursesPage({
                       : 'Next Academy Team';
 
                 const programRounds = roundsByProgram.get(program.id) || [];
-                const nextRound = programRounds.find((round) => new Date(round.startDate) >= now);
+                const nextRound = programRounds.find((round) => round.startDate && new Date(round.startDate) >= now);
                 const fallbackRound = programRounds[0];
                 const selectedRound = nextRound || fallbackRound;
                 const learnersCount = programRounds.reduce((sum, round) => sum + (round.currentEnrollments || 0), 0);

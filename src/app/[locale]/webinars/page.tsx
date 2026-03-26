@@ -67,12 +67,12 @@ export default async function WebinarsPage() {
   }
 
   const upcomingRounds = rounds
-    .filter((round) => new Date(round.startDate) >= now)
-    .sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime());
+    .filter((round) => round.startDate && new Date(round.startDate) >= now)
+    .sort((a, b) => new Date(a.startDate!).getTime() - new Date(b.startDate!).getTime());
 
   const archivedRounds = rounds
-    .filter((round) => new Date(round.startDate) < now)
-    .sort((a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime());
+    .filter((round) => round.startDate && new Date(round.startDate) < now)
+    .sort((a, b) => new Date(b.startDate!).getTime() - new Date(a.startDate!).getTime());
 
   const totalLearners = rounds.reduce((sum, round) => sum + (round.currentEnrollments || 0), 0);
   const totalViews = webinars.reduce((sum, webinar) => sum + (webinar.viewCount || 0), 0);
@@ -175,7 +175,7 @@ export default async function WebinarsPage() {
                     <div className={styles.sessionBody}>
                       <h3>{title}</h3>
                       <div className={styles.meta}>
-                        <span>{new Date(round.startDate).toLocaleDateString(locale === 'ar' ? 'ar-EG' : 'en-US')}</span>
+                        <span>{round.startDate ? new Date(round.startDate).toLocaleDateString(locale === 'ar' ? 'ar-EG' : 'en-US') : ''}</span>
                         <span>{instructor}</span>
                         <span>{(round.currentEnrollments || 0).toLocaleString()} {locale === 'ar' ? 'مشترك' : 'attendees'}</span>
                       </div>
@@ -220,7 +220,7 @@ export default async function WebinarsPage() {
                   <article key={`archive-${round.id}`} className={styles.archiveItem}>
                     <div>
                       <h3>{title}</h3>
-                      <p>{new Date(round.startDate).toLocaleDateString(locale === 'ar' ? 'ar-EG' : 'en-US')}</p>
+                      <p>{round.startDate ? new Date(round.startDate).toLocaleDateString(locale === 'ar' ? 'ar-EG' : 'en-US') : ''}</p>
                     </div>
                     <div className={styles.archiveActions}>
                       <Badge variant="outline">{(round.currentEnrollments || 0).toLocaleString()} {locale === 'ar' ? 'حضور' : 'attendees'}</Badge>

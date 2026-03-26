@@ -42,6 +42,7 @@ import { Popups } from './collections/Popups.ts';
 import { AnnouncementBars } from './collections/AnnouncementBars.ts';
 import { UpcomingEventsConfig } from './collections/UpcomingEventsConfig.ts';
 import { CrmSyncEvents } from './collections/CrmSyncEvents.ts';
+import { Partners } from './collections/Partners.ts';
 import { migrations } from './migrations/index.ts';
 
 if (!process.env.DATABASE_URI) {
@@ -223,6 +224,7 @@ export default buildConfig({
     AnnouncementBars,
     UpcomingEventsConfig,
     CrmSyncEvents,
+    Partners,
   ],
   editor: lexicalEditor({}),
   db: postgresAdapter({

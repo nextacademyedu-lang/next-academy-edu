@@ -1,4 +1,6 @@
 import React from 'react';
+import Image from 'next/image';
+import type { Media } from '@/payload-types';
 import { notFound } from 'next/navigation';
 import { getLocale, getTranslations } from 'next-intl/server';
 import { getPayload } from 'payload';
@@ -39,6 +41,13 @@ export default async function ProgramDetailsPage({
   const objectives = (program.objectives ?? []).filter(
     (obj): obj is { item: string; id?: string | null } => typeof obj.item === 'string',
   );
+
+  function getMediaUrl(media: Program['thumbnail'] | Program['coverImage']): string | null {
+    if (!media || typeof media === 'number') return null;
+    return (media as Media).url || null;
+  }
+
+  const coverImageUrl = getMediaUrl(program.coverImage) || getMediaUrl(program.thumbnail);
 
   // Instructor — may be a populated Instructor object or just a number (FK)
   const instructor: Instructor | null =
@@ -89,6 +98,19 @@ export default async function ProgramDetailsPage({
       <main className={styles.main}>
         {/* Hero */}
         <section className={styles.heroSection}>
+          {coverImageUrl && (
+            <div className={styles.heroCover}>
+              <Image
+                src={coverImageUrl}
+                alt={title}
+                fill
+                priority
+                className={styles.heroCoverImage}
+                sizes="100vw"
+              />
+              <div className={styles.heroCoverOverlay} />
+            </div>
+          )}
           <div className={styles.heroContainer}>
             <div className={styles.heroMeta}>
               <Badge variant="default">{program.type}</Badge>

@@ -152,8 +152,8 @@ export default async function InstructorProfilePage({
 
   const totalLearners = rounds.reduce((sum, round) => sum + (round.currentEnrollments || 0), 0);
   const totalViews = programs.reduce((sum, program) => sum + (program.viewCount || 0), 0);
-  const totalUpcomingRounds = rounds.filter((round) => new Date(round.startDate) >= now).length;
-  const totalCompletedRounds = rounds.filter((round) => new Date(round.startDate) < now).length;
+  const totalUpcomingRounds = rounds.filter((round) => round.startDate && new Date(round.startDate) >= now).length;
+  const totalCompletedRounds = rounds.filter((round) => round.startDate && new Date(round.startDate) < now).length;
   const totalAvailableSlots = availableSlots.length;
   const profileImage = getMediaUrl(instructor.picture);
   const coverImageUrl = getMediaUrl(instructor.coverImage);

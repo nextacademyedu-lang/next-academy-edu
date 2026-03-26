@@ -91,12 +91,12 @@ function pickBestRound(rounds: Round[]): Round | null {
 
   const now = Date.now();
   const sorted = [...rounds].sort(
-    (a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime(),
+    (a, b) => new Date(a.startDate ?? 0).getTime() - new Date(b.startDate ?? 0).getTime(),
   );
   const upcoming = sorted.find((round) => {
     const status = round.status || 'draft';
     if (status === 'cancelled' || status === 'draft') return false;
-    return new Date(round.startDate).getTime() >= now;
+    return round.startDate && new Date(round.startDate).getTime() >= now;
   });
 
   return upcoming || sorted[0] || null;

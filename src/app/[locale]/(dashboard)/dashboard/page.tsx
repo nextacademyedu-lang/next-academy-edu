@@ -68,14 +68,14 @@ export default function UserDashboardOverview() {
         return { booking: b, round };
       })
       .filter(Boolean)
-      .sort((a, b) => new Date(a!.round.startDate).getTime() - new Date(b!.round.startDate).getTime());
+      .sort((a, b) => new Date(a!.round.startDate ?? 0).getTime() - new Date(b!.round.startDate ?? 0).getTime());
 
     if (!confirmed.length || !confirmed[0]) return null;
     const { booking, round } = confirmed[0];
     return {
       title:      getProgramTitle(booking),
-      date:       new Date(round.startDate).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }),
-      time:       new Date(round.startDate).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
+      date:       new Date(round.startDate ?? 0).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }),
+      time:       new Date(round.startDate ?? 0).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
       zoomLink:   getMeetingUrl(booking),
     };
   })();

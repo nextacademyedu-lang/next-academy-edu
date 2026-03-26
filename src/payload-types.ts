@@ -100,6 +100,7 @@ export interface Config {
     'announcement-bars': AnnouncementBar;
     'upcoming-events-config': UpcomingEventsConfig;
     'crm-sync-events': CrmSyncEvent;
+    partners: Partner;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -140,6 +141,7 @@ export interface Config {
     'announcement-bars': AnnouncementBarsSelect<false> | AnnouncementBarsSelect<true>;
     'upcoming-events-config': UpcomingEventsConfigSelect<false> | UpcomingEventsConfigSelect<true>;
     'crm-sync-events': CrmSyncEventsSelect<false> | CrmSyncEventsSelect<true>;
+    partners: PartnersSelect<false> | PartnersSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -485,7 +487,7 @@ export interface Round {
   sessionPlan?:
     | {
         title?: string | null;
-        date: string;
+        date?: string | null;
         startTime: string;
         endTime: string;
         locationType?: ('online' | 'in-person' | 'hybrid') | null;
@@ -498,7 +500,7 @@ export interface Round {
   /**
    * Auto-synced from the earliest session date when Session Plan is filled.
    */
-  startDate: string;
+  startDate?: string | null;
   /**
    * Auto-synced from the latest session date when Session Plan is filled.
    */
@@ -1322,6 +1324,21 @@ export interface CrmSyncEvent {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "partners".
+ */
+export interface Partner {
+  id: number;
+  name: string;
+  logo: number | Media;
+  website?: string | null;
+  orderIndex?: number | null;
+  isActive?: boolean | null;
+  category?: ('general' | 'media' | 'strategic') | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -1475,6 +1492,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'crm-sync-events';
         value: number | CrmSyncEvent;
+      } | null)
+    | ({
+        relationTo: 'partners';
+        value: number | Partner;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -2410,6 +2431,20 @@ export interface CrmSyncEventsSelect<T extends boolean = true> {
   sourceCollection?: T;
   lockedAt?: T;
   processedAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "partners_select".
+ */
+export interface PartnersSelect<T extends boolean = true> {
+  name?: T;
+  logo?: T;
+  website?: T;
+  orderIndex?: T;
+  isActive?: T;
+  category?: T;
   updatedAt?: T;
   createdAt?: T;
 }

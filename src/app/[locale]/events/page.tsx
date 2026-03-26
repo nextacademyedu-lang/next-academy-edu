@@ -56,12 +56,12 @@ export default async function EventsPage() {
   });
 
   const upcomingEvents = eventRounds
-    .filter((round) => new Date(round.startDate) >= now)
-    .sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime());
+    .filter((round) => round.startDate && new Date(round.startDate) >= now)
+    .sort((a, b) => new Date(a.startDate!).getTime() - new Date(b.startDate!).getTime());
 
   const pastEvents = eventRounds
-    .filter((round) => new Date(round.startDate) < now)
-    .sort((a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime());
+    .filter((round) => round.startDate && new Date(round.startDate) < now)
+    .sort((a, b) => new Date(b.startDate!).getTime() - new Date(a.startDate!).getTime());
 
   const totalAttendees = eventRounds.reduce((sum, round) => sum + (round.currentEnrollments || 0), 0);
   const uniquePrograms = new Set(
@@ -168,7 +168,7 @@ export default async function EventsPage() {
                     <div className={styles.eventBody}>
                       <h3>{title}</h3>
                       <div className={styles.meta}>
-                        <span>{new Date(round.startDate).toLocaleDateString(locale === 'ar' ? 'ar-EG' : 'en-US')}</span>
+                        <span>{round.startDate ? new Date(round.startDate).toLocaleDateString(locale === 'ar' ? 'ar-EG' : 'en-US') : ''}</span>
                         <span>{round.locationType || (locale === 'ar' ? 'أونلاين' : 'Online')}</span>
                         <span>{instructor}</span>
                       </div>
@@ -212,7 +212,7 @@ export default async function EventsPage() {
                     <div>
                       <h3>{title}</h3>
                       <p>
-                        {new Date(round.startDate).toLocaleDateString(locale === 'ar' ? 'ar-EG' : 'en-US')} •{' '}
+                        {round.startDate ? new Date(round.startDate).toLocaleDateString(locale === 'ar' ? 'ar-EG' : 'en-US') : ''} •{' '}
                         {round.locationType || (locale === 'ar' ? 'أونلاين' : 'Online')}
                       </p>
                     </div>
