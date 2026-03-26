@@ -34,6 +34,7 @@ export function InstructorCard({ instructor, locale }: Props) {
               src={coverImage.url}
               alt=""
               fill
+              unoptimized
               className={styles.coverImg}
               sizes="100vw"
             />
@@ -53,6 +54,7 @@ export function InstructorCard({ instructor, locale }: Props) {
                 alt={fullName}
                 width={88}
                 height={88}
+                unoptimized
                 className={styles.avatar}
               />
             ) : (
