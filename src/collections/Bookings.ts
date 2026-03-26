@@ -70,101 +70,105 @@ export const Bookings: CollectionConfig = {
     ],
     afterChange: [
       async ({ req, doc, previousDoc, operation }) => {
-        const action = resolveBookingAction({
-          operation,
-          status: String(doc.status || ''),
-          previousStatus: previousDoc?.status ? String(previousDoc.status) : undefined,
-        });
+        try {
+          const action = resolveBookingAction({
+            operation,
+            status: String(doc.status || ''),
+            previousStatus: previousDoc?.status ? String(previousDoc.status) : undefined,
+          });
 
-        const fingerprint = [
-          doc.updatedAt || doc.createdAt || '',
-          doc.status || '',
-          doc.paidAmount ?? '',
-          doc.remainingAmount ?? '',
-          doc.finalAmount ?? '',
-        ].join('|');
+          const fingerprint = [
+            doc.updatedAt || doc.createdAt || '',
+            doc.status || '',
+            doc.paidAmount ?? '',
+            doc.remainingAmount ?? '',
+            doc.finalAmount ?? '',
+          ].join('|');
 
-        await enqueueCrmSyncEvent({
-          payload: req.payload,
-          req,
-          entityType: 'booking',
-          entityId: String(doc.id),
-          action,
-          dedupeKey: createCrmDedupeKey({
+          await enqueueCrmSyncEvent({
+            payload: req.payload,
+            req,
             entityType: 'booking',
             entityId: String(doc.id),
             action,
-            fingerprint,
-          }),
-          priority: 30,
-          sourceCollection: 'bookings',
-          payloadSnapshot: {
-            id: doc.id,
-            status: doc.status,
-            user: doc.user,
-            round: doc.round,
-            totalAmount: doc.totalAmount,
-            finalAmount: doc.finalAmount,
-            paidAmount: doc.paidAmount,
-            remainingAmount: doc.remainingAmount,
-            bookingSource: doc.bookingSource,
-            updatedAt: doc.updatedAt,
-          },
-        });
+            dedupeKey: createCrmDedupeKey({
+              entityType: 'booking',
+              entityId: String(doc.id),
+              action,
+              fingerprint,
+            }),
+            priority: 30,
+            sourceCollection: 'bookings',
+            payloadSnapshot: {
+              id: doc.id,
+              status: doc.status,
+              user: doc.user,
+              round: doc.round,
+              totalAmount: doc.totalAmount,
+              finalAmount: doc.finalAmount,
+              paidAmount: doc.paidAmount,
+              remainingAmount: doc.remainingAmount,
+              bookingSource: doc.bookingSource,
+              updatedAt: doc.updatedAt,
+            },
+          });
 
-        // Google Calendar: auto-invite on confirm, auto-revoke on cancel/refund
-        if (isGoogleCalendarEnabled()) {
-          const statusChanged = previousDoc?.status !== doc.status;
-          const isConfirmed = doc.status === 'confirmed' && statusChanged;
-          const isRevoked =
-            (doc.status === 'cancelled' || doc.status === 'refunded' || doc.status === 'cancelled_overdue') &&
-            statusChanged;
+          // Google Calendar: auto-invite on confirm, auto-revoke on cancel/refund
+          if (isGoogleCalendarEnabled()) {
+            const statusChanged = previousDoc?.status !== doc.status;
+            const isConfirmed = doc.status === 'confirmed' && statusChanged;
+            const isRevoked =
+              (doc.status === 'cancelled' || doc.status === 'refunded' || doc.status === 'cancelled_overdue') &&
+              statusChanged;
 
-          if (isConfirmed || isRevoked) {
-            try {
-              // Get user email
-              const userId = typeof doc.user === 'object' ? doc.user?.id : doc.user;
-              const userDoc = userId
-                ? await req.payload.findByID({
-                    collection: 'users',
-                    id: userId,
-                    depth: 0,
-                    overrideAccess: true,
-                    req,
-                  })
-                : null;
-              const email = (userDoc as any)?.email;
+            if (isConfirmed || isRevoked) {
+              try {
+                // Get user email
+                const userId = typeof doc.user === 'object' ? doc.user?.id : doc.user;
+                const userDoc = userId
+                  ? await req.payload.findByID({
+                      collection: 'users',
+                      id: userId,
+                      depth: 0,
+                      overrideAccess: true,
+                      req,
+                    })
+                  : null;
+                const email = (userDoc as any)?.email;
 
-              if (email) {
-                // Get sessions for this booking's round
-                const roundId = typeof doc.round === 'object' ? doc.round?.id : doc.round;
-                if (roundId) {
-                  const sessionsResult = await req.payload.find({
-                    collection: 'sessions',
-                    where: { round: { equals: roundId } },
-                    depth: 0,
-                    limit: 500,
-                    overrideAccess: true,
-                    req,
-                  });
+                if (email) {
+                  // Get sessions for this booking's round
+                  const roundId = typeof doc.round === 'object' ? doc.round?.id : doc.round;
+                  if (roundId) {
+                    const sessionsResult = await req.payload.find({
+                      collection: 'sessions',
+                      where: { round: { equals: roundId } },
+                      depth: 0,
+                      limit: 500,
+                      overrideAccess: true,
+                      req,
+                    });
 
-                  const eventIds = (sessionsResult.docs as any[])
-                    .map((s) => s.googleEventId)
-                    .filter(Boolean);
+                    const eventIds = (sessionsResult.docs as any[])
+                      .map((s) => s.googleEventId)
+                      .filter(Boolean);
 
-                  if (eventIds.length > 0) {
-                    if (isConfirmed) {
-                      await addAttendeeToAllEvents(eventIds, email);
-                    } else {
-                      await removeAttendeeFromAllEvents(eventIds, email);
+                    if (eventIds.length > 0) {
+                      if (isConfirmed) {
+                        await addAttendeeToAllEvents(eventIds, email);
+                      } else {
+                        await removeAttendeeFromAllEvents(eventIds, email);
+                      }
                     }
                   }
                 }
+              } catch (err) {
+                console.error('[Bookings] Google Calendar invite/revoke error:', err);
               }
-            } catch (err) {
-              console.error('[Bookings] Google Calendar invite/revoke error:', err);
             }
           }
+        } catch (err) {
+          console.error('[Bookings] afterChange hook failed (non-blocking):', err);
         }
       },
     ],

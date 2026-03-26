@@ -15,103 +15,107 @@ export const UserProfiles: CollectionConfig = {
   hooks: {
     afterChange: [
       async ({ req, doc, previousDoc, operation }) => {
-        const userId =
-          typeof doc.user === 'object' && doc.user
-            ? doc.user.id
-            : doc.user;
-        if (!userId) return;
+        try {
+          const userId =
+            typeof doc.user === 'object' && doc.user
+              ? doc.user.id
+              : doc.user;
+          if (!userId) return;
 
-        const onboardingCompleted =
-          Boolean(doc.onboardingCompleted) &&
-          !Boolean(previousDoc?.onboardingCompleted);
+          const onboardingCompleted =
+            Boolean(doc.onboardingCompleted) &&
+            !Boolean(previousDoc?.onboardingCompleted);
 
-        const action = onboardingCompleted
-          ? 'onboarding_completed'
-          : operation === 'create'
-            ? 'user_profile_created'
-            : 'user_profile_updated';
+          const action = onboardingCompleted
+            ? 'onboarding_completed'
+            : operation === 'create'
+              ? 'user_profile_created'
+              : 'user_profile_updated';
 
-        const profileFingerprint = [
-          doc.updatedAt || doc.createdAt || '',
-          doc.onboardingCompleted ? 'completed' : 'incomplete',
-          doc.company || '',
-        ].join('|');
+          const profileFingerprint = [
+            doc.updatedAt || doc.createdAt || '',
+            doc.onboardingCompleted ? 'completed' : 'incomplete',
+            doc.company || '',
+          ].join('|');
 
-        await enqueueCrmSyncEvent({
-          payload: req.payload,
-          req,
-          entityType: 'user_profile',
-          entityId: String(doc.id),
-          action,
-          dedupeKey: createCrmDedupeKey({
+          await enqueueCrmSyncEvent({
+            payload: req.payload,
+            req,
             entityType: 'user_profile',
             entityId: String(doc.id),
             action,
-            fingerprint: profileFingerprint,
-          }),
-          priority: 15,
-          sourceCollection: 'user-profiles',
-          payloadSnapshot: {
-            id: doc.id,
-            userId,
-            company: doc.company,
-            onboardingCompleted: doc.onboardingCompleted,
-            updatedAt: doc.updatedAt,
-          },
-        });
+            dedupeKey: createCrmDedupeKey({
+              entityType: 'user_profile',
+              entityId: String(doc.id),
+              action,
+              fingerprint: profileFingerprint,
+            }),
+            priority: 15,
+            sourceCollection: 'user-profiles',
+            payloadSnapshot: {
+              id: doc.id,
+              userId,
+              company: doc.company,
+              onboardingCompleted: doc.onboardingCompleted,
+              updatedAt: doc.updatedAt,
+            },
+          });
 
-        const userAction = onboardingCompleted
-          ? 'user_onboarding_completed'
-          : 'user_profile_updated';
+          const userAction = onboardingCompleted
+            ? 'user_onboarding_completed'
+            : 'user_profile_updated';
 
-        await enqueueCrmSyncEvent({
-          payload: req.payload,
-          req,
-          entityType: 'user',
-          entityId: String(userId),
-          action: userAction,
-          dedupeKey: createCrmDedupeKey({
+          await enqueueCrmSyncEvent({
+            payload: req.payload,
+            req,
             entityType: 'user',
             entityId: String(userId),
             action: userAction,
-            fingerprint: profileFingerprint,
-          }),
-          priority: 12,
-          sourceCollection: 'user-profiles',
-          payloadSnapshot: {
-            profileId: doc.id,
-            userId,
-            company: doc.company,
-            onboardingCompleted: doc.onboardingCompleted,
-          },
-        });
+            dedupeKey: createCrmDedupeKey({
+              entityType: 'user',
+              entityId: String(userId),
+              action: userAction,
+              fingerprint: profileFingerprint,
+            }),
+            priority: 12,
+            sourceCollection: 'user-profiles',
+            payloadSnapshot: {
+              profileId: doc.id,
+              userId,
+              company: doc.company,
+              onboardingCompleted: doc.onboardingCompleted,
+            },
+          });
 
-        const companyId =
-          typeof doc.company === 'object' && doc.company
-            ? doc.company.id
-            : doc.company;
-        if (!companyId) return;
+          const companyId =
+            typeof doc.company === 'object' && doc.company
+              ? doc.company.id
+              : doc.company;
+          if (!companyId) return;
 
-        await enqueueCrmSyncEvent({
-          payload: req.payload,
-          req,
-          entityType: 'company',
-          entityId: String(companyId),
-          action: 'company_profile_link_updated',
-          dedupeKey: createCrmDedupeKey({
+          await enqueueCrmSyncEvent({
+            payload: req.payload,
+            req,
             entityType: 'company',
             entityId: String(companyId),
             action: 'company_profile_link_updated',
-            fingerprint: `${doc.updatedAt || doc.createdAt || ''}|${userId}`,
-          }),
-          priority: 11,
-          sourceCollection: 'user-profiles',
-          payloadSnapshot: {
-            companyId,
-            userId,
-            profileId: doc.id,
-          },
-        });
+            dedupeKey: createCrmDedupeKey({
+              entityType: 'company',
+              entityId: String(companyId),
+              action: 'company_profile_link_updated',
+              fingerprint: `${doc.updatedAt || doc.createdAt || ''}|${userId}`,
+            }),
+            priority: 11,
+            sourceCollection: 'user-profiles',
+            payloadSnapshot: {
+              companyId,
+              userId,
+              profileId: doc.id,
+            },
+          });
+        } catch (err) {
+          console.error('[UserProfiles] afterChange CRM sync failed (non-blocking):', err);
+        }
       },
     ],
   },

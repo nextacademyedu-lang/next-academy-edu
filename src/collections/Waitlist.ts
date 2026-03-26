@@ -15,56 +15,60 @@ export const Waitlist: CollectionConfig = {
   hooks: {
     afterChange: [
       async ({ req, doc, previousDoc, operation }) => {
-        let action = operation === 'create' ? 'waitlist_joined' : 'waitlist_updated';
-        if (operation === 'update' && previousDoc?.status !== doc.status) {
-          switch (doc.status) {
-            case 'notified':
-              action = 'waitlist_notified';
-              break;
-            case 'expired':
-              action = 'waitlist_expired';
-              break;
-            case 'converted':
-              action = 'waitlist_converted';
-              break;
-            default:
-              action = 'waitlist_status_updated';
+        try {
+          let action = operation === 'create' ? 'waitlist_joined' : 'waitlist_updated';
+          if (operation === 'update' && previousDoc?.status !== doc.status) {
+            switch (doc.status) {
+              case 'notified':
+                action = 'waitlist_notified';
+                break;
+              case 'expired':
+                action = 'waitlist_expired';
+                break;
+              case 'converted':
+                action = 'waitlist_converted';
+                break;
+              default:
+                action = 'waitlist_status_updated';
+            }
           }
-        }
 
-        const fingerprint = [
-          doc.updatedAt || doc.createdAt || '',
-          doc.status || '',
-          doc.position ?? '',
-          doc.notifiedAt || '',
-          doc.expiresAt || '',
-        ].join('|');
+          const fingerprint = [
+            doc.updatedAt || doc.createdAt || '',
+            doc.status || '',
+            doc.position ?? '',
+            doc.notifiedAt || '',
+            doc.expiresAt || '',
+          ].join('|');
 
-        await enqueueCrmSyncEvent({
-          payload: req.payload,
-          req,
-          entityType: 'waitlist',
-          entityId: String(doc.id),
-          action,
-          dedupeKey: createCrmDedupeKey({
+          await enqueueCrmSyncEvent({
+            payload: req.payload,
+            req,
             entityType: 'waitlist',
             entityId: String(doc.id),
             action,
-            fingerprint,
-          }),
-          priority: 40,
-          sourceCollection: 'waitlist',
-          payloadSnapshot: {
-            id: doc.id,
-            user: doc.user,
-            round: doc.round,
-            status: doc.status,
-            position: doc.position,
-            notifiedAt: doc.notifiedAt,
-            expiresAt: doc.expiresAt,
-            updatedAt: doc.updatedAt,
-          },
-        });
+            dedupeKey: createCrmDedupeKey({
+              entityType: 'waitlist',
+              entityId: String(doc.id),
+              action,
+              fingerprint,
+            }),
+            priority: 40,
+            sourceCollection: 'waitlist',
+            payloadSnapshot: {
+              id: doc.id,
+              user: doc.user,
+              round: doc.round,
+              status: doc.status,
+              position: doc.position,
+              notifiedAt: doc.notifiedAt,
+              expiresAt: doc.expiresAt,
+              updatedAt: doc.updatedAt,
+            },
+          });
+        } catch (err) {
+          console.error('[Waitlist] afterChange CRM sync failed (non-blocking):', err);
+        }
       },
     ],
   },

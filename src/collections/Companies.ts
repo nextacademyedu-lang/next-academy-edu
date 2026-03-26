@@ -15,36 +15,40 @@ export const Companies: CollectionConfig = {
   hooks: {
     afterChange: [
       async ({ req, doc, operation }) => {
-        const action = operation === 'create' ? 'company_created' : 'company_updated';
-        const fingerprint = [
-          doc.updatedAt || doc.createdAt || '',
-          doc.name || '',
-          doc.website || '',
-        ].join('|');
+        try {
+          const action = operation === 'create' ? 'company_created' : 'company_updated';
+          const fingerprint = [
+            doc.updatedAt || doc.createdAt || '',
+            doc.name || '',
+            doc.website || '',
+          ].join('|');
 
-        await enqueueCrmSyncEvent({
-          payload: req.payload,
-          req,
-          entityType: 'company',
-          entityId: String(doc.id),
-          action,
-          dedupeKey: createCrmDedupeKey({
+          await enqueueCrmSyncEvent({
+            payload: req.payload,
+            req,
             entityType: 'company',
             entityId: String(doc.id),
             action,
-            fingerprint,
-          }),
-          priority: 10,
-          sourceCollection: 'companies',
-          payloadSnapshot: {
-            id: doc.id,
-            name: doc.name,
-            industry: doc.industry,
-            size: doc.size,
-            type: doc.type,
-            updatedAt: doc.updatedAt,
-          },
-        });
+            dedupeKey: createCrmDedupeKey({
+              entityType: 'company',
+              entityId: String(doc.id),
+              action,
+              fingerprint,
+            }),
+            priority: 10,
+            sourceCollection: 'companies',
+            payloadSnapshot: {
+              id: doc.id,
+              name: doc.name,
+              industry: doc.industry,
+              size: doc.size,
+              type: doc.type,
+              updatedAt: doc.updatedAt,
+            },
+          });
+        } catch (err) {
+          console.error('[Companies] afterChange CRM sync failed (non-blocking):', err);
+        }
       },
     ],
   },

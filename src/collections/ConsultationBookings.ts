@@ -20,53 +20,57 @@ export const ConsultationBookings: CollectionConfig = {
   hooks: {
     afterChange: [
       async ({ req, doc, previousDoc, operation }) => {
-        let action = operation === 'create'
-          ? 'consultation_booking_created'
-          : 'consultation_booking_updated';
+        try {
+          let action = operation === 'create'
+            ? 'consultation_booking_created'
+            : 'consultation_booking_updated';
 
-        if (operation === 'update') {
-          if (previousDoc?.paymentStatus !== doc.paymentStatus) {
-            if (doc.paymentStatus === 'paid') action = 'consultation_payment_paid';
-            else if (doc.paymentStatus === 'refunded') action = 'consultation_payment_refunded';
-            else action = 'consultation_payment_status_updated';
-          } else if (previousDoc?.status !== doc.status) {
-            action = 'consultation_status_updated';
+          if (operation === 'update') {
+            if (previousDoc?.paymentStatus !== doc.paymentStatus) {
+              if (doc.paymentStatus === 'paid') action = 'consultation_payment_paid';
+              else if (doc.paymentStatus === 'refunded') action = 'consultation_payment_refunded';
+              else action = 'consultation_payment_status_updated';
+            } else if (previousDoc?.status !== doc.status) {
+              action = 'consultation_status_updated';
+            }
           }
-        }
 
-        const fingerprint = [
-          doc.updatedAt || doc.createdAt || '',
-          doc.status || '',
-          doc.paymentStatus || '',
-          doc.amount ?? '',
-        ].join('|');
+          const fingerprint = [
+            doc.updatedAt || doc.createdAt || '',
+            doc.status || '',
+            doc.paymentStatus || '',
+            doc.amount ?? '',
+          ].join('|');
 
-        await enqueueCrmSyncEvent({
-          payload: req.payload,
-          req,
-          entityType: 'consultation_booking',
-          entityId: String(doc.id),
-          action,
-          dedupeKey: createCrmDedupeKey({
+          await enqueueCrmSyncEvent({
+            payload: req.payload,
+            req,
             entityType: 'consultation_booking',
             entityId: String(doc.id),
             action,
-            fingerprint,
-          }),
-          priority: 32,
-          sourceCollection: 'consultation-bookings',
-          payloadSnapshot: {
-            id: doc.id,
-            user: doc.user,
-            instructor: doc.instructor,
-            consultationType: doc.consultationType,
-            slot: doc.slot,
-            status: doc.status,
-            paymentStatus: doc.paymentStatus,
-            amount: doc.amount,
-            updatedAt: doc.updatedAt,
-          },
-        });
+            dedupeKey: createCrmDedupeKey({
+              entityType: 'consultation_booking',
+              entityId: String(doc.id),
+              action,
+              fingerprint,
+            }),
+            priority: 32,
+            sourceCollection: 'consultation-bookings',
+            payloadSnapshot: {
+              id: doc.id,
+              user: doc.user,
+              instructor: doc.instructor,
+              consultationType: doc.consultationType,
+              slot: doc.slot,
+              status: doc.status,
+              paymentStatus: doc.paymentStatus,
+              amount: doc.amount,
+              updatedAt: doc.updatedAt,
+            },
+          });
+        } catch (err) {
+          console.error('[ConsultationBookings] afterChange CRM sync failed (non-blocking):', err);
+        }
       },
     ],
   },

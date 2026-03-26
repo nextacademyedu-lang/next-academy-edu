@@ -115,50 +115,54 @@ export const Users: CollectionConfig = {
     ],
     afterChange: [
       async ({ req, doc, previousDoc, operation }) => {
-        if (doc.role === 'admin') return;
+        try {
+          if (doc.role === 'admin') return;
 
-        let action = operation === 'create' ? 'user_created' : 'user_updated';
+          let action = operation === 'create' ? 'user_created' : 'user_updated';
 
-        if (operation === 'update') {
-          const wasVerified = Boolean(previousDoc?.emailVerified);
-          const isVerified = Boolean(doc.emailVerified);
-          if (!wasVerified && isVerified) {
-            action = 'user_verified';
-          } else if (previousDoc?.lifecycleStage !== doc.lifecycleStage) {
-            action = 'user_lifecycle_updated';
+          if (operation === 'update') {
+            const wasVerified = Boolean(previousDoc?.emailVerified);
+            const isVerified = Boolean(doc.emailVerified);
+            if (!wasVerified && isVerified) {
+              action = 'user_verified';
+            } else if (previousDoc?.lifecycleStage !== doc.lifecycleStage) {
+              action = 'user_lifecycle_updated';
+            }
           }
-        }
 
-        const fingerprint = [
-          doc.updatedAt || doc.createdAt || '',
-          doc.emailVerified ? 'verified' : 'not_verified',
-          doc.lifecycleStage || '',
-          doc.role || '',
-        ].join('|');
+          const fingerprint = [
+            doc.updatedAt || doc.createdAt || '',
+            doc.emailVerified ? 'verified' : 'not_verified',
+            doc.lifecycleStage || '',
+            doc.role || '',
+          ].join('|');
 
-        await enqueueCrmSyncEvent({
-          payload: req.payload,
-          req,
-          entityType: 'user',
-          entityId: String(doc.id),
-          action,
-          dedupeKey: createCrmDedupeKey({
+          await enqueueCrmSyncEvent({
+            payload: req.payload,
+            req,
             entityType: 'user',
             entityId: String(doc.id),
             action,
-            fingerprint,
-          }),
-          priority: 10,
-          sourceCollection: 'users',
-          payloadSnapshot: {
-            id: doc.id,
-            email: doc.email,
-            role: doc.role,
-            lifecycleStage: doc.lifecycleStage,
-            emailVerified: doc.emailVerified,
-            updatedAt: doc.updatedAt,
-          },
-        });
+            dedupeKey: createCrmDedupeKey({
+              entityType: 'user',
+              entityId: String(doc.id),
+              action,
+              fingerprint,
+            }),
+            priority: 10,
+            sourceCollection: 'users',
+            payloadSnapshot: {
+              id: doc.id,
+              email: doc.email,
+              role: doc.role,
+              lifecycleStage: doc.lifecycleStage,
+              emailVerified: doc.emailVerified,
+              updatedAt: doc.updatedAt,
+            },
+          });
+        } catch (err) {
+          console.error('[Users] afterChange CRM sync failed (non-blocking):', err);
+        }
       },
     ],
   },
