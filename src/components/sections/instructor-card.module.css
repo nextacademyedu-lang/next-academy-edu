@@ -1,0 +1,155 @@
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md, 16px);
+}
+
+.heading {
+  font-size: var(--text-h2, 32px);
+  font-weight: var(--font-bold, 800);
+  color: var(--text-primary);
+  border-bottom: 2px solid var(--accent-primary);
+  padding-bottom: 8px;
+  display: inline-block;
+  align-self: flex-start;
+}
+
+/* Card */
+.card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: 16px;
+  overflow: hidden;
+  position: relative;
+}
+
+/* ── Cover strip ──────────────────────────────────────── */
+.cover {
+  position: relative;
+  height: 120px;
+  overflow: hidden;
+}
+
+.coverImg {
+  object-fit: cover;
+}
+
+.coverFallback {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    135deg,
+    var(--accent-primary-10, rgba(99, 102, 241, 0.12)) 0%,
+    var(--bg-surface-2, #1a1a2e) 100%
+  );
+}
+
+.coverOverlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, transparent 30%, var(--bg-surface) 100%);
+}
+
+/* ── Body ─────────────────────────────────────────────── */
+.body {
+  padding: 0 24px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: -44px; /* pull avatar up into cover */
+  position: relative;
+}
+
+/* ── Avatar ───────────────────────────────────────────── */
+.avatarWrap {
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  border: 3px solid var(--bg-surface);
+  overflow: hidden;
+  background: var(--bg-surface-2);
+  flex-shrink: 0;
+}
+
+.avatar {
+  object-fit: cover;
+  width: 100%;
+  height: 100%;
+}
+
+.avatarFallback {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--accent-text);
+  background: var(--accent-primary-10, rgba(99, 102, 241, 0.15));
+}
+
+/* ── Text ─────────────────────────────────────────────── */
+.meta {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.name {
+  font-size: var(--text-h3, 20px);
+  font-weight: 800;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.jobTitle {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--accent-text);
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.tagline {
+  font-size: var(--text-body, 16px);
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.bio {
+  font-size: var(--text-body, 16px);
+  color: var(--text-secondary);
+  line-height: 1.7;
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 5;
+  line-clamp: 5;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* ── Social ───────────────────────────────────────────── */
+.socials {
+  display: flex;
+  gap: 8px;
+}
+
+.socialLink {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: var(--bg-main);
+  border: 1px solid var(--border-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+
+.socialLink:hover {
+  color: var(--accent-text);
+  border-color: var(--accent-primary);
+}

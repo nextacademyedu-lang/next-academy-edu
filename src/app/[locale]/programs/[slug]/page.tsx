@@ -10,6 +10,7 @@ import { Card, CardHeader, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { BookRoundButton } from '@/components/checkout/book-round-button';
 import { EarlyBirdCountdown } from '@/components/ui/early-bird-countdown';
+import { InstructorCard } from '@/components/sections/instructor-card';
 import styles from './page.module.css';
 
 export default async function ProgramDetailsPage({
@@ -119,6 +120,10 @@ export default async function ProgramDetailsPage({
                   ))}
                 </ul>
               </section>
+            )}
+
+            {instructor && (
+              <InstructorCard instructor={instructor} locale={locale} />
             )}
           </div>
 
