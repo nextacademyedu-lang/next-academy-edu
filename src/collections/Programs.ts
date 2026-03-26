@@ -129,7 +129,25 @@ export const Programs: CollectionConfig = {
             req,
           });
         }
+        // Clean up certificates referencing this program.
+        const certificates = await req.payload.find({
+          collection: 'certificates',
+          where: { program: { equals: id } },
+          depth: 0,
+          limit: 500,
+          overrideAccess: true,
+          req,
+        });
+        for (const cert of certificates.docs) {
+          await req.payload.delete({
+            collection: 'certificates',
+            id: (cert as { id: number | string }).id,
+            overrideAccess: true,
+            req,
+          });
+        }
       },
+
     ],
     afterChange: [
       async ({ req, doc }) => {
