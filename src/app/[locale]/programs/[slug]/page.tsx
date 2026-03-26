@@ -9,6 +9,7 @@ import { Footer } from '@/components/layout/footer';
 import { Card, CardHeader, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { BookRoundButton } from '@/components/checkout/book-round-button';
+import { EarlyBirdCountdown } from '@/components/ui/early-bird-countdown';
 import styles from './page.module.css';
 
 export default async function ProgramDetailsPage({
@@ -140,6 +141,13 @@ export default async function ProgramDetailsPage({
                   const price = round.price ?? 0;
                   const roundSessions = sessionsByRound.get(round.id) || [];
 
+                  // Early bird logic
+                  const hasEarlyBird =
+                    round.earlyBirdPrice != null &&
+                    round.earlyBirdDeadline != null &&
+                    new Date(round.earlyBirdDeadline) > new Date();
+                  const displayPrice = hasEarlyBird ? (round.earlyBirdPrice ?? price) : price;
+
                   return (
                     <Card key={round.id} className={styles.roundCard}>
                       <CardHeader className={styles.roundHeader}>
@@ -161,10 +169,19 @@ export default async function ProgramDetailsPage({
                           <span className={styles.label}>{t('sessionsCount')}</span>
                           <span className={styles.value}>{roundSessions.length}</span>
                         </div>
-                        <div className={styles.roundInfo}>
-                          <span className={styles.label}>{t('price')}</span>
-                          <span className={styles.price}>{price.toLocaleString()} {t('currency')}</span>
-                        </div>
+                        {hasEarlyBird ? (
+                          <EarlyBirdCountdown
+                            deadline={round.earlyBirdDeadline!}
+                            earlyBirdPrice={round.earlyBirdPrice!}
+                            regularPrice={price}
+                            currency={t('currency')}
+                          />
+                        ) : (
+                          <div className={styles.roundInfo}>
+                            <span className={styles.label}>{t('price')}</span>
+                            <span className={styles.price}>{price.toLocaleString()} {t('currency')}</span>
+                          </div>
+                        )}
                         {roundSessions.length > 0 && (
                           <div className={styles.roundSessions}>
                             <p className={styles.roundSessionsTitle}>{t('roundSessionsTitle')}</p>
