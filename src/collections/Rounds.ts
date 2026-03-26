@@ -221,11 +221,15 @@ export const Rounds: CollectionConfig = {
 
     afterChange: [
       async ({ req, doc }) => {
-        await syncSessionsFromRoundPlan({
-          payload: req.payload,
-          req,
-          round: doc as RoundLike,
-        });
+        try {
+          await syncSessionsFromRoundPlan({
+            payload: req.payload,
+            req,
+            round: doc as RoundLike,
+          });
+        } catch (err) {
+          console.error('[Rounds] afterChange session sync failed (non-blocking):', err);
+        }
       },
     ],
   },

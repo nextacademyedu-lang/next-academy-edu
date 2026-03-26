@@ -183,10 +183,13 @@ export const Sessions: CollectionConfig = {
     ],
     afterDelete: [
       async ({ doc }) => {
-        // Remove Google Calendar event when session is deleted
-        const eventId = (doc as any)?.googleEventId;
-        if (eventId && isGoogleCalendarEnabled()) {
-          await deleteEvent(eventId);
+        try {
+          const eventId = (doc as any)?.googleEventId;
+          if (eventId && isGoogleCalendarEnabled()) {
+            await deleteEvent(eventId);
+          }
+        } catch (err) {
+          console.error('[Sessions] Failed to delete Google Calendar event (non-blocking):', err);
         }
       },
     ],
