@@ -50,68 +50,7 @@ function normalizeRelationId(value: unknown): number | string | null {
   return null;
 }
 
-function parseDateMs(value: unknown): number | null {
-  if (typeof value !== 'string' || value.trim().length === 0) return null;
-  const ms = new Date(value).getTime();
-  return Number.isFinite(ms) ? ms : null;
-}
 
-async function syncRoundDateRange(params: {
-  payload: any;
-  roundId: number | string;
-  req?: unknown;
-}) {
-  const { payload, roundId, req } = params;
-
-  const sessionsResult = await payload.find({
-    collection: 'sessions',
-    where: { round: { equals: roundId } },
-    depth: 0,
-    sort: 'date',
-    limit: 500,
-    overrideAccess: true,
-    req: req as any,
-  });
-
-  const timestamps = (sessionsResult.docs as Array<{ date?: string | null }>)
-    .map((doc) => parseDateMs(doc.date))
-    .filter((value): value is number => value !== null)
-    .sort((a, b) => a - b);
-
-  if (timestamps.length === 0) return;
-
-  const earliestIso = new Date(timestamps[0]).toISOString();
-  const latestIso = new Date(timestamps[timestamps.length - 1]).toISOString();
-
-  const round = await payload.findByID({
-    collection: 'rounds',
-    id: roundId,
-    depth: 0,
-    overrideAccess: true,
-    req: req as any,
-  });
-
-  if (!round) return;
-
-  const roundStartMs = parseDateMs((round as { startDate?: string | null }).startDate);
-  const roundEndMs = parseDateMs((round as { endDate?: string | null }).endDate);
-  const needsUpdate =
-    roundStartMs !== timestamps[0] ||
-    roundEndMs !== timestamps[timestamps.length - 1];
-
-  if (!needsUpdate) return;
-
-  await payload.update({
-    collection: 'rounds',
-    id: roundId,
-    data: {
-      startDate: earliestIso,
-      endDate: latestIso,
-    },
-    overrideAccess: true,
-    req: req as any,
-  });
-}
 
 export const Sessions: CollectionConfig = {
   slug: 'sessions',

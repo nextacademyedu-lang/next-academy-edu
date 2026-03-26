@@ -220,8 +220,13 @@ export const Rounds: CollectionConfig = {
     ],
 
     afterChange: [
-      async ({ req, doc }) => {
+      async ({ req, doc, previousDoc }) => {
         try {
+          // Only sync sessions when the sessionPlan was actually modified
+          const prevPlan = (previousDoc as RoundLike | undefined)?.sessionPlan;
+          const nextPlan = (doc as RoundLike)?.sessionPlan;
+          if (JSON.stringify(prevPlan) === JSON.stringify(nextPlan)) return;
+
           await syncSessionsFromRoundPlan({
             payload: req.payload,
             req,
