@@ -36,6 +36,18 @@ export async function register(): Promise<void> {
         console.log(
           `[instrumentation] ✅ Payload CMS initialized. Collections: ${collections.join(', ')}`,
         );
+
+        // Start internal cron scheduler after a short delay
+        // so the HTTP server is fully ready to accept requests
+        setTimeout(async () => {
+          try {
+            const { startCronScheduler } = await import('./lib/cron-scheduler');
+            startCronScheduler();
+          } catch (err) {
+            console.error('[instrumentation] ⚠️  Failed to start cron scheduler:', err);
+          }
+        }, 10_000);
+
         return; // success — exit the retry loop
       } catch (error) {
         console.error(
