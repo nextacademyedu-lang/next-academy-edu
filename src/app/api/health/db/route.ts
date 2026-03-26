@@ -36,29 +36,29 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
       }
     }
 
-    // Check migration status
+    // Check migration status via raw pool query (avoids drizzle-orm import)
     let migrationStatus: unknown = null;
     try {
       const db = payload.db as any;
-      if (db.drizzle) {
-        const { sql } = await import('drizzle-orm');
-        const migrationResult = await db.drizzle.execute(
-          sql`SELECT name, batch, created_at FROM payload_migrations ORDER BY created_at DESC LIMIT 20`
+      const pool = db.pool;
+      if (pool) {
+        const migrationResult = await pool.query(
+          'SELECT name, batch, created_at FROM payload_migrations ORDER BY created_at DESC LIMIT 20'
         );
-        migrationStatus = migrationResult.rows || migrationResult;
+        migrationStatus = migrationResult.rows;
       }
     } catch {
       migrationStatus = 'Could not query migration table';
     }
 
-    // Check if all tables exist
+    // Check if all tables exist via raw pool query
     let allTables: string[] = [];
     try {
       const db = payload.db as any;
-      if (db.drizzle) {
-        const { sql } = await import('drizzle-orm');
-        const tableResult = await db.drizzle.execute(
-          sql`SELECT tablename FROM pg_tables WHERE schemaname = 'public' ORDER BY tablename`
+      const pool = db.pool;
+      if (pool) {
+        const tableResult = await pool.query(
+          "SELECT tablename FROM pg_tables WHERE schemaname = 'public' ORDER BY tablename"
         );
         allTables = (tableResult.rows || []).map((r: any) => r.tablename);
       }
