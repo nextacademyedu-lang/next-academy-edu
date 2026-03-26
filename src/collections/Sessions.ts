@@ -1,5 +1,7 @@
 import type { CollectionConfig } from 'payload';
 import { isAdmin, isPublic } from '../lib/access-control.ts';
+import { isGoogleCalendarEnabled } from '../lib/google-auth.ts';
+import { createSessionEvent, deleteEvent } from '../lib/google-calendar.ts';
 
 type SessionLike = {
   date?: string | null;
@@ -143,8 +145,51 @@ export const Sessions: CollectionConfig = {
         return next;
       },
     ],
-    afterChange: [],
-    afterDelete: [],
+    afterChange: [
+      async ({ doc, operation, req }) => {
+        // Auto-create Google Calendar event for new sessions
+        if (operation !== 'create') return doc;
+        if (!isGoogleCalendarEnabled()) return doc;
+        if ((doc as any).googleEventId) return doc; // already linked
+
+        try {
+          const result = await createSessionEvent({
+            title: (doc as any).title || 'Session',
+            description: (doc as any).description || '',
+            date: (doc as any).date,
+            startTime: (doc as any).startTime,
+            endTime: (doc as any).endTime,
+          });
+
+          if (result) {
+            // Patch the session with event ID + meeting URL
+            await req.payload.update({
+              collection: 'sessions',
+              id: (doc as any).id,
+              data: {
+                googleEventId: result.eventId,
+                meetingUrl: result.meetingUrl || (doc as any).meetingUrl || '',
+              } as any, // googleEventId added at runtime; types updated after next importmap generation
+              overrideAccess: true,
+              req,
+            });
+          }
+        } catch (err) {
+          console.error('[Sessions] Failed to create Google Calendar event:', err);
+        }
+
+        return doc;
+      },
+    ],
+    afterDelete: [
+      async ({ doc }) => {
+        // Remove Google Calendar event when session is deleted
+        const eventId = (doc as any)?.googleEventId;
+        if (eventId && isGoogleCalendarEnabled()) {
+          await deleteEvent(eventId);
+        }
+      },
+    ],
 
     afterRead: [
       ({ doc }) => {
@@ -192,5 +237,6 @@ export const Sessions: CollectionConfig = {
     { name: 'cancellationReason', type: 'textarea' },
     { name: 'attendanceCount', type: 'number', defaultValue: 0 },
     { name: 'attendeesCount', type: 'number', defaultValue: 0 },
+    { name: 'googleEventId', type: 'text', admin: { readOnly: true, description: 'Google Calendar event ID (auto-set)' } },
   ],
 };

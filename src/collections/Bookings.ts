@@ -2,6 +2,8 @@ import type { CollectionConfig } from 'payload';
 import { isAdmin, isAdminOrOwner, isAuthenticated } from '../lib/access-control.ts';
 import { createCrmDedupeKey } from '../lib/crm/dedupe.ts';
 import { enqueueCrmSyncEvent } from '../lib/crm/queue.ts';
+import { isGoogleCalendarEnabled } from '../lib/google-auth.ts';
+import { addAttendeeToAllEvents, removeAttendeeFromAllEvents } from '../lib/google-calendar.ts';
 
 function resolveBookingAction(params: {
   operation: 'create' | 'update';
@@ -109,6 +111,61 @@ export const Bookings: CollectionConfig = {
             updatedAt: doc.updatedAt,
           },
         });
+
+        // Google Calendar: auto-invite on confirm, auto-revoke on cancel/refund
+        if (isGoogleCalendarEnabled()) {
+          const statusChanged = previousDoc?.status !== doc.status;
+          const isConfirmed = doc.status === 'confirmed' && statusChanged;
+          const isRevoked =
+            (doc.status === 'cancelled' || doc.status === 'refunded' || doc.status === 'cancelled_overdue') &&
+            statusChanged;
+
+          if (isConfirmed || isRevoked) {
+            try {
+              // Get user email
+              const userId = typeof doc.user === 'object' ? doc.user?.id : doc.user;
+              const userDoc = userId
+                ? await req.payload.findByID({
+                    collection: 'users',
+                    id: userId,
+                    depth: 0,
+                    overrideAccess: true,
+                    req,
+                  })
+                : null;
+              const email = (userDoc as any)?.email;
+
+              if (email) {
+                // Get sessions for this booking's round
+                const roundId = typeof doc.round === 'object' ? doc.round?.id : doc.round;
+                if (roundId) {
+                  const sessionsResult = await req.payload.find({
+                    collection: 'sessions',
+                    where: { round: { equals: roundId } },
+                    depth: 0,
+                    limit: 500,
+                    overrideAccess: true,
+                    req,
+                  });
+
+                  const eventIds = (sessionsResult.docs as any[])
+                    .map((s) => s.googleEventId)
+                    .filter(Boolean);
+
+                  if (eventIds.length > 0) {
+                    if (isConfirmed) {
+                      await addAttendeeToAllEvents(eventIds, email);
+                    } else {
+                      await removeAttendeeFromAllEvents(eventIds, email);
+                    }
+                  }
+                }
+              }
+            } catch (err) {
+              console.error('[Bookings] Google Calendar invite/revoke error:', err);
+            }
+          }
+        }
       },
     ],
   },

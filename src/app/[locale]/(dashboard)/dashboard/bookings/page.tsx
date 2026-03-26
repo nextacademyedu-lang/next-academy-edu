@@ -150,17 +150,25 @@ export default function BookingsPage() {
                       </Button>
                     </a>
                   )}
+                  {(booking.status === 'confirmed' || booking.status === 'completed') && (
+                    (() => {
+                      const round = booking.round;
+                      const roundId = round ? (typeof round === 'string' ? round : round.id) : null;
+                      return roundId ? (
+                        <Link href={`/${locale}/dashboard/courses/${roundId}`} style={{ flex: 1, textDecoration: 'none' }}>
+                          <Button variant="outline" fullWidth style={{ padding: '0 12px' }}>
+                            <BookOpen size={16} style={{ marginRight: '8px' }} /> Open Course
+                          </Button>
+                        </Link>
+                      ) : null;
+                    })()
+                  )}
                   {(booking.status === 'pending' || booking.status === 'reserved') && (
                     <Link href={`/${locale}/checkout/${booking.id}`} style={{ flex: 1, textDecoration: 'none' }}>
                       <Button variant="outline" fullWidth style={{ borderColor: '#ffc107', color: '#ffc107' }}>
                         Complete Payment
                       </Button>
                     </Link>
-                  )}
-                  {booking.status === 'completed' && (
-                    <Button variant="ghost" style={{ flex: 1, padding: '0 12px' }} disabled>
-                      Completed ✓
-                    </Button>
                   )}
                 </CardFooter>
               </Card>

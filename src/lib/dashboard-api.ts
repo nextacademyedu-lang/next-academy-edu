@@ -227,3 +227,39 @@ export function getStatusLabel(status: PayloadBooking['status']): string {
   };
   return map[status] ?? status;
 }
+
+// ─────────────────────────────────────────────
+// Sessions (for Course Player)
+// ─────────────────────────────────────────────
+
+export interface PayloadSession {
+  id: string;
+  title: string;
+  description?: string;
+  date: string;
+  startTime: string;
+  endTime: string;
+  status: 'scheduled' | 'live' | 'completed' | 'cancelled';
+  meetingUrl?: string;
+  recordingUrl?: string;
+  materials?: { name: string; file?: { url: string } | null }[];
+  isCancelled?: boolean;
+  order?: number;
+  round?: string | { id: string };
+}
+
+export async function getBookingSessions(roundId: string): Promise<AuthResponse<PayloadListResponse<PayloadSession>>> {
+  const response = await fetch(
+    `/api/sessions?where[round][equals]=${roundId}&sort=date&depth=1&limit=100`,
+    { credentials: 'include' },
+  );
+  return handleResponse<PayloadListResponse<PayloadSession>>(response);
+}
+
+export async function getBookingsForCourses(): Promise<AuthResponse<PayloadListResponse<PayloadBooking>>> {
+  const response = await fetch(
+    '/api/bookings?where[status][in]=confirmed,completed&depth=2&sort=-createdAt&limit=50',
+    { credentials: 'include' },
+  );
+  return handleResponse<PayloadListResponse<PayloadBooking>>(response);
+}

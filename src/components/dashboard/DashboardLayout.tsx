@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { Home, BookOpen, CreditCard, User, LogOut, Bell, ArrowLeft } from 'lucide-react';
+import { Home, BookOpen, CreditCard, User, LogOut, Bell, ArrowLeft, GraduationCap } from 'lucide-react';
 import styles from './dashboard.module.css';
 import { useAuth } from '@/context/auth-context';
 import { useLocale } from 'next-intl';
@@ -16,10 +16,11 @@ const ROLE_LABELS: Record<string, string> = {
 };
 
 const NAV_LINKS = [
-  { name: 'Overview',    href: '/dashboard',          icon: Home },
-  { name: 'My Bookings', href: '/dashboard/bookings', icon: BookOpen },
-  { name: 'Payments',    href: '/dashboard/payments', icon: CreditCard },
-  { name: 'Profile',     href: '/dashboard/profile',  icon: User },
+  { name: 'Overview',    href: '/dashboard',            icon: Home },
+  { name: 'My Bookings', href: '/dashboard/bookings',   icon: BookOpen },
+  { name: 'My Courses',  href: '/dashboard/courses',    icon: GraduationCap },
+  { name: 'Payments',    href: '/dashboard/payments',    icon: CreditCard },
+  { name: 'Profile',     href: '/dashboard/profile',     icon: User },
 ];
 
 export function DashboardLayout({ children }: { children: React.ReactNode }) {

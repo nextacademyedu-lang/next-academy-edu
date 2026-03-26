@@ -1,0 +1,327 @@
+   ▲ Next.js 15.4.11
+   - Local:        http://localhost:3001
+   - Network:      http://0.0.0.0:3001
+
+ ✓ Starting...
+[instrumentation] Attempt 1/5: Initializing Payload CMS…
+ ✓ Ready in 799ms
+[instrumentation] ✅ Payload CMS initialized. Collections: users, media, companies, user-profiles, tags, categories, instructors, programs, rounds, sessions, payment-plans, bookings, payments, installment-requests, notifications, discount-codes, consultation-types, consultation-availability, consultation-slots, consultation-bookings, leads, waitlist, reviews, certificates, payment-links, instructor-blocked-dates, verification-codes, blog-posts, bulk-seat-allocations, popups, announcement-bars, upcoming-events-config, crm-sync-events, payload-kv, payload-locked-documents, payload-preferences, payload-migrations
+[EasyKash] Sending Payload for Booking 21: {
+[Error: Failed to find Server Action "40ac840dcb6a5f370913784a0eb9299badc1e46f53". This request might be from an older or newer deployment.
+Read more: https://nextjs.org/docs/messages/failed-to-find-server-action]
+[Error: Failed to find Server Action "40ac840dcb6a5f370913784a0eb9299badc1e46f53". This request might be from an older or newer deployment.
+Read more: https://nextjs.org/docs/messages/failed-to-find-server-action]
+  "amount": 2,
+  "currency": "EGP",
+  "paymentOptions": [
+    2,
+    3,
+    4,
+    5,
+    6
+  ],
+  "cashExpiry": 24,
+  "name": "mohamed mekky",
+  "email": "<REDACTED>",
+  "mobile": "01000000000",
+  "redirectUrl": "https://nextacademyedu.com/api/webhooks/easykash/redirect?bookingId=21&locale=en",
+  "customerReference": "181774403007985"
+}
+[EasyKash] Response for 21: {
+  "redirectUrl": "https://easykash.net//DirectPayV1/HAH5657"
+}
+[01:53:59] ERROR: Failed query: delete from "payload_preferences" where "payload_preferences"."key" in ($1, $2, $3, $4, $5)
+params: collection-programs-5,collection-programs-4,collection-programs-3,collection-programs-2,collection-programs-1
+    err: {
+      "type": "me",
+      "message": "Failed query: delete from \"payload_preferences\" where \"payload_preferences\".\"key\" in ($1, $2, $3, $4, $5)\nparams: collection-programs-5,collection-programs-4,collection-programs-3,collection-programs-2,collection-programs-1: current transaction is aborted, commands ignored until end of transaction block",
+      "stack":
+          Error: Failed query: delete from "payload_preferences" where "payload_preferences"."key" in ($1, $2, $3, $4, $5)
+          params: collection-programs-5,collection-programs-4,collection-programs-3,collection-programs-2,collection-programs-1
+              at nm.queryWithCache (/app/.next/server/chunks/736.js:78:20009)
+              at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+              at async Object.jn [as deleteWhere] (/app/.next/server/chunks/736.js:55:1634)
+              at async Object.iA [as deleteMany] (/app/.next/server/chunks/736.js:46:2134)
+              at async e (/app/.next/server/chunks/4206.js:87:115493)
+              at async y (/app/.next/server/chunks/4206.js:1:24856)
+              at async cE (/app/.next/server/chunks/736.js:11:52905)
+              at async P (/app/.next/server/app/(payload)/api/[...slug]/route.js:1:5245)
+              at async /app/.next/server/app/(payload)/api/[...slug]/route.js:1:8026
+              at async rb.do (/app/node_modules/.pnpm/next@15.4.11_react-dom@19.2.3_react@19.2.3__react@19.2.3_sass@1.98.0/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js:5:21059)
+          caused by: error: current transaction is aborted, commands ignored until end of transaction block
+              at /app/.next/server/chunks/736.js:10:11762
+              at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+              at async /app/.next/server/chunks/736.js:78:23069
+              at async nm.queryWithCache (/app/.next/server/chunks/736.js:78:19984)
+              at async Object.jn [as deleteWhere] (/app/.next/server/chunks/736.js:55:1634)
+              at async Object.iA [as deleteMany] (/app/.next/server/chunks/736.js:46:2134)
+              at async e (/app/.next/server/chunks/4206.js:87:115493)
+              at async y (/app/.next/server/chunks/4206.js:1:24856)
+              at async cE (/app/.next/server/chunks/736.js:11:52905)
+              at async P (/app/.next/server/app/(payload)/api/[...slug]/route.js:1:5245)
+      "query": "delete from \"payload_preferences\" where \"payload_preferences\".\"key\" in ($1, $2, $3, $4, $5)",
+      "params": [
+        "collection-programs-5",
+        "collection-programs-4",
+        "collection-programs-3",
+        "collection-programs-2",
+        "collection-programs-1"
+      ]
+    }
+[01:54:12] ERROR: Failed query: delete from "payload_preferences" where "payload_preferences"."key" in ($1)
+params: collection-programs-3
+    err: {
+      "type": "me",
+      "message": "Failed query: delete from \"payload_preferences\" where \"payload_preferences\".\"key\" in ($1)\nparams: collection-programs-3: current transaction is aborted, commands ignored until end of transaction block",
+      "stack":
+          Error: Failed query: delete from "payload_preferences" where "payload_preferences"."key" in ($1)
+          params: collection-programs-3
+              at nm.queryWithCache (/app/.next/server/chunks/736.js:78:20009)
+              at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+              at async Object.jn [as deleteWhere] (/app/.next/server/chunks/736.js:55:1634)
+              at async Object.iA [as deleteMany] (/app/.next/server/chunks/736.js:46:2134)
+              at async e (/app/.next/server/chunks/4206.js:87:115493)
+              at async y (/app/.next/server/chunks/4206.js:1:24856)
+              at async cE (/app/.next/server/chunks/736.js:11:52905)
+              at async P (/app/.next/server/app/(payload)/api/[...slug]/route.js:1:5245)
+              at async /app/.next/server/app/(payload)/api/[...slug]/route.js:1:8026
+              at async rb.do (/app/node_modules/.pnpm/next@15.4.11_react-dom@19.2.3_react@19.2.3__react@19.2.3_sass@1.98.0/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js:5:21059)
+          caused by: error: current transaction is aborted, commands ignored until end of transaction block
+              at /app/.next/server/chunks/736.js:10:11762
+              at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+              at async /app/.next/server/chunks/736.js:78:23069
+              at async nm.queryWithCache (/app/.next/server/chunks/736.js:78:19984)
+              at async Object.jn [as deleteWhere] (/app/.next/server/chunks/736.js:55:1634)
+              at async Object.iA [as deleteMany] (/app/.next/server/chunks/736.js:46:2134)
+[payment-helper] Amount includes gateway fees { expected: 200, received: 300, diff: 100 }
+              at async e (/app/.next/server/chunks/4206.js:87:115493)
+              at async y (/app/.next/server/chunks/4206.js:1:24856)
+              at async cE (/app/.next/server/chunks/736.js:11:52905)
+              at async P (/app/.next/server/app/(payload)/api/[...slug]/route.js:1:5245)
+      "query": "delete from \"payload_preferences\" where \"payload_preferences\".\"key\" in ($1)",
+      "params": [
+        "collection-programs-3"
+      ]
+    }
+[01:54:17] ERROR: Failed query: delete from "payload_preferences" where "payload_preferences"."key" in ($1)
+params: collection-programs-2
+    err: {
+      "type": "me",
+      "message": "Failed query: delete from \"payload_preferences\" where \"payload_preferences\".\"key\" in ($1)\nparams: collection-programs-2: current transaction is aborted, commands ignored until end of transaction block",
+      "stack":
+          Error: Failed query: delete from "payload_preferences" where "payload_preferences"."key" in ($1)
+          params: collection-programs-2
+              at nm.queryWithCache (/app/.next/server/chunks/736.js:78:20009)
+              at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+              at async Object.jn [as deleteWhere] (/app/.next/server/chunks/736.js:55:1634)
+              at async Object.iA [as deleteMany] (/app/.next/server/chunks/736.js:46:2134)
+              at async e (/app/.next/server/chunks/4206.js:87:115493)
+              at async y (/app/.next/server/chunks/4206.js:1:24856)
+              at async cE (/app/.next/server/chunks/736.js:11:52905)
+              at async P (/app/.next/server/app/(payload)/api/[...slug]/route.js:1:5245)
+              at async /app/.next/server/app/(payload)/api/[...slug]/route.js:1:8026
+              at async rb.do (/app/node_modules/.pnpm/next@15.4.11_react-dom@19.2.3_react@19.2.3__react@19.2.3_sass@1.98.0/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js:5:21059)
+          caused by: error: current transaction is aborted, commands ignored until end of transaction block
+              at /app/.next/server/chunks/736.js:10:11762
+              at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+              at async /app/.next/server/chunks/736.js:78:23069
+              at async nm.queryWithCache (/app/.next/server/chunks/736.js:78:19984)
+              at async Object.jn [as deleteWhere] (/app/.next/server/chunks/736.js:55:1634)
+              at async Object.iA [as deleteMany] (/app/.next/server/chunks/736.js:46:2134)
+              at async e (/app/.next/server/chunks/4206.js:87:115493)
+              at async y (/app/.next/server/chunks/4206.js:1:24856)
+              at async cE (/app/.next/server/chunks/736.js:11:52905)
+              at async P (/app/.next/server/app/(payload)/api/[...slug]/route.js:1:5245)
+      "query": "delete from \"payload_preferences\" where \"payload_preferences\".\"key\" in ($1)",
+      "params": [
+        "collection-programs-2"
+      ]
+    }
+[01:54:20] ERROR: Failed query: delete from "payload_preferences" where "payload_preferences"."key" in ($1)
+params: collection-programs-1
+    err: {
+      "type": "me",
+      "message": "Failed query: delete from \"payload_preferences\" where \"payload_preferences\".\"key\" in ($1)\nparams: collection-programs-1: current transaction is aborted, commands ignored until end of transaction block",
+      "stack":
+          Error: Failed query: delete from "payload_preferences" where "payload_preferences"."key" in ($1)
+          params: collection-programs-1
+              at nm.queryWithCache (/app/.next/server/chunks/736.js:78:20009)
+              at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+              at async Object.jn [as deleteWhere] (/app/.next/server/chunks/736.js:55:1634)
+              at async Object.iA [as deleteMany] (/app/.next/server/chunks/736.js:46:2134)
+              at async e (/app/.next/server/chunks/4206.js:87:115493)
+              at async y (/app/.next/server/chunks/4206.js:1:24856)
+              at async cE (/app/.next/server/chunks/736.js:11:52905)
+              at async P (/app/.next/server/app/(payload)/api/[...slug]/route.js:1:5245)
+              at async /app/.next/server/app/(payload)/api/[...slug]/route.js:1:8026
+              at async rb.do (/app/node_modules/.pnpm/next@15.4.11_react-dom@19.2.3_react@19.2.3__react@19.2.3_sass@1.98.0/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js:5:21059)
+          caused by: error: current transaction is aborted, commands ignored until end of transaction block
+              at /app/.next/server/chunks/736.js:10:11762
+              at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+              at async /app/.next/server/chunks/736.js:78:23069
+              at async nm.queryWithCache (/app/.next/server/chunks/736.js:78:19984)
+              at async Object.jn [as deleteWhere] (/app/.next/server/chunks/736.js:55:1634)
+              at async Object.iA [as deleteMany] (/app/.next/server/chunks/736.js:46:2134)
+              at async e (/app/.next/server/chunks/4206.js:87:115493)
+              at async y (/app/.next/server/chunks/4206.js:1:24856)
+              at async cE (/app/.next/server/chunks/736.js:11:52905)
+              at async P (/app/.next/server/app/(payload)/api/[...slug]/route.js:1:5245)
+      "query": "delete from \"payload_preferences\" where \"payload_preferences\".\"key\" in ($1)",
+      "params": [
+        "collection-programs-1"
+      ]
+    }
+[01:54:42] ERROR: Failed query: delete from "payload_preferences" where "payload_preferences"."key" in ($1)
+params: collection-rounds-1
+    err: {
+      "type": "me",
+      "message": "Failed query: delete from \"payload_preferences\" where \"payload_preferences\".\"key\" in ($1)\nparams: collection-rounds-1: current transaction is aborted, commands ignored until end of transaction block",
+      "stack":
+          Error: Failed query: delete from "payload_preferences" where "payload_preferences"."key" in ($1)
+          params: collection-rounds-1
+              at nm.queryWithCache (/app/.next/server/chunks/736.js:78:20009)
+              at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+              at async Object.jn [as deleteWhere] (/app/.next/server/chunks/736.js:55:1634)
+              at async Object.iA [as deleteMany] (/app/.next/server/chunks/736.js:46:2134)
+              at async e (/app/.next/server/chunks/4206.js:87:115493)
+              at async y (/app/.next/server/chunks/4206.js:1:24856)
+              at async cE (/app/.next/server/chunks/736.js:11:52905)
+              at async P (/app/.next/server/app/(payload)/api/[...slug]/route.js:1:5245)
+              at async /app/.next/server/app/(payload)/api/[...slug]/route.js:1:8026
+              at async rb.do (/app/node_modules/.pnpm/next@15.4.11_react-dom@19.2.3_react@19.2.3__react@19.2.3_sass@1.98.0/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js:5:21059)
+          caused by: error: current transaction is aborted, commands ignored until end of transaction block
+              at /app/.next/server/chunks/736.js:10:11762
+              at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+              at async /app/.next/server/chunks/736.js:78:23069
+              at async nm.queryWithCache (/app/.next/server/chunks/736.js:78:19984)
+              at async Object.jn [as deleteWhere] (/app/.next/server/chunks/736.js:55:1634)
+              at async Object.iA [as deleteMany] (/app/.next/server/chunks/736.js:46:2134)
+              at async e (/app/.next/server/chunks/4206.js:87:115493)
+              at async y (/app/.next/server/chunks/4206.js:1:24856)
+              at async cE (/app/.next/server/chunks/736.js:11:52905)
+              at async P (/app/.next/server/app/(payload)/api/[...slug]/route.js:1:5245)
+      "query": "delete from \"payload_preferences\" where \"payload_preferences\".\"key\" in ($1)",
+      "params": [
+        "collection-rounds-1"
+      ]
+    }
+[01:54:46] ERROR: Failed query: delete from "payload_preferences" where "payload_preferences"."key" in ($1)
+params: collection-rounds-2
+    err: {
+      "type": "me",
+      "message": "Failed query: delete from \"payload_preferences\" where \"payload_preferences\".\"key\" in ($1)\nparams: collection-rounds-2: current transaction is aborted, commands ignored until end of transaction block",
+      "stack":
+          Error: Failed query: delete from "payload_preferences" where "payload_preferences"."key" in ($1)
+          params: collection-rounds-2
+              at nm.queryWithCache (/app/.next/server/chunks/736.js:78:20009)
+              at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+              at async Object.jn [as deleteWhere] (/app/.next/server/chunks/736.js:55:1634)
+              at async Object.iA [as deleteMany] (/app/.next/server/chunks/736.js:46:2134)
+              at async e (/app/.next/server/chunks/4206.js:87:115493)
+              at async y (/app/.next/server/chunks/4206.js:1:24856)
+              at async cE (/app/.next/server/chunks/736.js:11:52905)
+              at async P (/app/.next/server/app/(payload)/api/[...slug]/route.js:1:5245)
+              at async /app/.next/server/app/(payload)/api/[...slug]/route.js:1:8026
+              at async rb.do (/app/node_modules/.pnpm/next@15.4.11_react-dom@19.2.3_react@19.2.3__react@19.2.3_sass@1.98.0/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js:5:21059)
+          caused by: error: current transaction is aborted, commands ignored until end of transaction block
+              at /app/.next/server/chunks/736.js:10:11762
+              at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+              at async /app/.next/server/chunks/736.js:78:23069
+              at async nm.queryWithCache (/app/.next/server/chunks/736.js:78:19984)
+              at async Object.jn [as deleteWhere] (/app/.next/server/chunks/736.js:55:1634)
+              at async Object.iA [as deleteMany] (/app/.next/server/chunks/736.js:46:2134)
+              at async e (/app/.next/server/chunks/4206.js:87:115493)
+              at async y (/app/.next/server/chunks/4206.js:1:24856)
+              at async cE (/app/.next/server/chunks/736.js:11:52905)
+              at async P (/app/.next/server/app/(payload)/api/[...slug]/route.js:1:5245)
+      "query": "delete from \"payload_preferences\" where \"payload_preferences\".\"key\" in ($1)",
+      "params": [
+        "collection-rounds-2"
+      ]
+    }
+[01:54:56] ERROR: Failed query: delete from "payload_preferences" where "payload_preferences"."key" in ($1)
+params: collection-rounds-8
+    err: {
+      "type": "me",
+      "message": "Failed query: delete from \"payload_preferences\" where \"payload_preferences\".\"key\" in ($1)\nparams: collection-rounds-8: current transaction is aborted, commands ignored until end of transaction block",
+      "stack":
+          Error: Failed query: delete from "payload_preferences" where "payload_preferences"."key" in ($1)
+          params: collection-rounds-8
+              at nm.queryWithCache (/app/.next/server/chunks/736.js:78:20009)
+              at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+              at async Object.jn [as deleteWhere] (/app/.next/server/chunks/736.js:55:1634)
+              at async Object.iA [as deleteMany] (/app/.next/server/chunks/736.js:46:2134)
+              at async e (/app/.next/server/chunks/4206.js:87:115493)
+              at async y (/app/.next/server/chunks/4206.js:1:24856)
+              at async cE (/app/.next/server/chunks/736.js:11:52905)
+              at async P (/app/.next/server/app/(payload)/api/[...slug]/route.js:1:5245)
+              at async /app/.next/server/app/(payload)/api/[...slug]/route.js:1:8026
+              at async rb.do (/app/node_modules/.pnpm/next@15.4.11_react-dom@19.2.3_react@19.2.3__react@19.2.3_sass@1.98.0/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js:5:21059)
+          caused by: error: current transaction is aborted, commands ignored until end of transaction block
+              at /app/.next/server/chunks/736.js:10:11762
+              at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+              at async /app/.next/server/chunks/736.js:78:23069
+              at async nm.queryWithCache (/app/.next/server/chunks/736.js:78:19984)
+              at async Object.jn [as deleteWhere] (/app/.next/server/chunks/736.js:55:1634)
+              at async Object.iA [as deleteMany] (/app/.next/server/chunks/736.js:46:2134)
+              at async e (/app/.next/server/chunks/4206.js:87:115493)
+              at async y (/app/.next/server/chunks/4206.js:1:24856)
+              at async cE (/app/.next/server/chunks/736.js:11:52905)
+              at async P (/app/.next/server/app/(payload)/api/[...slug]/route.js:1:5245)
+      "query": "delete from \"payload_preferences\" where \"payload_preferences\".\"key\" in ($1)",
+      "params": [
+        "collection-rounds-8"
+      ]
+    }
+[01:56:28] ERROR: The following field is invalid: Company
+    err: {
+      "type": "h",
+      "message": "The following field is invalid: Company",
+      "stack":
+          h: The following field is invalid: Company
+              at g (/app/.next/server/chunks/4206.js:121:127742)
+              at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+              at async Q (/app/.next/server/chunks/4206.js:121:20746)
+              at async cC (/app/.next/server/chunks/736.js:11:52461)
+              at async P (/app/.next/server/app/(payload)/api/[...slug]/route.js:1:5245)
+              at async /app/.next/server/app/(payload)/api/[...slug]/route.js:1:8026
+              at async rb.do (/app/node_modules/.pnpm/next@15.4.11_react-dom@19.2.3_react@19.2.3__react@19.2.3_sass@1.98.0/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js:5:21059)
+              at async rb.handle (/app/node_modules/.pnpm/next@15.4.11_react-dom@19.2.3_react@19.2.3__react@19.2.3_sass@1.98.0/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js:5:25902)
+              at async k (/app/.next/server/app/(payload)/api/[...slug]/route.js:1:10829)
+              at async rb.handleResponse (/app/node_modules/.pnpm/next@15.4.11_react-dom@19.2.3_react@19.2.3__react@19.2.3_sass@1.98.0/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js:1:104365)
+      "data": {
+        "collection": "user-profiles",
+        "errors": [
+          {
+            "label": "Company",
+            "message": "This relationship field has the following invalid relationships: ValeuIMS 0",
+            "path": "company"
+          }
+        ]
+      },
+      "isOperational": true,
+      "isPublic": true,
+      "status": 400,
+      "name": "h"
+    }
+[EasyKash] Sending Payload for Booking 24: {
+  "amount": 2,
+  "currency": "EGP",
+  "paymentOptions": [
+    2,
+    3,
+    4,
+    5,
+    6
+  ],
+  "cashExpiry": 24,
+  "name": "mohamed mekky",
+  "email": "<REDACTED>",
+  "mobile": "01000000000",
+  "redirectUrl": "https://nextacademyedu.com/api/webhooks/easykash/redirect?bookingId=24&locale=en",
+  "customerReference": "211774403830116"
+}
+[EasyKash] Response for 24: {
+  "redirectUrl": "https://easykash.net//DirectPayV1/JDS3331"
+}
+[payment-helper] Amount includes gateway fees { expected: 200, received: 300, diff: 100 }
