@@ -12,6 +12,7 @@ import {
 import type { CheckoutSession } from '@/lib/payment-api';
 import { authenticateRequestUser } from '@/lib/server-auth';
 import { assertTrustedWriteRequest } from '@/lib/csrf';
+import { processSuccessfulPayment } from '@/lib/payment-helper';
 
 export async function POST(req: NextRequest) {
   try {
@@ -60,6 +61,33 @@ export async function POST(req: NextRequest) {
     const payment = paymentsResult.docs[0];
     if (!payment) return NextResponse.json({ error: 'No pending payment found' }, { status: 404 });
 
+    const resolvedLocale = locale === 'ar' ? 'ar' : 'en';
+
+    // Free/fully-discounted booking: skip gateway and auto-confirm.
+    if ((payment.amount ?? 0) <= 0) {
+      await processSuccessfulPayment({
+        paymentId: payment.id,
+        bookingId,
+        receivedAmountCents: 0,
+        transactionId: `FREE-${bookingId}-${Date.now()}`,
+        gatewayResponse: {
+          gateway: 'internal',
+          flow: 'free-checkout',
+          method,
+          amountCents: 0,
+        },
+        req: req as any,
+      });
+
+      return NextResponse.json({
+        redirectUrl: `/${resolvedLocale}/checkout/success?bookingId=${encodeURIComponent(bookingId)}`,
+        bookingId,
+        gateway: 'internal',
+        method: 'free',
+        free: true,
+      });
+    }
+
     // ── 4. Build session ───────────────────────────────────────────
     const session: CheckoutSession = {
       bookingId,
@@ -86,7 +114,7 @@ export async function POST(req: NextRequest) {
       const custRef = `${payment.id}-${Date.now()}`;
       const directPay = await createEasyKashDirectPay(session, {
         currency,
-        locale: typeof locale === 'string' ? locale : undefined,
+        locale: resolvedLocale,
         customerReference: custRef,
       });
       const productCode = extractEasyKashProductCode(directPay.redirectUrl);
@@ -130,7 +158,7 @@ export async function POST(req: NextRequest) {
       console.error('[paymob/checkout] Missing env vars: PAYMOB_API_KEY=', !!process.env.PAYMOB_API_KEY, 'integrationId=', integrationId);
       return NextResponse.json({ error: 'Payment gateway not configured' }, { status: 503 });
     }
-    const intention = await createPaymobIntention(session, method, typeof locale === 'string' ? locale : undefined);
+    const intention = await createPaymobIntention(session, method, resolvedLocale);
 
     await payload.update({
       collection: 'payments',

@@ -13,6 +13,12 @@ type ExistingBookingsResponse = {
   docs?: ExistingBookingDoc[];
 };
 
+type CreateBookingResponse = {
+  bookingId?: string | number;
+  isFree?: boolean;
+  error?: string;
+};
+
 type Props = {
   locale: string;
   roundId: string | number;
@@ -67,7 +73,7 @@ export function BookRoundButton({
         body: JSON.stringify({ roundId }),
       });
 
-      const createData = await createRes.json().catch(() => ({}));
+      const createData = (await createRes.json().catch(() => ({}))) as CreateBookingResponse;
 
       if (createRes.status === 401) {
         if (typeof window !== 'undefined') {
@@ -78,6 +84,10 @@ export function BookRoundButton({
       }
 
       if (createRes.ok && createData?.bookingId != null) {
+        if (createData.isFree) {
+          router.push(`/${locale}/checkout/success?bookingId=${createData.bookingId}`);
+          return;
+        }
         router.push(`/${locale}/checkout/${createData.bookingId}`);
         return;
       }

@@ -182,12 +182,21 @@ export default function CheckoutPage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'فشل إنشاء الدفع');
 
+      if (typeof data?.redirectUrl === 'string' && data.redirectUrl.length > 0) {
+        if (/^https?:\/\//i.test(data.redirectUrl)) {
+          window.location.href = data.redirectUrl;
+        } else {
+          router.push(data.redirectUrl);
+        }
+        return;
+      }
+
       if (selectedOption.method === 'fawry') {
         router.push(
           `/${locale}/checkout/pending?bookingId=${bookingId}&voucher=${data.voucher}&provider=${data.provider}&expiryDate=${encodeURIComponent(data.expiryDate)}`,
         );
       } else {
-        window.location.href = data.redirectUrl;
+        throw new Error('تعذر بدء الدفع الآن.');
       }
     } catch (err: any) {
       setError(err.message || 'حصلت مشكلة. حاول تاني.');

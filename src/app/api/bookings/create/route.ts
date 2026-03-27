@@ -5,6 +5,7 @@ import { authenticateRequestUser } from '@/lib/server-auth';
 import crypto from 'node:crypto';
 import { assertTrustedWriteRequest } from '@/lib/csrf';
 import { atomicIncrement, atomicIncrementWithLimit, atomicIncrementWithCeiling } from '@/lib/atomic-db';
+import { processSuccessfulPayment } from '@/lib/payment-helper';
 
 function generateCode(prefix: string): string {
   const random = crypto.randomBytes(3).toString('hex').toUpperCase();
@@ -126,6 +127,7 @@ export async function POST(req: NextRequest) {
     }
 
     const finalAmount = basePrice - discountAmount;
+    const isFreeBooking = finalAmount <= 0;
 
     // ── Create booking ────────────────────────────────────────────────────
     stage = 'create_booking';
@@ -150,8 +152,25 @@ export async function POST(req: NextRequest) {
 
     // ── Create payment records ────────────────────────────────────────────
     const now = new Date();
+    let freePaymentId: number | string | null = null;
 
-    if (normalizedPaymentPlanId != null) {
+    if (isFreeBooking) {
+      // Free booking: create a single zero-amount payment, then auto-settle it.
+      stage = 'create_free_payment';
+      const freePayment = await payload.create({
+        collection: 'payments',
+        data: {
+          paymentCode: generateCode('PAY'),
+          booking: booking.id,
+          amount: 0,
+          dueDate: new Date(now.getTime() + 24 * 60 * 60 * 1000).toISOString(),
+          status: 'pending',
+        },
+        overrideAccess: true,
+        req: req as any,
+      });
+      freePaymentId = freePayment.id;
+    } else if (normalizedPaymentPlanId != null) {
       // Installment plan — create N payment records
       stage = 'find_payment_plan';
       const plan = await payload.findByID({
@@ -240,8 +259,28 @@ export async function POST(req: NextRequest) {
       });
     }
 
+    if (isFreeBooking && freePaymentId != null) {
+      stage = 'auto_confirm_free_booking';
+      await processSuccessfulPayment({
+        paymentId: freePaymentId,
+        bookingId: booking.id,
+        receivedAmountCents: 0,
+        transactionId: `FREE-${booking.id}-${Date.now()}`,
+        gatewayResponse: {
+          gateway: 'internal',
+          flow: 'free-booking',
+          amountCents: 0,
+        },
+        req: req as any,
+      });
+    }
+
     stage = 'done';
-    return NextResponse.json({ bookingId: booking.id, bookingCode: booking.bookingCode });
+    return NextResponse.json({
+      bookingId: booking.id,
+      bookingCode: booking.bookingCode,
+      isFree: isFreeBooking,
+    });
   } catch (err) {
     console.error('[bookings/create]', { stage, err });
     return NextResponse.json({ error: 'حصلت مشكلة' }, { status: 500 });
