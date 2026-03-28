@@ -70,6 +70,10 @@ export interface PayloadConsultationType {
   descriptionEn?: string;
   durationMinutes: number;
   price: number;
+  currency?: 'EGP' | 'USD';
+  meetingType?: 'online' | 'in-person' | 'both';
+  meetingPlatform?: string;
+  maxParticipants?: number;
   isActive: boolean;
   instructor: string;
 }
@@ -170,8 +174,43 @@ export async function updateConsultationBookingStatus(
 // ─────────────────────────────────────────────
 
 export async function getConsultationTypes(): Promise<AuthResponse<PayloadListResponse<PayloadConsultationType>>> {
-  const res = await fetch('/api/consultation-types?depth=1&limit=20', { credentials: 'include' });
+  const res = await fetch('/api/instructor/consultation-types?limit=100', { credentials: 'include' });
   return handleResponse<PayloadListResponse<PayloadConsultationType>>(res);
+}
+
+export async function createConsultationType(
+  payload: Omit<PayloadConsultationType, 'id' | 'instructor'>,
+): Promise<AuthResponse<{ doc: PayloadConsultationType }>> {
+  const res = await fetch('/api/instructor/consultation-types', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
+    body: JSON.stringify(payload),
+  });
+  return handleResponse<{ doc: PayloadConsultationType }>(res);
+}
+
+export async function updateConsultationType(
+  id: string,
+  payload: Partial<Omit<PayloadConsultationType, 'id' | 'instructor'>>,
+): Promise<AuthResponse<{ doc: PayloadConsultationType }>> {
+  const res = await fetch(`/api/instructor/consultation-types/${id}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
+    body: JSON.stringify(payload),
+  });
+  return handleResponse<{ doc: PayloadConsultationType }>(res);
+}
+
+export async function removeConsultationType(
+  id: string,
+): Promise<AuthResponse<{ deleted: boolean }>> {
+  const res = await fetch(`/api/instructor/consultation-types/${id}`, {
+    method: 'DELETE',
+    credentials: 'include',
+  });
+  return handleResponse<{ deleted: boolean }>(res);
 }
 
 // ─────────────────────────────────────────────
@@ -339,6 +378,93 @@ export interface PayloadEarning {
     lastName: string;
     email: string;
   } | string;
+}
+
+// ─────────────────────────────────────────────
+// Program Submissions
+// ─────────────────────────────────────────────
+
+export interface PayloadProgramSubmission {
+  id: string;
+  status: 'draft' | 'pending' | 'approved' | 'rejected';
+  type: 'workshop' | 'course' | 'webinar';
+  titleAr: string;
+  titleEn?: string;
+  shortDescriptionAr: string;
+  shortDescriptionEn?: string;
+  descriptionAr: string;
+  descriptionEn?: string;
+  categoryName?: string;
+  durationHours?: number;
+  sessionsCount: number;
+  language?: 'ar' | 'en' | 'both';
+  level?: 'beginner' | 'intermediate' | 'advanced';
+  price?: number;
+  currency?: 'EGP' | 'USD' | 'EUR';
+  objectivesText?: string;
+  requirementsText?: string;
+  targetAudienceText?: string;
+  sessionOutline?: Array<{
+    sessionNumber?: number;
+    title: string;
+    summary?: string;
+  }>;
+  extraNotes?: string;
+  reviewNotes?: string;
+  submittedAt?: string;
+  reviewedAt?: string;
+}
+
+export async function getProgramSubmissions(): Promise<AuthResponse<PayloadListResponse<PayloadProgramSubmission>>> {
+  const res = await fetch('/api/instructor/program-submissions?limit=100', {
+    credentials: 'include',
+  });
+  return handleResponse<PayloadListResponse<PayloadProgramSubmission>>(res);
+}
+
+export async function createProgramSubmission(
+  payload: Omit<PayloadProgramSubmission, 'id' | 'status' | 'submittedAt' | 'reviewedAt' | 'reviewNotes'>,
+): Promise<AuthResponse<{ doc: PayloadProgramSubmission }>> {
+  const res = await fetch('/api/instructor/program-submissions', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
+    body: JSON.stringify(payload),
+  });
+  return handleResponse<{ doc: PayloadProgramSubmission }>(res);
+}
+
+export async function updateProgramSubmission(
+  id: string,
+  payload: Partial<Omit<PayloadProgramSubmission, 'id' | 'status' | 'submittedAt' | 'reviewedAt' | 'reviewNotes'>>,
+): Promise<AuthResponse<{ doc: PayloadProgramSubmission }>> {
+  const res = await fetch(`/api/instructor/program-submissions/${id}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
+    body: JSON.stringify(payload),
+  });
+  return handleResponse<{ doc: PayloadProgramSubmission }>(res);
+}
+
+export async function submitProgramSubmission(
+  id: string,
+): Promise<AuthResponse<{ submitted: boolean; missingFields?: string[] }>> {
+  const res = await fetch(`/api/instructor/program-submissions/${id}/submit`, {
+    method: 'POST',
+    credentials: 'include',
+  });
+  return handleResponse<{ submitted: boolean; missingFields?: string[] }>(res);
+}
+
+export async function deleteProgramSubmission(
+  id: string,
+): Promise<AuthResponse<{ deleted: boolean }>> {
+  const res = await fetch(`/api/instructor/program-submissions/${id}`, {
+    method: 'DELETE',
+    credentials: 'include',
+  });
+  return handleResponse<{ deleted: boolean }>(res);
 }
 
 export async function getInstructorEarnings(): Promise<AuthResponse<PayloadListResponse<PayloadEarning>>> {

@@ -92,6 +92,7 @@ export async function POST(req: NextRequest) {
         firstName,
         lastName,
         role: 'admin',
+        signupIntent: 'student',
         emailVerified: true,
       },
       overrideAccess: true,

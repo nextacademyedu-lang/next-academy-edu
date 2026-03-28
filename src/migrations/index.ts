@@ -6,6 +6,7 @@ import * as migration_20260325_224823_add_instructor_cover_image from './2026032
 import * as migration_20260326_132315_add_partners_collection from './20260326_132315_add_partners_collection';
 import * as migration_20260327_001500_add_sessions_google_event_id from './20260327_001500_add_sessions_google_event_id';
 import * as migration_20260328_154958_add_instructor_signup_intent_and_verification from './20260328_154958_add_instructor_signup_intent_and_verification';
+import * as migration_20260328_192145_add_instructor_program_submissions from './20260328_192145_add_instructor_program_submissions';
 
 export const migrations = [
   {
@@ -46,6 +47,11 @@ export const migrations = [
   {
     up: migration_20260328_154958_add_instructor_signup_intent_and_verification.up,
     down: migration_20260328_154958_add_instructor_signup_intent_and_verification.down,
-    name: '20260328_154958_add_instructor_signup_intent_and_verification'
+    name: '20260328_154958_add_instructor_signup_intent_and_verification',
+  },
+  {
+    up: migration_20260328_192145_add_instructor_program_submissions.up,
+    down: migration_20260328_192145_add_instructor_program_submissions.down,
+    name: '20260328_192145_add_instructor_program_submissions'
   },
 ];

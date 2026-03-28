@@ -224,6 +224,7 @@ export async function GET(req: NextRequest) {
         lastName: googleUser.family_name || '',
         password: randomPwd,
         role: 'user' as const,
+        signupIntent: 'student' as const,
         emailVerified: true,
         googleId: googleUser.sub,
         preferredLanguage: 'ar' as const,

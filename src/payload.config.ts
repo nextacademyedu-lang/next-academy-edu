@@ -43,6 +43,7 @@ import { AnnouncementBars } from './collections/AnnouncementBars.ts';
 import { UpcomingEventsConfig } from './collections/UpcomingEventsConfig.ts';
 import { CrmSyncEvents } from './collections/CrmSyncEvents.ts';
 import { Partners } from './collections/Partners.ts';
+import { InstructorProgramSubmissions } from './collections/InstructorProgramSubmissions.ts';
 import { migrations } from './migrations/index.ts';
 
 if (!process.env.DATABASE_URI) {
@@ -155,6 +156,7 @@ export default buildConfig({
           firstName: 'Admin',
           lastName: 'User',
           role: 'admin',
+          signupIntent: 'student',
           emailVerified: true,
         },
         context: { allowPrivilegedRoleWrite: true },
@@ -225,6 +227,7 @@ export default buildConfig({
     UpcomingEventsConfig,
     CrmSyncEvents,
     Partners,
+    InstructorProgramSubmissions,
   ],
   editor: lexicalEditor({}),
   db: postgresAdapter({

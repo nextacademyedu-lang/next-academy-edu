@@ -52,6 +52,7 @@ async function seed() {
         firstName: 'Admin',
         lastName: 'User',
         role: 'admin',
+        signupIntent: 'student',
         emailVerified: true,
       },
       overrideAccess: true,

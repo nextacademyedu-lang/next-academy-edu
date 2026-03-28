@@ -4,7 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useLocale } from 'next-intl';
-import { Home, Video, Clock, Users, ArrowLeft, LogOut, Bell, Settings, DollarSign, User } from 'lucide-react';
+import { Home, Video, Clock, Users, ArrowLeft, LogOut, Bell, Settings, DollarSign, User, BookOpen } from 'lucide-react';
 import styles from './instructor.module.css';
 import { useAuth } from '@/context/auth-context';
 
@@ -14,6 +14,7 @@ const INSTRUCTOR_NAV_LINKS = [
   { name: 'Consultations', mobileLabel: 'Bookings',  href: '/instructor/bookings',           icon: Users      },
   { name: 'Earnings',      mobileLabel: 'Earnings',  href: '/instructor/earnings',           icon: DollarSign },
   { name: 'Services',      mobileLabel: 'Services',  href: '/instructor/consultation-types', icon: Settings   },
+  { name: 'Programs',      mobileLabel: 'Programs',  href: '/instructor/program-submissions', icon: BookOpen  },
   { name: 'Availability',  mobileLabel: 'Hours',     href: '/instructor/availability',       icon: Clock      },
   { name: 'Profile',       mobileLabel: 'Profile',   href: '/instructor/profile',            icon: User       },
 ];

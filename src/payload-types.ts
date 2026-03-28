@@ -101,6 +101,7 @@ export interface Config {
     'upcoming-events-config': UpcomingEventsConfig;
     'crm-sync-events': CrmSyncEvent;
     partners: Partner;
+    'instructor-program-submissions': InstructorProgramSubmission;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -142,6 +143,7 @@ export interface Config {
     'upcoming-events-config': UpcomingEventsConfigSelect<false> | UpcomingEventsConfigSelect<true>;
     'crm-sync-events': CrmSyncEventsSelect<false> | CrmSyncEventsSelect<true>;
     partners: PartnersSelect<false> | PartnersSelect<true>;
+    'instructor-program-submissions': InstructorProgramSubmissionsSelect<false> | InstructorProgramSubmissionsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -194,6 +196,7 @@ export interface User {
   picture?: (number | null) | Media;
   role: 'user' | 'admin' | 'instructor' | 'b2b_manager';
   instructorId?: (number | null) | Instructor;
+  signupIntent: 'student' | 'instructor';
   preferredLanguage?: ('ar' | 'en') | null;
   newsletterOptIn?: boolean | null;
   whatsappOptIn?: boolean | null;
@@ -294,6 +297,14 @@ export interface Instructor {
   twitterUrl?: string | null;
   email?: string | null;
   featuredOrder?: number | null;
+  /**
+   * Instructor profile review status (for self-service onboarding flow).
+   */
+  verificationStatus?: ('draft' | 'pending' | 'approved' | 'rejected') | null;
+  submittedAt?: string | null;
+  approvedAt?: string | null;
+  rejectedAt?: string | null;
+  rejectionReason?: string | null;
   isActive?: boolean | null;
   updatedAt: string;
   createdAt: string;
@@ -550,6 +561,10 @@ export interface Session {
   cancellationReason?: string | null;
   attendanceCount?: number | null;
   attendeesCount?: number | null;
+  /**
+   * Google Calendar event ID (auto-set)
+   */
+  googleEventId?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1339,6 +1354,47 @@ export interface Partner {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "instructor-program-submissions".
+ */
+export interface InstructorProgramSubmission {
+  id: number;
+  instructor: number | Instructor;
+  submittedBy: number | User;
+  status: 'draft' | 'pending' | 'approved' | 'rejected';
+  submittedAt?: string | null;
+  reviewedAt?: string | null;
+  reviewNotes?: string | null;
+  type: 'workshop' | 'course' | 'webinar';
+  titleAr: string;
+  titleEn?: string | null;
+  shortDescriptionAr: string;
+  shortDescriptionEn?: string | null;
+  descriptionAr: string;
+  descriptionEn?: string | null;
+  categoryName?: string | null;
+  durationHours?: number | null;
+  sessionsCount: number;
+  language?: ('ar' | 'en' | 'both') | null;
+  level?: ('beginner' | 'intermediate' | 'advanced') | null;
+  price?: number | null;
+  currency?: ('EGP' | 'USD' | 'EUR') | null;
+  objectivesText?: string | null;
+  requirementsText?: string | null;
+  targetAudienceText?: string | null;
+  sessionOutline?:
+    | {
+        sessionNumber?: number | null;
+        title: string;
+        summary?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  extraNotes?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -1496,6 +1552,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'partners';
         value: number | Partner;
+      } | null)
+    | ({
+        relationTo: 'instructor-program-submissions';
+        value: number | InstructorProgramSubmission;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -1551,6 +1611,7 @@ export interface UsersSelect<T extends boolean = true> {
   picture?: T;
   role?: T;
   instructorId?: T;
+  signupIntent?: T;
   preferredLanguage?: T;
   newsletterOptIn?: T;
   whatsappOptIn?: T;
@@ -1689,6 +1750,11 @@ export interface InstructorsSelect<T extends boolean = true> {
   twitterUrl?: T;
   email?: T;
   featuredOrder?: T;
+  verificationStatus?: T;
+  submittedAt?: T;
+  approvedAt?: T;
+  rejectedAt?: T;
+  rejectionReason?: T;
   isActive?: T;
   updatedAt?: T;
   createdAt?: T;
@@ -1819,6 +1885,7 @@ export interface SessionsSelect<T extends boolean = true> {
   cancellationReason?: T;
   attendanceCount?: T;
   attendeesCount?: T;
+  googleEventId?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -2445,6 +2512,46 @@ export interface PartnersSelect<T extends boolean = true> {
   orderIndex?: T;
   isActive?: T;
   category?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "instructor-program-submissions_select".
+ */
+export interface InstructorProgramSubmissionsSelect<T extends boolean = true> {
+  instructor?: T;
+  submittedBy?: T;
+  status?: T;
+  submittedAt?: T;
+  reviewedAt?: T;
+  reviewNotes?: T;
+  type?: T;
+  titleAr?: T;
+  titleEn?: T;
+  shortDescriptionAr?: T;
+  shortDescriptionEn?: T;
+  descriptionAr?: T;
+  descriptionEn?: T;
+  categoryName?: T;
+  durationHours?: T;
+  sessionsCount?: T;
+  language?: T;
+  level?: T;
+  price?: T;
+  currency?: T;
+  objectivesText?: T;
+  requirementsText?: T;
+  targetAudienceText?: T;
+  sessionOutline?:
+    | T
+    | {
+        sessionNumber?: T;
+        title?: T;
+        summary?: T;
+        id?: T;
+      };
+  extraNotes?: T;
   updatedAt?: T;
   createdAt?: T;
 }
