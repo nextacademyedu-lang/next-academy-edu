@@ -9,6 +9,10 @@ type UserDocLike = {
 };
 
 type LinkResult = 'linked' | 'unchanged' | 'conflict' | 'skipped';
+type InstructorLookupResult =
+  | { status: 'none' }
+  | { status: 'duplicate' }
+  | { status: 'found'; instructorId: RelationId };
 
 export function normalizeEmail(value: unknown): string | null {
   if (typeof value !== 'string') return null;
@@ -44,7 +48,7 @@ export async function findInstructorIdByEmail(params: {
   req: any;
   normalizedEmail: string;
   source: string;
-}): Promise<RelationId | null> {
+}): Promise<InstructorLookupResult> {
   const { payload, req, normalizedEmail, source } = params;
 
   const instructors = await payload.find({
@@ -56,17 +60,18 @@ export async function findInstructorIdByEmail(params: {
     req,
   });
 
-  if (!instructors.docs.length) return null;
+  if (!instructors.docs.length) return { status: 'none' };
 
   if (instructors.docs.length > 1) {
     console.warn(
       `[${source}] Multiple instructor profiles share email "${normalizedEmail}". Auto-link skipped.`,
     );
-    return null;
+    return { status: 'duplicate' };
   }
 
   const instructorId = relationToId((instructors.docs[0] as { id?: unknown }).id);
-  return instructorId;
+  if (instructorId === null) return { status: 'none' };
+  return { status: 'found', instructorId };
 }
 
 export async function linkUserToInstructor(params: {

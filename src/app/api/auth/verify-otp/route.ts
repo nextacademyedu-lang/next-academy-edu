@@ -71,12 +71,22 @@ async function ensureInstructorAccountForIntent(params: {
   const normalizedEmail = normalizeEmail(user.email);
   if (!normalizedEmail) return;
 
-  let instructorId = await findInstructorIdByEmail({
+  const instructorLookup = await findInstructorIdByEmail({
     payload,
     req,
     normalizedEmail,
     source: 'verify-otp',
   });
+
+  if (instructorLookup.status === 'duplicate') {
+    console.warn(
+      `[verify-otp] Multiple instructor profiles share email "${normalizedEmail}". Instructor auto-link skipped for user #${user.id}.`,
+    );
+    return;
+  }
+
+  let instructorId =
+    instructorLookup.status === 'found' ? instructorLookup.instructorId : null;
 
   if (instructorId === null) {
     const firstName = (user.firstName || '').trim() || 'New';

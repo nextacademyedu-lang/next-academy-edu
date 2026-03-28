@@ -64,17 +64,18 @@ async function resolveScope(req: NextRequest) {
 }
 
 async function verifyOwnership(payload: Awaited<ReturnType<typeof getPayload>>, req: NextRequest, id: number, instructorId: number) {
-  const doc = await payload.findByID({
+  const result = await payload.find({
     collection: 'consultation-types',
-    id,
+    where: {
+      and: [{ id: { equals: id } }, { instructor: { equals: instructorId } }],
+    },
     depth: 0,
+    limit: 1,
     overrideAccess: true,
     req,
   });
 
-  const ownerId = relationToId((doc as { instructor?: unknown }).instructor);
-  if (!ownerId || ownerId !== instructorId) return null;
-  return doc;
+  return result.docs[0] || null;
 }
 
 export async function PATCH(

@@ -63,11 +63,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
         // If email is not verified, send OTP and signal caller
         if (!userData.emailVerified) {
-          await sendVerificationCode(email);
+          const otpResult = await sendVerificationCode(email);
+          if (!otpResult.success) {
+            console.warn('[auth-context] Failed to send verification OTP on login:', otpResult.error);
+          }
           return {
             success: false,
             error: 'EMAIL_NOT_VERIFIED',
-            data: { email },
+            data: { email, otpSent: otpResult.success },
           };
         }
 
@@ -109,11 +112,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
         if (loginResult.success && loginResult.data) {
           // Send OTP for email verification
-          await sendVerificationCode(data.email);
+          const otpResult = await sendVerificationCode(data.email);
+          if (!otpResult.success) {
+            console.warn('[auth-context] Failed to send verification OTP on register:', otpResult.error);
+          }
 
           return {
             success: true,
-            data: { email: data.email, requiresVerification: true },
+            data: {
+              email: data.email,
+              requiresVerification: true,
+              otpSent: otpResult.success,
+            },
           };
         }
       }

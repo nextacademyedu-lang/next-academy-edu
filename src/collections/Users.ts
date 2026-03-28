@@ -69,6 +69,7 @@ export const Users: CollectionConfig = {
         await deleteByUser('installment-requests');
         await deleteByUser('verification-codes');
         await deleteByUser('consultation-bookings');
+        await deleteByUser('instructor-program-submissions', 'submittedBy');
       },
     ],
     beforeChange: [
@@ -151,14 +152,14 @@ export const Users: CollectionConfig = {
               needsInstructorBinding);
 
           if (shouldAttemptAutoLink && normalizedEmail) {
-            const instructorId = await findInstructorIdByEmail({
+            const instructorLookup = await findInstructorIdByEmail({
               payload: req.payload,
               req,
               normalizedEmail,
               source: 'Users.afterChange',
             });
 
-            if (instructorId !== null) {
+            if (instructorLookup.status === 'found') {
               await linkUserToInstructor({
                 payload: req.payload,
                 req,
@@ -169,7 +170,7 @@ export const Users: CollectionConfig = {
                   emailVerified: doc.emailVerified,
                   instructorId: doc.instructorId,
                 },
-                instructorId,
+                instructorId: instructorLookup.instructorId,
                 source: 'Users.afterChange',
               });
             }

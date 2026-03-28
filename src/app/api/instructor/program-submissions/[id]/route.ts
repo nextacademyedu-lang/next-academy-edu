@@ -117,18 +117,22 @@ async function getOwnedSubmission(params: {
   instructorId: number;
 }) {
   const { payload, req, id, userId, instructorId } = params;
-  const doc = await payload.findByID({
+  const result = await payload.find({
     collection: 'instructor-program-submissions',
-    id,
+    where: {
+      and: [
+        { id: { equals: id } },
+        { instructor: { equals: instructorId } },
+        { submittedBy: { equals: userId } },
+      ],
+    },
     depth: 0,
+    limit: 1,
     overrideAccess: true,
     req,
   });
 
-  const ownerInstructorId = relationToId((doc as { instructor?: unknown }).instructor);
-  const ownerUserId = relationToId((doc as { submittedBy?: unknown }).submittedBy);
-  if (ownerInstructorId !== instructorId || ownerUserId !== userId) return null;
-  return doc;
+  return result.docs[0] || null;
 }
 
 export async function PATCH(

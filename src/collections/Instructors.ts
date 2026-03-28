@@ -143,6 +143,9 @@ export const Instructors: CollectionConfig = {
           }
         };
         await deleteByInstructor('instructor-blocked-dates');
+        await deleteByInstructor('consultation-availability');
+        await deleteByInstructor('consultation-bookings');
+        await deleteByInstructor('instructor-program-submissions');
         await deleteByInstructor('consultation-slots');
         // Delete consultation types last (slots reference them)
         await deleteByInstructor('consultation-types');

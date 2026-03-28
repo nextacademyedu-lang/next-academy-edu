@@ -53,17 +53,23 @@ export async function POST(
     const id = Number(rawId);
     if (!Number.isFinite(id)) return NextResponse.json({ error: 'Invalid id' }, { status: 400 });
 
-    const doc = await scope.payload.findByID({
+    const result = await scope.payload.find({
       collection: 'instructor-program-submissions',
-      id,
+      where: {
+        and: [
+          { id: { equals: id } },
+          { instructor: { equals: scope.instructorId } },
+          { submittedBy: { equals: scope.userId } },
+        ],
+      },
       depth: 0,
+      limit: 1,
       overrideAccess: true,
       req,
     });
 
-    const ownerInstructorId = relationToId((doc as { instructor?: unknown }).instructor);
-    const ownerUserId = relationToId((doc as { submittedBy?: unknown }).submittedBy);
-    if (ownerInstructorId !== scope.instructorId || ownerUserId !== scope.userId) {
+    const doc = result.docs[0];
+    if (!doc) {
       return NextResponse.json({ error: 'Not found' }, { status: 404 });
     }
 
