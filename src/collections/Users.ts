@@ -43,33 +43,73 @@ export const Users: CollectionConfig = {
   hooks: {
     beforeDelete: [
       async ({ req, id }) => {
-        const deleteByUser = async (collection: string, field = 'user') => {
-          const found = await req.payload.find({
-            collection: collection as any,
-            where: { [field]: { equals: id } },
+        const targetUser = await req.payload
+          .findByID({
+            collection: 'users',
+            id,
             depth: 0,
-            limit: 1000,
             overrideAccess: true,
             req,
-          });
-          for (const doc of found.docs) {
-            await req.payload.delete({
+          })
+          .catch(() => null);
+
+        const normalizedEmail =
+          typeof targetUser?.email === 'string' && targetUser.email.trim()
+            ? targetUser.email.trim().toLowerCase()
+            : null;
+
+        const deleteByFieldValue = async (
+          collection: string,
+          field: string,
+          value: number | string | null,
+        ) => {
+          if (value === null || value === '') return;
+
+          let found: { docs: Array<{ id: number | string }> };
+          try {
+            found = (await req.payload.find({
               collection: collection as any,
-              id: (doc as { id: number | string }).id,
+              where: { [field]: { equals: value } },
+              depth: 0,
+              limit: 1000,
               overrideAccess: true,
               req,
-            });
+            })) as { docs: Array<{ id: number | string }> };
+          } catch (err) {
+            console.warn(
+              `[Users.beforeDelete] Skipping ${collection} cleanup by field "${field}" for user #${id}.`,
+              err,
+            );
+            return;
+          }
+
+          for (const doc of found.docs) {
+            try {
+              await req.payload.delete({
+                collection: collection as any,
+                id: doc.id,
+                overrideAccess: true,
+                req,
+              });
+            } catch (err) {
+              console.warn(
+                `[Users.beforeDelete] Failed deleting ${collection} #${doc.id} while cleaning user #${id}.`,
+                err,
+              );
+            }
           }
         };
-        // Order matters: bookings → reviews/payments (handled by Bookings beforeDelete)
-        await deleteByUser('bookings');
-        await deleteByUser('user-profiles');
-        await deleteByUser('notifications');
-        await deleteByUser('waitlist');
-        await deleteByUser('installment-requests');
-        await deleteByUser('verification-codes');
-        await deleteByUser('consultation-bookings');
-        await deleteByUser('instructor-program-submissions', 'submittedBy');
+
+        // Order matters: bookings -> reviews/payments (handled by Bookings beforeDelete)
+        await deleteByFieldValue('bookings', 'user', id);
+        await deleteByFieldValue('user-profiles', 'user', id);
+        await deleteByFieldValue('notifications', 'user', id);
+        await deleteByFieldValue('waitlist', 'user', id);
+        await deleteByFieldValue('installment-requests', 'user', id);
+        await deleteByFieldValue('installment-requests', 'reviewedBy', id);
+        await deleteByFieldValue('verification-codes', 'email', normalizedEmail);
+        await deleteByFieldValue('consultation-bookings', 'user', id);
+        await deleteByFieldValue('instructor-program-submissions', 'submittedBy', id);
       },
     ],
     beforeChange: [
