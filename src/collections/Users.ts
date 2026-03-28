@@ -2,6 +2,12 @@ import type { CollectionConfig } from 'payload';
 import { isAdmin, isAdminOrSelf, isAdminRequest } from '../lib/access-control.ts';
 import { createCrmDedupeKey } from '../lib/crm/dedupe.ts';
 import { enqueueCrmSyncEvent } from '../lib/crm/queue.ts';
+import {
+  findInstructorIdByEmail,
+  linkUserToInstructor,
+  normalizeEmail,
+  relationToId,
+} from '../lib/instructor-account-link.ts';
 
 function parseConfiguredAdminEmails(): string[] {
   const raw = process.env.PAYLOAD_ADMIN_EMAIL || '';
@@ -80,6 +86,9 @@ export const Users: CollectionConfig = {
 
         // Public/self-service create must never be allowed to assign privileged roles.
         if (operation === 'create') {
+          const requestedIntent = data.signupIntent === 'instructor' ? 'instructor' : 'student';
+          data.signupIntent = requestedIntent;
+
           if (!canWritePrivilegedRole) {
             data.role = 'user';
             data.instructorId = null;
@@ -114,8 +123,58 @@ export const Users: CollectionConfig = {
       },
     ],
     afterChange: [
-      async ({ req, doc, previousDoc, operation }) => {
+      async ({ req, doc, previousDoc, operation, context }) => {
         try {
+          const skipInstructorAutoLink = Boolean(
+            (context as { skipInstructorAutoLink?: boolean } | undefined)?.skipInstructorAutoLink,
+          );
+          const normalizedEmail = normalizeEmail(doc.email);
+          const previousEmail = normalizeEmail(previousDoc?.email);
+          const emailChanged = normalizedEmail !== previousEmail;
+          const justVerified = Boolean(doc.emailVerified) && !Boolean(previousDoc?.emailVerified);
+          const promotedToInstructor = doc.role === 'instructor' && previousDoc?.role !== 'instructor';
+          const needsInstructorBinding =
+            doc.role === 'instructor' && relationToId(doc.instructorId) === null;
+          const explicitlyDemotedFromInstructor =
+            operation === 'update' && previousDoc?.role === 'instructor' && doc.role !== 'instructor';
+
+          const shouldAttemptAutoLink =
+            !skipInstructorAutoLink &&
+            !explicitlyDemotedFromInstructor &&
+            doc.role !== 'admin' &&
+            Boolean(doc.emailVerified) &&
+            Boolean(normalizedEmail) &&
+            (operation === 'create' ||
+              justVerified ||
+              emailChanged ||
+              promotedToInstructor ||
+              needsInstructorBinding);
+
+          if (shouldAttemptAutoLink && normalizedEmail) {
+            const instructorId = await findInstructorIdByEmail({
+              payload: req.payload,
+              req,
+              normalizedEmail,
+              source: 'Users.afterChange',
+            });
+
+            if (instructorId !== null) {
+              await linkUserToInstructor({
+                payload: req.payload,
+                req,
+                user: {
+                  id: doc.id,
+                  email: doc.email,
+                  role: doc.role,
+                  emailVerified: doc.emailVerified,
+                  instructorId: doc.instructorId,
+                },
+                instructorId,
+                source: 'Users.afterChange',
+              });
+            }
+          }
+
           if (doc.role === 'admin') return;
 
           let action = operation === 'create' ? 'user_created' : 'user_updated';
@@ -187,6 +246,16 @@ export const Users: CollectionConfig = {
       // Role protection is handled by the beforeChange hook above.
     },
     { name: 'instructorId', type: 'relationship', relationTo: 'instructors', hasMany: false },
+    {
+      name: 'signupIntent',
+      type: 'select',
+      options: [
+        { label: 'Student', value: 'student' },
+        { label: 'Instructor', value: 'instructor' },
+      ],
+      defaultValue: 'student',
+      required: true,
+    },
     { name: 'preferredLanguage', type: 'select', options: ['ar', 'en'], defaultValue: 'ar' },
     { name: 'newsletterOptIn', type: 'checkbox', defaultValue: false },
     { name: 'whatsappOptIn', type: 'checkbox', defaultValue: false },

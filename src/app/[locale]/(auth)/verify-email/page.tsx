@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { useTranslations, useLocale } from 'next-intl';
 import { Button } from '@/components/ui/button';
-import { verifyOtp, sendVerificationCode } from '@/lib/auth-api';
+import { verifyOtp, sendVerificationCode, getCurrentUser } from '@/lib/auth-api';
 import { useAuth } from '@/context/auth-context';
 import { getSafeRedirectPath } from '@/lib/role-redirect';
 import styles from './verify-email.module.css';
@@ -117,9 +117,15 @@ export default function VerifyEmailPage() {
       if (result.success) {
         setSuccessMsg(t('emailVerifiedRedirecting'));
         await refreshUser();
+        const me = await getCurrentUser();
+        const verifiedUser = me.success ? me.data?.user : null;
+        const fallbackPath =
+          verifiedUser?.role === 'instructor'
+            ? `/${locale}/instructor/profile`
+            : `/${locale}/onboarding`;
         const redirectPath = getSafeRedirectPath(
           searchParams.get('redirect'),
-          `/${locale}/onboarding`,
+          fallbackPath,
         );
         setTimeout(() => {
           router.push(redirectPath);

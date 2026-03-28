@@ -184,7 +184,7 @@ export default async function InstructorsPage() {
                   ? 'شارك خبرتك مع آلاف المتعلمين عبر برامج وورش عملية.'
                   : 'Share your expertise through practical courses and workshops.'}
               </p>
-              <Link href={`/${locale}/contact`}>
+              <Link href={`/${locale}/register?intent=instructor`}>
                 <Button variant="secondary" size="lg">
                   {locale === 'ar' ? 'قدّم الآن' : 'Apply Now'}
                 </Button>

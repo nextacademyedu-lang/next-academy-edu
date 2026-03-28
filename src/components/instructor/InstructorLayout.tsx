@@ -4,7 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useLocale } from 'next-intl';
-import { Home, Video, Clock, Users, ArrowLeft, LogOut, Bell, Settings, DollarSign } from 'lucide-react';
+import { Home, Video, Clock, Users, ArrowLeft, LogOut, Bell, Settings, DollarSign, User } from 'lucide-react';
 import styles from './instructor.module.css';
 import { useAuth } from '@/context/auth-context';
 
@@ -15,6 +15,7 @@ const INSTRUCTOR_NAV_LINKS = [
   { name: 'Earnings',      mobileLabel: 'Earnings',  href: '/instructor/earnings',           icon: DollarSign },
   { name: 'Services',      mobileLabel: 'Services',  href: '/instructor/consultation-types', icon: Settings   },
   { name: 'Availability',  mobileLabel: 'Hours',     href: '/instructor/availability',       icon: Clock      },
+  { name: 'Profile',       mobileLabel: 'Profile',   href: '/instructor/profile',            icon: User       },
 ];
 
 export function InstructorLayout({ children }: { children: React.ReactNode }) {
@@ -26,6 +27,12 @@ export function InstructorLayout({ children }: { children: React.ReactNode }) {
   React.useEffect(() => {
     if (!isLoading && !isAuthenticated) router.push(`/${locale}/login`);
   }, [isLoading, isAuthenticated, router, locale]);
+
+  React.useEffect(() => {
+    if (!isLoading && isAuthenticated && user && user.role !== 'instructor') {
+      router.push(`/${locale}/dashboard`);
+    }
+  }, [isLoading, isAuthenticated, user, router, locale]);
 
   const displayName   = user ? `${user.firstName} ${user.lastName}`.trim() : '…';
   const avatarInitial = user?.firstName?.[0]?.toUpperCase() ?? '?';

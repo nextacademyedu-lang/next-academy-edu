@@ -27,6 +27,7 @@ interface UserData {
   preferredLanguage: 'ar' | 'en';
   picture?: { url?: string | null } | number | string | null;
   instructorId?: string | { id: string } | null;
+  signupIntent?: 'student' | 'instructor';
 }
 
 interface RegisterPayload {
@@ -36,6 +37,7 @@ interface RegisterPayload {
   lastName: string;
   phone?: string;
   preferredLanguage?: 'ar' | 'en';
+  signupIntent?: 'student' | 'instructor';
 }
 
 async function handleResponse<T>(response: Response): Promise<AuthResponse<T>> {

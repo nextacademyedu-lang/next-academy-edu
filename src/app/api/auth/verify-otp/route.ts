@@ -2,9 +2,119 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getPayload } from 'payload';
 import config from '@payload-config';
 import { rateLimit } from '@/lib/rate-limit';
+import {
+  findInstructorIdByEmail,
+  linkUserToInstructor,
+  normalizeEmail,
+} from '@/lib/instructor-account-link';
 
 const VERIFY_LIMIT = 5;
 const VERIFY_WINDOW_MS = 15 * 60 * 1000;
+
+function buildSlugBase(parts: Array<string | undefined | null>): string {
+  const joined = parts
+    .map((part) => (typeof part === 'string' ? part.trim().toLowerCase() : ''))
+    .filter(Boolean)
+    .join('-');
+
+  const normalized = joined
+    .replace(/[^a-z0-9-]+/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '');
+
+  return normalized || 'instructor';
+}
+
+async function buildUniqueInstructorSlug(params: {
+  payload: Awaited<ReturnType<typeof getPayload>>;
+  req: NextRequest;
+  base: string;
+  userId: string | number;
+}): Promise<string> {
+  const { payload, req, base, userId } = params;
+  const safeBase = base || `instructor-${userId}`;
+
+  for (let i = 0; i < 100; i += 1) {
+    const candidate = i === 0 ? safeBase : `${safeBase}-${i + 1}`;
+    const existing = await payload.find({
+      collection: 'instructors',
+      where: { slug: { equals: candidate } },
+      depth: 0,
+      limit: 1,
+      overrideAccess: true,
+      req,
+    });
+
+    if (existing.docs.length === 0) return candidate;
+  }
+
+  return `instructor-${userId}-${Date.now()}`;
+}
+
+async function ensureInstructorAccountForIntent(params: {
+  payload: Awaited<ReturnType<typeof getPayload>>;
+  req: NextRequest;
+  user: {
+    id: number | string;
+    email?: string | null;
+    firstName?: string | null;
+    lastName?: string | null;
+    role?: string | null;
+    emailVerified?: boolean | null;
+    instructorId?: unknown;
+    signupIntent?: string | null;
+  };
+}): Promise<void> {
+  const { payload, req, user } = params;
+  if (user.signupIntent !== 'instructor') return;
+
+  const normalizedEmail = normalizeEmail(user.email);
+  if (!normalizedEmail) return;
+
+  let instructorId = await findInstructorIdByEmail({
+    payload,
+    req,
+    normalizedEmail,
+    source: 'verify-otp',
+  });
+
+  if (instructorId === null) {
+    const firstName = (user.firstName || '').trim() || 'New';
+    const lastName = (user.lastName || '').trim() || 'Instructor';
+    const baseSlug = buildSlugBase([user.firstName, user.lastName, String(user.id)]);
+    const slug = await buildUniqueInstructorSlug({
+      payload,
+      req,
+      base: baseSlug,
+      userId: user.id,
+    });
+
+    const created = await (payload as any).create({
+      collection: 'instructors',
+      data: {
+        firstName,
+        lastName,
+        slug,
+        email: normalizedEmail,
+        isActive: false,
+        verificationStatus: 'draft',
+      },
+      overrideAccess: true,
+      req,
+      context: { skipInstructorAutoLink: true, selfServiceInstructorProfile: true },
+    } as any);
+
+    instructorId = created.id as number | string;
+  }
+
+  await linkUserToInstructor({
+    payload,
+    req,
+    user,
+    instructorId,
+    source: 'verify-otp',
+  });
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -100,10 +210,27 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    await payload.update({
+    const updatedUser = await payload.update({
       collection: 'users',
       id: users.docs[0].id,
       data: { emailVerified: true },
+      overrideAccess: true,
+      req: request as any,
+    });
+
+    await ensureInstructorAccountForIntent({
+      payload,
+      req: request,
+      user: updatedUser as {
+        id: number | string;
+        email?: string | null;
+        firstName?: string | null;
+        lastName?: string | null;
+        role?: string | null;
+        emailVerified?: boolean | null;
+        instructorId?: unknown;
+        signupIntent?: string | null;
+      },
     });
 
     return NextResponse.json(

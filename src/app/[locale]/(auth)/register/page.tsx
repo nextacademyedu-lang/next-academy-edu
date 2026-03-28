@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
@@ -33,6 +33,9 @@ export default function RegisterPage() {
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [signupIntent, setSignupIntent] = useState<'student' | 'instructor'>(
+    searchParams.get('intent') === 'instructor' ? 'instructor' : 'student',
+  );
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
@@ -45,6 +48,17 @@ export default function RegisterPage() {
   };
 
   const allValid = Object.values(reqs).every(Boolean);
+
+  useEffect(() => {
+    const intentParam = searchParams.get('intent');
+    if (intentParam === 'instructor') {
+      setSignupIntent('instructor');
+      return;
+    }
+    if (intentParam === 'student') {
+      setSignupIntent('student');
+    }
+  }, [searchParams]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -61,7 +75,7 @@ export default function RegisterPage() {
     setError('');
 
     try {
-      const result = await register({ firstName, lastName, email, password });
+      const result = await register({ firstName, lastName, email, password, signupIntent });
 
       if (result.success) {
         // Registration successful — redirect to verify email
@@ -157,6 +171,46 @@ export default function RegisterPage() {
             onChange={(e) => { setPassword(e.target.value); setError(''); }}
             disabled={isLoading}
           />
+        </div>
+
+        <div className={styles.inputGroup}>
+          <Label className={styles.label}>نوع الحساب</Label>
+          <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+            <button
+              type="button"
+              onClick={() => setSignupIntent('student')}
+              disabled={isLoading}
+              style={{
+                padding: '10px 14px',
+                borderRadius: '10px',
+                border: signupIntent === 'student' ? '1px solid #c9a96e' : '1px solid rgba(255,255,255,0.16)',
+                background: signupIntent === 'student' ? 'rgba(201,169,110,0.12)' : 'rgba(255,255,255,0.03)',
+                color: 'var(--text-primary)',
+                cursor: 'pointer',
+                fontSize: '13px',
+                fontWeight: 500,
+              }}
+            >
+              Student
+            </button>
+            <button
+              type="button"
+              onClick={() => setSignupIntent('instructor')}
+              disabled={isLoading}
+              style={{
+                padding: '10px 14px',
+                borderRadius: '10px',
+                border: signupIntent === 'instructor' ? '1px solid #c9a96e' : '1px solid rgba(255,255,255,0.16)',
+                background: signupIntent === 'instructor' ? 'rgba(201,169,110,0.12)' : 'rgba(255,255,255,0.03)',
+                color: 'var(--text-primary)',
+                cursor: 'pointer',
+                fontSize: '13px',
+                fontWeight: 500,
+              }}
+            >
+              Instructor
+            </button>
+          </div>
         </div>
 
         {/* Password Requirements Checklist */}

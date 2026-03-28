@@ -92,6 +92,25 @@ export interface PayloadBlockedDate {
   instructor: string;
 }
 
+export interface PayloadInstructorProfile {
+  id: string;
+  firstName: string;
+  lastName: string;
+  jobTitle?: string;
+  tagline?: string;
+  bioAr?: unknown;
+  bioEn?: unknown;
+  linkedinUrl?: string;
+  twitterUrl?: string;
+  picture?: { id?: string | number; url?: string | null } | number | string | null;
+  coverImage?: { id?: string | number; url?: string | null } | number | string | null;
+  verificationStatus?: 'draft' | 'pending' | 'approved' | 'rejected';
+  rejectionReason?: string;
+  submittedAt?: string;
+  approvedAt?: string;
+  rejectedAt?: string;
+}
+
 export interface InstructorStats {
   totalStudents: number;
   upcomingSessionsCount: number;
@@ -200,6 +219,48 @@ export async function deleteBlockedDate(id: string): Promise<AuthResponse<{ doc:
     credentials: 'include',
   });
   return handleResponse<{ doc: PayloadBlockedDate }>(res);
+}
+
+// ─────────────────────────────────────────────
+// Instructor Profile
+// ─────────────────────────────────────────────
+
+export async function getInstructorProfile(): Promise<AuthResponse<{ profile: PayloadInstructorProfile }>> {
+  const res = await fetch('/api/instructor/profile', {
+    method: 'GET',
+    credentials: 'include',
+  });
+  return handleResponse<{ profile: PayloadInstructorProfile }>(res);
+}
+
+export async function updateInstructorProfile(
+  payload: Partial<PayloadInstructorProfile>,
+): Promise<AuthResponse<{ profile: PayloadInstructorProfile }>> {
+  const res = await fetch('/api/instructor/profile', {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
+    body: JSON.stringify(payload),
+  });
+  return handleResponse<{ profile: PayloadInstructorProfile }>(res);
+}
+
+export async function submitInstructorProfileVerification(): Promise<
+  AuthResponse<{
+    submitted: boolean;
+    status: 'draft' | 'pending' | 'approved' | 'rejected';
+    missingFields?: string[];
+  }>
+> {
+  const res = await fetch('/api/instructor/profile/submit', {
+    method: 'POST',
+    credentials: 'include',
+  });
+  return handleResponse<{
+    submitted: boolean;
+    status: 'draft' | 'pending' | 'approved' | 'rejected';
+    missingFields?: string[];
+  }>(res);
 }
 
 // ─────────────────────────────────────────────

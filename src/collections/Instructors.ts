@@ -1,5 +1,9 @@
 import type { CollectionConfig } from 'payload';
-import { isAdmin, isPublic } from '../lib/access-control.ts';
+import { isAdmin, isAdminRequest, isPublic } from '../lib/access-control.ts';
+import {
+  linkUserToInstructor,
+  normalizeEmail,
+} from '../lib/instructor-account-link.ts';
 
 export const Instructors: CollectionConfig = {
   slug: 'instructors',
@@ -11,6 +15,113 @@ export const Instructors: CollectionConfig = {
     delete: isAdmin,
   },
   hooks: {
+    beforeChange: [
+      async ({ req, data, originalDoc, operation, context }) => {
+        const next = { ...(data || {}) } as Record<string, unknown>;
+        const isAdminActor = await isAdminRequest(req);
+        const isSelfServiceActor = Boolean(
+          (context as { selfServiceInstructorProfile?: boolean } | undefined)?.selfServiceInstructorProfile,
+        );
+        const actorRole =
+          typeof (req as { user?: { role?: unknown } }).user?.role === 'string'
+            ? ((req as { user?: { role?: string } }).user?.role as string)
+            : '';
+        const enforceSelfServiceRules = !isAdminActor && (isSelfServiceActor || actorRole === 'instructor');
+        const previousStatus =
+          typeof originalDoc?.verificationStatus === 'string'
+            ? originalDoc.verificationStatus
+            : 'approved';
+        const nextStatus =
+          typeof next.verificationStatus === 'string'
+            ? next.verificationStatus
+            : previousStatus;
+
+        if (enforceSelfServiceRules) {
+          next.isActive = false;
+          if (!next.verificationStatus) next.verificationStatus = operation === 'create' ? 'draft' : previousStatus;
+          if (nextStatus === 'approved' || nextStatus === 'rejected') {
+            next.verificationStatus = previousStatus;
+          }
+          return next;
+        }
+
+        if (nextStatus === 'approved' && previousStatus !== 'approved') {
+          next.approvedAt = new Date().toISOString();
+          next.rejectedAt = null;
+          next.rejectionReason = null;
+          next.isActive = true;
+        } else if (nextStatus === 'rejected' && previousStatus !== 'rejected') {
+          next.rejectedAt = new Date().toISOString();
+          next.approvedAt = null;
+          next.isActive = false;
+        } else if (nextStatus === 'pending' && previousStatus !== 'pending') {
+          next.submittedAt = new Date().toISOString();
+          next.approvedAt = null;
+          next.rejectedAt = null;
+          next.isActive = false;
+        } else if (nextStatus === 'draft' && previousStatus !== 'draft') {
+          next.approvedAt = null;
+          next.rejectedAt = null;
+          next.isActive = false;
+        }
+
+        return next;
+      },
+    ],
+    afterChange: [
+      async ({ req, doc, previousDoc, operation, context }) => {
+        const skipInstructorAutoLink = Boolean(
+          (context as { skipInstructorAutoLink?: boolean } | undefined)?.skipInstructorAutoLink,
+        );
+        if (skipInstructorAutoLink) return;
+
+        const normalizedEmail = normalizeEmail(doc.email);
+        if (!normalizedEmail) return;
+
+        const previousEmail = normalizeEmail(previousDoc?.email);
+        const emailChanged = normalizedEmail !== previousEmail;
+        if (operation !== 'create' && !emailChanged) return;
+
+        const users = await req.payload.find({
+          collection: 'users',
+          where: {
+            and: [
+              { email: { equals: normalizedEmail } },
+              { emailVerified: { equals: true } },
+            ],
+          },
+          depth: 0,
+          limit: 2,
+          overrideAccess: true,
+          req,
+        });
+
+        if (!users.docs.length) return;
+
+        if (users.docs.length > 1) {
+          console.warn(
+            `[Instructors.afterChange] Multiple users share email "${normalizedEmail}". Auto-link skipped.`,
+          );
+          return;
+        }
+
+        const user = users.docs[0] as {
+          id: number | string;
+          email?: string | null;
+          role?: string | null;
+          emailVerified?: boolean | null;
+          instructorId?: unknown;
+        };
+
+        await linkUserToInstructor({
+          payload: req.payload,
+          req,
+          user,
+          instructorId: doc.id,
+          source: 'Instructors.afterChange',
+        });
+      },
+    ],
     beforeDelete: [
       async ({ req, id }) => {
         const deleteByInstructor = async (collection: string) => {
@@ -52,6 +163,19 @@ export const Instructors: CollectionConfig = {
     { name: 'twitterUrl', type: 'text' },
     { name: 'email', type: 'email' },
     { name: 'featuredOrder', type: 'number' },
+    {
+      name: 'verificationStatus',
+      type: 'select',
+      options: ['draft', 'pending', 'approved', 'rejected'],
+      defaultValue: 'approved',
+      admin: {
+        description: 'Instructor profile review status (for self-service onboarding flow).',
+      },
+    },
+    { name: 'submittedAt', type: 'date' },
+    { name: 'approvedAt', type: 'date' },
+    { name: 'rejectedAt', type: 'date' },
+    { name: 'rejectionReason', type: 'textarea' },
     { name: 'isActive', type: 'checkbox', defaultValue: true },
   ],
 };
