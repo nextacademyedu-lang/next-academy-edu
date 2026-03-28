@@ -32,6 +32,15 @@ export interface PayloadSession {
     } | string;
   } | string;
   attendanceCount?: number;
+  materials?: PayloadSessionMaterial[];
+}
+
+export interface PayloadSessionMaterial {
+  id: string;
+  name: string;
+  url?: string | null;
+  mimeType?: string | null;
+  filesize?: number | null;
 }
 
 export interface PayloadConsultationBooking {
@@ -143,8 +152,47 @@ async function handleResponse<T>(res: Response): Promise<AuthResponse<T>> {
 // ─────────────────────────────────────────────
 
 export async function getInstructorSessions(): Promise<AuthResponse<PayloadListResponse<PayloadSession>>> {
-  const res = await fetch('/api/sessions?depth=2&sort=-date&limit=50', { credentials: 'include' });
+  const res = await fetch('/api/instructor/sessions?sort=-date&limit=50', { credentials: 'include' });
   return handleResponse<PayloadListResponse<PayloadSession>>(res);
+}
+
+export async function getSessionMaterials(
+  sessionId: string,
+): Promise<AuthResponse<{ sessionId: string; materials: PayloadSessionMaterial[] }>> {
+  const res = await fetch(`/api/instructor/sessions/${sessionId}/materials`, {
+    credentials: 'include',
+  });
+  return handleResponse<{ sessionId: string; materials: PayloadSessionMaterial[] }>(res);
+}
+
+export async function uploadSessionMaterials(
+  sessionId: string,
+  files: File[],
+): Promise<AuthResponse<{ sessionId: string; materials: PayloadSessionMaterial[]; uploadedIds: string[] }>> {
+  const formData = new FormData();
+  for (const file of files) {
+    formData.append('files', file);
+  }
+
+  const res = await fetch(`/api/instructor/sessions/${sessionId}/materials`, {
+    method: 'POST',
+    credentials: 'include',
+    body: formData,
+  });
+  return handleResponse<{ sessionId: string; materials: PayloadSessionMaterial[]; uploadedIds: string[] }>(res);
+}
+
+export async function setSessionMaterials(
+  sessionId: string,
+  materialIds: string[],
+): Promise<AuthResponse<{ sessionId: string; materials: PayloadSessionMaterial[] }>> {
+  const res = await fetch(`/api/instructor/sessions/${sessionId}/materials`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
+    body: JSON.stringify({ materialIds }),
+  });
+  return handleResponse<{ sessionId: string; materials: PayloadSessionMaterial[] }>(res);
 }
 
 // ─────────────────────────────────────────────

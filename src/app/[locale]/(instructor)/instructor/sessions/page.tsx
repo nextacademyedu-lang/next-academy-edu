@@ -6,10 +6,14 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
+  getSessionMaterials,
   getInstructorSessions,
   getSessionProgramTitle,
   getSessionRoundTitle,
+  setSessionMaterials,
+  uploadSessionMaterials,
   type PayloadSession,
+  type PayloadSessionMaterial,
 } from '@/lib/instructor-api';
 
 const STATUS_STYLE: Record<string, { color: string; bg: string }> = {
@@ -23,6 +27,11 @@ export default function InstructorSessionsPage() {
   const [sessions, setSessions] = useState<PayloadSession[]>([]);
   const [loading,  setLoading]  = useState(true);
   const [query,    setQuery]    = useState('');
+  const [activeSession, setActiveSession] = useState<PayloadSession | null>(null);
+  const [materials, setMaterials] = useState<PayloadSessionMaterial[]>([]);
+  const [materialsLoading, setMaterialsLoading] = useState(false);
+  const [materialsSaving, setMaterialsSaving] = useState(false);
+  const [materialsError, setMaterialsError] = useState('');
 
   useEffect(() => {
     getInstructorSessions().then(res => {
@@ -30,6 +39,67 @@ export default function InstructorSessionsPage() {
       setLoading(false);
     });
   }, []);
+
+  const openMaterialsManager = async (session: PayloadSession) => {
+    setActiveSession(session);
+    setMaterials([]);
+    setMaterialsError('');
+    setMaterialsLoading(true);
+
+    const res = await getSessionMaterials(session.id);
+    setMaterialsLoading(false);
+    if (!res.success || !res.data) {
+      setMaterialsError(res.error || 'Failed to load materials');
+      return;
+    }
+    setMaterials(res.data.materials);
+  };
+
+  const closeMaterialsManager = () => {
+    if (materialsSaving) return;
+    setActiveSession(null);
+    setMaterials([]);
+    setMaterialsError('');
+  };
+
+  const handleUploadMaterials = async (files: FileList | null) => {
+    if (!activeSession || !files || files.length === 0) return;
+    setMaterialsError('');
+    setMaterialsSaving(true);
+
+    const res = await uploadSessionMaterials(activeSession.id, Array.from(files));
+    setMaterialsSaving(false);
+    if (!res.success || !res.data) {
+      setMaterialsError(res.error || 'Failed to upload materials');
+      return;
+    }
+
+    setMaterials(res.data.materials);
+  };
+
+  const handleRemoveMaterial = async (materialId: string) => {
+    if (!activeSession) return;
+    setMaterialsError('');
+    const nextMaterials = materials.filter((item) => item.id !== materialId);
+    setMaterials(nextMaterials);
+    setMaterialsSaving(true);
+
+    const res = await setSessionMaterials(
+      activeSession.id,
+      nextMaterials.map((item) => item.id),
+    );
+    setMaterialsSaving(false);
+    if (!res.success || !res.data) {
+      setMaterialsError(res.error || 'Failed to update materials');
+      const refresh = await getSessionMaterials(activeSession.id);
+      if (refresh.success && refresh.data) {
+        setMaterials(refresh.data.materials);
+      }
+      return;
+    }
+
+    setMaterials(res.data.materials);
+  };
 
   const filtered = sessions.filter(s =>
     getSessionProgramTitle(s).toLowerCase().includes(query.toLowerCase()) ||
@@ -110,7 +180,7 @@ export default function InstructorSessionsPage() {
                       </Button>
                     </a>
                   )}
-                  <Button variant="outline" style={{ flex: 1 }}>
+                  <Button variant="outline" style={{ flex: 1 }} onClick={() => openMaterialsManager(session)}>
                     <FileText size={16} style={{ marginRight: '8px' }} />
                     {session.status === 'completed' ? 'View Materials' : 'Edit Materials'}
                   </Button>
@@ -118,6 +188,118 @@ export default function InstructorSessionsPage() {
               </Card>
             );
           })}
+        </div>
+      )}
+
+      {activeSession && (
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(0,0,0,0.62)',
+            zIndex: 80,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '16px',
+          }}
+          onClick={closeMaterialsManager}
+        >
+          <div
+            style={{
+              width: 'min(760px, 100%)',
+              background: 'var(--bg-elevated)',
+              border: '1px solid var(--border-subtle)',
+              borderRadius: '12px',
+              padding: '20px',
+              maxHeight: '85vh',
+              overflow: 'auto',
+            }}
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', gap: '12px', alignItems: 'flex-start' }}>
+              <div>
+                <h2 style={{ margin: 0, fontSize: '20px' }}>Session Materials</h2>
+                <p style={{ margin: '6px 0 0', color: 'var(--text-secondary)', fontSize: '14px' }}>
+                  {getSessionProgramTitle(activeSession)}{activeSession.title ? ` • ${activeSession.title}` : ''}
+                </p>
+              </div>
+              <Button variant="ghost" size="sm" onClick={closeMaterialsManager} disabled={materialsSaving}>
+                Close
+              </Button>
+            </div>
+
+            <div style={{ marginTop: '14px', display: 'flex', gap: '10px', flexWrap: 'wrap', alignItems: 'center' }}>
+              <input
+                type="file"
+                multiple
+                onChange={(event) => {
+                  const files = event.target.files;
+                  handleUploadMaterials(files);
+                  event.currentTarget.value = '';
+                }}
+                disabled={materialsSaving}
+              />
+              {materialsSaving && (
+                <span style={{ color: 'var(--text-muted)', fontSize: '13px' }}>Saving…</span>
+              )}
+            </div>
+
+            {materialsError && (
+              <p style={{ marginTop: '12px', color: '#ff4d4f', fontSize: '14px' }}>{materialsError}</p>
+            )}
+
+            {materialsLoading ? (
+              <p style={{ marginTop: '16px', color: 'var(--text-muted)' }}>Loading materials…</p>
+            ) : materials.length === 0 ? (
+              <p style={{ marginTop: '16px', color: 'var(--text-muted)' }}>No materials uploaded yet.</p>
+            ) : (
+              <div style={{ marginTop: '16px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                {materials.map((item) => (
+                  <div
+                    key={item.id}
+                    style={{
+                      border: '1px solid var(--border-subtle)',
+                      borderRadius: '10px',
+                      padding: '10px 12px',
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      gap: '12px',
+                      alignItems: 'center',
+                    }}
+                  >
+                    <div style={{ minWidth: 0 }}>
+                      {item.url ? (
+                        <a
+                          href={item.url}
+                          target="_blank"
+                          rel="noreferrer"
+                          style={{ color: 'var(--accent-primary)', fontWeight: 500, textDecoration: 'none' }}
+                        >
+                          {item.name}
+                        </a>
+                      ) : (
+                        <p style={{ margin: 0, color: 'var(--text-primary)', fontWeight: 500 }}>{item.name}</p>
+                      )}
+                      <p style={{ margin: '4px 0 0', color: 'var(--text-muted)', fontSize: '12px' }}>
+                        {item.mimeType || 'Unknown type'}
+                        {typeof item.filesize === 'number' ? ` • ${Math.max(1, Math.round(item.filesize / 1024))} KB` : ''}
+                      </p>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleRemoveMaterial(item.id)}
+                      disabled={materialsSaving}
+                      style={{ color: '#ff4d4f' }}
+                    >
+                      Remove
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       )}
     </div>
