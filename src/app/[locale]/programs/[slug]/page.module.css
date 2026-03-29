@@ -298,6 +298,29 @@
   margin-top: 6px;
 }
 
+.recordingActionLink {
+  margin-top: 6px;
+  min-height: 38px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-subtle);
+  background: color-mix(in srgb, var(--bg-surface) 88%, transparent);
+  color: var(--text-primary);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 0 14px;
+  font-size: 14px;
+  font-weight: 600;
+  transition: background var(--duration-fast) var(--ease-default), border-color var(--duration-fast) var(--ease-default);
+}
+
+.recordingActionLink:hover {
+  background: var(--hover-overlay);
+  border-color: var(--border-strong);
+}
+
 /* ── Sessions within round ──────────────────────────── */
 .roundSessions {
   margin-top: 8px;

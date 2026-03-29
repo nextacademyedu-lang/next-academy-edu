@@ -260,10 +260,8 @@ export default async function WebinarsPage() {
                     </div>
                     <div className={styles.archiveActions}>
                       <Badge variant="outline">{(round.currentEnrollments || 0).toLocaleString()} {locale === 'ar' ? 'حضور' : 'attendees'}</Badge>
-                      <Link href={actionHref}>
-                        <Button variant="ghost" size="sm">
-                          {actionLabel}
-                        </Button>
+                      <Link href={actionHref} className={styles.archiveActionLink}>
+                        {actionLabel}
                       </Link>
                     </div>
                   </article>

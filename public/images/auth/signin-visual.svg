@@ -1,0 +1,66 @@
+<svg width="1400" height="1000" viewBox="0 0 1400 1000" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg2" x1="0" y1="0" x2="1400" y2="1000" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#02070F"/>
+      <stop offset="1" stop-color="#0C1E36"/>
+    </linearGradient>
+    <radialGradient id="glowMain" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(860 420) rotate(90) scale(380 380)">
+      <stop stop-color="#4FA3FF" stop-opacity="0.38"/>
+      <stop offset="1" stop-color="#4FA3FF" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="glowWarm" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(620 360) rotate(90) scale(260 260)">
+      <stop stop-color="#C9A96E" stop-opacity="0.32"/>
+      <stop offset="1" stop-color="#C9A96E" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="dashPanel" x1="420" y1="220" x2="990" y2="780" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0F2742" stop-opacity="0.96"/>
+      <stop offset="1" stop-color="#0A1627" stop-opacity="0.96"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1400" height="1000" fill="url(#bg2)"/>
+
+  <g opacity="0.14">
+    <path d="M0 0H1400V1000H0V0Z" stroke="#53739C" stroke-width="1"/>
+    <path d="M0 80H1400M0 160H1400M0 240H1400M0 320H1400M0 400H1400M0 480H1400M0 560H1400M0 640H1400M0 720H1400M0 800H1400M0 880H1400M0 960H1400" stroke="#53739C" stroke-width="1"/>
+    <path d="M80 0V1000M160 0V1000M240 0V1000M320 0V1000M400 0V1000M480 0V1000M560 0V1000M640 0V1000M720 0V1000M800 0V1000M880 0V1000M960 0V1000M1040 0V1000M1120 0V1000M1200 0V1000M1280 0V1000M1360 0V1000" stroke="#53739C" stroke-width="1"/>
+  </g>
+
+  <circle cx="860" cy="420" r="380" fill="url(#glowMain)"/>
+  <circle cx="620" cy="360" r="260" fill="url(#glowWarm)"/>
+
+  <rect x="420" y="220" width="570" height="420" rx="26" fill="url(#dashPanel)" stroke="#34597E"/>
+  <rect x="456" y="258" width="498" height="42" rx="12" fill="#173556"/>
+  <circle cx="486" cy="279" r="8" fill="#58B2FF"/>
+  <rect x="508" y="272" width="170" height="14" rx="7" fill="#2E5378"/>
+
+  <rect x="456" y="330" width="220" height="126" rx="16" fill="#132B45"/>
+  <rect x="472" y="348" width="92" height="12" rx="6" fill="#3D638A"/>
+  <rect x="472" y="374" width="188" height="10" rx="5" fill="#2B4D71"/>
+  <rect x="472" y="394" width="156" height="10" rx="5" fill="#2B4D71"/>
+  <rect x="472" y="416" width="128" height="10" rx="5" fill="#2B4D71"/>
+
+  <rect x="698" y="330" width="256" height="126" rx="16" fill="#132B45"/>
+  <path d="M724 420L764 380L806 404L852 358L928 396" stroke="#59B1FF" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="764" cy="380" r="6" fill="#59B1FF"/>
+  <circle cx="852" cy="358" r="6" fill="#C9A96E"/>
+  <circle cx="928" cy="396" r="6" fill="#9FD3A7"/>
+
+  <rect x="456" y="482" width="498" height="126" rx="16" fill="#132B45"/>
+  <rect x="480" y="508" width="40" height="40" rx="10" fill="#1D456C"/>
+  <path d="M491 528L500 537L512 521" stroke="#9FD3A7" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="536" y="514" width="186" height="12" rx="6" fill="#365F88"/>
+  <rect x="536" y="536" width="138" height="10" rx="5" fill="#27486B"/>
+
+  <rect x="744" y="508" width="40" height="40" rx="10" fill="#1D456C"/>
+  <path d="M755 528L764 537L776 521" stroke="#9FD3A7" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="800" y="514" width="128" height="12" rx="6" fill="#365F88"/>
+  <rect x="800" y="536" width="96" height="10" rx="5" fill="#27486B"/>
+
+  <circle cx="1110" cy="760" r="66" fill="#112845" stroke="#3A6187" stroke-width="2"/>
+  <path d="M1085 760L1103 778L1137 742" stroke="#9FD3A7" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <circle cx="320" cy="760" r="52" fill="#112845" stroke="#3A6187" stroke-width="2"/>
+  <rect x="294" y="734" width="52" height="52" rx="12" fill="#1E446A"/>
+  <path d="M309 760H333M321 748V772" stroke="#C9A96E" stroke-width="4" stroke-linecap="round"/>
+</svg>

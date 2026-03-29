@@ -8,6 +8,7 @@ import type { Category, Program, Round, Media } from '@/payload-types';
 import { Navbar } from '@/components/layout/navbar';
 import { Footer } from '@/components/layout/footer';
 import { Button } from '@/components/ui/button';
+import { buildYouTubeThumbnailUrl } from '@/lib/youtube';
 import styles from './page.module.css';
 
 export const dynamic = 'force-dynamic';
@@ -299,7 +300,13 @@ export default async function CoursesPage({
                       ? 'يُحدّد لاحقاً'
                       : 'TBA';
 
-                const imageUrl = getMediaUrl(program.thumbnail) || getMediaUrl(program.coverImage);
+                const youtubeThumbnail = selectedRound?.meetingUrl
+                  ? buildYouTubeThumbnailUrl(selectedRound.meetingUrl, 'hqdefault')
+                  : null;
+                const imageUrl =
+                  getMediaUrl(program.thumbnail) ||
+                  getMediaUrl(program.coverImage) ||
+                  youtubeThumbnail;
                 const typeLabel = buildPlainTypeLabel(program.type, locale);
                 const title =
                   locale === 'ar'

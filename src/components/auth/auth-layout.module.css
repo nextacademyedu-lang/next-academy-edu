@@ -22,10 +22,9 @@
   left: 0;
   width: 50%;
   height: 100%;
-  background: radial-gradient(circle at top right, rgba(30, 41, 59, 1) 0%, var(--bg-main) 100%);
   display: flex;
-  align-items: center;
-  justify-content: center;
+  align-items: stretch;
+  justify-content: stretch;
   z-index: 10;
   border-right: 1px solid var(--border-subtle);
   overflow: hidden;
@@ -50,76 +49,101 @@
   position: relative;
   display: flex;
   align-items: flex-end;
-  padding: 60px;
-  background-image: 
-    linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
-    linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
-  background-size: 40px 40px;
+  padding: 56px;
+  background-color: #030b14;
 }
 
-/* Add a glowing golden/tech orb in background */
-.brandContent::before {
-  content: '';
+.brandVisual {
   position: absolute;
-  top: 30%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 600px;
-  height: 600px;
-  background: radial-gradient(circle, rgba(214, 163, 43, 0.15) 0%, transparent 60%);
-  filter: blur(40px);
-  pointer-events: none;
+  inset: 0;
 }
 
-.testimonialCard {
-  background-color: var(--glass-bg);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid var(--icon-border);
-  padding: 32px;
-  border-radius: var(--radius-lg);
-  max-width: 480px;
+.brandVisualImage {
+  object-fit: cover;
+  object-position: center;
+}
+
+.brandOverlay {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(2, 6, 16, 0.15) 0%, rgba(2, 6, 16, 0.62) 56%, rgba(2, 6, 16, 0.88) 100%);
+}
+
+.brandCopy {
+  position: relative;
   z-index: 2;
+  width: min(520px, 100%);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--icon-border);
+  background: var(--glass-bg);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
   box-shadow: var(--card-shadow);
+  padding: 24px;
 }
 
 .badges {
   display: flex;
+  flex-wrap: wrap;
   gap: 8px;
-  margin-bottom: 16px;
+  margin-bottom: 14px;
 }
 
 .badge {
   font-size: 12px;
-  font-weight: 500;
-  padding: 4px 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  padding: 5px 10px;
   border-radius: 100px;
+  border: 1px solid var(--icon-border);
   background-color: var(--hover-overlay);
   color: var(--text-secondary);
 }
 
-.testimonialQuote {
-  font-size: 16px;
-  line-height: 1.6;
+.brandTitle {
+  margin: 0;
   color: var(--text-primary);
-  margin-bottom: 24px;
+  font-size: clamp(24px, 2.6vw, 34px);
+  line-height: 1.2;
+  font-family: var(--font-heading-en), var(--font-heading-ar);
 }
 
-.authorName {
-  font-size: 16px;
-  font-weight: 600;
-  color: var(--text-primary);
-  margin-bottom: 4px;
-}
-
-.authorRole {
-  font-size: 14px;
-  color: var(--text-muted);
-}
-
-.authorRole strong {
+.brandSubtitle {
+  margin: 12px 0 0;
   color: var(--text-secondary);
-  font-weight: 600;
+  font-size: 15px;
+  line-height: 1.65;
+}
+
+.statsGrid {
+  margin-top: 18px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.statItem {
+  border: 1px solid var(--icon-border);
+  background-color: rgba(255, 255, 255, 0.03);
+  border-radius: 10px;
+  padding: 10px;
+}
+
+.statItem span {
+  display: block;
+  color: var(--text-primary);
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.statItem small {
+  display: block;
+  margin-top: 3px;
+  color: var(--text-muted);
+  font-size: 11px;
+  line-height: 1.4;
 }
 
 .formContent {
@@ -128,15 +152,25 @@
   margin: 0 auto;
 }
 
-/* Mobile responsive handling */
+@media (max-width: 1100px) {
+  .brandContent {
+    padding: 36px;
+  }
+
+  .statsGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
 @media (max-width: 900px) {
   .brandPanel {
-    display: none; /* Hide interactive brand panel on mobile */
+    display: none;
   }
-  
+
   .formContainerWrapper {
     width: 100%;
     margin-left: 0 !important;
     transform: none !important;
+    padding: 24px;
   }
 }

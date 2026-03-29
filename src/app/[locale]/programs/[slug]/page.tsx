@@ -10,7 +10,6 @@ import { Navbar } from '@/components/layout/navbar';
 import { Footer } from '@/components/layout/footer';
 import { Card, CardHeader, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { BookRoundButton } from '@/components/checkout/book-round-button';
 import { EarlyBirdCountdown } from '@/components/ui/early-bird-countdown';
 import { InstructorCard } from '@/components/sections/instructor-card';
@@ -277,16 +276,17 @@ export default async function ProgramDetailsPage({
                         )}
 
                         {showWebinarRecording && recordingEmbedUrl ? (
-                          <a href={`#${recordingAnchorId}`}>
-                            <Button variant="secondary" className={styles.bookBtn}>
-                              {watchRecordingLabel}
-                            </Button>
+                          <a href={`#${recordingAnchorId}`} className={styles.recordingActionLink}>
+                            {watchRecordingLabel}
                           </a>
                         ) : showWebinarRecording && hasRecordingLink ? (
-                          <a href={round.meetingUrl || '#'} target="_blank" rel="noreferrer">
-                            <Button variant="secondary" className={styles.bookBtn}>
-                              {openOnYoutubeLabel}
-                            </Button>
+                          <a
+                            href={round.meetingUrl || '#'}
+                            target="_blank"
+                            rel="noreferrer"
+                            className={styles.recordingActionLink}
+                          >
+                            {openOnYoutubeLabel}
                           </a>
                         ) : (
                           <BookRoundButton

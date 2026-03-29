@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getPayload } from 'payload';
 import config from '@payload-config';
 import type { Category, Instructor, Media, Program, Review, Round } from '@/payload-types';
+import { buildYouTubeThumbnailUrl } from '@/lib/youtube';
 
 type FeaturedCard = {
   id: string;
@@ -102,6 +103,49 @@ function pickBestRound(rounds: Round[]): Round | null {
   return upcoming || sorted[0] || null;
 }
 
+function pickUpcomingRound(rounds: Round[]): Round | null {
+  const now = Date.now();
+  const sorted = [...rounds].sort(
+    (a, b) => new Date(a.startDate ?? 0).getTime() - new Date(b.startDate ?? 0).getTime(),
+  );
+
+  return (
+    sorted.find((round) => {
+      const status = round.status || 'draft';
+      if (status === 'cancelled' || status === 'draft') return false;
+      if (!round.startDate) return false;
+      return new Date(round.startDate).getTime() >= now;
+    }) || null
+  );
+}
+
+function pickRecordedRound(rounds: Round[]): Round | null {
+  const now = Date.now();
+  const sorted = [...rounds].sort(
+    (a, b) => new Date(b.startDate ?? 0).getTime() - new Date(a.startDate ?? 0).getTime(),
+  );
+
+  return (
+    sorted.find((round) => {
+      const hasRecording = typeof round.meetingUrl === 'string' && round.meetingUrl.trim().length > 0;
+      if (!hasRecording) return false;
+      const isPastRound = round.startDate ? new Date(round.startDate).getTime() < now : false;
+      return round.status === 'completed' || isPastRound;
+    }) || null
+  );
+}
+
+function pickCardImage(program: Program, round: Round | null): string | null {
+  const mediaImage = mediaUrl(program.thumbnail) || mediaUrl(program.coverImage);
+  if (mediaImage) return mediaImage;
+
+  if (round?.meetingUrl) {
+    return buildYouTubeThumbnailUrl(round.meetingUrl, 'hqdefault');
+  }
+
+  return null;
+}
+
 export async function GET(req: NextRequest) {
   try {
     const payload = await getPayload({ config });
@@ -147,7 +191,10 @@ export async function GET(req: NextRequest) {
     }
 
     if (programs.length === 0) {
-      return NextResponse.json({ programs: [] }, { headers: PUBLIC_CACHE_HEADERS });
+      return NextResponse.json(
+        { upcomingPrograms: [], recordedPrograms: [] },
+        { headers: PUBLIC_CACHE_HEADERS },
+      );
     }
 
     const programIds = programs.map((program) => program.id);
@@ -203,10 +250,15 @@ export async function GET(req: NextRequest) {
       reviewStats.set(programId, current);
     }
 
-    const mapped: FeaturedCard[] = programs.map((rawProgram) => {
+    const upcomingPrograms: FeaturedCard[] = [];
+    const recordedPrograms: FeaturedCard[] = [];
+
+    programs.forEach((rawProgram) => {
       const program = rawProgram as ProgramWithDerived;
       const rounds = roundsByProgram.get(program.id) || [];
-      const selectedRound = pickBestRound(rounds);
+      const upcomingRound = pickUpcomingRound(rounds);
+      const recordedRound = pickRecordedRound(rounds);
+      const selectedRound = upcomingRound || pickBestRound(rounds);
       const enrollmentsFromRounds = rounds.reduce(
         (sum, round) => sum + (round.currentEnrollments || 0),
         0,
@@ -223,7 +275,7 @@ export async function GET(req: NextRequest) {
         ? (program.titleAr || program.titleEn || 'برنامج')
         : (program.titleEn || program.titleAr || 'Program');
 
-      return {
+      const baseCard = {
         id: String(program.id),
         title,
         kind: typeLabel(program.type, locale),
@@ -234,12 +286,37 @@ export async function GET(req: NextRequest) {
         instructor: instructorLabel(program.instructor, locale),
         date: roundLabel(selectedRound, locale),
         price: priceLabel(selectedRound, locale),
-        image: mediaUrl(program.thumbnail) || mediaUrl(program.coverImage),
-        href: `/${locale}/programs/${program.slug || program.id}`,
+        image: pickCardImage(program, selectedRound),
       };
+
+      if (upcomingRound) {
+        upcomingPrograms.push({
+          ...baseCard,
+          date: roundLabel(upcomingRound, locale),
+          price: priceLabel(upcomingRound, locale),
+          image: pickCardImage(program, upcomingRound),
+          href: `/${locale}/programs/${program.slug || program.id}`,
+        });
+      }
+
+      if (!upcomingRound && recordedRound) {
+        recordedPrograms.push({
+          ...baseCard,
+          date: roundLabel(recordedRound, locale),
+          price: priceLabel(recordedRound, locale),
+          image: pickCardImage(program, recordedRound),
+          href: `/${locale}/programs/${program.slug || program.id}#recording-${recordedRound.id}`,
+        });
+      }
     });
 
-    return NextResponse.json({ programs: mapped }, { headers: PUBLIC_CACHE_HEADERS });
+    return NextResponse.json(
+      {
+        upcomingPrograms: upcomingPrograms.slice(0, limit),
+        recordedPrograms: recordedPrograms.slice(0, limit),
+      },
+      { headers: PUBLIC_CACHE_HEADERS },
+    );
   } catch (error) {
     console.error('[api/home/featured-programs] Failed to fetch cards:', error);
     return NextResponse.json(

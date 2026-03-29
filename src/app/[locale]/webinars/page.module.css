@@ -242,6 +242,26 @@
   gap: 8px;
 }
 
+.archiveActionLink {
+  min-height: 32px;
+  padding: 0 12px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--border-subtle);
+  background: transparent;
+  color: var(--text-primary);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  transition: background var(--duration-fast) var(--ease-default), border-color var(--duration-fast) var(--ease-default);
+}
+
+.archiveActionLink:hover {
+  background: var(--hover-overlay);
+  border-color: var(--border-strong);
+}
+
 .highlights {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));

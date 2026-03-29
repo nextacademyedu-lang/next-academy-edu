@@ -59,13 +59,18 @@
   },
   "Featured": {
     "title": "Featured Programs",
-    "subtitle": "A curated mix of hot courses, workshops, and career-focused tracks.",
+    "subtitle": "Upcoming first, then recorded sessions you can watch anytime.",
+    "upcomingTitle": "Upcoming Programs",
+    "upcomingSubtitle": "Programs and webinars that still have upcoming rounds.",
+    "recordedTitle": "Recorded Sessions",
+    "recordedSubtitle": "Completed webinars with available recordings.",
     "viewAll": "View All Programs",
     "instructor": "Instructor",
     "enrolled": "enrolled",
     "noRating": "No rating",
     "date": "Date",
-    "bookNow": "Book Now"
+    "bookNow": "Book Now",
+    "watchRecording": "Watch Recording"
   },
   "WhyChooseUs": {
     "label": "Your Next Step",
