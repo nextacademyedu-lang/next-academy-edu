@@ -38,8 +38,14 @@ export default async function ProgramDetailsPage({
   if (!program) notFound();
 
   // --- Derive display values from the typed Program ---
-  const title = program.titleEn || program.titleAr || 'Program';
-  const description = program.shortDescriptionEn || program.shortDescriptionAr || '';
+  const title =
+    locale === 'ar'
+      ? program.titleAr || program.titleEn || 'Program'
+      : program.titleEn || program.titleAr || 'Program';
+  const description =
+    locale === 'ar'
+      ? program.shortDescriptionAr || program.shortDescriptionEn || ''
+      : program.shortDescriptionEn || program.shortDescriptionAr || '';
   const objectives = (program.objectives ?? []).filter(
     (obj): obj is { item: string; id?: string | null } => typeof obj.item === 'string',
   );

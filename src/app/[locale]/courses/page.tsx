@@ -301,7 +301,10 @@ export default async function CoursesPage({
 
                 const imageUrl = getMediaUrl(program.thumbnail) || getMediaUrl(program.coverImage);
                 const typeLabel = buildPlainTypeLabel(program.type, locale);
-                const title = program.titleEn || program.titleAr || 'Program';
+                const title =
+                  locale === 'ar'
+                    ? program.titleAr || program.titleEn || 'Program'
+                    : program.titleEn || program.titleAr || 'Program';
 
                 return (
                   <article key={program.id} className={styles.card}>

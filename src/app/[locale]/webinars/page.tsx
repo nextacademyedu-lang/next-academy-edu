@@ -150,7 +150,10 @@ export default async function WebinarsPage() {
                 const webinar = webinars.find((item) => item.id === programId);
                 if (!webinar) return null;
 
-                const title = webinar.titleEn || webinar.titleAr || 'Webinar';
+                const title =
+                  locale === 'ar'
+                    ? webinar.titleAr || webinar.titleEn || 'Webinar'
+                    : webinar.titleEn || webinar.titleAr || 'Webinar';
                 const image = getMediaUrl(webinar.coverImage) || getMediaUrl(webinar.thumbnail) || fallbackImages[index % fallbackImages.length];
                 const instructor =
                   typeof webinar.instructor === 'object' && webinar.instructor
@@ -214,7 +217,10 @@ export default async function WebinarsPage() {
                 const webinar = webinars.find((item) => item.id === programId);
                 if (!webinar) return null;
 
-                const title = webinar.titleEn || webinar.titleAr || 'Webinar';
+                const title =
+                  locale === 'ar'
+                    ? webinar.titleAr || webinar.titleEn || 'Webinar'
+                    : webinar.titleEn || webinar.titleAr || 'Webinar';
                 const programHref = `/${locale}/programs/${webinar.slug || webinar.id}`;
                 const actionHref = round.meetingUrl ? `${programHref}#recording-${round.id}` : programHref;
                 const actionLabel = round.meetingUrl

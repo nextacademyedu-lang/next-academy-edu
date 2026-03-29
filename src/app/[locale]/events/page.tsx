@@ -150,7 +150,10 @@ export default async function EventsPage() {
                       ? 'فريق نكست'
                       : 'Next Team';
 
-                const title = program.titleEn || program.titleAr || 'Program';
+                const title =
+                  locale === 'ar'
+                    ? program.titleAr || program.titleEn || 'Program'
+                    : program.titleEn || program.titleAr || 'Program';
 
                 return (
                   <article key={round.id} className={styles.eventCard}>
@@ -204,7 +207,10 @@ export default async function EventsPage() {
 
               {pastEvents.slice(0, 10).map((round) => {
                 const program = round.program as Program;
-                const title = program.titleEn || program.titleAr || 'Program';
+                const title =
+                  locale === 'ar'
+                    ? program.titleAr || program.titleEn || 'Program'
+                    : program.titleEn || program.titleAr || 'Program';
                 const learners = round.currentEnrollments || 0;
 
                 return (
