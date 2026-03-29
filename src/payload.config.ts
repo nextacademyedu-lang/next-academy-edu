@@ -44,6 +44,7 @@ import { UpcomingEventsConfig } from './collections/UpcomingEventsConfig.ts';
 import { CrmSyncEvents } from './collections/CrmSyncEvents.ts';
 import { Partners } from './collections/Partners.ts';
 import { InstructorProgramSubmissions } from './collections/InstructorProgramSubmissions.ts';
+import { CompanyInvitations } from './collections/CompanyInvitations.ts';
 import { migrations } from './migrations/index.ts';
 
 if (!process.env.DATABASE_URI) {
@@ -228,6 +229,7 @@ export default buildConfig({
     CrmSyncEvents,
     Partners,
     InstructorProgramSubmissions,
+    CompanyInvitations,
   ],
   editor: lexicalEditor({}),
   db: postgresAdapter({

@@ -19,6 +19,23 @@ interface Tag {
   name: string;
 }
 
+function relationToId(value: unknown): number | undefined {
+  if (typeof value === 'number') return value;
+  if (typeof value === 'string') {
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : undefined;
+  }
+  if (value && typeof value === 'object' && 'id' in value) {
+    const raw = (value as { id?: unknown }).id;
+    if (typeof raw === 'number') return raw;
+    if (typeof raw === 'string') {
+      const parsed = Number(raw);
+      return Number.isFinite(parsed) ? parsed : undefined;
+    }
+  }
+  return undefined;
+}
+
 export default function OnboardingPage() {
   const router = useRouter();
   const { user } = useAuth();
@@ -137,19 +154,24 @@ export default function OnboardingPage() {
         return Number(createdId);
       };
 
-      const companyId = await resolveCompanyId();
-      if (user?.role === 'b2b_manager' && !companyId) {
-        setError('Company name is required for B2B manager onboarding.');
-        setIsLoading(false);
-        return;
-      }
-
       // Find or create user profile
       const profileRes = await fetch(
         `/api/user-profiles?where[user][equals]=${user?.id}&depth=0`,
       );
       const profileData = await profileRes.json();
       const existingProfile = profileData.docs?.[0];
+
+      let companyId = await resolveCompanyId();
+      const existingCompanyId = relationToId(existingProfile?.company);
+      if (existingCompanyId && user?.role !== 'b2b_manager') {
+        companyId = existingCompanyId;
+      }
+
+      if (user?.role === 'b2b_manager' && !companyId) {
+        setError('Company name is required for B2B manager onboarding.');
+        setIsLoading(false);
+        return;
+      }
 
       const profilePayload = {
         user: user?.id,

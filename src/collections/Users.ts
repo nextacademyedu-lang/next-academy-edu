@@ -8,6 +8,7 @@ import {
   normalizeEmail,
   relationToId,
 } from '../lib/instructor-account-link.ts';
+import { autoAcceptInvitationByEmail } from '../lib/company-invitations.ts';
 
 function parseConfiguredAdminEmails(): string[] {
   const raw = process.env.PAYLOAD_ADMIN_EMAIL || '';
@@ -108,6 +109,7 @@ export const Users: CollectionConfig = {
         await deleteByFieldValue('installment-requests', 'user', id);
         await deleteByFieldValue('installment-requests', 'reviewedBy', id);
         await deleteByFieldValue('verification-codes', 'email', normalizedEmail);
+        await deleteByFieldValue('company-invitations', 'email', normalizedEmail);
         await deleteByFieldValue('consultation-bookings', 'user', id);
         await deleteByFieldValue('instructor-program-submissions', 'submittedBy', id);
       },
@@ -219,6 +221,25 @@ export const Users: CollectionConfig = {
                 source: 'Users.afterChange',
               });
             }
+          }
+
+          const shouldAttemptCompanyAutoLink =
+            doc.role !== 'admin' &&
+            Boolean(doc.emailVerified) &&
+            Boolean(normalizedEmail) &&
+            (operation === 'create' || justVerified || emailChanged);
+
+          if (shouldAttemptCompanyAutoLink) {
+            await autoAcceptInvitationByEmail({
+              payload: req.payload,
+              req: req as any,
+              user: {
+                id: doc.id,
+                email: doc.email,
+                role: doc.role,
+                emailVerified: doc.emailVerified,
+              },
+            });
           }
 
           if (doc.role === 'admin') return;

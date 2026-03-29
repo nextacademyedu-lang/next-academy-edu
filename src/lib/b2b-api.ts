@@ -36,6 +36,22 @@ export interface B2BTeamMember {
   last_booking_date?: string;
 }
 
+export interface B2BInvitation {
+  id: string;
+  email: string;
+  status: 'pending' | 'accepted' | 'revoked' | 'expired';
+  company: {
+    id: string;
+    name: string;
+  };
+  jobTitle?: string | null;
+  title?: string | null;
+  expiresAt?: string | null;
+  acceptedAt?: string | null;
+  createdAt?: string | null;
+  updatedAt?: string | null;
+}
+
 export interface B2BBooking {
   id: string;
   bookingCode: string;
@@ -110,22 +126,73 @@ export async function getB2BTeam(page = 1): Promise<AuthResponse<PayloadListResp
   return handleResponse<PayloadListResponse<B2BTeamMember>>(res);
 }
 
-export async function addB2BTeamMember(payload: {
-  userId?: string;
+export async function getB2BInvitations(
+  status: 'all' | 'pending' | 'accepted' | 'revoked' | 'expired' = 'pending',
+): Promise<AuthResponse<PayloadListResponse<B2BInvitation>>> {
+  const res = await fetch(`/api/b2b/invitations?status=${status}`, { credentials: 'include' });
+  return handleResponse<PayloadListResponse<B2BInvitation>>(res);
+}
+
+export async function inviteB2BTeamMember(payload: {
   email?: string;
-  firstName?: string;
-  lastName?: string;
-  password?: string;
   jobTitle?: string;
   title?: string;
-}): Promise<AuthResponse<{ member: B2BTeamMember; created: boolean }>> {
-  const res = await fetch('/api/b2b/team', {
+  locale?: 'ar' | 'en';
+}): Promise<
+  AuthResponse<{
+    invitation?: B2BInvitation;
+    created?: boolean;
+    emailSent?: boolean;
+    previewUrl?: string;
+    alreadyMember?: boolean;
+    message?: string;
+  }>
+> {
+  const res = await fetch('/api/b2b/invitations', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     credentials: 'include',
     body: JSON.stringify(payload),
   });
-  return handleResponse<{ member: B2BTeamMember; created: boolean }>(res);
+  return handleResponse<{
+    invitation?: B2BInvitation;
+    created?: boolean;
+    emailSent?: boolean;
+    previewUrl?: string;
+    alreadyMember?: boolean;
+    message?: string;
+  }>(res);
+}
+
+export async function revokeB2BInvitation(
+  invitationId: string,
+): Promise<AuthResponse<{ revoked: boolean; invitationId: string }>> {
+  const res = await fetch('/api/b2b/invitations', {
+    method: 'DELETE',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
+    body: JSON.stringify({ invitationId }),
+  });
+  return handleResponse<{ revoked: boolean; invitationId: string }>(res);
+}
+
+// Backward-compatible alias used by old callers.
+export const addB2BTeamMember = inviteB2BTeamMember;
+
+export async function resendB2BInvitation(payload: {
+  email: string;
+  jobTitle?: string;
+  title?: string;
+  locale?: 'ar' | 'en';
+}): Promise<
+  AuthResponse<{
+    invitation?: B2BInvitation;
+    created?: boolean;
+    emailSent?: boolean;
+    previewUrl?: string;
+  }>
+> {
+  return inviteB2BTeamMember(payload);
 }
 
 export async function removeB2BTeamMember(
