@@ -6,6 +6,30 @@
 
 ## Session Log
 
+### Session 2026-03-29 (19:16) — B2B Team Invitation Token Flow
+
+- [x] Added new `company-invitations` collection and migration wiring
+- [x] Added invitation core helper logic (`src/lib/company-invitations.ts`)
+- [x] Added B2B invitation APIs:
+  - [x] `GET/POST/DELETE /api/b2b/invitations`
+  - [x] `GET /api/b2b/invitations/validate`
+  - [x] `POST /api/b2b/invitations/accept`
+- [x] Added public accept page:
+  - [x] `/{locale}/invite/company?token=...`
+  - [x] login/register/verify-email guided flow before accept
+- [x] Switched Team UI from direct member creation to invite-based flow
+- [x] Added pending invitations list with resend/revoke actions
+- [x] Added auto-link fallback on user verification in `Users.afterChange`
+- [x] Added invitation cleanup path in `Users.beforeDelete`
+- [x] Preserved existing company relation in onboarding for already-linked non-B2B users
+- [x] Verified TypeScript compile:
+  - [x] `cmd /c pnpm exec tsc --noEmit --pretty false` ✅
+- [ ] Deploy and verify production flow end-to-end:
+  - [ ] manager sends invite
+  - [ ] employee registers with same email + OTP verify
+  - [ ] employee appears under company team automatically
+  - [ ] invite-link accept flow works when already logged in
+
 ### Session 2026-03-22 (17:09) — Program/Round/Session Alignment
 
 - [x] Added `roundsCount` in `programs` schema

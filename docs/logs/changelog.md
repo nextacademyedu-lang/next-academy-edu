@@ -4,6 +4,58 @@
 
 ---
 
+### [2026-03-29 19:16] - B2B Team Invitation Flow (Token + Email Auto-Link)
+
+**Files updated (this pass):**
+- `src/collections/CompanyInvitations.ts` (new)
+- `src/migrations/20260329_010500_add_company_invitations.ts` (new)
+- `src/migrations/index.ts`
+- `src/payload.config.ts`
+- `src/lib/company-invitations.ts` (new)
+- `src/app/api/b2b/invitations/route.ts` (new)
+- `src/app/api/b2b/invitations/validate/route.ts` (new)
+- `src/app/api/b2b/invitations/accept/route.ts` (new)
+- `src/app/[locale]/invite/company/page.tsx` (new)
+- `src/lib/b2b-api.ts`
+- `src/app/[locale]/(b2b)/b2b-dashboard/team/page.tsx`
+- `src/collections/Users.ts`
+- `src/app/[locale]/(auth)/onboarding/page.tsx`
+- `docs/logs/changelog.md`
+- `docs/logs/tasks.md`
+- `docs/sessions/2026-03-29-19-16-session-25.md` (new)
+
+**What changed technically:**
+- Added a dedicated `company-invitations` collection with invitation token lifecycle:
+  - statuses: `pending`, `accepted`, `revoked`, `expired`
+  - invitation metadata: `email`, `company`, `invitedBy`, `expiresAt`, `acceptedAt`, `acceptedBy`
+  - optional prefill fields for employee profile: `jobTitle`, `title`
+- Added invitation APIs for B2B manager:
+  - list/create/revoke invitations under manager company scope
+  - validate invitation token for public accept page
+  - accept invitation with auth + verified-email + email-match checks
+- Added full invitation acceptance page:
+  - `/{locale}/invite/company?token=...`
+  - handles login/register redirect, account mismatch, verify-email requirement, and accept action
+- Switched B2B Team "Add Member" flow from direct user creation to invite-by-email:
+  - send invitation email with token link
+  - view pending invitations
+  - resend/revoke invitation actions
+- Added automatic invitation acceptance by email after user verification:
+  - centralized in `Users.afterChange` when user email becomes verified
+  - links user profile to the invited company if no conflicting company exists
+- Added invitation cleanup on user delete (`company-invitations` by email).
+- Hardened onboarding company persistence:
+  - preserves existing linked company for non-B2B users when profile already has company relation.
+
+**Reason:**
+- User requested B2B manager to invite employees by email token and have automatic company-team linking when employee registers later with the same email.
+
+**Verification:**
+- `cmd /c pnpm exec tsc --noEmit --pretty false` ✅
+- `cmd /c pnpm build` ⚠️ local Windows standalone symlink step failed with `EPERM` (environment limitation), while type-checking/static generation completed.
+
+---
+
 ### [2026-03-22 17:09] - Program/Round/Session Model Alignment + Auto Round Generation
 
 **Files updated (this pass):**
