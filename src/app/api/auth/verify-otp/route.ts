@@ -126,6 +126,35 @@ async function ensureInstructorAccountForIntent(params: {
   });
 }
 
+async function ensureB2BManagerAccountForIntent(params: {
+  payload: Awaited<ReturnType<typeof getPayload>>;
+  req: NextRequest;
+  user: {
+    id: number | string;
+    role?: string | null;
+    signupIntent?: string | null;
+  };
+}) {
+  const { payload, req, user } = params;
+  if (user.signupIntent !== 'b2b_manager') return user;
+  if (user.role === 'b2b_manager') return user;
+
+  const updated = await payload.update({
+    collection: 'users',
+    id: user.id,
+    data: { role: 'b2b_manager' },
+    overrideAccess: true,
+    req: req as any,
+    context: { allowPrivilegedRoleWrite: true },
+  });
+
+  return updated as {
+    id: number | string;
+    role?: string | null;
+    signupIntent?: string | null;
+  };
+}
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
@@ -228,10 +257,20 @@ export async function POST(request: NextRequest) {
       req: request as any,
     });
 
-    await ensureInstructorAccountForIntent({
+    const intentAdjustedUser = await ensureB2BManagerAccountForIntent({
       payload,
       req: request,
       user: updatedUser as {
+        id: number | string;
+        role?: string | null;
+        signupIntent?: string | null;
+      },
+    });
+
+    await ensureInstructorAccountForIntent({
+      payload,
+      req: request,
+      user: intentAdjustedUser as {
         id: number | string;
         email?: string | null;
         firstName?: string | null;

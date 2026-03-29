@@ -127,7 +127,12 @@ export const Users: CollectionConfig = {
 
         // Public/self-service create must never be allowed to assign privileged roles.
         if (operation === 'create') {
-          const requestedIntent = data.signupIntent === 'instructor' ? 'instructor' : 'student';
+          const requestedIntent =
+            data.signupIntent === 'instructor'
+              ? 'instructor'
+              : data.signupIntent === 'b2b_manager'
+                ? 'b2b_manager'
+                : 'student';
           data.signupIntent = requestedIntent;
 
           if (!canWritePrivilegedRole) {
@@ -293,6 +298,7 @@ export const Users: CollectionConfig = {
       options: [
         { label: 'Student', value: 'student' },
         { label: 'Instructor', value: 'instructor' },
+        { label: 'B2B Manager', value: 'b2b_manager' },
       ],
       defaultValue: 'student',
       required: true,

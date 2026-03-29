@@ -8,6 +8,7 @@ import * as migration_20260327_001500_add_sessions_google_event_id from './20260
 import * as migration_20260328_154958_add_instructor_signup_intent_and_verification from './20260328_154958_add_instructor_signup_intent_and_verification';
 import * as migration_20260328_192145_add_instructor_program_submissions from './20260328_192145_add_instructor_program_submissions';
 import * as migration_20260328_214500_fix_instructor_program_submissions_fk from './20260328_214500_fix_instructor_program_submissions_fk';
+import * as migration_20260329_000500_add_b2b_signup_intent from './20260329_000500_add_b2b_signup_intent';
 
 export const migrations = [
   {
@@ -59,5 +60,10 @@ export const migrations = [
     up: migration_20260328_214500_fix_instructor_program_submissions_fk.up,
     down: migration_20260328_214500_fix_instructor_program_submissions_fk.down,
     name: '20260328_214500_fix_instructor_program_submissions_fk',
+  },
+  {
+    up: migration_20260329_000500_add_b2b_signup_intent.up,
+    down: migration_20260329_000500_add_b2b_signup_intent.down,
+    name: '20260329_000500_add_b2b_signup_intent',
   },
 ];

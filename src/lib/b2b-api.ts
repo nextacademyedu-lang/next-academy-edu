@@ -110,6 +110,36 @@ export async function getB2BTeam(page = 1): Promise<AuthResponse<PayloadListResp
   return handleResponse<PayloadListResponse<B2BTeamMember>>(res);
 }
 
+export async function addB2BTeamMember(payload: {
+  userId?: string;
+  email?: string;
+  firstName?: string;
+  lastName?: string;
+  password?: string;
+  jobTitle?: string;
+  title?: string;
+}): Promise<AuthResponse<{ member: B2BTeamMember; created: boolean }>> {
+  const res = await fetch('/api/b2b/team', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
+    body: JSON.stringify(payload),
+  });
+  return handleResponse<{ member: B2BTeamMember; created: boolean }>(res);
+}
+
+export async function removeB2BTeamMember(
+  userId: string,
+): Promise<AuthResponse<{ removed: boolean; userId: string }>> {
+  const res = await fetch('/api/b2b/team', {
+    method: 'DELETE',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
+    body: JSON.stringify({ userId }),
+  });
+  return handleResponse<{ removed: boolean; userId: string }>(res);
+}
+
 // ─────────────────────────────────────────────
 // Bookings
 // ─────────────────────────────────────────────

@@ -6,6 +6,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useLocale } from 'next-intl';
 import { LayoutDashboard, Users, BookOpen, Package, LogOut, Building2, ArrowLeft } from 'lucide-react';
 import { useAuth } from '@/context/auth-context';
+import { getDashboardPath } from '@/lib/role-redirect';
 import styles from './b2b-layout.module.css';
 
 const NAV_ITEMS = [
@@ -24,6 +25,14 @@ export default function B2BLayout({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (!isLoading && !isAuthenticated) router.replace(`/${locale}/login`);
   }, [isLoading, isAuthenticated, router, locale]);
+
+  useEffect(() => {
+    if (!isLoading && isAuthenticated && user) {
+      if (user.role !== 'b2b_manager' && user.role !== 'admin') {
+        router.replace(getDashboardPath(user.role, locale));
+      }
+    }
+  }, [isLoading, isAuthenticated, user, router, locale]);
 
   if (isLoading) {
     return (

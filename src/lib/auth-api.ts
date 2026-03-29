@@ -27,7 +27,7 @@ interface UserData {
   preferredLanguage: 'ar' | 'en';
   picture?: { url?: string | null } | number | string | null;
   instructorId?: string | { id: string } | null;
-  signupIntent?: 'student' | 'instructor';
+  signupIntent?: 'student' | 'instructor' | 'b2b_manager';
 }
 
 interface RegisterPayload {
@@ -37,7 +37,7 @@ interface RegisterPayload {
   lastName: string;
   phone?: string;
   preferredLanguage?: 'ar' | 'en';
-  signupIntent?: 'student' | 'instructor';
+  signupIntent?: 'student' | 'instructor' | 'b2b_manager';
 }
 
 async function handleResponse<T>(response: Response): Promise<AuthResponse<T>> {

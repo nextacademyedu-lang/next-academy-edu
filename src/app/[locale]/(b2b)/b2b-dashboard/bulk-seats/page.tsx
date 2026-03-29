@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { Package, UserPlus, Users, AlertCircle } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { useAuth } from '@/context/auth-context';
+import { getB2BTeam, type B2BTeamMember } from '@/lib/b2b-api';
 
 /* ── Types ────────────────────────────────────────────────── */
 interface Allocation {
@@ -49,17 +49,29 @@ const STATUS_COLORS: Record<string, { color: string; bg: string }> = {
 
 /* ── Component ────────────────────────────────────────────── */
 export default function BulkSeatsPage() {
-  const { user } = useAuth();
   const [docs, setDocs]       = useState<BulkSeatDoc[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError]     = useState<string | null>(null);
   const [allocating, setAllocating] = useState<string | null>(null); // bulkSeatId being allocated
+  const [teamMembers, setTeamMembers] = useState<B2BTeamMember[]>([]);
+  const [selectedUsers, setSelectedUsers] = useState<Record<string, string>>({});
+
+  const refreshDocs = async () => {
+    const refreshed = await fetch('/api/bulk-seat-allocations?depth=2&limit=50');
+    const refreshData = await refreshed.json();
+    setDocs(refreshData.docs ?? []);
+  };
 
   useEffect(() => {
-    fetch('/api/bulk-seat-allocations?depth=2&limit=50')
-      .then(r => r.json())
-      .then(res => {
-        setDocs(res.docs ?? []);
+    Promise.all([
+      fetch('/api/bulk-seat-allocations?depth=2&limit=50').then((r) => r.json()),
+      getB2BTeam(),
+    ])
+      .then(([seatsRes, teamRes]) => {
+        setDocs(seatsRes.docs ?? []);
+        if (teamRes.success && teamRes.data) {
+          setTeamMembers(teamRes.data.docs);
+        }
         setLoading(false);
       })
       .catch(() => {
@@ -78,10 +90,8 @@ export default function BulkSeatsPage() {
       });
       const data = await res.json();
       if (data.success) {
-        // Refresh data
-        const refreshed = await fetch('/api/bulk-seat-allocations?depth=2&limit=50');
-        const refreshData = await refreshed.json();
-        setDocs(refreshData.docs ?? []);
+        await refreshDocs();
+        setSelectedUsers((prev) => ({ ...prev, [bulkSeatId]: '' }));
       } else {
         setError(data.error || 'Allocation failed');
       }
@@ -149,6 +159,19 @@ export default function BulkSeatsPage() {
         const used = activeAllocations.length;
         const total = doc.totalSeats;
         const pct = total > 0 ? Math.round((used / total) * 100) : 0;
+        const allocatedUserIds = new Set(
+          activeAllocations
+            .map((allocation) =>
+              typeof allocation.user === 'string' ? allocation.user : allocation.user.id,
+            )
+            .map((id) => String(id)),
+        );
+
+        const availableMembers = teamMembers.filter(
+          (member) => !allocatedUserIds.has(String(member.user.id)),
+        );
+        const selectedUserId = selectedUsers[doc.id] || '';
+        const canAllocate = doc.status === 'active' && total - used > 0 && selectedUserId;
 
         return (
           <Card key={doc.id} style={{
@@ -196,6 +219,62 @@ export default function BulkSeatsPage() {
             </CardHeader>
 
             <CardContent>
+              {doc.status === 'active' && total - used > 0 && (
+                <div
+                  style={{
+                    display: 'flex',
+                    flexWrap: 'wrap',
+                    gap: '10px',
+                    marginBottom: '14px',
+                    alignItems: 'center',
+                  }}
+                >
+                  <select
+                    value={selectedUserId}
+                    onChange={(event) =>
+                      setSelectedUsers((prev) => ({ ...prev, [doc.id]: event.target.value }))
+                    }
+                    style={{
+                      minWidth: '220px',
+                      flex: '1 1 220px',
+                      borderRadius: '10px',
+                      border: '1px solid var(--border-subtle)',
+                      background: 'var(--bg-surface)',
+                      color: 'var(--text-primary)',
+                      padding: '9px 12px',
+                    }}
+                  >
+                    <option value="">Select team member</option>
+                    {availableMembers.map((member) => (
+                      <option key={member.user.id} value={member.user.id}>
+                        {member.user.firstName} {member.user.lastName} ({member.user.email})
+                      </option>
+                    ))}
+                  </select>
+
+                  <button
+                    type="button"
+                    onClick={() => handleAllocate(doc.id, selectedUserId)}
+                    disabled={!canAllocate || allocating === doc.id}
+                    style={{
+                      border: 'none',
+                      borderRadius: '10px',
+                      padding: '10px 14px',
+                      background: canAllocate ? 'var(--accent-primary)' : 'rgba(255,255,255,0.15)',
+                      color: canAllocate ? '#111' : 'var(--text-muted)',
+                      cursor: canAllocate ? 'pointer' : 'not-allowed',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      fontWeight: 600,
+                    }}
+                  >
+                    <UserPlus size={15} />
+                    {allocating === doc.id ? 'Allocating…' : 'Allocate Seat'}
+                  </button>
+                </div>
+              )}
+
               {/* Allocations table */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                 {(doc.allocations ?? []).length === 0 ? (
