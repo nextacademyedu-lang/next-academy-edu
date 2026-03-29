@@ -9,6 +9,7 @@ import { Navbar } from '@/components/layout/navbar';
 import { Footer } from '@/components/layout/footer';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { buildYouTubeThumbnailUrl } from '@/lib/youtube';
 import styles from './page.module.css';
 
 export const dynamic = 'force-dynamic';
@@ -145,7 +146,7 @@ export default async function WebinarsPage() {
                 </p>
               )}
 
-              {upcomingRounds.slice(0, 8).map((round, index) => {
+              {upcomingRounds.map((round, index) => {
                 const programId = typeof round.program === 'number' ? round.program : round.program?.id;
                 const webinar = webinars.find((item) => item.id === programId);
                 if (!webinar) return null;
@@ -154,7 +155,12 @@ export default async function WebinarsPage() {
                   locale === 'ar'
                     ? webinar.titleAr || webinar.titleEn || 'Webinar'
                     : webinar.titleEn || webinar.titleAr || 'Webinar';
-                const image = getMediaUrl(webinar.coverImage) || getMediaUrl(webinar.thumbnail) || fallbackImages[index % fallbackImages.length];
+                const youtubeThumbnail = round.meetingUrl ? buildYouTubeThumbnailUrl(round.meetingUrl, 'hqdefault') : null;
+                const image =
+                  getMediaUrl(webinar.coverImage) ||
+                  getMediaUrl(webinar.thumbnail) ||
+                  youtubeThumbnail ||
+                  fallbackImages[index % fallbackImages.length];
                 const instructor =
                   typeof webinar.instructor === 'object' && webinar.instructor
                     ? `${webinar.instructor.firstName} ${webinar.instructor.lastName}`.trim()
@@ -212,7 +218,7 @@ export default async function WebinarsPage() {
                 </p>
               )}
 
-              {archivedRounds.slice(0, 10).map((round) => {
+              {archivedRounds.map((round, index) => {
                 const programId = typeof round.program === 'number' ? round.program : round.program?.id;
                 const webinar = webinars.find((item) => item.id === programId);
                 if (!webinar) return null;
@@ -230,9 +236,24 @@ export default async function WebinarsPage() {
                   : locale === 'ar'
                     ? 'عرض الندوة'
                     : 'View Webinar';
+                const youtubeThumbnail = round.meetingUrl ? buildYouTubeThumbnailUrl(round.meetingUrl, 'hqdefault') : null;
+                const image =
+                  getMediaUrl(webinar.coverImage) ||
+                  getMediaUrl(webinar.thumbnail) ||
+                  youtubeThumbnail ||
+                  fallbackImages[index % fallbackImages.length];
 
                 return (
                   <article key={`archive-${round.id}`} className={styles.archiveItem}>
+                    <div className={styles.archiveMedia}>
+                      <Image
+                        src={image}
+                        alt={title}
+                        fill
+                        className={styles.archiveImage}
+                        sizes="(max-width: 768px) 100vw, 220px"
+                      />
+                    </div>
                     <div>
                       <h3>{title}</h3>
                       <p>{round.startDate ? new Date(round.startDate).toLocaleDateString(locale === 'ar' ? 'ar-EG' : 'en-US') : ''}</p>

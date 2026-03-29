@@ -38,3 +38,11 @@ export function buildYouTubeEmbedUrl(url: string): string | null {
   return `https://www.youtube-nocookie.com/embed/${id}?rel=0`;
 }
 
+export function buildYouTubeThumbnailUrl(
+  url: string,
+  quality: 'default' | 'mqdefault' | 'hqdefault' | 'sddefault' | 'maxresdefault' = 'hqdefault',
+): string | null {
+  const id = extractYouTubeVideoId(url);
+  if (!id) return null;
+  return `https://i.ytimg.com/vi/${id}/${quality}.jpg`;
+}

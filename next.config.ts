@@ -10,6 +10,8 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       { protocol: 'https', hostname: '*.nextacademyedu.com' },
       { protocol: 'https', hostname: 'res.cloudinary.com' },
+      { protocol: 'https', hostname: 'i.ytimg.com' },
+      { protocol: 'https', hostname: 'img.youtube.com' },
       { protocol: 'http', hostname: 'localhost', port: '3000', pathname: '/api/media/**' },
       { protocol: 'http', hostname: '127.0.0.1', port: '3000', pathname: '/api/media/**' },
     ],
@@ -58,7 +60,7 @@ const nextConfig: NextConfig = {
             "font-src 'self' https://fonts.gstatic.com",
             "img-src 'self' data: https: blob:",
             "connect-src 'self' https://accept.paymob.com https://back.easykash.net",
-            "frame-src 'self' https://accept.paymob.com",
+            "frame-src 'self' https://accept.paymob.com https://www.youtube-nocookie.com https://www.youtube.com",
             "frame-ancestors 'none'",
           ].join('; '),
         },

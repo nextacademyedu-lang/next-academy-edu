@@ -14,7 +14,7 @@ import { Button } from '@/components/ui/button';
 import { BookRoundButton } from '@/components/checkout/book-round-button';
 import { EarlyBirdCountdown } from '@/components/ui/early-bird-countdown';
 import { InstructorCard } from '@/components/sections/instructor-card';
-import { buildYouTubeEmbedUrl } from '@/lib/youtube';
+import { buildYouTubeEmbedUrl, buildYouTubeThumbnailUrl } from '@/lib/youtube';
 import styles from './page.module.css';
 
 export default async function ProgramDetailsPage({
@@ -55,7 +55,7 @@ export default async function ProgramDetailsPage({
     return (media as Media).url || null;
   }
 
-  const coverImageUrl = getMediaUrl(program.coverImage) || getMediaUrl(program.thumbnail);
+  const coverImageUrlFromMedia = getMediaUrl(program.coverImage) || getMediaUrl(program.thumbnail);
 
   // Instructor — may be a populated Instructor object or just a number (FK)
   const instructor: Instructor | null =
@@ -102,6 +102,12 @@ export default async function ProgramDetailsPage({
   const openOnYoutubeLabel = locale === 'ar' ? 'فتح على YouTube' : 'Open on YouTube';
   const noRecordingEmbedLabel =
     locale === 'ar' ? 'الرابط لا يدعم العرض المضمن، افتحه على YouTube.' : 'This link cannot be embedded. Open it on YouTube.';
+  const firstRecordingRound = rounds.find(
+    (round) => typeof round.meetingUrl === 'string' && round.meetingUrl.trim().length > 0,
+  );
+  const coverImageUrl =
+    coverImageUrlFromMedia ||
+    (firstRecordingRound?.meetingUrl ? buildYouTubeThumbnailUrl(firstRecordingRound.meetingUrl, 'hqdefault') : null);
 
   return (
     <div className={styles.wrapper}>
@@ -270,7 +276,13 @@ export default async function ProgramDetailsPage({
                           </div>
                         )}
 
-                        {showWebinarRecording && hasRecordingLink ? (
+                        {showWebinarRecording && recordingEmbedUrl ? (
+                          <a href={`#${recordingAnchorId}`}>
+                            <Button variant="secondary" className={styles.bookBtn}>
+                              {watchRecordingLabel}
+                            </Button>
+                          </a>
+                        ) : showWebinarRecording && hasRecordingLink ? (
                           <a href={round.meetingUrl || '#'} target="_blank" rel="noreferrer">
                             <Button variant="secondary" className={styles.bookBtn}>
                               {openOnYoutubeLabel}
