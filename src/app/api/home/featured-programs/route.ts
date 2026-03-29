@@ -9,7 +9,7 @@ type FeaturedCard = {
   title: string;
   kind: string;
   category: string;
-  enrolledCount: number;
+  audienceCount: number;
   rating: number;
   ratingCount: number;
   instructor: string;
@@ -21,6 +21,7 @@ type FeaturedCard = {
 
 type ProgramWithDerived = Program & {
   learnersCount?: number | null;
+  viewCount?: number | null;
 };
 
 const PUBLIC_CACHE_HEADERS = {
@@ -280,7 +281,7 @@ export async function GET(req: NextRequest) {
         title,
         kind: typeLabel(program.type, locale),
         category: categoryLabel(program.category, locale),
-        enrolledCount: enrollmentsFromRounds || program.learnersCount || 0,
+        audienceCount: enrollmentsFromRounds || program.learnersCount || 0,
         rating,
         ratingCount,
         instructor: instructorLabel(program.instructor, locale),
@@ -300,8 +301,10 @@ export async function GET(req: NextRequest) {
       }
 
       if (!upcomingRound && recordedRound) {
+        const viewsCount = Math.max(program.viewCount || 0, enrollmentsFromRounds || 0);
         recordedPrograms.push({
           ...baseCard,
+          audienceCount: viewsCount,
           date: roundLabel(recordedRound, locale),
           price: priceLabel(recordedRound, locale),
           image: pickCardImage(program, recordedRound),

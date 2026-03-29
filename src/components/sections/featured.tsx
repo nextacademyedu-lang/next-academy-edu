@@ -13,7 +13,7 @@ type FeaturedProgram = {
   title: string;
   kind: string;
   category: string;
-  enrolledCount: number;
+  audienceCount: number;
   rating: number;
   ratingCount: number;
   instructor: string;
@@ -35,7 +35,7 @@ type CarouselProps = {
   programs: FeaturedProgram[];
   instructorLabel: string;
   dateLabel: string;
-  enrolledLabel: string;
+  audienceLabel: string;
   noRatingLabel: string;
 };
 
@@ -46,7 +46,7 @@ function ProgramsCarousel({
   programs,
   instructorLabel,
   dateLabel,
-  enrolledLabel,
+  audienceLabel,
   noRatingLabel,
 }: CarouselProps) {
   const [emblaRef, emblaApi] = useEmblaCarousel({ align: 'start', loop: true, dragFree: true });
@@ -116,7 +116,7 @@ function ProgramsCarousel({
                     </div>
 
                     <p className={styles.meta}>
-                      {program.enrolledCount.toLocaleString()} {enrolledLabel} •{' '}
+                      {program.audienceCount.toLocaleString()} {audienceLabel} •{' '}
                       {program.rating > 0 ? program.rating.toFixed(1) : noRatingLabel} ★
                       {program.ratingCount > 0 ? ` (${program.ratingCount})` : ''}
                     </p>
@@ -212,7 +212,7 @@ export function FeaturedPrograms() {
           programs={data.upcomingPrograms}
           instructorLabel={t('instructor')}
           dateLabel={t('date')}
-          enrolledLabel={t('enrolled')}
+          audienceLabel={t('learners')}
           noRatingLabel={t('noRating')}
         />
 
@@ -223,7 +223,7 @@ export function FeaturedPrograms() {
           programs={data.recordedPrograms}
           instructorLabel={t('instructor')}
           dateLabel={t('date')}
-          enrolledLabel={t('enrolled')}
+          audienceLabel={t('views')}
           noRatingLabel={t('noRating')}
         />
       </div>
