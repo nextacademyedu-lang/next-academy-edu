@@ -215,6 +215,15 @@ export default async function WebinarsPage() {
                 if (!webinar) return null;
 
                 const title = webinar.titleEn || webinar.titleAr || 'Webinar';
+                const programHref = `/${locale}/programs/${webinar.slug || webinar.id}`;
+                const actionHref = round.meetingUrl ? `${programHref}#recording-${round.id}` : programHref;
+                const actionLabel = round.meetingUrl
+                  ? locale === 'ar'
+                    ? 'شاهد التسجيل'
+                    : 'Watch Recording'
+                  : locale === 'ar'
+                    ? 'عرض الندوة'
+                    : 'View Webinar';
 
                 return (
                   <article key={`archive-${round.id}`} className={styles.archiveItem}>
@@ -224,9 +233,9 @@ export default async function WebinarsPage() {
                     </div>
                     <div className={styles.archiveActions}>
                       <Badge variant="outline">{(round.currentEnrollments || 0).toLocaleString()} {locale === 'ar' ? 'حضور' : 'attendees'}</Badge>
-                      <Link href={`/${locale}/programs/${webinar.slug || webinar.id}`}>
+                      <Link href={actionHref}>
                         <Button variant="ghost" size="sm">
-                          {locale === 'ar' ? 'عرض الندوة' : 'View Webinar'}
+                          {actionLabel}
                         </Button>
                       </Link>
                     </div>

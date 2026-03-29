@@ -352,6 +352,28 @@
   white-space: nowrap;
 }
 
+.recordingWrap {
+  margin-top: 8px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--bg-main);
+}
+
+.recordingFrame {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border: 0;
+}
+
+.recordingFallback {
+  margin: 0;
+  padding: 10px;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
 /* ═══════════════════════════════════════════════════════
    RESPONSIVE BREAKPOINTS
    ═══════════════════════════════════════════════════════ */

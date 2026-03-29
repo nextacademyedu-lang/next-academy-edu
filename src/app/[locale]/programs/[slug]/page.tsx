@@ -10,9 +10,11 @@ import { Navbar } from '@/components/layout/navbar';
 import { Footer } from '@/components/layout/footer';
 import { Card, CardHeader, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { BookRoundButton } from '@/components/checkout/book-round-button';
 import { EarlyBirdCountdown } from '@/components/ui/early-bird-countdown';
 import { InstructorCard } from '@/components/sections/instructor-card';
+import { buildYouTubeEmbedUrl } from '@/lib/youtube';
 import styles from './page.module.css';
 
 export default async function ProgramDetailsPage({
@@ -90,6 +92,10 @@ export default async function ProgramDetailsPage({
   }
 
   const dateLocale = locale === 'ar' ? 'ar-EG' : 'en-US';
+  const watchRecordingLabel = locale === 'ar' ? 'مشاهدة التسجيل' : 'Watch Recording';
+  const openOnYoutubeLabel = locale === 'ar' ? 'فتح على YouTube' : 'Open on YouTube';
+  const noRecordingEmbedLabel =
+    locale === 'ar' ? 'الرابط لا يدعم العرض المضمن، افتحه على YouTube.' : 'This link cannot be embedded. Open it on YouTube.';
 
   return (
     <div className={styles.wrapper}>
@@ -174,6 +180,16 @@ export default async function ProgramDetailsPage({
                     round.earlyBirdDeadline != null &&
                     new Date(round.earlyBirdDeadline) > new Date();
                   const displayPrice = hasEarlyBird ? (round.earlyBirdPrice ?? price) : price;
+                  const isPastRound = round.startDate ? new Date(round.startDate) < new Date() : false;
+                  const hasRecordingLink = typeof round.meetingUrl === 'string' && round.meetingUrl.trim().length > 0;
+                  const showWebinarRecording =
+                    program.type === 'webinar' &&
+                    hasRecordingLink &&
+                    (round.status === 'completed' || isPastRound);
+                  const recordingEmbedUrl = showWebinarRecording && round.meetingUrl
+                    ? buildYouTubeEmbedUrl(round.meetingUrl)
+                    : null;
+                  const recordingAnchorId = `recording-${round.id}`;
 
                   return (
                     <Card key={round.id} className={styles.roundCard}>
@@ -230,13 +246,39 @@ export default async function ProgramDetailsPage({
                             </ul>
                           </div>
                         )}
-                        <BookRoundButton
-                          locale={locale}
-                          roundId={round.id}
-                          programSlug={program.slug || String(program.id)}
-                          label={t('bookRound')}
-                          className={styles.bookBtn}
-                        />
+                        {showWebinarRecording && (
+                          <div id={recordingAnchorId} className={styles.recordingWrap}>
+                            {recordingEmbedUrl ? (
+                              <iframe
+                                src={recordingEmbedUrl}
+                                title={`${title} - ${watchRecordingLabel}`}
+                                className={styles.recordingFrame}
+                                loading="lazy"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                referrerPolicy="strict-origin-when-cross-origin"
+                                allowFullScreen
+                              />
+                            ) : (
+                              <p className={styles.recordingFallback}>{noRecordingEmbedLabel}</p>
+                            )}
+                          </div>
+                        )}
+
+                        {showWebinarRecording && hasRecordingLink ? (
+                          <a href={round.meetingUrl || '#'} target="_blank" rel="noreferrer">
+                            <Button variant="secondary" className={styles.bookBtn}>
+                              {openOnYoutubeLabel}
+                            </Button>
+                          </a>
+                        ) : (
+                          <BookRoundButton
+                            locale={locale}
+                            roundId={round.id}
+                            programSlug={program.slug || String(program.id)}
+                            label={t('bookRound')}
+                            className={styles.bookBtn}
+                          />
+                        )}
                       </CardContent>
                     </Card>
                   );
