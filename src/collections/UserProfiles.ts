@@ -1,5 +1,5 @@
 import type { CollectionConfig } from 'payload';
-import { isAdmin, isAuthenticated, isPublic } from '../lib/access-control.ts';
+import { isAdmin, isAdminOrOwnerByField, isAuthenticated, isPublic } from '../lib/access-control.ts';
 import { createCrmDedupeKey } from '../lib/crm/dedupe.ts';
 import { enqueueCrmSyncEvent } from '../lib/crm/queue.ts';
 
@@ -9,7 +9,7 @@ export const UserProfiles: CollectionConfig = {
   access: {
     read: isAuthenticated,
     create: isAuthenticated,
-    update: isAuthenticated,
+    update: isAdminOrOwnerByField('user'),
     delete: isAdmin,
   },
   hooks: {

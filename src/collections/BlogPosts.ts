@@ -1,4 +1,5 @@
 import type { CollectionConfig } from 'payload';
+import { isAdmin, isPublic } from '../lib/access-control.ts';
 
 export const BlogPosts: CollectionConfig = {
   slug: 'blog-posts',
@@ -8,10 +9,10 @@ export const BlogPosts: CollectionConfig = {
     group: 'Content',
   },
   access: {
-    read: () => true,
-    create: ({ req: { user } }) => Boolean(user),
-    update: ({ req: { user } }) => Boolean(user),
-    delete: ({ req: { user } }) => Boolean(user),
+    read: isPublic,
+    create: isAdmin,
+    update: isAdmin,
+    delete: isAdmin,
   },
   fields: [
     {

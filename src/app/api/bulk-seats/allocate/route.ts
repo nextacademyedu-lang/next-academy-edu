@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getPayload } from 'payload';
 import configPromise from '@payload-config';
+import { assertTrustedWriteRequest } from '@/lib/csrf';
 
 type AuthUser = {
   id?: number | string;
@@ -53,6 +54,10 @@ const ACTIVE_BOOKING_STATUSES = ['reserved', 'pending', 'confirmed', 'completed'
  */
 export async function POST(req: NextRequest) {
   try {
+    // CSRF protection — consistent with other write endpoints
+    const csrfError = assertTrustedWriteRequest(req);
+    if (csrfError) return csrfError;
+
     const body = (await req.json().catch(() => null)) as {
       bulkSeatId?: unknown;
       userId?: unknown;

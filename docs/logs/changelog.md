@@ -4,6 +4,37 @@
 
 ---
 
+### [2026-03-29 22:40] - Phase 2.1 Security Hotfixes (RBAC + Endpoint Guards)
+
+**Files updated (this pass):**
+- `src/app/api/seed-instructors/route.ts`
+- `src/app/api/seed-partners/route.ts`
+- `src/collections/UserProfiles.ts`
+- `src/collections/BlogPosts.ts`
+- `src/collections/Notifications.ts`
+- `src/app/api/bulk-seats/allocate/route.ts`
+- `docs/logs/changelog.md`
+- `docs/logs/tasks.md`
+- `docs/sessions/2026-03-29-22-40-session-26.md` (new)
+
+**What changed technically:**
+- Locked `seed-instructors` and `seed-partners` endpoints behind:
+  - `ENABLE_SEED_ENDPOINTS === "true"` kill-switch
+  - `Authorization: Bearer <CRON_SECRET>` check using timing-safe compare
+- Tightened `user-profiles.update` access from `isAuthenticated` to owner/admin only via `isAdminOrOwnerByField('user')`.
+- Tightened `blog-posts` write permissions (create/update/delete) to `isAdmin`.
+- Tightened `notifications.update` from any authenticated user to owner/admin only (`isAdminOrOwner`).
+- Added CSRF validation (`assertTrustedWriteRequest`) for `POST /api/bulk-seats/allocate`.
+
+**Reason:**
+- Close Phase 2 critical/high RBAC and API security gaps discovered in audit (unauthorized write paths and unguarded seed endpoints).
+
+**Verification:**
+- `cmd /c pnpm tsc --noEmit` ✅
+- `cmd /c pnpm build` ⚠️ fails locally at standalone symlink step with Windows `EPERM` (known environment limitation), after compile + type checks + static pages generation complete.
+
+---
+
 ### [2026-03-29 19:16] - B2B Team Invitation Flow (Token + Email Auto-Link)
 
 **Files updated (this pass):**

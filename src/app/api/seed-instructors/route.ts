@@ -1,6 +1,25 @@
-import { NextResponse } from 'next/server';
+/**
+ * Seed instructors endpoint.
+ *
+ * POST /api/seed-instructors
+ *
+ * Security:
+ * - Disabled by default (ENABLE_SEED_ENDPOINTS must be "true")
+ * - Requires Authorization: Bearer <CRON_SECRET>
+ */
+import crypto from 'node:crypto';
+import { NextRequest, NextResponse } from 'next/server';
 import { getPayload } from 'payload';
 import config from '@payload-config';
+
+export const dynamic = 'force-dynamic';
+
+function timingSafeEqualString(a: string, b: string): boolean {
+  const aBuf = Buffer.from(a);
+  const bBuf = Buffer.from(b);
+  if (aBuf.length !== bBuf.length) return false;
+  return crypto.timingSafeEqual(aBuf, bBuf);
+}
 
 // ─── Data from old site (consaltants file) ────────────────────────────────
 const consultants = [
@@ -125,8 +144,28 @@ async function uploadImageFromUrl(
   }
 }
 
-export async function POST() {
+export async function POST(req: NextRequest) {
   try {
+    // Kill-switch: disabled unless explicitly enabled
+    if (process.env.ENABLE_SEED_ENDPOINTS !== 'true') {
+      return NextResponse.json({ error: 'Not found' }, { status: 404 });
+    }
+
+    // CRON_SECRET auth gate
+    const configuredSecret = process.env.CRON_SECRET?.trim();
+    if (!configuredSecret) {
+      return NextResponse.json(
+        { error: 'CRON_SECRET is not configured' },
+        { status: 503 },
+      );
+    }
+
+    const incomingAuth = req.headers.get('authorization') || '';
+    const expectedAuth = `Bearer ${configuredSecret}`;
+    if (!timingSafeEqualString(incomingAuth, expectedAuth)) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const payload = await getPayload({ config });
     const results: string[] = [];
 

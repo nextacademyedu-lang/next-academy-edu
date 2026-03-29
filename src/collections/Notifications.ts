@@ -7,7 +7,7 @@ export const Notifications: CollectionConfig = {
   access: {
     read: isAdminOrOwner,
     create: isAdmin,
-    update: isAuthenticated,
+    update: isAdminOrOwner,
     delete: isAdmin,
   },
   fields: [

@@ -6,6 +6,25 @@
 
 ## Session Log
 
+### Session 2026-03-29 (22:40) — Phase 2.1 Security Hotfixes
+
+- [x] Secured `POST /api/seed-instructors`:
+  - [x] added `ENABLE_SEED_ENDPOINTS` kill-switch
+  - [x] added `CRON_SECRET` bearer auth gate (timing-safe compare)
+- [x] Secured `POST /api/seed-partners`:
+  - [x] added `ENABLE_SEED_ENDPOINTS` kill-switch
+  - [x] added `CRON_SECRET` bearer auth gate (timing-safe compare)
+- [x] Fixed `user-profiles.update` access:
+  - [x] changed from `isAuthenticated` to `isAdminOrOwnerByField('user')`
+- [x] Fixed `blog-posts` write access:
+  - [x] changed create/update/delete from any authenticated user to `isAdmin`
+- [x] Fixed `notifications.update` access:
+  - [x] changed from `isAuthenticated` to `isAdminOrOwner`
+- [x] Added CSRF guard to `POST /api/bulk-seats/allocate`
+- [x] Verification:
+  - [x] `cmd /c pnpm tsc --noEmit` passed
+  - [x] `cmd /c pnpm build` reached compile/types/static generation, then failed at Windows symlink `EPERM` step
+
 ### Session 2026-03-29 (19:16) — B2B Team Invitation Token Flow
 
 - [x] Added new `company-invitations` collection and migration wiring
