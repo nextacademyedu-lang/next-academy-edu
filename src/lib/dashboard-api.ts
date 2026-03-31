@@ -242,7 +242,13 @@ export interface PayloadSession {
   status: 'scheduled' | 'live' | 'completed' | 'cancelled';
   meetingUrl?: string;
   recordingUrl?: string;
-  materials?: { name: string; file?: { url: string } | null }[];
+  materials?: Array<{
+    name?: string;
+    alt?: string;
+    filename?: string;
+    url?: string | null;
+    file?: { url?: string | null } | null;
+  }>;
   isCancelled?: boolean;
   order?: number;
   round?: string | { id: string };

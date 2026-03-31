@@ -1,4 +1,7 @@
-import React from 'react';
+"use client";
+
+import React, { FormEvent, useEffect, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { Navbar } from '@/components/layout/navbar';
 import { Footer } from '@/components/layout/footer';
 import { Card, CardContent } from '@/components/ui/card';
@@ -7,6 +10,61 @@ import { Input } from '@/components/ui/input';
 import styles from './page.module.css';
 
 export default function ContactPage() {
+  const searchParams = useSearchParams();
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [subject, setSubject] = useState('');
+  const [message, setMessage] = useState('');
+  const [sending, setSending] = useState(false);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+
+  useEffect(() => {
+    const intent = searchParams.get('intent');
+    const instructor = searchParams.get('instructor');
+    if (intent === 'consultation' && !subject) {
+      setSubject('Consultation request');
+      if (instructor && !message) {
+        setMessage(`I want to request a consultation with instructor: ${instructor}`);
+      }
+    }
+  }, [message, searchParams, subject]);
+
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setError('');
+    setSuccess('');
+    setSending(true);
+
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ name, email, subject, message }),
+      });
+      const data = (await response.json().catch(() => null)) as
+        | { error?: string; sent?: boolean }
+        | null;
+
+      if (!response.ok) {
+        setError(data?.error || 'Failed to send message');
+        setSending(false);
+        return;
+      }
+
+      setSuccess('Message sent successfully. We will get back to you soon.');
+      setName('');
+      setEmail('');
+      setSubject('');
+      setMessage('');
+    } catch {
+      setError('Network error. Please try again.');
+    } finally {
+      setSending(false);
+    }
+  };
+
   return (
     <div className={styles.wrapper}>
       <Navbar />
@@ -26,27 +84,59 @@ export default function ContactPage() {
             <div className={styles.formColumn}>
               <Card className={styles.formCard}>
                 <CardContent className={styles.formContent}>
-                  <form className={styles.form}>
+                  <form className={styles.form} onSubmit={handleSubmit}>
                     <div className={styles.formGroup}>
-                      <Input id="name" label="Full Name" placeholder="John Doe" required />
+                      <Input
+                        id="name"
+                        name="name"
+                        label="Full Name"
+                        placeholder="John Doe"
+                        required
+                        value={name}
+                        onChange={(event) => setName(event.target.value)}
+                      />
                     </div>
                     <div className={styles.formGroup}>
-                      <Input id="email" type="email" label="Work Email" placeholder="john@company.com" required />
+                      <Input
+                        id="email"
+                        name="email"
+                        type="email"
+                        label="Work Email"
+                        placeholder="john@company.com"
+                        required
+                        value={email}
+                        onChange={(event) => setEmail(event.target.value)}
+                      />
                     </div>
                     <div className={styles.formGroup}>
-                      <Input id="subject" label="Subject" placeholder="How can we help?" required />
+                      <Input
+                        id="subject"
+                        name="subject"
+                        label="Subject"
+                        placeholder="How can we help?"
+                        required
+                        value={subject}
+                        onChange={(event) => setSubject(event.target.value)}
+                      />
                     </div>
                     <div className={styles.formGroup}>
                       <label className={styles.label} htmlFor="message">Message<span className={styles.required}>*</span></label>
                       <textarea 
+                        name="message"
                         id="message" 
                         className={styles.textarea} 
                         placeholder="Tell us more about your inquiry..."
                         rows={5}
                         required
-                      ></textarea>
+                        value={message}
+                        onChange={(event) => setMessage(event.target.value)}
+                      />
                     </div>
-                    <Button type="button" variant="primary" size="lg" fullWidth>Send Message</Button>
+                    {error ? <p style={{ color: '#ff4d4f', margin: 0 }}>{error}</p> : null}
+                    {success ? <p style={{ color: '#22c55e', margin: 0 }}>{success}</p> : null}
+                    <Button type="submit" variant="primary" size="lg" fullWidth disabled={sending}>
+                      {sending ? 'Sending…' : 'Send Message'}
+                    </Button>
                   </form>
                 </CardContent>
               </Card>

@@ -139,7 +139,11 @@ async function handleResponse<T>(res: Response): Promise<AuthResponse<T>> {
   try {
     const data = await res.json();
     if (!res.ok) {
-      return { success: false, error: data?.errors?.[0]?.message || data?.message || 'An error occurred' };
+      return {
+        success: false,
+        data,
+        error: data?.errors?.[0]?.message || data?.message || data?.error || 'An error occurred',
+      };
     }
     return { success: true, data };
   } catch {
@@ -193,6 +197,19 @@ export async function setSessionMaterials(
     body: JSON.stringify({ materialIds }),
   });
   return handleResponse<{ sessionId: string; materials: PayloadSessionMaterial[] }>(res);
+}
+
+export async function updateSessionRecordingUrl(
+  sessionId: string,
+  recordingUrl: string | null,
+): Promise<AuthResponse<{ sessionId: string; recordingUrl: string | null }>> {
+  const res = await fetch(`/api/instructor/sessions/${sessionId}/recording`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
+    body: JSON.stringify({ recordingUrl }),
+  });
+  return handleResponse<{ sessionId: string; recordingUrl: string | null }>(res);
 }
 
 // ─────────────────────────────────────────────
@@ -283,7 +300,7 @@ export async function saveInstructorAvailability(
 }
 
 export async function getBlockedDates(): Promise<AuthResponse<PayloadListResponse<PayloadBlockedDate>>> {
-  const res = await fetch('/api/instructor-blocked-dates?depth=1&sort=date&limit=50', { credentials: 'include' });
+  const res = await fetch('/api/instructor/blocked-dates?sort=date&limit=50', { credentials: 'include' });
   return handleResponse<PayloadListResponse<PayloadBlockedDate>>(res);
 }
 
@@ -291,7 +308,7 @@ export async function addBlockedDate(
   date: string,
   reason?: string,
 ): Promise<AuthResponse<{ doc: PayloadBlockedDate }>> {
-  const res = await fetch('/api/instructor-blocked-dates', {
+  const res = await fetch('/api/instructor/blocked-dates', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     credentials: 'include',
@@ -300,12 +317,12 @@ export async function addBlockedDate(
   return handleResponse<{ doc: PayloadBlockedDate }>(res);
 }
 
-export async function deleteBlockedDate(id: string): Promise<AuthResponse<{ doc: PayloadBlockedDate }>> {
-  const res = await fetch(`/api/instructor-blocked-dates/${id}`, {
+export async function deleteBlockedDate(id: string): Promise<AuthResponse<{ deleted: boolean; id: string }>> {
+  const res = await fetch(`/api/instructor/blocked-dates/${id}`, {
     method: 'DELETE',
     credentials: 'include',
   });
-  return handleResponse<{ doc: PayloadBlockedDate }>(res);
+  return handleResponse<{ deleted: boolean; id: string }>(res);
 }
 
 // ─────────────────────────────────────────────

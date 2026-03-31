@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getPayload } from 'payload';
 import config from '@payload-config';
 import type { ConsultationType } from '@/payload-types';
+import { syncInstructorConsultationSlots } from '@/lib/instructor-slot-sync';
 
 function relationToId(value: unknown): number | null {
   if (typeof value === 'number') return value;
@@ -162,6 +163,16 @@ export async function PATCH(
       req,
     } as any);
 
+    try {
+      await syncInstructorConsultationSlots({
+        payload: scope.payload as any,
+        instructorId: scope.instructorId,
+        req,
+      });
+    } catch (syncError) {
+      console.error('[api/instructor/consultation-types/:id][PATCH] slot sync failed', syncError);
+    }
+
     return NextResponse.json({ doc: mapDoc(updated as ConsultationType) });
   } catch (error) {
     console.error('[api/instructor/consultation-types/:id][PATCH]', error);
@@ -196,6 +207,16 @@ export async function DELETE(
       overrideAccess: true,
       req,
     });
+
+    try {
+      await syncInstructorConsultationSlots({
+        payload: scope.payload as any,
+        instructorId: scope.instructorId,
+        req,
+      });
+    } catch (syncError) {
+      console.error('[api/instructor/consultation-types/:id][DELETE] slot sync failed', syncError);
+    }
 
     return NextResponse.json({ deleted: true });
   } catch (error) {

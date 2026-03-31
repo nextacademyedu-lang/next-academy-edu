@@ -11,6 +11,7 @@ import {
   getSessionProgramTitle,
   getSessionRoundTitle,
   setSessionMaterials,
+  updateSessionRecordingUrl,
   uploadSessionMaterials,
   type PayloadSession,
   type PayloadSessionMaterial,
@@ -31,6 +32,8 @@ export default function InstructorSessionsPage() {
   const [materials, setMaterials] = useState<PayloadSessionMaterial[]>([]);
   const [materialsLoading, setMaterialsLoading] = useState(false);
   const [materialsSaving, setMaterialsSaving] = useState(false);
+  const [recordingSaving, setRecordingSaving] = useState(false);
+  const [recordingUrlInput, setRecordingUrlInput] = useState('');
   const [materialsError, setMaterialsError] = useState('');
 
   useEffect(() => {
@@ -44,6 +47,7 @@ export default function InstructorSessionsPage() {
     setActiveSession(session);
     setMaterials([]);
     setMaterialsError('');
+    setRecordingUrlInput(session.recordingUrl || '');
     setMaterialsLoading(true);
 
     const res = await getSessionMaterials(session.id);
@@ -56,10 +60,37 @@ export default function InstructorSessionsPage() {
   };
 
   const closeMaterialsManager = () => {
-    if (materialsSaving) return;
+    if (materialsSaving || recordingSaving) return;
     setActiveSession(null);
     setMaterials([]);
+    setRecordingUrlInput('');
     setMaterialsError('');
+  };
+
+  const handleSaveRecordingUrl = async () => {
+    if (!activeSession) return;
+    setMaterialsError('');
+    setRecordingSaving(true);
+
+    const normalized = recordingUrlInput.trim() ? recordingUrlInput.trim() : null;
+    const res = await updateSessionRecordingUrl(activeSession.id, normalized);
+    setRecordingSaving(false);
+
+    if (!res.success || !res.data) {
+      setMaterialsError(res.error || 'Failed to save recording URL');
+      return;
+    }
+
+    const nextRecording = res.data.recordingUrl || '';
+    setRecordingUrlInput(nextRecording);
+    setActiveSession((prev) => (prev ? { ...prev, recordingUrl: nextRecording || undefined } : prev));
+    setSessions((prev) =>
+      prev.map((item) =>
+        item.id === activeSession.id
+          ? { ...item, recordingUrl: nextRecording || undefined }
+          : item,
+      ),
+    );
   };
 
   const handleUploadMaterials = async (files: FileList | null) => {
@@ -224,9 +255,45 @@ export default function InstructorSessionsPage() {
                   {getSessionProgramTitle(activeSession)}{activeSession.title ? ` • ${activeSession.title}` : ''}
                 </p>
               </div>
-              <Button variant="ghost" size="sm" onClick={closeMaterialsManager} disabled={materialsSaving}>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={closeMaterialsManager}
+                disabled={materialsSaving || recordingSaving}
+              >
                 Close
               </Button>
+            </div>
+
+            <div style={{ marginTop: '16px', display: 'grid', gap: '10px' }}>
+              <label style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>Recording URL</label>
+              <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                <Input
+                  type="url"
+                  placeholder="https://youtube.com/watch?v=..."
+                  value={recordingUrlInput}
+                  onChange={(event) => setRecordingUrlInput(event.target.value)}
+                  disabled={recordingSaving}
+                  style={{ flex: 1, minWidth: '260px' }}
+                />
+                <Button
+                  variant="secondary"
+                  onClick={handleSaveRecordingUrl}
+                  disabled={recordingSaving}
+                >
+                  {recordingSaving ? 'Saving…' : 'Save Recording'}
+                </Button>
+              </div>
+              {activeSession.recordingUrl && (
+                <a
+                  href={activeSession.recordingUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  style={{ color: 'var(--accent-primary)', fontSize: '13px', textDecoration: 'none' }}
+                >
+                  Open current recording link
+                </a>
+              )}
             </div>
 
             <div style={{ marginTop: '14px', display: 'flex', gap: '10px', flexWrap: 'wrap', alignItems: 'center' }}>
@@ -238,7 +305,7 @@ export default function InstructorSessionsPage() {
                   handleUploadMaterials(files);
                   event.currentTarget.value = '';
                 }}
-                disabled={materialsSaving}
+                disabled={materialsSaving || recordingSaving}
               />
               {materialsSaving && (
                 <span style={{ color: 'var(--text-muted)', fontSize: '13px' }}>Saving…</span>

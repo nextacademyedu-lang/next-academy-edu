@@ -226,21 +226,32 @@ export default function CoursePlayerPage() {
                   </h3>
                   <div className={styles.materialsList}>
                     {selected.materials.map((mat, i) => (
-                      mat.file?.url ? (
+                      (((mat as { file?: { url?: string | null } | null }).file?.url) ||
+                        ((mat as { url?: string | null }).url)) ? (
                         <a
                           key={i}
-                          href={mat.file.url}
+                          href={
+                            ((mat as { file?: { url?: string | null } | null }).file?.url ||
+                              (mat as { url?: string | null }).url)!
+                          }
                           target="_blank"
                           rel="noreferrer"
                           className={styles.materialLink}
                         >
                           <Download size={16} />
-                          {mat.name || `Material ${i + 1}`}
+                          {(mat as { name?: string; alt?: string; filename?: string }).name ||
+                            (mat as { alt?: string }).alt ||
+                            (mat as { filename?: string }).filename ||
+                            `Material ${i + 1}`}
                         </a>
                       ) : (
                         <div key={i} className={styles.materialLink} style={{ opacity: 0.5 }}>
                           <FileText size={16} />
-                          {mat.name || `Material ${i + 1}`} (file pending)
+                          {(mat as { name?: string; alt?: string; filename?: string }).name ||
+                            (mat as { alt?: string }).alt ||
+                            (mat as { filename?: string }).filename ||
+                            `Material ${i + 1}`}{' '}
+                          (file pending)
                         </div>
                       )
                     ))}

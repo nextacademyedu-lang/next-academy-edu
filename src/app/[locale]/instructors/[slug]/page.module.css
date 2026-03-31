@@ -341,6 +341,45 @@
   display: block;
 }
 
+.availableSlots {
+  margin-top: 14px;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--bg-surface) 90%, transparent);
+  padding: 10px;
+}
+
+.availableSlots h4 {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 14px;
+}
+
+.availableSlotsList {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.availableSlotItem {
+  border: 1px solid var(--border-subtle);
+  border-radius: 10px;
+  padding: 8px;
+  display: grid;
+  gap: 4px;
+}
+
+.availableSlotItem strong {
+  color: var(--text-primary);
+  font-size: 13px;
+}
+
+.availableSlotItem span {
+  color: var(--text-secondary);
+  font-size: 12px;
+}
+
 .emptyText {
   margin: 0;
   color: var(--text-muted);

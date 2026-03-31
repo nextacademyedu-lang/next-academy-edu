@@ -5,7 +5,15 @@ import { notFound } from 'next/navigation';
 import { getLocale } from 'next-intl/server';
 import { getPayload } from 'payload';
 import config from '@payload-config';
-import type { ConsultationSlot, ConsultationType, Instructor, Media, Program, Round } from '@/payload-types';
+import type {
+  ConsultationAvailability,
+  ConsultationSlot,
+  ConsultationType,
+  Instructor,
+  Media,
+  Program,
+  Round,
+} from '@/payload-types';
 import { Navbar } from '@/components/layout/navbar';
 import { Footer } from '@/components/layout/footer';
 import { Button } from '@/components/ui/button';
@@ -52,6 +60,30 @@ function buildProgramTypeLabel(type: Program['type'], locale: string): string {
   if (type === 'course') return 'Course';
   if (type === 'workshop') return 'Workshop';
   return 'Webinar';
+}
+
+function dayLabel(day: string, locale: string): string {
+  const normalized = day.toLowerCase();
+  const mapAr: Record<string, string> = {
+    saturday: 'السبت',
+    sunday: 'الأحد',
+    monday: 'الاثنين',
+    tuesday: 'الثلاثاء',
+    wednesday: 'الأربعاء',
+    thursday: 'الخميس',
+    friday: 'الجمعة',
+  };
+  const mapEn: Record<string, string> = {
+    saturday: 'Saturday',
+    sunday: 'Sunday',
+    monday: 'Monday',
+    tuesday: 'Tuesday',
+    wednesday: 'Wednesday',
+    thursday: 'Thursday',
+    friday: 'Friday',
+  };
+
+  return locale === 'ar' ? mapAr[normalized] || normalized : mapEn[normalized] || normalized;
 }
 
 export default async function InstructorProfilePage({
@@ -116,6 +148,17 @@ export default async function InstructorProfilePage({
   const consultationTypes = consultationTypesResult.docs as ConsultationType[];
   const consultationTypeIds = consultationTypes.map((type) => type.id);
 
+  const availabilityResult = await payload.find({
+    collection: 'consultation-availability',
+    depth: 0,
+    limit: 100,
+    sort: 'dayIndex',
+    where: {
+      and: [{ instructor: { equals: instructor.id } }, { isActive: { equals: true } }],
+    },
+  });
+  const weeklyAvailability = availabilityResult.docs as ConsultationAvailability[];
+
   let availableSlots: ConsultationSlot[] = [];
   if (consultationTypeIds.length > 0) {
     const slotsResult = await payload.find({
@@ -148,6 +191,14 @@ export default async function InstructorProfilePage({
     const typeId = typeof slot.consultationType === 'number' ? slot.consultationType : slot.consultationType?.id;
     if (!typeId) continue;
     slotCountByType.set(typeId, (slotCountByType.get(typeId) || 0) + 1);
+  }
+
+  const consultationTypeTitleById = new Map<number, string>();
+  for (const type of consultationTypes) {
+    consultationTypeTitleById.set(
+      type.id,
+      type.titleEn || type.titleAr || type.title || 'Consultation',
+    );
   }
 
   const totalLearners = rounds.reduce((sum, round) => sum + (round.currentEnrollments || 0), 0);
@@ -341,9 +392,61 @@ export default async function InstructorProfilePage({
                   })}
                 </div>
 
-                <Link href={`/${locale}/contact`} className={styles.sidebarAction}>
+                {availableSlots.length > 0 && (
+                  <div className={styles.availableSlots}>
+                    <h4>{locale === 'ar' ? 'المواعيد المتاحة القادمة' : 'Next Available Slots'}</h4>
+                    <div className={styles.availableSlotsList}>
+                      {availableSlots.slice(0, 6).map((slot) => {
+                        const slotTypeId =
+                          typeof slot.consultationType === 'number'
+                            ? slot.consultationType
+                            : slot.consultationType?.id;
+                        const slotTypeTitle = slotTypeId
+                          ? consultationTypeTitleById.get(slotTypeId) || 'Consultation'
+                          : 'Consultation';
+
+                        return (
+                          <div key={slot.id} className={styles.availableSlotItem}>
+                            <strong>{slotTypeTitle}</strong>
+                            <span>
+                              {new Date(slot.date).toLocaleDateString(locale === 'ar' ? 'ar-EG' : 'en-US', {
+                                month: 'short',
+                                day: 'numeric',
+                                year: 'numeric',
+                              })}{' '}
+                              • {slot.startTime} - {slot.endTime}
+                            </span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+
+                {weeklyAvailability.length > 0 && (
+                  <div className={styles.availableSlots}>
+                    <h4>{locale === 'ar' ? 'المواعيد الأسبوعية' : 'Weekly Availability'}</h4>
+                    <div className={styles.availableSlotsList}>
+                      {weeklyAvailability.map((item) => (
+                        <div key={item.id} className={styles.availableSlotItem}>
+                          <strong>{dayLabel(item.dayOfWeek || '', locale)}</strong>
+                          <span>
+                            {item.startTime} - {item.endTime}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                <Link
+                  href={`/${locale}/contact?intent=consultation&instructor=${encodeURIComponent(
+                    instructor.slug || String(instructor.id),
+                  )}`}
+                  className={styles.sidebarAction}
+                >
                   <Button variant="secondary" fullWidth>
-                    {locale === 'ar' ? 'اطلب جلسة مباشرة' : 'Request A Session'}
+                    {locale === 'ar' ? 'اطلب جلسة' : 'Request A Session'}
                   </Button>
                 </Link>
               </div>

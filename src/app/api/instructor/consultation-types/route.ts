@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getPayload } from 'payload';
 import config from '@payload-config';
 import type { ConsultationType } from '@/payload-types';
+import { syncInstructorConsultationSlots } from '@/lib/instructor-slot-sync';
 
 type ScopeError = { status: number; error: string };
 type InstructorScope = {
@@ -157,6 +158,16 @@ export async function POST(req: NextRequest) {
       overrideAccess: true,
       req,
     } as any);
+
+    try {
+      await syncInstructorConsultationSlots({
+        payload: scope.payload as any,
+        instructorId: scope.instructorId,
+        req,
+      });
+    } catch (syncError) {
+      console.error('[api/instructor/consultation-types][POST] slot sync failed', syncError);
+    }
 
     return NextResponse.json({ doc: mapDoc(doc as ConsultationType) });
   } catch (error) {

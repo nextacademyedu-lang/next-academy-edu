@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getPayload } from 'payload';
 import type { ConsultationAvailability } from '@/payload-types';
 import config from '@payload-config';
+import { syncInstructorConsultationSlots } from '@/lib/instructor-slot-sync';
 
 const INDEX_TO_DAY = [
   'sunday',
@@ -263,6 +264,16 @@ export async function PUT(req: NextRequest) {
         ),
       ),
     );
+
+    try {
+      await syncInstructorConsultationSlots({
+        payload: payload as any,
+        instructorId,
+        req,
+      });
+    } catch (syncError) {
+      console.error('[api/instructor/availability][PUT] slot sync failed', syncError);
+    }
 
     return NextResponse.json({ success: true });
   } catch (error) {

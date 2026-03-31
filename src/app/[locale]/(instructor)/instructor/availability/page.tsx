@@ -29,6 +29,8 @@ export default function InstructorAvailabilityPage() {
   const [newReason,    setNewReason]    = useState('');
   const [loading,      setLoading]      = useState(true);
   const [saving,       setSaving]       = useState(false);
+  const [error,        setError]        = useState('');
+  const [success,      setSuccess]      = useState('');
 
   useEffect(() => {
     Promise.all([getInstructorAvailability(), getBlockedDates()]).then(([aRes, bRes]) => {
@@ -50,27 +52,46 @@ export default function InstructorAvailabilityPage() {
     setHours(prev => ({ ...prev, [day]: prev[day].map((s, i) => i === idx ? { ...s, [field]: val } : s) }));
 
   const handleSave = async () => {
+    setError('');
+    setSuccess('');
     setSaving(true);
     const records = Object.entries(hours).flatMap(([day, slots]) =>
       slots.map(s => ({ dayOfWeek: Number(day) as PayloadAvailability['dayOfWeek'], startTime: s.start, endTime: s.end, isActive: true })),
     );
-    await saveInstructorAvailability(records);
+    const res = await saveInstructorAvailability(records);
     setSaving(false);
+    if (!res.success) {
+      setError(res.error || 'Failed to save availability');
+      return;
+    }
+    setSuccess('Availability saved successfully');
   };
 
   const handleAddBlocked = async () => {
     if (!newDate) return;
+    setError('');
+    setSuccess('');
     const res = await addBlockedDate(newDate, newReason || undefined);
     if (res.success && res.data) {
       setBlockedDates(prev => [...prev, res.data!.doc]);
       setNewDate('');
       setNewReason('');
+      setSuccess('Date blocked successfully');
+      return;
     }
+    setError(res.error || 'Failed to block selected date');
   };
 
   const handleDeleteBlocked = async (id: string) => {
-    await deleteBlockedDate(id);
+    setError('');
+    setSuccess('');
+    const res = await deleteBlockedDate(id);
+    if (!res.success) {
+      setError(res.error || 'Failed to delete blocked date');
+      return;
+    }
     setBlockedDates(prev => prev.filter(b => b.id !== id));
+    setSuccess('Blocked date removed');
   };
 
   const tabStyle = (active: boolean) => ({
@@ -106,6 +127,9 @@ export default function InstructorAvailabilityPage() {
           <CalendarIcon size={16} /> Date Overrides
         </button>
       </div>
+
+      {error ? <p style={{ margin: 0, color: '#ff4d4f' }}>{error}</p> : null}
+      {success ? <p style={{ margin: 0, color: '#22c55e' }}>{success}</p> : null}
 
       {/* Weekly Hours */}
       {activeTab === 'weekly' && (
