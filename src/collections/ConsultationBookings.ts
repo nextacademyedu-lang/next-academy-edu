@@ -71,6 +71,37 @@ export const ConsultationBookings: CollectionConfig = {
         } catch (err) {
           console.error('[ConsultationBookings] afterChange CRM sync failed (non-blocking):', err);
         }
+
+        try {
+          const slotId =
+            typeof doc.slot === 'object' && doc.slot
+              ? Number((doc.slot as { id?: unknown }).id)
+              : Number(doc.slot);
+          if (!Number.isFinite(slotId)) return;
+
+          if (doc.paymentStatus === 'paid') {
+            await req.payload.update({
+              collection: 'consultation-slots',
+              id: slotId,
+              data: { status: 'booked' },
+              overrideAccess: true,
+              req,
+            });
+            return;
+          }
+
+          if (doc.status === 'cancelled' || doc.paymentStatus === 'refunded') {
+            await req.payload.update({
+              collection: 'consultation-slots',
+              id: slotId,
+              data: { status: 'available' },
+              overrideAccess: true,
+              req,
+            });
+          }
+        } catch (slotErr) {
+          console.error('[ConsultationBookings] slot status sync failed (non-blocking):', slotErr);
+        }
       },
     ],
   },

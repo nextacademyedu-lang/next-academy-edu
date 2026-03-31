@@ -129,6 +129,13 @@ export async function createPaymobIntention(
   session: CheckoutSession,
   method: 'card' | 'wallet',
   locale?: string,
+  options?: {
+    notificationUrl?: string;
+    redirectionUrl?: string;
+    extras?: Record<string, unknown>;
+    specialReference?: string;
+    itemName?: string;
+  },
 ): Promise<PaymobIntentionResponse> {
   const integrationId =
     method === 'wallet'
@@ -136,7 +143,17 @@ export async function createPaymobIntention(
       : process.env.PAYMOB_INTEGRATION_ID!;
 
   const redirectBase = `${process.env.NEXT_PUBLIC_APP_URL}/api/webhooks/paymob/redirect`;
-  const redirectUrl = locale ? `${redirectBase}?locale=${locale}` : redirectBase;
+  const defaultRedirectUrl = locale ? `${redirectBase}?locale=${locale}` : redirectBase;
+  const redirectUrl = options?.redirectionUrl || defaultRedirectUrl;
+  const notificationUrl =
+    options?.notificationUrl || `${process.env.NEXT_PUBLIC_APP_URL}/api/webhooks/paymob`;
+  const itemName = options?.itemName || session.programTitle;
+  const specialReference = options?.specialReference || session.bookingId;
+  const extras = {
+    booking_id: session.bookingId,
+    payment_id: session.paymentId,
+    ...(options?.extras || {}),
+  };
 
   const body = {
     amount: Math.round(session.amount * 100), // Paymob uses cents (piastres)
@@ -144,7 +161,7 @@ export async function createPaymobIntention(
     payment_methods: [parseInt(integrationId)],
     items: [
       {
-        name: session.programTitle,
+        name: itemName,
         amount: Math.round(session.amount * 100),
         description: `Booking ${session.bookingId}`,
         quantity: 1,
@@ -165,12 +182,9 @@ export async function createPaymobIntention(
       first_name: session.userName.split(' ')[0] || session.userName,
       last_name: session.userName.split(' ').slice(1).join(' ') || 'N/A',
     },
-    extras: {
-      booking_id: session.bookingId,
-      payment_id: session.paymentId,
-    },
-    special_reference: session.bookingId,
-    notification_url: `${process.env.NEXT_PUBLIC_APP_URL}/api/webhooks/paymob`,
+    extras,
+    special_reference: specialReference,
+    notification_url: notificationUrl,
     redirection_url: redirectUrl,
   };
 
