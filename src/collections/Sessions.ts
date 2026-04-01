@@ -5,20 +5,95 @@ import { createSessionEvent, deleteEvent } from '../lib/google-calendar.ts';
 
 type SessionLike = {
   date?: string | null;
+  startTime?: string | null;
+  endTime?: string | null;
   status?: 'scheduled' | 'live' | 'completed' | 'cancelled' | null;
   isCancelled?: boolean | null;
   attendanceCount?: number | null;
   attendeesCount?: number | null;
 };
 
-function normalizeStatus(session: SessionLike): 'scheduled' | 'live' | 'completed' | 'cancelled' {
-  if (session.status) return session.status;
-  if (session.isCancelled) return 'cancelled';
+function parseTimeToMinutes(value?: string | null): number | null {
+  const raw = (value || '').trim();
+  if (!raw) return null;
 
-  const dateValue = session.date ? new Date(session.date).getTime() : null;
-  if (dateValue && !Number.isNaN(dateValue) && dateValue < Date.now()) {
+  const match12h = /^(\d{1,2}):(\d{2})\s*([AP]M)$/i.exec(raw);
+  if (match12h) {
+    let hour = Number(match12h[1]);
+    const minute = Number(match12h[2]);
+    const period = match12h[3].toUpperCase();
+    if (!Number.isFinite(hour) || !Number.isFinite(minute) || hour < 1 || hour > 12 || minute < 0 || minute > 59) {
+      return null;
+    }
+    if (period === 'PM' && hour < 12) hour += 12;
+    if (period === 'AM' && hour === 12) hour = 0;
+    return hour * 60 + minute;
+  }
+
+  const match24h = /^(\d{1,2}):(\d{2})$/.exec(raw);
+  if (match24h) {
+    const hour = Number(match24h[1]);
+    const minute = Number(match24h[2]);
+    if (!Number.isFinite(hour) || !Number.isFinite(minute) || hour < 0 || hour > 23 || minute < 0 || minute > 59) {
+      return null;
+    }
+    return hour * 60 + minute;
+  }
+
+  return null;
+}
+
+function getSessionWindow(session: SessionLike): { startAt: number; endAt: number } | null {
+  if (!session.date) return null;
+  const parsedDate = new Date(session.date);
+  if (Number.isNaN(parsedDate.getTime())) return null;
+
+  const dayStart = new Date(parsedDate.getFullYear(), parsedDate.getMonth(), parsedDate.getDate(), 0, 0, 0, 0);
+  const startMinutes = parseTimeToMinutes(session.startTime);
+  const endMinutes = parseTimeToMinutes(session.endTime);
+
+  if (startMinutes == null && endMinutes == null) {
+    return {
+      startAt: dayStart.getTime(),
+      endAt: dayStart.getTime() + 24 * 60 * 60 * 1000 - 1,
+    };
+  }
+
+  const safeStartMinutes = startMinutes ?? 0;
+  let safeEndMinutes = endMinutes ?? safeStartMinutes + 60;
+  if (safeEndMinutes <= safeStartMinutes) {
+    safeEndMinutes = safeStartMinutes + 60;
+  }
+
+  return {
+    startAt: dayStart.getTime() + safeStartMinutes * 60 * 1000,
+    endAt: dayStart.getTime() + safeEndMinutes * 60 * 1000,
+  };
+}
+
+function normalizeStatus(session: SessionLike): 'scheduled' | 'live' | 'completed' | 'cancelled' {
+  if (session.isCancelled || session.status === 'cancelled') return 'cancelled';
+  if (session.status === 'completed') return 'completed';
+
+  const now = Date.now();
+  const window = getSessionWindow(session);
+
+  if (window) {
+    if (now >= window.endAt) {
+      return 'completed';
+    }
+    if (now >= window.startAt) {
+      return 'live';
+    }
+    return 'scheduled';
+  }
+
+  const dateValue = session.date ? new Date(session.date).getTime() : Number.NaN;
+  if (Number.isFinite(dateValue) && dateValue < now) {
     return 'completed';
   }
+
+  if (session.status === 'live') return 'live';
 
   return 'scheduled';
 }

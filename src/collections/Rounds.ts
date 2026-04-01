@@ -16,12 +16,91 @@ type RoundLike = {
   id?: number | string;
   roundNumber?: number | null;
   title?: string | null;
+  startDate?: string | null;
+  endDate?: string | null;
   locationType?: 'online' | 'in-person' | 'hybrid' | null;
   locationName?: string | null;
   locationAddress?: string | null;
   meetingUrl?: string | null;
+  status?: 'draft' | 'upcoming' | 'open' | 'full' | 'in_progress' | 'cancelled' | 'completed' | null;
   sessionPlan?: SessionPlanInput[] | null;
 };
+
+function parseTimeToMinutes(value?: string | null): number | null {
+  const raw = (value || '').trim();
+  if (!raw) return null;
+
+  const match12h = /^(\d{1,2}):(\d{2})\s*([AP]M)$/i.exec(raw);
+  if (match12h) {
+    let hour = Number(match12h[1]);
+    const minute = Number(match12h[2]);
+    const period = match12h[3].toUpperCase();
+    if (!Number.isFinite(hour) || !Number.isFinite(minute) || hour < 1 || hour > 12 || minute < 0 || minute > 59) {
+      return null;
+    }
+    if (period === 'PM' && hour < 12) hour += 12;
+    if (period === 'AM' && hour === 12) hour = 0;
+    return hour * 60 + minute;
+  }
+
+  const match24h = /^(\d{1,2}):(\d{2})$/.exec(raw);
+  if (match24h) {
+    const hour = Number(match24h[1]);
+    const minute = Number(match24h[2]);
+    if (!Number.isFinite(hour) || !Number.isFinite(minute) || hour < 0 || hour > 23 || minute < 0 || minute > 59) {
+      return null;
+    }
+    return hour * 60 + minute;
+  }
+
+  return null;
+}
+
+function buildTimestampFromDateAndMinutes(dateValue: string, minutes: number): number | null {
+  const parsedDate = new Date(dateValue);
+  if (Number.isNaN(parsedDate.getTime())) return null;
+  const dayStart = new Date(parsedDate.getFullYear(), parsedDate.getMonth(), parsedDate.getDate(), 0, 0, 0, 0);
+  return dayStart.getTime() + minutes * 60 * 1000;
+}
+
+function getRoundEndAtTimestamp(round: RoundLike): number | null {
+  const sessionPlan = normalizeSessionPlan(round.sessionPlan);
+  if (sessionPlan.length > 0) {
+    let latest: number | null = null;
+    for (const session of sessionPlan) {
+      if (!session.date) continue;
+      const startMinutes = parseTimeToMinutes(session.startTime) ?? 0;
+      let endMinutes = parseTimeToMinutes(session.endTime);
+      if (endMinutes == null || endMinutes <= startMinutes) {
+        endMinutes = startMinutes + 60;
+      }
+      const timestamp = buildTimestampFromDateAndMinutes(session.date, endMinutes);
+      if (timestamp == null) continue;
+      if (latest == null || timestamp > latest) latest = timestamp;
+    }
+    if (latest != null) return latest;
+  }
+
+  if (!round.endDate) return null;
+  const parsedEnd = new Date(round.endDate);
+  if (Number.isNaN(parsedEnd.getTime())) return null;
+  const endOfDay = new Date(parsedEnd.getFullYear(), parsedEnd.getMonth(), parsedEnd.getDate(), 23, 59, 59, 999);
+  return endOfDay.getTime();
+}
+
+function normalizeRoundStatus(round: RoundLike): RoundLike['status'] {
+  const current = round.status || 'draft';
+  if (current === 'draft' || current === 'cancelled' || current === 'completed') {
+    return current;
+  }
+
+  const endAt = getRoundEndAtTimestamp(round);
+  if (endAt != null && Date.now() >= endAt) {
+    return 'completed';
+  }
+
+  return current;
+}
 
 function normalizeSessionPlan(value: unknown): SessionPlanInput[] {
   if (!Array.isArray(value)) return [];
@@ -235,6 +314,16 @@ export const Rounds: CollectionConfig = {
         } catch (err) {
           console.error('[Rounds] afterChange session sync failed (non-blocking):', err);
         }
+      },
+    ],
+    afterRead: [
+      ({ doc }) => {
+        if (!doc) return doc;
+        const status = normalizeRoundStatus(doc as RoundLike);
+        return {
+          ...doc,
+          status,
+        };
       },
     ],
   },
