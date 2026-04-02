@@ -23,6 +23,7 @@ export function AboutStory() {
           <div className={styles.accentLine} />
           <p className={styles.paragraph}>{t('storyP1')}</p>
           <p className={styles.paragraph}>{t('storyP2')}</p>
+          <p className={styles.paragraph}>{t('storyP3')}</p>
         </motion.div>
 
         <motion.div

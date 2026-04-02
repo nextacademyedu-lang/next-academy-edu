@@ -32,7 +32,7 @@ const VALUE_ICONS: Record<string, React.ReactNode> = {
   ),
 };
 
-const VALUES = ['value1', 'value2', 'value3', 'value4'] as const;
+const VALUES = ['value1', 'value2', 'value3'] as const;
 
 export function AboutValues() {
   const t = useTranslations('About');

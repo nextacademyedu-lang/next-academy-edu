@@ -5,10 +5,7 @@ import { useTranslations } from 'next-intl';
 import styles from './about-timeline.module.css';
 
 const MILESTONES = [
-  { key: 'milestone1', year: '2020' },
-  { key: 'milestone2', year: '2021' },
-  { key: 'milestone3', year: '2023' },
-  { key: 'milestone4', year: '2025' },
+  { key: 'milestone1', yearKey: 'milestone1Year' },
 ];
 
 export function AboutTimeline() {
@@ -44,7 +41,7 @@ export function AboutTimeline() {
                 <div className={styles.dotInner} />
               </div>
               <div className={styles.card}>
-                <span className={styles.year}>{milestone.year}</span>
+                <span className={styles.year}>{t(milestone.yearKey)}</span>
                 <h3 className={styles.cardTitle}>{t(`${milestone.key}Title`)}</h3>
                 <p className={styles.cardDesc}>{t(`${milestone.key}Desc`)}</p>
               </div>

@@ -74,6 +74,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  gap: 10px;
   padding: 14px 36px;
   border-radius: var(--radius-md, 12px);
   background: linear-gradient(135deg, var(--accent-gold, #D4AF37) 0%, #ab8b2a 100%);
@@ -83,6 +84,12 @@
   text-decoration: none;
   transition: all 0.3s ease;
   letter-spacing: 0.5px;
+}
+
+.btnIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .btnPrimary:hover {
