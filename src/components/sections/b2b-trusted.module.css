@@ -100,11 +100,24 @@
   transition: transform 0.2s ease, border-color 0.2s ease;
 }
 
+.logoImage {
+  width: 120px;
+  height: 48px;
+  object-fit: contain;
+  filter: grayscale(100%);
+  opacity: 0.85;
+}
+
 .logoItem:hover {
   transform: scale(1.05);
   border-color: var(--accent-primary);
   color: var(--text-primary);
   z-index: 10;
+}
+
+.logoItem:hover .logoImage {
+  filter: grayscale(0%);
+  opacity: 1;
 }
 
 /* Animations */

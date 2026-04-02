@@ -76,6 +76,19 @@
   white-space: nowrap;
 }
 
+.partnerLogo {
+  width: 120px;
+  height: 48px;
+  object-fit: contain;
+  filter: grayscale(100%);
+  opacity: 0.85;
+}
+
+.partnerChip:hover .partnerLogo {
+  filter: grayscale(0%);
+  opacity: 1;
+}
+
 @keyframes marquee {
   0% {
     transform: translateX(0);
