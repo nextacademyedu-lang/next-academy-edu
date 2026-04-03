@@ -68,6 +68,95 @@ export const Bookings: CollectionConfig = {
         await deleteByBooking('payments');
       },
     ],
+    beforeChange: [
+      // B2B Policy enforcement: check if user's company allows this booking
+      async ({ req, data, operation }) => {
+        if (operation !== 'create') return data;
+
+        try {
+          const userId = typeof data?.user === 'object' ? data.user?.id : data?.user;
+          if (!userId) return data;
+
+          // Check if user belongs to a company with a policy
+          const profileResult = await req.payload.find({
+            collection: 'user-profiles',
+            where: { user: { equals: userId } },
+            depth: 0,
+            limit: 1,
+            overrideAccess: true,
+            req,
+          });
+
+          const profile = profileResult.docs[0] as { company?: unknown } | undefined;
+          const companyId =
+            profile?.company && typeof profile.company === 'object'
+              ? (profile.company as { id?: number }).id
+              : profile?.company;
+          if (!companyId) return data; // No company = no policy
+
+          const policyResult = await req.payload.find({
+            collection: 'company-policies' as any,
+            where: { company: { equals: companyId } },
+            depth: 0,
+            limit: 1,
+            overrideAccess: true,
+            req,
+          });
+
+          const policy = policyResult.docs[0] as Record<string, unknown> | undefined;
+          if (!policy) return data; // No policy = allow everything
+
+          // Check allowed/blocked programs
+          const roundId = typeof data?.round === 'object' ? data.round?.id : data?.round;
+          if (roundId) {
+            const roundDoc = await req.payload.findByID({
+              collection: 'rounds',
+              id: roundId,
+              depth: 0,
+              overrideAccess: true,
+              req,
+            });
+
+            const programId =
+              typeof (roundDoc as any)?.program === 'object'
+                ? (roundDoc as any).program?.id
+                : (roundDoc as any)?.program;
+
+            if (programId) {
+              const allowed = policy.allowedPrograms as number[] | undefined;
+              const blocked = policy.blockedPrograms as number[] | undefined;
+
+              if (blocked && Array.isArray(blocked) && blocked.length > 0) {
+                if (blocked.includes(programId)) {
+                  throw new Error('This program is blocked by your company policy');
+                }
+              }
+
+              if (allowed && Array.isArray(allowed) && allowed.length > 0) {
+                if (!allowed.includes(programId)) {
+                  throw new Error('This program is not in your company\'s allowed list');
+                }
+              }
+            }
+          }
+
+          // If requireApproval is set, change status to pending_approval
+          if (policy.requireApproval === true) {
+            return { ...data, status: 'pending_approval' };
+          }
+
+          return data;
+        } catch (err) {
+          // Re-throw policy errors (they have specific messages)
+          if (err instanceof Error && err.message.includes('company policy')) {
+            throw err;
+          }
+          // Log other errors but don't block the booking
+          console.error('[Bookings] beforeChange policy check failed (non-blocking):', err);
+          return data;
+        }
+      },
+    ],
     afterChange: [
       async ({ req, doc, previousDoc, operation }) => {
         try {
@@ -171,6 +260,79 @@ export const Bookings: CollectionConfig = {
           console.error('[Bookings] afterChange hook failed (non-blocking):', err);
         }
       },
+      // B2B Manager notification on booking changes
+      async ({ req, doc, previousDoc, operation }) => {
+        try {
+          const userId = typeof doc.user === 'object' ? doc.user?.id : doc.user;
+          if (!userId) return;
+
+          // Check if user belongs to a company
+          const profileResult = await req.payload.find({
+            collection: 'user-profiles',
+            where: { user: { equals: userId } },
+            depth: 0,
+            limit: 1,
+            overrideAccess: true,
+            req,
+          });
+
+          const profile = profileResult.docs[0] as { company?: unknown; user?: unknown } | undefined;
+          const companyId =
+            profile?.company && typeof profile.company === 'object'
+              ? (profile.company as { id?: number }).id
+              : (profile?.company as number | undefined);
+
+          if (!companyId) return; // Not a company member
+
+          // Get user name
+          const userDoc = await req.payload.findByID({
+            collection: 'users',
+            id: userId,
+            depth: 0,
+            overrideAccess: true,
+            req,
+          });
+          const memberName = `${(userDoc as any)?.firstName || ''} ${(userDoc as any)?.lastName || ''}`.trim() || 'Team Member';
+
+          // Get program title from round
+          const roundId = typeof doc.round === 'object' ? doc.round?.id : doc.round;
+          let programTitle = 'Program';
+          if (roundId) {
+            const roundDoc = await req.payload.findByID({
+              collection: 'rounds',
+              id: roundId,
+              depth: 1,
+              overrideAccess: true,
+              req,
+            });
+            const program = (roundDoc as any)?.program;
+            programTitle = (typeof program === 'object' ? program?.titleEn || program?.titleAr : null) || 'Program';
+          }
+
+          const { notifyMemberBooked, notifyMemberCancelled } = await import('../lib/b2b-notifications.ts');
+
+          if (operation === 'create') {
+            await notifyMemberBooked(req.payload as any, {
+              companyId,
+              memberName,
+              programTitle,
+            });
+          } else if (operation === 'update') {
+            const statusChanged = previousDoc?.status !== doc.status;
+            if (statusChanged) {
+              if (doc.status === 'cancelled' || doc.status === 'refunded' || doc.status === 'cancelled_overdue') {
+                await notifyMemberCancelled(req.payload as any, {
+                  companyId,
+                  memberName,
+                  programTitle,
+                });
+              }
+            }
+          }
+        } catch (err) {
+          console.error('[Bookings] B2B notification hook failed (non-blocking):', err);
+        }
+      },
     ],
   },
   fields: [
@@ -182,7 +344,7 @@ export const Bookings: CollectionConfig = {
     {
       name: 'status',
       type: 'select',
-      options: ['reserved', 'pending', 'confirmed', 'cancelled', 'completed', 'refunded', 'payment_failed', 'cancelled_overdue'],
+      options: ['reserved', 'pending', 'pending_approval', 'confirmed', 'cancelled', 'completed', 'refunded', 'payment_failed', 'cancelled_overdue'],
       defaultValue: 'pending',
       required: true,
     },

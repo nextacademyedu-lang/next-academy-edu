@@ -10,6 +10,7 @@ import * as migration_20260328_192145_add_instructor_program_submissions from '.
 import * as migration_20260328_214500_fix_instructor_program_submissions_fk from './20260328_214500_fix_instructor_program_submissions_fk';
 import * as migration_20260329_000500_add_b2b_signup_intent from './20260329_000500_add_b2b_signup_intent';
 import * as migration_20260329_010500_add_company_invitations from './20260329_010500_add_company_invitations';
+import * as migration_20260403_034751_add_b2b_groups_policies_seats from './20260403_034751_add_b2b_groups_policies_seats';
 
 export const migrations = [
   {
@@ -55,7 +56,7 @@ export const migrations = [
   {
     up: migration_20260328_192145_add_instructor_program_submissions.up,
     down: migration_20260328_192145_add_instructor_program_submissions.down,
-    name: '20260328_192145_add_instructor_program_submissions'
+    name: '20260328_192145_add_instructor_program_submissions',
   },
   {
     up: migration_20260328_214500_fix_instructor_program_submissions_fk.up,
@@ -71,5 +72,10 @@ export const migrations = [
     up: migration_20260329_010500_add_company_invitations.up,
     down: migration_20260329_010500_add_company_invitations.down,
     name: '20260329_010500_add_company_invitations',
+  },
+  {
+    up: migration_20260403_034751_add_b2b_groups_policies_seats.up,
+    down: migration_20260403_034751_add_b2b_groups_policies_seats.down,
+    name: '20260403_034751_add_b2b_groups_policies_seats'
   },
 ];

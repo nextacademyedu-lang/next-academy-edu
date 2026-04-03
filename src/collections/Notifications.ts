@@ -23,6 +23,10 @@ export const Notifications: CollectionConfig = {
         'installment_approved', 'installment_rejected',
         'certificate_ready', 'waitlist_available', 'payment_overdue',
         'access_blocked', 'refund_approved', 'review_request',
+        // B2B Manager notification types
+        'b2b_member_booked', 'b2b_member_cancelled',
+        'b2b_invitation_accepted', 'b2b_seats_low',
+        'b2b_budget_threshold', 'b2b_member_joined', 'b2b_member_removed',
       ],
     },
     { name: 'title', type: 'text', required: true },

@@ -45,6 +45,9 @@ import { CrmSyncEvents } from './collections/CrmSyncEvents.ts';
 import { Partners } from './collections/Partners.ts';
 import { InstructorProgramSubmissions } from './collections/InstructorProgramSubmissions.ts';
 import { CompanyInvitations } from './collections/CompanyInvitations.ts';
+import { CompanyGroups } from './collections/CompanyGroups.ts';
+import { CompanyGroupMembers } from './collections/CompanyGroupMembers.ts';
+import { CompanyPolicies } from './collections/CompanyPolicies.ts';
 import { migrations } from './migrations/index.ts';
 
 if (!process.env.DATABASE_URI) {
@@ -230,6 +233,9 @@ export default buildConfig({
     Partners,
     InstructorProgramSubmissions,
     CompanyInvitations,
+    CompanyGroups,
+    CompanyGroupMembers,
+    CompanyPolicies,
   ],
   editor: lexicalEditor({}),
   db: postgresAdapter({

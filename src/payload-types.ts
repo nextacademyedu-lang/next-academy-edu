@@ -102,6 +102,10 @@ export interface Config {
     'crm-sync-events': CrmSyncEvent;
     partners: Partner;
     'instructor-program-submissions': InstructorProgramSubmission;
+    'company-invitations': CompanyInvitation;
+    'company-groups': CompanyGroup;
+    'company-group-members': CompanyGroupMember;
+    'company-policies': CompanyPolicy;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -144,6 +148,10 @@ export interface Config {
     'crm-sync-events': CrmSyncEventsSelect<false> | CrmSyncEventsSelect<true>;
     partners: PartnersSelect<false> | PartnersSelect<true>;
     'instructor-program-submissions': InstructorProgramSubmissionsSelect<false> | InstructorProgramSubmissionsSelect<true>;
+    'company-invitations': CompanyInvitationsSelect<false> | CompanyInvitationsSelect<true>;
+    'company-groups': CompanyGroupsSelect<false> | CompanyGroupsSelect<true>;
+    'company-group-members': CompanyGroupMembersSelect<false> | CompanyGroupMembersSelect<true>;
+    'company-policies': CompanyPoliciesSelect<false> | CompanyPoliciesSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -196,7 +204,7 @@ export interface User {
   picture?: (number | null) | Media;
   role: 'user' | 'admin' | 'instructor' | 'b2b_manager';
   instructorId?: (number | null) | Instructor;
-  signupIntent: 'student' | 'instructor';
+  signupIntent: 'student' | 'instructor' | 'b2b_manager';
   preferredLanguage?: ('ar' | 'en') | null;
   newsletterOptIn?: boolean | null;
   whatsappOptIn?: boolean | null;
@@ -323,6 +331,10 @@ export interface Company {
   country?: string | null;
   city?: string | null;
   logo?: (number | null) | Media;
+  /**
+   * Total seat pool purchased by this company (across all rounds). Both admin and B2B manager can update.
+   */
+  totalSeats?: number | null;
   twentyCrmCompanyId?: string | null;
   updatedAt: string;
   createdAt: string;
@@ -604,6 +616,7 @@ export interface Booking {
   status:
     | 'reserved'
     | 'pending'
+    | 'pending_approval'
     | 'confirmed'
     | 'cancelled'
     | 'completed'
@@ -709,7 +722,14 @@ export interface Notification {
     | 'payment_overdue'
     | 'access_blocked'
     | 'refund_approved'
-    | 'review_request';
+    | 'review_request'
+    | 'b2b_member_booked'
+    | 'b2b_member_cancelled'
+    | 'b2b_invitation_accepted'
+    | 'b2b_seats_low'
+    | 'b2b_budget_threshold'
+    | 'b2b_member_joined'
+    | 'b2b_member_removed';
   title: string;
   message: string;
   actionUrl?: string | null;
@@ -1395,6 +1415,87 @@ export interface InstructorProgramSubmission {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "company-invitations".
+ */
+export interface CompanyInvitation {
+  id: number;
+  email: string;
+  company: number | Company;
+  invitedBy: number | User;
+  jobTitle?: string | null;
+  title?: string | null;
+  token: string;
+  status: 'pending' | 'accepted' | 'revoked' | 'expired';
+  expiresAt: string;
+  acceptedAt?: string | null;
+  acceptedBy?: (number | null) | User;
+  revokedAt?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "company-groups".
+ */
+export interface CompanyGroup {
+  id: number;
+  name: string;
+  company: number | Company;
+  description?: string | null;
+  /**
+   * Number of seats allocated to this group from the company pool
+   */
+  seatAllocation?: number | null;
+  createdBy?: (number | null) | User;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "company-group-members".
+ */
+export interface CompanyGroupMember {
+  id: number;
+  user: number | User;
+  group: number | CompanyGroup;
+  role: 'member' | 'admin';
+  addedBy?: (number | null) | User;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "company-policies".
+ */
+export interface CompanyPolicy {
+  id: number;
+  company: number | Company;
+  /**
+   * Programs this company can book. Empty = all programs allowed.
+   */
+  allowedPrograms?: (number | Program)[] | null;
+  /**
+   * Programs explicitly blocked for this company.
+   */
+  blockedPrograms?: (number | Program)[] | null;
+  /**
+   * Maximum spending per month in EGP. 0 or empty = no limit.
+   */
+  monthlyBudget?: number | null;
+  /**
+   * If true, bookings by company members need manager approval before confirmation.
+   */
+  requireApproval?: boolean | null;
+  /**
+   * Max active bookings per member per month. 0 or empty = no limit.
+   */
+  maxBookingsPerMember?: number | null;
+  notes?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -1556,6 +1657,22 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'instructor-program-submissions';
         value: number | InstructorProgramSubmission;
+      } | null)
+    | ({
+        relationTo: 'company-invitations';
+        value: number | CompanyInvitation;
+      } | null)
+    | ({
+        relationTo: 'company-groups';
+        value: number | CompanyGroup;
+      } | null)
+    | ({
+        relationTo: 'company-group-members';
+        value: number | CompanyGroupMember;
+      } | null)
+    | ({
+        relationTo: 'company-policies';
+        value: number | CompanyPolicy;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -1672,6 +1789,7 @@ export interface CompaniesSelect<T extends boolean = true> {
   country?: T;
   city?: T;
   logo?: T;
+  totalSeats?: T;
   twentyCrmCompanyId?: T;
   updatedAt?: T;
   createdAt?: T;
@@ -2552,6 +2670,65 @@ export interface InstructorProgramSubmissionsSelect<T extends boolean = true> {
         id?: T;
       };
   extraNotes?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "company-invitations_select".
+ */
+export interface CompanyInvitationsSelect<T extends boolean = true> {
+  email?: T;
+  company?: T;
+  invitedBy?: T;
+  jobTitle?: T;
+  title?: T;
+  token?: T;
+  status?: T;
+  expiresAt?: T;
+  acceptedAt?: T;
+  acceptedBy?: T;
+  revokedAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "company-groups_select".
+ */
+export interface CompanyGroupsSelect<T extends boolean = true> {
+  name?: T;
+  company?: T;
+  description?: T;
+  seatAllocation?: T;
+  createdBy?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "company-group-members_select".
+ */
+export interface CompanyGroupMembersSelect<T extends boolean = true> {
+  user?: T;
+  group?: T;
+  role?: T;
+  addedBy?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "company-policies_select".
+ */
+export interface CompanyPoliciesSelect<T extends boolean = true> {
+  company?: T;
+  allowedPrograms?: T;
+  blockedPrograms?: T;
+  monthlyBudget?: T;
+  requireApproval?: T;
+  maxBookingsPerMember?: T;
+  notes?: T;
   updatedAt?: T;
   createdAt?: T;
 }

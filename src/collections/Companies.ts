@@ -69,6 +69,14 @@ export const Companies: CollectionConfig = {
     { name: 'country', type: 'text' },
     { name: 'city', type: 'text' },
     { name: 'logo', type: 'upload', relationTo: 'media' },
+    {
+      name: 'totalSeats',
+      type: 'number',
+      min: 0,
+      admin: {
+        description: 'Total seat pool purchased by this company (across all rounds). Both admin and B2B manager can update.',
+      },
+    },
     { name: 'twentyCrmCompanyId', type: 'text', admin: { readOnly: true } },
   ],
 };
