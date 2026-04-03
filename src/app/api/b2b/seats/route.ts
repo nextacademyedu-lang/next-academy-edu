@@ -10,7 +10,7 @@ export async function GET(req: NextRequest) {
     }
 
     const summary = await getCompanySeatSummary(
-      scope.payload as Parameters<typeof getCompanySeatSummary>[0],
+      scope.payload as any,
       scope.companyId,
     );
 

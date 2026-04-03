@@ -31,7 +31,7 @@ export async function POST(req: NextRequest) {
     }
 
     const result = await transferSeat(
-      scope.payload as Parameters<typeof transferSeat>[0],
+      scope.payload as any,
       {
         companyId: scope.companyId,
         fromUserId,
