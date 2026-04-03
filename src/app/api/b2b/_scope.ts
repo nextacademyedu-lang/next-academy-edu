@@ -1,6 +1,7 @@
 import type { NextRequest } from 'next/server';
 import { getPayload } from 'payload';
 import config from '@payload-config';
+import { authenticateRequestUser } from '@/lib/server-auth';
 
 type PayloadClient = Awaited<ReturnType<typeof getPayload>>;
 
@@ -80,8 +81,7 @@ async function resolveCompanyFromProfile(
 
 export async function resolveB2BScope(req: NextRequest): Promise<B2BScope | B2BScopeError> {
   const payload = await getPayload({ config });
-  const { user } = await payload.auth({ headers: req.headers });
-  const authUser = (user || null) as AuthUser | null;
+  const authUser = (await authenticateRequestUser(payload, req)) as AuthUser | null;
 
   if (!authUser) {
     return { status: 401, error: 'Unauthorized' };
