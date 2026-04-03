@@ -37,9 +37,9 @@ async function fetchPartners(): Promise<PartnerLogo[]> {
 export async function B2BTrustedSection() {
   const t = await getTranslations('B2B');
   const partners = await fetchPartners();
-  const items = partners.length
+  const items: PartnerLogo[] = partners.length
     ? partners
-    : FALLBACK_LIST.map((name) => ({ name }));
+    : FALLBACK_LIST.map((name) => ({ name, logo: null }));
   const col1 = [...items.slice(0, 5), ...items.slice(0, 5)];
   const col2 = [...items.slice(5, 10), ...items.slice(5, 10)];
   const col3 = [...items.slice(10, 15), ...items.slice(10, 15)];
