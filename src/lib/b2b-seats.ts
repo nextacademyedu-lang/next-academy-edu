@@ -20,6 +20,7 @@ type AllocationEntry = {
   user?: unknown;
   allocatedAt?: string | null;
   status?: string | null;
+  source?: string | null;
   id?: string | null;
 };
 
@@ -28,7 +29,10 @@ type BulkSeatAllocationDoc = {
   company?: unknown;
   round?: unknown;
   totalSeats?: number | null;
+  openPoolSeats?: number | null;
+  allocationMode?: string | null;
   status?: string | null;
+  createdByManager?: unknown;
   allocations?: AllocationEntry[] | null;
 };
 
@@ -49,15 +53,29 @@ function resolveId(value: unknown): number | null {
   return null;
 }
 
+export interface SeatAssignee {
+  userId: string;
+  name: string;
+  email: string;
+  status: string;
+  source: string;
+  allocatedAt: string | null;
+}
+
 export interface SeatRoundBreakdown {
   roundId: number;
   roundTitle: string;
   allocationId: number | string;
+  allocationMode: string;
   totalSeats: number;
+  openPoolSeats: number;
   allocated: number;
   enrolled: number;
   cancelled: number;
   available: number;
+  poolClaimed: number;
+  poolAvailable: number;
+  assignees: SeatAssignee[];
 }
 
 export interface CompanySeatSummary {
@@ -101,6 +119,45 @@ export async function getCompanySeatSummary(
   const byRound: SeatRoundBreakdown[] = [];
   let totalUsed = 0;
 
+  // Collect all user IDs to fetch names in batch
+  const allUserIds = new Set<number>();
+  for (const doc of allocationsResult.docs as unknown as BulkSeatAllocationDoc[]) {
+    const entries = Array.isArray(doc.allocations) ? doc.allocations : [];
+    for (const e of entries) {
+      const uid = resolveId(e.user);
+      if (uid) allUserIds.add(uid);
+    }
+  }
+
+  // Batch fetch user info
+  const userMap = new Map<number, { name: string; email: string }>();
+  if (allUserIds.size > 0) {
+    const userIds = Array.from(allUserIds);
+    // Fetch in pages of 100
+    for (let i = 0; i < userIds.length; i += 100) {
+      const chunk = userIds.slice(i, i + 100);
+      const usersResult = await payload.find({
+        collection: 'users',
+        where: { id: { in: chunk } },
+        depth: 0,
+        limit: 100,
+        overrideAccess: true,
+      });
+
+      for (const u of usersResult.docs as Array<Record<string, unknown>>) {
+        const uid = resolveId(u.id);
+        if (!uid) continue;
+        const firstName = typeof u.firstName === 'string' ? u.firstName : '';
+        const lastName = typeof u.lastName === 'string' ? u.lastName : '';
+        const email = typeof u.email === 'string' ? u.email : '';
+        userMap.set(uid, {
+          name: `${firstName} ${lastName}`.trim() || email || `User ${uid}`,
+          email,
+        });
+      }
+    }
+  }
+
   for (const doc of allocationsResult.docs as unknown as BulkSeatAllocationDoc[]) {
     const roundRelation = doc.round;
     const roundId = resolveId(roundRelation);
@@ -110,28 +167,48 @@ export async function getCompanySeatSummary(
         : 'Round';
 
     const entries = Array.isArray(doc.allocations) ? doc.allocations : [];
-    const allocated = entries.filter(
-      (e: AllocationEntry) => e.status !== 'cancelled',
-    ).length;
-    const enrolled = entries.filter(
-      (e: AllocationEntry) => e.status === 'enrolled',
-    ).length;
-    const cancelled = entries.filter(
-      (e: AllocationEntry) => e.status === 'cancelled',
-    ).length;
+    const activeEntries = entries.filter((e) => e.status !== 'cancelled');
+    const allocated = activeEntries.length;
+    const enrolled = entries.filter((e) => e.status === 'enrolled').length;
+    const cancelled = entries.filter((e) => e.status === 'cancelled').length;
     const totalForRound = typeof doc.totalSeats === 'number' ? doc.totalSeats : 0;
+    const openPoolSeats = typeof doc.openPoolSeats === 'number' ? doc.openPoolSeats : 0;
+    const allocationMode = doc.allocationMode || 'mixed';
+
+    const poolClaimed = activeEntries.filter((e) => e.source === 'pool_claim').length;
+    const maxClaimable = allocationMode === 'open_pool' ? totalForRound : openPoolSeats;
+    const poolAvailable = Math.max(0, maxClaimable - poolClaimed);
 
     totalUsed += allocated;
+
+    // Build assignees list
+    const assignees: SeatAssignee[] = activeEntries.map((e) => {
+      const uid = resolveId(e.user);
+      const info = uid ? userMap.get(uid) : undefined;
+      return {
+        userId: String(uid || ''),
+        name: info?.name || 'Unknown',
+        email: info?.email || '',
+        status: e.status || 'pending',
+        source: e.source || 'assigned',
+        allocatedAt: e.allocatedAt || null,
+      };
+    });
 
     byRound.push({
       roundId: roundId || 0,
       roundTitle,
       allocationId: doc.id,
+      allocationMode,
       totalSeats: totalForRound,
+      openPoolSeats,
       allocated,
       enrolled,
       cancelled,
       available: Math.max(0, totalForRound - allocated),
+      poolClaimed,
+      poolAvailable,
+      assignees,
     });
   }
 
@@ -236,9 +313,10 @@ export async function transferSeat(
     };
   }
 
-  // Cancel source, add target
+  // Cancel source, add target (preserve source type)
+  const sourceEntry = entries[sourceIndex];
   entries[sourceIndex] = {
-    ...entries[sourceIndex],
+    ...sourceEntry,
     status: 'cancelled',
   };
 
@@ -246,6 +324,7 @@ export async function transferSeat(
     user: toUserId as unknown as undefined,
     allocatedAt: new Date().toISOString(),
     status: 'pending',
+    source: sourceEntry.source || 'assigned',
   });
 
   await payload.update({

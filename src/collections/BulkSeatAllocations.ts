@@ -8,8 +8,8 @@ export const BulkSeatAllocations: CollectionConfig = {
   admin: { useAsTitle: 'id' },
   access: {
     read: isAdminOrB2BManager,
-    create: isAdmin,
-    update: isAdmin,
+    create: isAdminOrB2BManager,
+    update: isAdminOrB2BManager,
     delete: isAdmin,
   },
   hooks: {
@@ -51,6 +51,7 @@ export const BulkSeatAllocations: CollectionConfig = {
               round: doc.round,
               totalSeats: doc.totalSeats,
               status: doc.status,
+              allocationMode: doc.allocationMode,
               activeAllocations,
               updatedAt: doc.updatedAt,
             },
@@ -72,7 +73,27 @@ export const BulkSeatAllocations: CollectionConfig = {
       type: 'number',
       required: true,
       min: 1,
-      admin: { description: 'Number of seats purchased for this round' },
+      admin: { description: 'Total seats purchased for this round' },
+    },
+    {
+      name: 'openPoolSeats',
+      type: 'number',
+      min: 0,
+      defaultValue: 0,
+      admin: { description: 'How many seats are available as open pool (self-claim by company members). Rest are manager-assigned.' },
+    },
+
+    /* ── Allocation mode ─────────────────────────────────── */
+    {
+      name: 'allocationMode',
+      type: 'select',
+      options: [
+        { label: 'Assigned (Manager picks)', value: 'assigned' },
+        { label: 'Open Pool (Members claim)', value: 'open_pool' },
+        { label: 'Mixed (Both)', value: 'mixed' },
+      ],
+      defaultValue: 'mixed',
+      required: true,
     },
 
     /* ── Status ───────────────────────────────────────────── */
@@ -83,6 +104,9 @@ export const BulkSeatAllocations: CollectionConfig = {
       defaultValue: 'active',
       required: true,
     },
+
+    /* ── Who created it ──────────────────────────────────── */
+    { name: 'createdByManager', type: 'relationship', relationTo: 'users' },
 
     /* ── Allocations (array of individual seat assignments) ─ */
     {
@@ -97,6 +121,15 @@ export const BulkSeatAllocations: CollectionConfig = {
           options: ['pending', 'enrolled', 'cancelled'],
           defaultValue: 'pending',
           required: true,
+        },
+        {
+          name: 'source',
+          type: 'select',
+          options: [
+            { label: 'Manager assigned', value: 'assigned' },
+            { label: 'Self-claimed from pool', value: 'pool_claim' },
+          ],
+          defaultValue: 'assigned',
         },
       ],
     },
