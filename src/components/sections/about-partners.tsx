@@ -41,8 +41,8 @@ export function AboutPartners() {
       });
   }, []);
 
-  const items = useMemo(
-    () => (partners.length ? partners : FALLBACK_NAMES.map((name) => ({ name }))),
+  const items = useMemo<PartnerLogo[]>(
+    () => (partners.length ? partners : FALLBACK_NAMES.map((name) => ({ name, logo: null }))),
     [partners]
   );
 
