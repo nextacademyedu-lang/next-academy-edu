@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import {
   Dela_Gothic_One,
-  General_Sans,
-  Sansation,
+  DM_Sans,
   Noto_Sans,
 } from "next/font/google";
 import "./globals.css";
@@ -12,12 +11,12 @@ const delaGothicOne = Dela_Gothic_One({
   weight: ["400"],
   variable: "--font-dela-gothic-one",
 });
-const generalSans = General_Sans({
+const generalSans = DM_Sans({
   subsets: ["latin"],
   weight: ["500", "600"],
   variable: "--font-general-sans",
 });
-const sansation = Sansation({
+const sansation = DM_Sans({
   subsets: ["latin"],
   weight: ["700"],
   variable: "--font-sansation",
@@ -47,3 +46,4 @@ export default function RootLayout({
     </html>
   );
 }
+
