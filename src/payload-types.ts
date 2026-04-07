@@ -532,7 +532,7 @@ export interface Program {
   /**
    * What's included (accommodation, meals, transport, etc.)
    */
-  includes?:
+  programIncludes?:
     | {
         item?: string | null;
         id?: string | null;
@@ -541,7 +541,7 @@ export interface Program {
   /**
    * What's NOT included.
    */
-  excludes?:
+  programExcludes?:
     | {
         item?: string | null;
         id?: string | null;
@@ -2035,13 +2035,13 @@ export interface ProgramsSelect<T extends boolean = true> {
             };
         id?: T;
       };
-  includes?:
+  programIncludes?:
     | T
     | {
         item?: T;
         id?: T;
       };
-  excludes?:
+  programExcludes?:
     | T
     | {
         item?: T;

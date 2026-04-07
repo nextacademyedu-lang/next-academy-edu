@@ -265,27 +265,27 @@ export default async function ProgramDetailsPage({
             )}
 
             {/* Includes / Excludes */}
-            {((program.includes && program.includes.length > 0) || (program.excludes && program.excludes.length > 0)) && (
+            {((program.programIncludes && program.programIncludes.length > 0) || (program.programExcludes && program.programExcludes.length > 0)) && (
               <section className={styles.sectionBlock}>
                 <h2 className={styles.sectionTitle}>
                   {locale === 'ar' ? 'ماذا يشمل' : 'What\'s Included'}
                 </h2>
                 <div className={styles.includesExcludesGrid}>
-                  {program.includes && program.includes.length > 0 && (
+                  {program.programIncludes && program.programIncludes.length > 0 && (
                     <div>
                       <h3 className={styles.subTitle}>{locale === 'ar' ? '✅ يشمل' : '✅ Includes'}</h3>
                       <ul className={styles.list}>
-                        {program.includes.map((inc, i) => (
+                        {program.programIncludes.map((inc, i) => (
                           <li key={inc.id ?? i} className={styles.listItem}>{inc.item}</li>
                         ))}
                       </ul>
                     </div>
                   )}
-                  {program.excludes && program.excludes.length > 0 && (
+                  {program.programExcludes && program.programExcludes.length > 0 && (
                     <div>
                       <h3 className={styles.subTitle}>{locale === 'ar' ? '❌ لا يشمل' : '❌ Not Included'}</h3>
                       <ul className={styles.excludeList}>
-                        {program.excludes.map((exc, i) => (
+                        {program.programExcludes.map((exc, i) => (
                           <li key={exc.id ?? i} className={styles.excludeItem}>{exc.item}</li>
                         ))}
                       </ul>

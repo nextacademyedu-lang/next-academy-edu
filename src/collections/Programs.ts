@@ -356,7 +356,7 @@ export const Programs: CollectionConfig = {
 
     /* ── Includes / Excludes (retreat/camp) ──────────────────── */
     {
-      name: 'includes',
+      name: 'programIncludes',
       type: 'array',
       fields: [{ name: 'item', type: 'text' }],
       admin: {
@@ -365,7 +365,7 @@ export const Programs: CollectionConfig = {
       },
     },
     {
-      name: 'excludes',
+      name: 'programExcludes',
       type: 'array',
       fields: [{ name: 'item', type: 'text' }],
       admin: {
