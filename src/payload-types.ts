@@ -477,76 +477,6 @@ export interface Program {
         id?: string | null;
       }[]
     | null;
-  /**
-   * Speakers, hosts, panelists for this program.
-   */
-  speakers?:
-    | {
-        name: string;
-        title?: string | null;
-        photo?: (number | null) | Media;
-        role?: ('speaker' | 'host' | 'panelist' | 'moderator') | null;
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * Select sponsors/partners from the Partners collection.
-   */
-  sponsors?: (number | Partner)[] | null;
-  /**
-   * Event agenda / schedule.
-   */
-  agenda?:
-    | {
-        time: string;
-        titleAr: string;
-        titleEn?: string | null;
-        descriptionAr?: string | null;
-        speaker?: string | null;
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * Last date to register for this program.
-   */
-  registrationDeadline?: string | null;
-  /**
-   * Day-by-day itinerary for retreats.
-   */
-  itinerary?:
-    | {
-        dayNumber: number;
-        titleAr: string;
-        titleEn?: string | null;
-        activities?:
-          | {
-              time?: string | null;
-              activityAr: string;
-              activityEn?: string | null;
-              id?: string | null;
-            }[]
-          | null;
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * What's included (accommodation, meals, transport, etc.)
-   */
-  programIncludes?:
-    | {
-        item?: string | null;
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * What's NOT included.
-   */
-  programExcludes?:
-    | {
-        item?: string | null;
-        id?: string | null;
-      }[]
-    | null;
   learnersCount?: number | null;
   viewCount?: number | null;
   averageRating?: number | null;
@@ -559,21 +489,6 @@ export interface Program {
         id?: string | null;
       }[]
     | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "partners".
- */
-export interface Partner {
-  id: number;
-  name: string;
-  logo: number | Media;
-  website?: string | null;
-  orderIndex?: number | null;
-  isActive?: boolean | null;
-  category?: ('general' | 'media' | 'strategic' | 'sponsor') | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1451,6 +1366,21 @@ export interface CrmSyncEvent {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "partners".
+ */
+export interface Partner {
+  id: number;
+  name: string;
+  logo: number | Media;
+  website?: string | null;
+  orderIndex?: number | null;
+  isActive?: boolean | null;
+  category?: ('general' | 'media' | 'strategic' | 'sponsor') | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "instructor-program-submissions".
  */
 export interface InstructorProgramSubmission {
@@ -1993,55 +1923,6 @@ export interface ProgramsSelect<T extends boolean = true> {
         id?: T;
       };
   requirements?:
-    | T
-    | {
-        item?: T;
-        id?: T;
-      };
-  speakers?:
-    | T
-    | {
-        name?: T;
-        title?: T;
-        photo?: T;
-        role?: T;
-        id?: T;
-      };
-  sponsors?: T;
-  agenda?:
-    | T
-    | {
-        time?: T;
-        titleAr?: T;
-        titleEn?: T;
-        descriptionAr?: T;
-        speaker?: T;
-        id?: T;
-      };
-  registrationDeadline?: T;
-  itinerary?:
-    | T
-    | {
-        dayNumber?: T;
-        titleAr?: T;
-        titleEn?: T;
-        activities?:
-          | T
-          | {
-              time?: T;
-              activityAr?: T;
-              activityEn?: T;
-              id?: T;
-            };
-        id?: T;
-      };
-  programIncludes?:
-    | T
-    | {
-        item?: T;
-        id?: T;
-      };
-  programExcludes?:
     | T
     | {
         item?: T;

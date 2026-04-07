@@ -161,8 +161,13 @@ export default async function ProgramDetailsPage({
               <InstructorCard instructor={instructor} locale={locale} />
             )}
 
+            {/* NOTE: Speakers, Agenda, Itinerary, Includes/Excludes, and Sponsors
+               sections are temporarily disabled. The corresponding schema fields were
+               removed to fix a production DB issue. They will be re-enabled after
+               a proper DB migration is performed. */}
+
             {/* Speakers / Hosts */}
-            {program.speakers && program.speakers.length > 0 && (
+            {/* {program.speakers && program.speakers.length > 0 && (
               <section className={styles.sectionBlock}>
                 <h2 className={styles.sectionTitle}>
                   {locale === 'ar' ? 'المتحدثون' : 'Speakers & Hosts'}
@@ -196,10 +201,10 @@ export default async function ProgramDetailsPage({
                   })}
                 </div>
               </section>
-            )}
+            )} */}
 
             {/* Event Agenda */}
-            {program.agenda && program.agenda.length > 0 && (
+            {/* {program.agenda && program.agenda.length > 0 && (
               <section className={styles.sectionBlock}>
                 <h2 className={styles.sectionTitle}>
                   {locale === 'ar' ? 'جدول الأعمال' : 'Agenda'}
@@ -225,10 +230,10 @@ export default async function ProgramDetailsPage({
                   ))}
                 </div>
               </section>
-            )}
+            )} */}
 
             {/* Retreat Itinerary */}
-            {program.itinerary && program.itinerary.length > 0 && (
+            {/* {program.itinerary && program.itinerary.length > 0 && (
               <section className={styles.sectionBlock}>
                 <h2 className={styles.sectionTitle}>
                   {locale === 'ar' ? 'البرنامج اليومي' : 'Daily Itinerary'}
@@ -262,10 +267,10 @@ export default async function ProgramDetailsPage({
                   ))}
                 </div>
               </section>
-            )}
+            )} */}
 
             {/* Includes / Excludes */}
-            {((program.programIncludes && program.programIncludes.length > 0) || (program.programExcludes && program.programExcludes.length > 0)) && (
+            {/* {((program.programIncludes && program.programIncludes.length > 0) || (program.programExcludes && program.programExcludes.length > 0)) && (
               <section className={styles.sectionBlock}>
                 <h2 className={styles.sectionTitle}>
                   {locale === 'ar' ? 'ماذا يشمل' : 'What\'s Included'}
@@ -293,10 +298,10 @@ export default async function ProgramDetailsPage({
                   )}
                 </div>
               </section>
-            )}
+            )} */}
 
             {/* Sponsors */}
-            {program.sponsors && program.sponsors.length > 0 && (
+            {/* {program.sponsors && program.sponsors.length > 0 && (
               <section className={styles.sectionBlock}>
                 <h2 className={styles.sectionTitle}>
                   {locale === 'ar' ? 'الرعاة والشركاء' : 'Sponsors & Partners'}
@@ -326,7 +331,7 @@ export default async function ProgramDetailsPage({
                   })}
                 </div>
               </section>
-            )}
+            )} */}
           </div>
 
           {/* Sidebar */}

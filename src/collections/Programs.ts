@@ -264,115 +264,11 @@ export const Programs: CollectionConfig = {
       },
     },
 
-    /* ── Speakers / Hosts (event/retreat/camp) ───────────────── */
-    {
-      name: 'speakers',
-      type: 'array',
-      fields: [
-        { name: 'name', type: 'text', required: true },
-        { name: 'title', type: 'text' },
-        { name: 'photo', type: 'upload', relationTo: 'media' },
-        {
-          name: 'role',
-          type: 'select',
-          options: [
-            { label: 'Speaker', value: 'speaker' },
-            { label: 'Host', value: 'host' },
-            { label: 'Panelist', value: 'panelist' },
-            { label: 'Moderator', value: 'moderator' },
-          ],
-          defaultValue: 'speaker',
-        },
-      ],
-      admin: {
-        description: 'Speakers, hosts, panelists for this program.',
-        condition: (data) => isEventLike(data as Record<string, unknown>),
-      },
-    },
 
-    /* ── Sponsors & Partners (event/retreat/camp/corporate) ─── */
-    {
-      name: 'sponsors',
-      type: 'relationship',
-      relationTo: 'partners',
-      hasMany: true,
-      admin: {
-        description: 'Select sponsors/partners from the Partners collection.',
-        condition: (data) =>
-          ['event', 'retreat', 'camp', 'corporate_training'].includes(data?.type as string),
-      },
-    },
-
-    /* ── Event-specific: Agenda ──────────────────────────────── */
-    {
-      name: 'agenda',
-      type: 'array',
-      fields: [
-        { name: 'time', type: 'text', required: true },
-        { name: 'titleAr', type: 'text', required: true },
-        { name: 'titleEn', type: 'text' },
-        { name: 'descriptionAr', type: 'textarea' },
-        { name: 'speaker', type: 'text' },
-      ],
-      admin: {
-        description: 'Event agenda / schedule.',
-        condition: (data) => (data?.type as string) === 'event',
-      },
-    },
-
-    /* ── Registration Deadline (event/retreat/camp) ──────────── */
-    {
-      name: 'registrationDeadline',
-      type: 'date',
-      admin: {
-        description: 'Last date to register for this program.',
-        condition: (data) => isEventLike(data as Record<string, unknown>),
-      },
-    },
-
-    /* ── Retreat-specific: Itinerary ─────────────────────────── */
-    {
-      name: 'itinerary',
-      type: 'array',
-      fields: [
-        { name: 'dayNumber', type: 'number', required: true },
-        { name: 'titleAr', type: 'text', required: true },
-        { name: 'titleEn', type: 'text' },
-        {
-          name: 'activities',
-          type: 'array',
-          fields: [
-            { name: 'time', type: 'text' },
-            { name: 'activityAr', type: 'text', required: true },
-            { name: 'activityEn', type: 'text' },
-          ],
-        },
-      ],
-      admin: {
-        description: 'Day-by-day itinerary for retreats.',
-        condition: (data) => (data?.type as string) === 'retreat',
-      },
-    },
-
-    /* ── Includes / Excludes (retreat/camp) ──────────────────── */
-    {
-      name: 'programIncludes',
-      type: 'array',
-      fields: [{ name: 'item', type: 'text' }],
-      admin: {
-        description: "What's included (accommodation, meals, transport, etc.)",
-        condition: (data) => isRetreatOrCamp(data as Record<string, unknown>),
-      },
-    },
-    {
-      name: 'programExcludes',
-      type: 'array',
-      fields: [{ name: 'item', type: 'text' }],
-      admin: {
-        description: "What's NOT included.",
-        condition: (data) => isRetreatOrCamp(data as Record<string, unknown>),
-      },
-    },
+    /* ── New fields temporarily disabled until DB migration is planned ─── */
+    /* speakers, sponsors, agenda, registrationDeadline, itinerary,
+       programIncludes, programExcludes will be re-added after proper
+       DB migration on production. */
 
     /* ── Stats (read-only, all types) ────────────────────────── */
     {
