@@ -12,3 +12,5 @@ scripts/
 Dockerfile
 docker-compose*.yml
 nginx/
+cardo/
+mekk/
