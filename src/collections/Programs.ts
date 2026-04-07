@@ -198,7 +198,7 @@ export const Programs: CollectionConfig = {
     { name: 'shortDescriptionAr', type: 'textarea' },
     { name: 'shortDescriptionEn', type: 'textarea' },
     { name: 'category', type: 'relationship', relationTo: 'categories' },
-    { name: 'instructor', type: 'relationship', relationTo: 'instructors', hasMany: true },
+    { name: 'instructor', type: 'relationship', relationTo: 'instructors' },
     { name: 'thumbnail', type: 'upload', relationTo: 'media' },
     { name: 'coverImage', type: 'upload', relationTo: 'media' },
     { name: 'durationHours', type: 'number' },

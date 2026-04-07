@@ -441,7 +441,7 @@ export interface Program {
   shortDescriptionAr?: string | null;
   shortDescriptionEn?: string | null;
   category?: (number | null) | Category;
-  instructor?: (number | Instructor)[] | null;
+  instructor?: (number | null) | Instructor;
   thumbnail?: (number | null) | Media;
   coverImage?: (number | null) | Media;
   durationHours?: number | null;
