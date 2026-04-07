@@ -1,0 +1,184 @@
+.section {
+    background-color: #fffcf2;
+    color: #050505;
+    padding: 15vh 5vw 20vh;
+    position: relative;
+    z-index: 10;
+}
+
+.container {
+    display: grid;
+    grid-template-columns: minmax(300px, 40%) 1fr;
+    gap: 10vw;
+    align-items: flex-start;
+}
+
+.leftColumn {
+    position: sticky;
+    top: 15vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    height: 80vh; /* Gives room for inner content to be spaced */
+}
+
+.sectionHeader {
+    display: flex;
+    gap: 2rem;
+    align-items: flex-start;
+    margin-bottom: auto; /* Push one percent to bottom */
+}
+
+.number {
+    font-family: var(--font-sans);
+    font-weight: 500;
+    font-size: 1rem;
+    letter-spacing: 0.05em;
+    padding-top: 0.5rem;
+    color: #050505;
+}
+
+.title {
+    font-family: var(--font-sans);
+    font-size: clamp(3rem, 5vw, 5.5rem);
+    line-height: 1;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: -0.02em;
+    margin: 0;
+}
+
+.sentenceItem {
+    transition: opacity 0.1s;
+    will-change: opacity;
+}
+
+.onePercentWrapper {
+    display: flex;
+    flex-direction: column;
+    text-transform: uppercase;
+    font-family: var(--font-serif); /* Using serif for the numbers like in screenshot */
+    color: #050505; /* Black as requested on light */
+    margin-bottom: 10vh;
+}
+
+.become {
+    font-size: 1.25rem;
+    letter-spacing: 0.1em;
+    margin-bottom: -2rem;
+    padding-left: 0.5rem;
+}
+
+.onePercentText {
+    font-size: clamp(10rem, 20vw, 25rem);
+    line-height: 0.8;
+    margin: 0;
+    transform-origin: left bottom;
+    will-change: transform;
+}
+
+.better {
+    font-size: 1rem;
+    letter-spacing: 0.1em;
+    padding-left: 0.5rem;
+}
+
+.rightColumn {
+    display: flex;
+    flex-direction: column;
+    padding-top: 25vh; /* Starts lower than the left column header */
+}
+
+.rightHeader {
+    font-family: var(--font-sans);
+    font-size: clamp(2rem, 3.5vw, 3.5rem);
+    font-weight: 300;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    margin-bottom: 6rem;
+}
+
+.paragraphs {
+    font-family: var(--font-sans);
+    font-size: clamp(0.9rem, 1vw, 1.125rem);
+    line-height: 1.6;
+    max-width: 450px;
+    margin-bottom: 15vh;
+    color: #555;
+}
+
+.paragraphs p {
+    margin-bottom: 2rem;
+}
+
+.paragraphs p:last-child {
+    margin-bottom: 0;
+}
+
+.largeReveal {
+    font-family: var(--font-sans);
+    font-size: clamp(2rem, 4vw, 4rem);
+    font-weight: 300;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    color: rgba(0, 0, 0, 0.15); /* Base for scrub reveal on light */
+    max-width: 800px;
+}
+
+.largeReveal :global(.word) {
+    will-change: color;
+    transition: color 0.1s;
+}
+
+@media (max-width: 900px) {
+    .container {
+        display: block;
+        position: relative;
+    }
+    
+    .leftColumn {
+        position: static;
+        height: auto;
+        display: block;
+    }
+    
+    .sectionHeader {
+        margin-bottom: 4rem;
+    }
+
+    .title {
+        font-size: clamp(2rem, 7vw, 3.5rem);
+    }
+
+    .onePercentWrapper {
+        position: sticky;
+        top: 5vh;
+        height: 0;
+        overflow: visible;
+        z-index: 1;
+        opacity: 0.3;
+        pointer-events: none;
+        margin-bottom: 0;
+        align-items: center;
+        width: 100%;
+    }
+
+    .onePercentText {
+        font-size: clamp(5rem, 18vw, 12rem);
+    }
+    
+    .rightColumn {
+        position: relative;
+        padding-top: 2rem; 
+        z-index: 2;
+    }
+
+    .rightHeader {
+        font-size: clamp(1.5rem, 5vw, 2.5rem);
+        margin-bottom: 3rem;
+    }
+
+    .largeReveal {
+        font-size: clamp(1.2rem, 4vw, 2rem);
+    }
+}

@@ -1,0 +1,117 @@
+/* ═══════════════════════════════════════
+   TESTIMONIALS MARQUEE — 3 ROWS
+   ═══════════════════════════════════════ */
+
+.section {
+  background-color: var(--bg-primary);
+  padding: var(--space-lg) 0;
+  overflow: hidden;
+}
+
+.topLabel {
+  padding: 0 var(--container-padding);
+  margin-bottom: 3rem;
+}
+
+.label {
+  font-family: var(--font-body);
+  font-size: var(--text-label);
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--text-secondary);
+  opacity: 0.5;
+}
+
+/* Row container */
+.row {
+  overflow: hidden;
+  padding: 0.75rem 0;
+}
+
+/* Infinite scrolling track */
+.track {
+  display: flex;
+  gap: 1.5rem;
+  width: max-content;
+  animation: marquee 40s linear infinite;
+}
+
+.trackReverse {
+  animation: marqueeReverse 38s linear infinite;
+}
+
+/* Pause on hover */
+.track:hover,
+.trackReverse:hover {
+  animation-play-state: paused;
+}
+
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+@keyframes marqueeReverse {
+  0% { transform: translateX(-50%); }
+  100% { transform: translateX(0); }
+}
+
+/* Card */
+.card {
+  flex-shrink: 0;
+  width: 320px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 1.75rem 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  cursor: default;
+  transition: border-color 0.4s ease, transform 0.4s ease;
+}
+
+.card:hover {
+  border-color: rgba(235, 94, 40, 0.3);
+  transform: translateY(-4px);
+}
+
+.stars {
+  font-size: 0.9rem;
+  color: var(--accent);
+  letter-spacing: 0.1em;
+}
+
+.quote {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  line-height: 1.65;
+  flex: 1;
+}
+
+.author {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+}
+
+.authorName {
+  font-family: var(--font-heading);
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-primary);
+  letter-spacing: 0.05em;
+}
+
+.authorRole {
+  font-family: var(--font-body);
+  font-size: var(--text-label);
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}

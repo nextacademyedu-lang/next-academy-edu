@@ -24,6 +24,7 @@ export const Partners: CollectionConfig = {
         { label: 'General', value: 'general' },
         { label: 'Media', value: 'media' },
         { label: 'Strategic', value: 'strategic' },
+        { label: 'Sponsor', value: 'sponsor' },
       ],
     },
   ],

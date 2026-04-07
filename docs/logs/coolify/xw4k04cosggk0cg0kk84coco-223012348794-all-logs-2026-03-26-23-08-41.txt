@@ -1,0 +1,571 @@
+   ▲ Next.js 15.4.11
+   - Local:        http://localhost:3001
+   - Network:      http://0.0.0.0:3001
+
+ ✓ Starting...
+[instrumentation] Attempt 1/5: Initializing Payload CMS…
+ ✓ Ready in 1888ms
+[instrumentation] ✅ Payload CMS initialized. Collections: users, media, companies, user-profiles, tags, categories, instructors, programs, rounds, sessions, payment-plans, bookings, payments, installment-requests, notifications, discount-codes, consultation-types, consultation-availability, consultation-slots, consultation-bookings, leads, waitlist, reviews, certificates, payment-links, instructor-blocked-dates, verification-codes, blog-posts, bulk-seat-allocations, popups, announcement-bars, upcoming-events-config, crm-sync-events, partners, payload-kv, payload-locked-documents, payload-preferences, payload-migrations
+[cron-scheduler] Starting 3 cron jobs (base: https://nextacademyedu.com)
+[cron-scheduler]   📅 crm-sync → every 30 min
+[cron-scheduler]   📅 check-overdue → every 360 min
+[cron-scheduler]   📅 waitlist → every 60 min
+[cron-scheduler] ✅ All cron jobs registered
+[cron/waitlist] { notified: 0, expired: 0 }
+[cron] ✅ waitlist completed (200) in 242ms
+[cron] ✅ check-overdue completed (200) in 452ms
+[cron] ✅ crm-sync completed (207) in 4820ms
+[23:05:43] ERROR: There was an error fetching the list view data for collection sessions
+    err: {
+      "type": "me",
+      "message": "Failed query: select \"sessions\".\"id\", \"sessions\".\"round_id\", \"sessions\".\"session_number\", \"sessions\".\"title\", \"sessions\".\"description\", \"sessions\".\"date\", \"sessions\".\"start_time\", \"sessions\".\"end_time\", \"sessions\".\"location_type\", \"sessions\".\"location_name\", \"sessions\".\"location_address\", \"sessions\".\"meeting_url\", \"sessions\".\"instructor_id\", \"sessions\".\"recording_url\", \"sessions\".\"status\", \"sessions\".\"is_cancelled\", \"sessions\".\"cancellation_reason\", \"sessions\".\"attendance_count\", \"sessions\".\"attendees_count\", \"sessions\".\"google_event_id\", \"sessions\".\"updated_at\", \"sessions\".\"created_at\", \"sessions__rels\".\"data\" as \"_rels\" from \"sessions\" \"sessions\" left join lateral (select coalesce(json_agg(json_build_array(\"sessions__rels\".\"order\", \"sessions__rels\".\"path\", \"sessions__rels\".\"media_id\") order by \"sessions__rels\".\"order\" asc), '[]'::json) as \"data\" from (select * from \"sessions_rels\" \"sessions__rels\" where \"sessions__rels\".\"parent_id\" = \"sessions\".\"id\" order by \"sessions__rels\".\"order\" asc) \"sessions__rels\") \"sessions__rels\" on true order by \"sessions\".\"created_at\" desc limit $1\nparams: 10: column sessions.google_event_id does not exist",
+      "stack":
+          Error: Failed query: select "sessions"."id", "sessions"."round_id", "sessions"."session_number", "sessions"."title", "sessions"."description", "sessions"."date", "sessions"."start_time", "sessions"."end_time", "sessions"."location_type", "sessions"."location_name", "sessions"."location_address", "sessions"."meeting_url", "sessions"."instructor_id", "sessions"."recording_url", "sessions"."status", "sessions"."is_cancelled", "sessions"."cancellation_reason", "sessions"."attendance_count", "sessions"."attendees_count", "sessions"."google_event_id", "sessions"."updated_at", "sessions"."created_at", "sessions__rels"."data" as "_rels" from "sessions" "sessions" left join lateral (select coalesce(json_agg(json_build_array("sessions__rels"."order", "sessions__rels"."path", "sessions__rels"."media_id") order by "sessions__rels"."order" asc), '[]'::json) as "data" from (select * from "sessions_rels" "sessions__rels" where "sessions__rels"."parent_id" = "sessions"."id" order by "sessions__rels"."order" asc) "sessions__rels") "sessions__rels" on true order by "sessions"."created_at" desc limit $1
+          params: 10
+              at nm.queryWithCache (/app/.next/server/chunks/4266.js:122:20011)
+              at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+              at async /app/.next/server/chunks/4266.js:122:23099
+              at async iz (/app/.next/server/chunks/4266.js:90:1334)
+              at async w (/app/.next/server/chunks/4206.js:85:4761)
+              at async B (/app/.next/server/app/(payload)/admin/[[...segments]]/page.js:63:147709)
+              at async C (/app/.next/server/app/(payload)/admin/[[...segments]]/page.js:63:151347)
+          caused by: error: column sessions.google_event_id does not exist
+              at /app/.next/server/chunks/4266.js:46:734753
+              at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+              at async /app/.next/server/chunks/4266.js:122:23308
+              at async nm.queryWithCache (/app/.next/server/chunks/4266.js:122:19986)
+              at async /app/.next/server/chunks/4266.js:122:23099
+              at async iz (/app/.next/server/chunks/4266.js:90:1334)
+              at async w (/app/.next/server/chunks/4206.js:85:4761)
+              at async B (/app/.next/server/app/(payload)/admin/[[...segments]]/page.js:63:147709)
+              at async C (/app/.next/server/app/(payload)/admin/[[...segments]]/page.js:63:151347)
+      "query": "select \"sessions\".\"id\", \"sessions\".\"round_id\", \"sessions\".\"session_number\", \"sessions\".\"title\", \"sessions\".\"description\", \"sessions\".\"date\", \"sessions\".\"start_time\", \"sessions\".\"end_time\", \"sessions\".\"location_type\", \"sessions\".\"location_name\", \"sessions\".\"location_address\", \"sessions\".\"meeting_url\", \"sessions\".\"instructor_id\", \"sessions\".\"recording_url\", \"sessions\".\"status\", \"sessions\".\"is_cancelled\", \"sessions\".\"cancellation_reason\", \"sessions\".\"attendance_count\", \"sessions\".\"attendees_count\", \"sessions\".\"google_event_id\", \"sessions\".\"updated_at\", \"sessions\".\"created_at\", \"sessions__rels\".\"data\" as \"_rels\" from \"sessions\" \"sessions\" left join lateral (select coalesce(json_agg(json_build_array(\"sessions__rels\".\"order\", \"sessions__rels\".\"path\", \"sessions__rels\".\"media_id\") order by \"sessions__rels\".\"order\" asc), '[]'::json) as \"data\" from (select * from \"sessions_rels\" \"sessions__rels\" where \"sessions__rels\".\"parent_id\" = \"sessions\".\"id\" order by \"sessions__rels\".\"order\" asc) \"sessions__rels\") \"sessions__rels\" on true order by \"sessions\".\"created_at\" desc limit $1",
+      "params": [
+        10
+      ]
+    }
+[23:05:44] ERROR: There was an error fetching the list view data for collection sessions
+    err: {
+      "type": "me",
+      "message": "Failed query: select \"sessions\".\"id\", \"sessions\".\"round_id\", \"sessions\".\"session_number\", \"sessions\".\"title\", \"sessions\".\"description\", \"sessions\".\"date\", \"sessions\".\"start_time\", \"sessions\".\"end_time\", \"sessions\".\"location_type\", \"sessions\".\"location_name\", \"sessions\".\"location_address\", \"sessions\".\"meeting_url\", \"sessions\".\"instructor_id\", \"sessions\".\"recording_url\", \"sessions\".\"status\", \"sessions\".\"is_cancelled\", \"sessions\".\"cancellation_reason\", \"sessions\".\"attendance_count\", \"sessions\".\"attendees_count\", \"sessions\".\"google_event_id\", \"sessions\".\"updated_at\", \"sessions\".\"created_at\", \"sessions__rels\".\"data\" as \"_rels\" from \"sessions\" \"sessions\" left join lateral (select coalesce(json_agg(json_build_array(\"sessions__rels\".\"order\", \"sessions__rels\".\"path\", \"sessions__rels\".\"media_id\") order by \"sessions__rels\".\"order\" asc), '[]'::json) as \"data\" from (select * from \"sessions_rels\" \"sessions__rels\" where \"sessions__rels\".\"parent_id\" = \"sessions\".\"id\" order by \"sessions__rels\".\"order\" asc) \"sessions__rels\") \"sessions__rels\" on true order by \"sessions\".\"created_at\" desc limit $1\nparams: 10: column sessions.google_event_id does not exist",
+      "stack":
+          Error: Failed query: select "sessions"."id", "sessions"."round_id", "sessions"."session_number", "sessions"."title", "sessions"."description", "sessions"."date", "sessions"."start_time", "sessions"."end_time", "sessions"."location_type", "sessions"."location_name", "sessions"."location_address", "sessions"."meeting_url", "sessions"."instructor_id", "sessions"."recording_url", "sessions"."status", "sessions"."is_cancelled", "sessions"."cancellation_reason", "sessions"."attendance_count", "sessions"."attendees_count", "sessions"."google_event_id", "sessions"."updated_at", "sessions"."created_at", "sessions__rels"."data" as "_rels" from "sessions" "sessions" left join lateral (select coalesce(json_agg(json_build_array("sessions__rels"."order", "sessions__rels"."path", "sessions__rels"."media_id") order by "sessions__rels"."order" asc), '[]'::json) as "data" from (select * from "sessions_rels" "sessions__rels" where "sessions__rels"."parent_id" = "sessions"."id" order by "sessions__rels"."order" asc) "sessions__rels") "sessions__rels" on true order by "sessions"."created_at" desc limit $1
+          params: 10
+              at nm.queryWithCache (/app/.next/server/chunks/4266.js:122:20011)
+              at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+              at async /app/.next/server/chunks/4266.js:122:23099
+              at async iz (/app/.next/server/chunks/4266.js:90:1334)
+              at async w (/app/.next/server/chunks/4206.js:85:4761)
+              at async B (/app/.next/server/app/(payload)/admin/[[...segments]]/page.js:63:147709)
+              at async C (/app/.next/server/app/(payload)/admin/[[...segments]]/page.js:63:151347)
+          caused by: error: column sessions.google_event_id does not exist
+              at /app/.next/server/chunks/4266.js:46:734753
+              at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+              at async /app/.next/server/chunks/4266.js:122:23308
+              at async nm.queryWithCache (/app/.next/server/chunks/4266.js:122:19986)
+              at async /app/.next/server/chunks/4266.js:122:23099
+              at async iz (/app/.next/server/chunks/4266.js:90:1334)
+              at async w (/app/.next/server/chunks/4206.js:85:4761)
+              at async B (/app/.next/server/app/(payload)/admin/[[...segments]]/page.js:63:147709)
+              at async C (/app/.next/server/app/(payload)/admin/[[...segments]]/page.js:63:151347)
+      "query": "select \"sessions\".\"id\", \"sessions\".\"round_id\", \"sessions\".\"session_number\", \"sessions\".\"title\", \"sessions\".\"description\", \"sessions\".\"date\", \"sessions\".\"start_time\", \"sessions\".\"end_time\", \"sessions\".\"location_type\", \"sessions\".\"location_name\", \"sessions\".\"location_address\", \"sessions\".\"meeting_url\", \"sessions\".\"instructor_id\", \"sessions\".\"recording_url\", \"sessions\".\"status\", \"sessions\".\"is_cancelled\", \"sessions\".\"cancellation_reason\", \"sessions\".\"attendance_count\", \"sessions\".\"attendees_count\", \"sessions\".\"google_event_id\", \"sessions\".\"updated_at\", \"sessions\".\"created_at\", \"sessions__rels\".\"data\" as \"_rels\" from \"sessions\" \"sessions\" left join lateral (select coalesce(json_agg(json_build_array(\"sessions__rels\".\"order\", \"sessions__rels\".\"path\", \"sessions__rels\".\"media_id\") order by \"sessions__rels\".\"order\" asc), '[]'::json) as \"data\" from (select * from \"sessions_rels\" \"sessions__rels\" where \"sessions__rels\".\"parent_id\" = \"sessions\".\"id\" order by \"sessions__rels\".\"order\" asc) \"sessions__rels\") \"sessions__rels\" on true order by \"sessions\".\"created_at\" desc limit $1",
+      "params": [
+        10
+      ]
+    }
+[cron] ✅ crm-sync completed (207) in 2456ms
+[Rounds] afterChange session sync failed (non-blocking): Error: Failed query: select "sessions"."id", "sessions"."round_id", "sessions"."session_number", "sessions"."title", "sessions"."description", "sessions"."date", "sessions"."start_time", "sessions"."end_time", "sessions"."location_type", "sessions"."location_name", "sessions"."location_address", "sessions"."meeting_url", "sessions"."instructor_id", "sessions"."recording_url", "sessions"."status", "sessions"."is_cancelled", "sessions"."cancellation_reason", "sessions"."attendance_count", "sessions"."attendees_count", "sessions"."google_event_id", "sessions"."updated_at", "sessions"."created_at", "sessions__rels"."data" as "_rels" from "sessions" "sessions" left join lateral (select coalesce(json_agg(json_build_array("sessions__rels"."order", "sessions__rels"."path", "sessions__rels"."media_id") order by "sessions__rels"."order" asc), '[]'::json) as "data" from (select * from "sessions_rels" "sessions__rels" where "sessions__rels"."parent_id" = "sessions"."id" order by "sessions__rels"."order" asc) "sessions__rels") "sessions__rels" on true where "sessions"."round_id" = $1 order by "sessions"."session_number" asc, "sessions"."created_at" desc limit $2
+params: 14,500
+    at nm.queryWithCache (.next/server/chunks/4266.js:122:20011)
+    at async (.next/server/chunks/4266.js:122:23099)
+    at async iz (.next/server/chunks/4266.js:90:1334)
+    at async w (.next/server/chunks/4206.js:85:4761)
+    at async z1 (.next/server/chunks/4266.js:138:47531)
+    at async z2.hooks.afterChange (.next/server/chunks/4266.js:138:49451)
+    at async r (.next/server/chunks/4206.js:106:191793)
+    at async w (.next/server/chunks/4206.js:85:10147)
+    at async handler (.next/server/chunks/4266.js:55:270317) {
+  query: `select "sessions"."id", "sessions"."round_id", "sessions"."session_number", "sessions"."title", "sessions"."description", "sessions"."date", "sessions"."start_time", "sessions"."end_time", "sessions"."location_type", "sessions"."location_name", "sessions"."location_address", "sessions"."meeting_url", "sessions"."instructor_id", "sessions"."recording_url", "sessions"."status", "sessions"."is_cancelled", "sessions"."cancellation_reason", "sessions"."attendance_count", "sessions"."attendees_count", "sessions"."google_event_id", "sessions"."updated_at", "sessions"."created_at", "sessions__rels"."data" as "_rels" from "sessions" "sessions" left join lateral (select coalesce(json_agg(json_build_array("sessions__rels"."order", "sessions__rels"."path", "sessions__rels"."media_id") order by "sessions__rels"."order" asc), '[]'::json) as "data" from (select * from "sessions_rels" "sessions__rels" where "sessions__rels"."parent_id" = "sessions"."id" order by "sessions__rels"."order" asc) "sessions__rels") "sessions__rels" on true where "sessions"."round_id" = $1 order by "sessions"."session_number" asc, "sessions"."created_at" desc limit $2`,
+  params: [Array],
+  [cause]: error: column sessions.google_event_id does not exist
+      at <unknown> (.next/server/chunks/4266.js:9:660958)
+      at async (.next/server/chunks/4266.js:122:23308)
+      at async nm.queryWithCache (.next/server/chunks/4266.js:122:19986)
+      at async (.next/server/chunks/4266.js:122:23099)
+      at async iz (.next/server/chunks/4266.js:90:1334)
+      at async w (.next/server/chunks/4206.js:85:4761)
+      at async z1 (.next/server/chunks/4266.js:138:47531)
+      at async z2.hooks.afterChange (.next/server/chunks/4266.js:138:49451)
+      at async r (.next/server/chunks/4206.js:106:191793) {
+    length: 123,
+    severity: 'ERROR',
+    code: '42703',
+    detail: undefined,
+    hint: undefined,
+    position: '502',
+    internalPosition: undefined,
+    internalQuery: undefined,
+    where: undefined,
+    schema: undefined,
+    table: undefined,
+    column: undefined,
+    dataType: undefined,
+    constraint: undefined,
+    file: 'parse_relation.c',
+    line: '3716',
+    routine: 'errorMissingColumn'
+  }
+}
+Error: Failed query: select "sessions"."id", "sessions"."round_id", "sessions"."session_number", "sessions"."title", "sessions"."description", "sessions"."date", "sessions"."start_time", "sessions"."end_time", "sessions"."location_type", "sessions"."location_name", "sessions"."location_address", "sessions"."meeting_url", "sessions"."instructor_id", "sessions"."recording_url", "sessions"."status", "sessions"."is_cancelled", "sessions"."cancellation_reason", "sessions"."attendance_count", "sessions"."attendees_count", "sessions"."google_event_id", "sessions"."updated_at", "sessions"."created_at", "sessions__rels"."data" as "_rels" from "sessions" "sessions" left join lateral (select coalesce(json_agg(json_build_array("sessions__rels"."order", "sessions__rels"."path", "sessions__rels"."media_id") order by "sessions__rels"."order" asc), '[]'::json) as "data" from (select * from "sessions_rels" "sessions__rels" where "sessions__rels"."parent_id" = "sessions"."id" order by "sessions__rels"."order" asc) "sessions__rels") "sessions__rels" on true order by "sessions"."created_at" desc limit $1
+params: 10
+    at nm.queryWithCache (.next/server/chunks/4266.js:122:20011)
+    at async (.next/server/chunks/4266.js:122:23099)
+    at async iz (.next/server/chunks/4266.js:90:1334)
+    at async w (.next/server/chunks/4206.js:85:4761)
+    at async B (.next/server/app/(payload)/admin/[[...segments]]/page.js:63:147709)
+    at async C (.next/server/app/(payload)/admin/[[...segments]]/page.js:63:151347) {
+  query: `select "sessions"."id", "sessions"."round_id", "sessions"."session_number", "sessions"."title", "sessions"."description", "sessions"."date", "sessions"."start_time", "sessions"."end_time", "sessions"."location_type", "sessions"."location_name", "sessions"."location_address", "sessions"."meeting_url", "sessions"."instructor_id", "sessions"."recording_url", "sessions"."status", "sessions"."is_cancelled", "sessions"."cancellation_reason", "sessions"."attendance_count", "sessions"."attendees_count", "sessions"."google_event_id", "sessions"."updated_at", "sessions"."created_at", "sessions__rels"."data" as "_rels" from "sessions" "sessions" left join lateral (select coalesce(json_agg(json_build_array("sessions__rels"."order", "sessions__rels"."path", "sessions__rels"."media_id") order by "sessions__rels"."order" asc), '[]'::json) as "data" from (select * from "sessions_rels" "sessions__rels" where "sessions__rels"."parent_id" = "sessions"."id" order by "sessions__rels"."order" asc) "sessions__rels") "sessions__rels" on true order by "sessions"."created_at" desc limit $1`,
+  params: [Array],
+  [cause]: error: column sessions.google_event_id does not exist
+      at <unknown> (.next/server/chunks/4266.js:46:734753)
+      at async (.next/server/chunks/4266.js:122:23308)
+      at async nm.queryWithCache (.next/server/chunks/4266.js:122:19986)
+      at async (.next/server/chunks/4266.js:122:23099)
+      at async iz (.next/server/chunks/4266.js:90:1334)
+      at async w (.next/server/chunks/4206.js:85:4761)
+      at async B (.next/server/app/(payload)/admin/[[...segments]]/page.js:63:147709)
+      at async C (.next/server/app/(payload)/admin/[[...segments]]/page.js:63:151347) {
+    length: 123,
+    severity: 'ERROR',
+    code: '42703',
+    detail: undefined,
+    hint: undefined,
+    position: '502',
+    internalPosition: undefined,
+    internalQuery: undefined,
+    where: undefined,
+    schema: undefined,
+    table: undefined,
+    column: undefined,
+    dataType: undefined,
+    constraint: undefined,
+    file: 'parse_relation.c',
+    line: '3716',
+    routine: 'errorMissingColumn'
+  }
+}
+Error: Failed query: select "sessions"."id", "sessions"."round_id", "sessions"."session_number", "sessions"."title", "sessions"."description", "sessions"."date", "sessions"."start_time", "sessions"."end_time", "sessions"."location_type", "sessions"."location_name", "sessions"."location_address", "sessions"."meeting_url", "sessions"."instructor_id", "sessions"."recording_url", "sessions"."status", "sessions"."is_cancelled", "sessions"."cancellation_reason", "sessions"."attendance_count", "sessions"."attendees_count", "sessions"."google_event_id", "sessions"."updated_at", "sessions"."created_at", "sessions__rels"."data" as "_rels" from "sessions" "sessions" left join lateral (select coalesce(json_agg(json_build_array("sessions__rels"."order", "sessions__rels"."path", "sessions__rels"."media_id") order by "sessions__rels"."order" asc), '[]'::json) as "data" from (select * from "sessions_rels" "sessions__rels" where "sessions__rels"."parent_id" = "sessions"."id" order by "sessions__rels"."order" asc) "sessions__rels") "sessions__rels" on true order by "sessions"."created_at" desc limit $1
+params: 10
+    at nm.queryWithCache (.next/server/chunks/4266.js:122:20011)
+    at async (.next/server/chunks/4266.js:122:23099)
+    at async iz (.next/server/chunks/4266.js:90:1334)
+    at async w (.next/server/chunks/4206.js:85:4761)
+    at async B (.next/server/app/(payload)/admin/[[...segments]]/page.js:63:147709)
+    at async C (.next/server/app/(payload)/admin/[[...segments]]/page.js:63:151347) {
+  query: `select "sessions"."id", "sessions"."round_id", "sessions"."session_number", "sessions"."title", "sessions"."description", "sessions"."date", "sessions"."start_time", "sessions"."end_time", "sessions"."location_type", "sessions"."location_name", "sessions"."location_address", "sessions"."meeting_url", "sessions"."instructor_id", "sessions"."recording_url", "sessions"."status", "sessions"."is_cancelled", "sessions"."cancellation_reason", "sessions"."attendance_count", "sessions"."attendees_count", "sessions"."google_event_id", "sessions"."updated_at", "sessions"."created_at", "sessions__rels"."data" as "_rels" from "sessions" "sessions" left join lateral (select coalesce(json_agg(json_build_array("sessions__rels"."order", "sessions__rels"."path", "sessions__rels"."media_id") order by "sessions__rels"."order" asc), '[]'::json) as "data" from (select * from "sessions_rels" "sessions__rels" where "sessions__rels"."parent_id" = "sessions"."id" order by "sessions__rels"."order" asc) "sessions__rels") "sessions__rels" on true order by "sessions"."created_at" desc limit $1`,
+  params: [Array],
+  [cause]: error: column sessions.google_event_id does not exist
+      at <unknown> (.next/server/chunks/4266.js:46:734753)
+      at async (.next/server/chunks/4266.js:122:23308)
+      at async nm.queryWithCache (.next/server/chunks/4266.js:122:19986)
+      at async (.next/server/chunks/4266.js:122:23099)
+      at async iz (.next/server/chunks/4266.js:90:1334)
+      at async w (.next/server/chunks/4206.js:85:4761)
+      at async B (.next/server/app/(payload)/admin/[[...segments]]/page.js:63:147709)
+      at async C (.next/server/app/(payload)/admin/[[...segments]]/page.js:63:151347) {
+    length: 123,
+    severity: 'ERROR',
+    code: '42703',
+    detail: undefined,
+    hint: undefined,
+    position: '502',
+    internalPosition: undefined,
+    internalQuery: undefined,
+    where: undefined,
+    schema: undefined,
+    table: undefined,
+    column: undefined,
+    dataType: undefined,
+    constraint: undefined,
+    file: 'parse_relation.c',
+    line: '3716',
+    routine: 'errorMissingColumn'
+  }
+}
+[Rounds] afterChange session sync failed (non-blocking): Error: Failed query: select "sessions"."id", "sessions"."round_id", "sessions"."session_number", "sessions"."title", "sessions"."description", "sessions"."date", "sessions"."start_time", "sessions"."end_time", "sessions"."location_type", "sessions"."location_name", "sessions"."location_address", "sessions"."meeting_url", "sessions"."instructor_id", "sessions"."recording_url", "sessions"."status", "sessions"."is_cancelled", "sessions"."cancellation_reason", "sessions"."attendance_count", "sessions"."attendees_count", "sessions"."google_event_id", "sessions"."updated_at", "sessions"."created_at", "sessions__rels"."data" as "_rels" from "sessions" "sessions" left join lateral (select coalesce(json_agg(json_build_array("sessions__rels"."order", "sessions__rels"."path", "sessions__rels"."media_id") order by "sessions__rels"."order" asc), '[]'::json) as "data" from (select * from "sessions_rels" "sessions__rels" where "sessions__rels"."parent_id" = "sessions"."id" order by "sessions__rels"."order" asc) "sessions__rels") "sessions__rels" on true where "sessions"."round_id" = $1 order by "sessions"."session_number" asc, "sessions"."created_at" desc limit $2
+params: 15,500
+    at nm.queryWithCache (.next/server/chunks/4266.js:122:20011)
+    at async (.next/server/chunks/4266.js:122:23099)
+    at async iz (.next/server/chunks/4266.js:90:1334)
+    at async w (.next/server/chunks/4206.js:85:4761)
+    at async z1 (.next/server/chunks/4266.js:138:47531)
+    at async z2.hooks.afterChange (.next/server/chunks/4266.js:138:49451)
+    at async r (.next/server/chunks/4206.js:106:191793)
+    at async w (.next/server/chunks/4206.js:85:10147)
+    at async handler (.next/server/chunks/4266.js:55:270317) {
+  query: `select "sessions"."id", "sessions"."round_id", "sessions"."session_number", "sessions"."title", "sessions"."description", "sessions"."date", "sessions"."start_time", "sessions"."end_time", "sessions"."location_type", "sessions"."location_name", "sessions"."location_address", "sessions"."meeting_url", "sessions"."instructor_id", "sessions"."recording_url", "sessions"."status", "sessions"."is_cancelled", "sessions"."cancellation_reason", "sessions"."attendance_count", "sessions"."attendees_count", "sessions"."google_event_id", "sessions"."updated_at", "sessions"."created_at", "sessions__rels"."data" as "_rels" from "sessions" "sessions" left join lateral (select coalesce(json_agg(json_build_array("sessions__rels"."order", "sessions__rels"."path", "sessions__rels"."media_id") order by "sessions__rels"."order" asc), '[]'::json) as "data" from (select * from "sessions_rels" "sessions__rels" where "sessions__rels"."parent_id" = "sessions"."id" order by "sessions__rels"."order" asc) "sessions__rels") "sessions__rels" on true where "sessions"."round_id" = $1 order by "sessions"."session_number" asc, "sessions"."created_at" desc limit $2`,
+  params: [Array],
+  [cause]: error: column sessions.google_event_id does not exist
+      at <unknown> (.next/server/chunks/4266.js:9:660958)
+      at async (.next/server/chunks/4266.js:122:23308)
+      at async nm.queryWithCache (.next/server/chunks/4266.js:122:19986)
+      at async (.next/server/chunks/4266.js:122:23099)
+      at async iz (.next/server/chunks/4266.js:90:1334)
+      at async w (.next/server/chunks/4206.js:85:4761)
+      at async z1 (.next/server/chunks/4266.js:138:47531)
+      at async z2.hooks.afterChange (.next/server/chunks/4266.js:138:49451)
+      at async r (.next/server/chunks/4206.js:106:191793) {
+    length: 123,
+    severity: 'ERROR',
+    code: '42703',
+    detail: undefined,
+    hint: undefined,
+    position: '502',
+    internalPosition: undefined,
+    internalQuery: undefined,
+    where: undefined,
+    schema: undefined,
+    table: undefined,
+    column: undefined,
+    dataType: undefined,
+    constraint: undefined,
+    file: 'parse_relation.c',
+    line: '3716',
+    routine: 'errorMissingColumn'
+  }
+}
+Error: Failed query: select "sessions"."id", "sessions"."round_id", "sessions"."session_number", "sessions"."title", "sessions"."description", "sessions"."date", "sessions"."start_time", "sessions"."end_time", "sessions"."location_type", "sessions"."location_name", "sessions"."location_address", "sessions"."meeting_url", "sessions"."instructor_id", "sessions"."recording_url", "sessions"."status", "sessions"."is_cancelled", "sessions"."cancellation_reason", "sessions"."attendance_count", "sessions"."attendees_count", "sessions"."google_event_id", "sessions"."updated_at", "sessions"."created_at", "sessions__rels"."data" as "_rels" from "sessions" "sessions" left join lateral (select coalesce(json_agg(json_build_array("sessions__rels"."order", "sessions__rels"."path", "sessions__rels"."media_id") order by "sessions__rels"."order" asc), '[]'::json) as "data" from (select * from "sessions_rels" "sessions__rels" where "sessions__rels"."parent_id" = "sessions"."id" order by "sessions__rels"."order" asc) "sessions__rels") "sessions__rels" on true order by "sessions"."created_at" desc limit $1
+params: 10
+    at nm.queryWithCache (.next/server/chunks/4266.js:122:20011)
+    at async (.next/server/chunks/4266.js:122:23099)
+    at async iz (.next/server/chunks/4266.js:90:1334)
+    at async w (.next/server/chunks/4206.js:85:4761)
+    at async B (.next/server/app/(payload)/admin/[[...segments]]/page.js:63:147709)
+    at async C (.next/server/app/(payload)/admin/[[...segments]]/page.js:63:151347) {
+  query: `select "sessions"."id", "sessions"."round_id", "sessions"."session_number", "sessions"."title", "sessions"."description", "sessions"."date", "sessions"."start_time", "sessions"."end_time", "sessions"."location_type", "sessions"."location_name", "sessions"."location_address", "sessions"."meeting_url", "sessions"."instructor_id", "sessions"."recording_url", "sessions"."status", "sessions"."is_cancelled", "sessions"."cancellation_reason", "sessions"."attendance_count", "sessions"."attendees_count", "sessions"."google_event_id", "sessions"."updated_at", "sessions"."created_at", "sessions__rels"."data" as "_rels" from "sessions" "sessions" left join lateral (select coalesce(json_agg(json_build_array("sessions__rels"."order", "sessions__rels"."path", "sessions__rels"."media_id") order by "sessions__rels"."order" asc), '[]'::json) as "data" from (select * from "sessions_rels" "sessions__rels" where "sessions__rels"."parent_id" = "sessions"."id" order by "sessions__rels"."order" asc) "sessions__rels") "sessions__rels" on true order by "sessions"."created_at" desc limit $1`,
+  params: [Array],
+  [cause]: error: column sessions.google_event_id does not exist
+      at <unknown> (.next/server/chunks/4266.js:46:734753)
+[23:06:50] ERROR: There was an error fetching the list view data for collection sessions
+    err: {
+      "type": "me",
+      "message": "Failed query: select \"sessions\".\"id\", \"sessions\".\"round_id\", \"sessions\".\"session_number\", \"sessions\".\"title\", \"sessions\".\"description\", \"sessions\".\"date\", \"sessions\".\"start_time\", \"sessions\".\"end_time\", \"sessions\".\"location_type\", \"sessions\".\"location_name\", \"sessions\".\"location_address\", \"sessions\".\"meeting_url\", \"sessions\".\"instructor_id\", \"sessions\".\"recording_url\", \"sessions\".\"status\", \"sessions\".\"is_cancelled\", \"sessions\".\"cancellation_reason\", \"sessions\".\"attendance_count\", \"sessions\".\"attendees_count\", \"sessions\".\"google_event_id\", \"sessions\".\"updated_at\", \"sessions\".\"created_at\", \"sessions__rels\".\"data\" as \"_rels\" from \"sessions\" \"sessions\" left join lateral (select coalesce(json_agg(json_build_array(\"sessions__rels\".\"order\", \"sessions__rels\".\"path\", \"sessions__rels\".\"media_id\") order by \"sessions__rels\".\"order\" asc), '[]'::json) as \"data\" from (select * from \"sessions_rels\" \"sessions__rels\" where \"sessions__rels\".\"parent_id\" = \"sessions\".\"id\" order by \"sessions__rels\".\"order\" asc) \"sessions__rels\") \"sessions__rels\" on true order by \"sessions\".\"created_at\" desc limit $1\nparams: 10: column sessions.google_event_id does not exist",
+      "stack":
+          Error: Failed query: select "sessions"."id", "sessions"."round_id", "sessions"."session_number", "sessions"."title", "sessions"."description", "sessions"."date", "sessions"."start_time", "sessions"."end_time", "sessions"."location_type", "sessions"."location_name", "sessions"."location_address", "sessions"."meeting_url", "sessions"."instructor_id", "sessions"."recording_url", "sessions"."status", "sessions"."is_cancelled", "sessions"."cancellation_reason", "sessions"."attendance_count", "sessions"."attendees_count", "sessions"."google_event_id", "sessions"."updated_at", "sessions"."created_at", "sessions__rels"."data" as "_rels" from "sessions" "sessions" left join lateral (select coalesce(json_agg(json_build_array("sessions__rels"."order", "sessions__rels"."path", "sessions__rels"."media_id") order by "sessions__rels"."order" asc), '[]'::json) as "data" from (select * from "sessions_rels" "sessions__rels" where "sessions__rels"."parent_id" = "sessions"."id" order by "sessions__rels"."order" asc) "sessions__rels") "sessions__rels" on true order by "sessions"."created_at" desc limit $1
+          params: 10
+              at nm.queryWithCache (/app/.next/server/chunks/4266.js:122:20011)
+              at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+              at async /app/.next/server/chunks/4266.js:122:23099
+              at async iz (/app/.next/server/chunks/4266.js:90:1334)
+              at async w (/app/.next/server/chunks/4206.js:85:4761)
+              at async B (/app/.next/server/app/(payload)/admin/[[...segments]]/page.js:63:147709)
+              at async C (/app/.next/server/app/(payload)/admin/[[...segments]]/page.js:63:151347)
+          caused by: error: column sessions.google_event_id does not exist
+              at /app/.next/server/chunks/4266.js:46:734753
+              at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+              at async /app/.next/server/chunks/4266.js:122:23308
+              at async nm.queryWithCache (/app/.next/server/chunks/4266.js:122:19986)
+              at async /app/.next/server/chunks/4266.js:122:23099
+              at async iz (/app/.next/server/chunks/4266.js:90:1334)
+              at async w (/app/.next/server/chunks/4206.js:85:4761)
+              at async B (/app/.next/server/app/(payload)/admin/[[...segments]]/page.js:63:147709)
+              at async C (/app/.next/server/app/(payload)/admin/[[...segments]]/page.js:63:151347)
+      "query": "select \"sessions\".\"id\", \"sessions\".\"round_id\", \"sessions\".\"session_number\", \"sessions\".\"title\", \"sessions\".\"description\", \"sessions\".\"date\", \"sessions\".\"start_time\", \"sessions\".\"end_time\", \"sessions\".\"location_type\", \"sessions\".\"location_name\", \"sessions\".\"location_address\", \"sessions\".\"meeting_url\", \"sessions\".\"instructor_id\", \"sessions\".\"recording_url\", \"sessions\".\"status\", \"sessions\".\"is_cancelled\", \"sessions\".\"cancellation_reason\", \"sessions\".\"attendance_count\", \"sessions\".\"attendees_count\", \"sessions\".\"google_event_id\", \"sessions\".\"updated_at\", \"sessions\".\"created_at\", \"sessions__rels\".\"data\" as \"_rels\" from \"sessions\" \"sessions\" left join lateral (select coalesce(json_agg(json_build_array(\"sessions__rels\".\"order\", \"sessions__rels\".\"path\", \"sessions__rels\".\"media_id\") order by \"sessions__rels\".\"order\" asc), '[]'::json) as \"data\" from (select * from \"sessions_rels\" \"sessions__rels\" where \"sessions__rels\".\"parent_id\" = \"sessions\".\"id\" order by \"sessions__rels\".\"order\" asc) \"sessions__rels\") \"sessions__rels\" on true order by \"sessions\".\"created_at\" desc limit $1",
+      "params": [
+        10
+      ]
+    }
+[23:06:57] ERROR: There was an error fetching the list view data for collection sessions
+    err: {
+      "type": "me",
+      "message": "Failed query: select \"sessions\".\"id\", \"sessions\".\"round_id\", \"sessions\".\"session_number\", \"sessions\".\"title\", \"sessions\".\"description\", \"sessions\".\"date\", \"sessions\".\"start_time\", \"sessions\".\"end_time\", \"sessions\".\"location_type\", \"sessions\".\"location_name\", \"sessions\".\"location_address\", \"sessions\".\"meeting_url\", \"sessions\".\"instructor_id\", \"sessions\".\"recording_url\", \"sessions\".\"status\", \"sessions\".\"is_cancelled\", \"sessions\".\"cancellation_reason\", \"sessions\".\"attendance_count\", \"sessions\".\"attendees_count\", \"sessions\".\"google_event_id\", \"sessions\".\"updated_at\", \"sessions\".\"created_at\", \"sessions__rels\".\"data\" as \"_rels\" from \"sessions\" \"sessions\" left join lateral (select coalesce(json_agg(json_build_array(\"sessions__rels\".\"order\", \"sessions__rels\".\"path\", \"sessions__rels\".\"media_id\") order by \"sessions__rels\".\"order\" asc), '[]'::json) as \"data\" from (select * from \"sessions_rels\" \"sessions__rels\" where \"sessions__rels\".\"parent_id\" = \"sessions\".\"id\" order by \"sessions__rels\".\"order\" asc) \"sessions__rels\") \"sessions__rels\" on true order by \"sessions\".\"created_at\" desc limit $1\nparams: 10: column sessions.google_event_id does not exist",
+      "stack":
+          Error: Failed query: select "sessions"."id", "sessions"."round_id", "sessions"."session_number", "sessions"."title", "sessions"."description", "sessions"."date", "sessions"."start_time", "sessions"."end_time", "sessions"."location_type", "sessions"."location_name", "sessions"."location_address", "sessions"."meeting_url", "sessions"."instructor_id", "sessions"."recording_url", "sessions"."status", "sessions"."is_cancelled", "sessions"."cancellation_reason", "sessions"."attendance_count", "sessions"."attendees_count", "sessions"."google_event_id", "sessions"."updated_at", "sessions"."created_at", "sessions__rels"."data" as "_rels" from "sessions" "sessions" left join lateral (select coalesce(json_agg(json_build_array("sessions__rels"."order", "sessions__rels"."path", "sessions__rels"."media_id") order by "sessions__rels"."order" asc), '[]'::json) as "data" from (select * from "sessions_rels" "sessions__rels" where "sessions__rels"."parent_id" = "sessions"."id" order by "sessions__rels"."order" asc) "sessions__rels") "sessions__rels" on true order by "sessions"."created_at" desc limit $1
+          params: 10
+              at nm.queryWithCache (/app/.next/server/chunks/4266.js:122:20011)
+              at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+              at async /app/.next/server/chunks/4266.js:122:23099
+              at async iz (/app/.next/server/chunks/4266.js:90:1334)
+              at async w (/app/.next/server/chunks/4206.js:85:4761)
+              at async B (/app/.next/server/app/(payload)/admin/[[...segments]]/page.js:63:147709)
+              at async C (/app/.next/server/app/(payload)/admin/[[...segments]]/page.js:63:151347)
+          caused by: error: column sessions.google_event_id does not exist
+              at /app/.next/server/chunks/4266.js:46:734753
+              at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+              at async /app/.next/server/chunks/4266.js:122:23308
+              at async nm.queryWithCache (/app/.next/server/chunks/4266.js:122:19986)
+              at async /app/.next/server/chunks/4266.js:122:23099
+              at async iz (/app/.next/server/chunks/4266.js:90:1334)
+              at async w (/app/.next/server/chunks/4206.js:85:4761)
+              at async B (/app/.next/server/app/(payload)/admin/[[...segments]]/page.js:63:147709)
+              at async C (/app/.next/server/app/(payload)/admin/[[...segments]]/page.js:63:151347)
+      "query": "select \"sessions\".\"id\", \"sessions\".\"round_id\", \"sessions\".\"session_number\", \"sessions\".\"title\", \"sessions\".\"description\", \"sessions\".\"date\", \"sessions\".\"start_time\", \"sessions\".\"end_time\", \"sessions\".\"location_type\", \"sessions\".\"location_name\", \"sessions\".\"location_address\", \"sessions\".\"meeting_url\", \"sessions\".\"instructor_id\", \"sessions\".\"recording_url\", \"sessions\".\"status\", \"sessions\".\"is_cancelled\", \"sessions\".\"cancellation_reason\", \"sessions\".\"attendance_count\", \"sessions\".\"attendees_count\", \"sessions\".\"google_event_id\", \"sessions\".\"updated_at\", \"sessions\".\"created_at\", \"sessions__rels\".\"data\" as \"_rels\" from \"sessions\" \"sessions\" left join lateral (select coalesce(json_agg(json_build_array(\"sessions__rels\".\"order\", \"sessions__rels\".\"path\", \"sessions__rels\".\"media_id\") order by \"sessions__rels\".\"order\" asc), '[]'::json) as \"data\" from (select * from \"sessions_rels\" \"sessions__rels\" where \"sessions__rels\".\"parent_id\" = \"sessions\".\"id\" order by \"sessions__rels\".\"order\" asc) \"sessions__rels\") \"sessions__rels\" on true order by \"sessions\".\"created_at\" desc limit $1",
+      "params": [
+        10
+      ]
+    }
+[23:07:00] ERROR: There was an error fetching the list view data for collection sessions
+    err: {
+      "type": "me",
+      "message": "Failed query: select \"sessions\".\"id\", \"sessions\".\"round_id\", \"sessions\".\"session_number\", \"sessions\".\"title\", \"sessions\".\"description\", \"sessions\".\"date\", \"sessions\".\"start_time\", \"sessions\".\"end_time\", \"sessions\".\"location_type\", \"sessions\".\"location_name\", \"sessions\".\"location_address\", \"sessions\".\"meeting_url\", \"sessions\".\"instructor_id\", \"sessions\".\"recording_url\", \"sessions\".\"status\", \"sessions\".\"is_cancelled\", \"sessions\".\"cancellation_reason\", \"sessions\".\"attendance_count\", \"sessions\".\"attendees_count\", \"sessions\".\"google_event_id\", \"sessions\".\"updated_at\", \"sessions\".\"created_at\", \"sessions__rels\".\"data\" as \"_rels\" from \"sessions\" \"sessions\" left join lateral (select coalesce(json_agg(json_build_array(\"sessions__rels\".\"order\", \"sessions__rels\".\"path\", \"sessions__rels\".\"media_id\") order by \"sessions__rels\".\"order\" asc), '[]'::json) as \"data\" from (select * from \"sessions_rels\" \"sessions__rels\" where \"sessions__rels\".\"parent_id\" = \"sessions\".\"id\" order by \"sessions__rels\".\"order\" asc) \"sessions__rels\") \"sessions__rels\" on true order by \"sessions\".\"created_at\" desc limit $1\nparams: 10: column sessions.google_event_id does not exist",
+      "stack":
+          Error: Failed query: select "sessions"."id", "sessions"."round_id", "sessions"."session_number", "sessions"."title", "sessions"."description", "sessions"."date", "sessions"."start_time", "sessions"."end_time", "sessions"."location_type", "sessions"."location_name", "sessions"."location_address", "sessions"."meeting_url", "sessions"."instructor_id", "sessions"."recording_url", "sessions"."status", "sessions"."is_cancelled", "sessions"."cancellation_reason", "sessions"."attendance_count", "sessions"."attendees_count", "sessions"."google_event_id", "sessions"."updated_at", "sessions"."created_at", "sessions__rels"."data" as "_rels" from "sessions" "sessions" left join lateral (select coalesce(json_agg(json_build_array("sessions__rels"."order", "sessions__rels"."path", "sessions__rels"."media_id") order by "sessions__rels"."order" asc), '[]'::json) as "data" from (select * from "sessions_rels" "sessions__rels" where "sessions__rels"."parent_id" = "sessions"."id" order by "sessions__rels"."order" asc) "sessions__rels") "sessions__rels" on true order by "sessions"."created_at" desc limit $1
+          params: 10
+              at nm.queryWithCache (/app/.next/server/chunks/4266.js:122:20011)
+              at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+              at async /app/.next/server/chunks/4266.js:122:23099
+              at async iz (/app/.next/server/chunks/4266.js:90:1334)
+              at async w (/app/.next/server/chunks/4206.js:85:4761)
+              at async B (/app/.next/server/app/(payload)/admin/[[...segments]]/page.js:63:147709)
+              at async C (/app/.next/server/app/(payload)/admin/[[...segments]]/page.js:63:151347)
+          caused by: error: column sessions.google_event_id does not exist
+              at /app/.next/server/chunks/4266.js:46:734753
+              at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+              at async /app/.next/server/chunks/4266.js:122:23308
+              at async nm.queryWithCache (/app/.next/server/chunks/4266.js:122:19986)
+              at async /app/.next/server/chunks/4266.js:122:23099
+              at async iz (/app/.next/server/chunks/4266.js:90:1334)
+              at async w (/app/.next/server/chunks/4206.js:85:4761)
+              at async B (/app/.next/server/app/(payload)/admin/[[...segments]]/page.js:63:147709)
+              at async C (/app/.next/server/app/(payload)/admin/[[...segments]]/page.js:63:151347)
+      "query": "select \"sessions\".\"id\", \"sessions\".\"round_id\", \"sessions\".\"session_number\", \"sessions\".\"title\", \"sessions\".\"description\", \"sessions\".\"date\", \"sessions\".\"start_time\", \"sessions\".\"end_time\", \"sessions\".\"location_type\", \"sessions\".\"location_name\", \"sessions\".\"location_address\", \"sessions\".\"meeting_url\", \"sessions\".\"instructor_id\", \"sessions\".\"recording_url\", \"sessions\".\"status\", \"sessions\".\"is_cancelled\", \"sessions\".\"cancellation_reason\", \"sessions\".\"attendance_count\", \"sessions\".\"attendees_count\", \"sessions\".\"google_event_id\", \"sessions\".\"updated_at\", \"sessions\".\"created_at\", \"sessions__rels\".\"data\" as \"_rels\" from \"sessions\" \"sessions\" left join lateral (select coalesce(json_agg(json_build_array(\"sessions__rels\".\"order\", \"sessions__rels\".\"path\", \"sessions__rels\".\"media_id\") order by \"sessions__rels\".\"order\" asc), '[]'::json) as \"data\" from (select * from \"sessions_rels\" \"sessions__rels\" where \"sessions__rels\".\"parent_id\" = \"sessions\".\"id\" order by \"sessions__rels\".\"order\" asc) \"sessions__rels\") \"sessions__rels\" on true order by \"sessions\".\"created_at\" desc limit $1",
+      "params": [
+        10
+      ]
+    }
+[23:07:02] ERROR: There was an error fetching the list view data for collection sessions
+    err: {
+      "type": "me",
+      "message": "Failed query: select \"sessions\".\"id\", \"sessions\".\"round_id\", \"sessions\".\"session_number\", \"sessions\".\"title\", \"sessions\".\"description\", \"sessions\".\"date\", \"sessions\".\"start_time\", \"sessions\".\"end_time\", \"sessions\".\"location_type\", \"sessions\".\"location_name\", \"sessions\".\"location_address\", \"sessions\".\"meeting_url\", \"sessions\".\"instructor_id\", \"sessions\".\"recording_url\", \"sessions\".\"status\", \"sessions\".\"is_cancelled\", \"sessions\".\"cancellation_reason\", \"sessions\".\"attendance_count\", \"sessions\".\"attendees_count\", \"sessions\".\"google_event_id\", \"sessions\".\"updated_at\", \"sessions\".\"created_at\", \"sessions__rels\".\"data\" as \"_rels\" from \"sessions\" \"sessions\" left join lateral (select coalesce(json_agg(json_build_array(\"sessions__rels\".\"order\", \"sessions__rels\".\"path\", \"sessions__rels\".\"media_id\") order by \"sessions__rels\".\"order\" asc), '[]'::json) as \"data\" from (select * from \"sessions_rels\" \"sessions__rels\" where \"sessions__rels\".\"parent_id\" = \"sessions\".\"id\" order by \"sessions__rels\".\"order\" asc) \"sessions__rels\") \"sessions__rels\" on true order by \"sessions\".\"created_at\" desc limit $1\nparams: 10: column sessions.google_event_id does not exist",
+      "stack":
+          Error: Failed query: select "sessions"."id", "sessions"."round_id", "sessions"."session_number", "sessions"."title", "sessions"."description", "sessions"."date", "sessions"."start_time", "sessions"."end_time", "sessions"."location_type", "sessions"."location_name", "sessions"."location_address", "sessions"."meeting_url", "sessions"."instructor_id", "sessions"."recording_url", "sessions"."status", "sessions"."is_cancelled", "sessions"."cancellation_reason", "sessions"."attendance_count", "sessions"."attendees_count", "sessions"."google_event_id", "sessions"."updated_at", "sessions"."created_at", "sessions__rels"."data" as "_rels" from "sessions" "sessions" left join lateral (select coalesce(json_agg(json_build_array("sessions__rels"."order", "sessions__rels"."path", "sessions__rels"."media_id") order by "sessions__rels"."order" asc), '[]'::json) as "data" from (select * from "sessions_rels" "sessions__rels" where "sessions__rels"."parent_id" = "sessions"."id" order by "sessions__rels"."order" asc) "sessions__rels") "sessions__rels" on true order by "sessions"."created_at" desc limit $1
+          params: 10
+              at nm.queryWithCache (/app/.next/server/chunks/4266.js:122:20011)
+              at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+              at async /app/.next/server/chunks/4266.js:122:23099
+              at async iz (/app/.next/server/chunks/4266.js:90:1334)
+              at async w (/app/.next/server/chunks/4206.js:85:4761)
+              at async B (/app/.next/server/app/(payload)/admin/[[...segments]]/page.js:63:147709)
+              at async C (/app/.next/server/app/(payload)/admin/[[...segments]]/page.js:63:151347)
+          caused by: error: column sessions.google_event_id does not exist
+              at /app/.next/server/chunks/4266.js:46:734753
+              at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+              at async /app/.next/server/chunks/4266.js:122:23308
+              at async nm.queryWithCache (/app/.next/server/chunks/4266.js:122:19986)
+              at async /app/.next/server/chunks/4266.js:122:23099
+              at async iz (/app/.next/server/chunks/4266.js:90:1334)
+              at async w (/app/.next/server/chunks/4206.js:85:4761)
+              at async B (/app/.next/server/app/(payload)/admin/[[...segments]]/page.js:63:147709)
+              at async C (/app/.next/server/app/(payload)/admin/[[...segments]]/page.js:63:151347)
+      "query": "select \"sessions\".\"id\", \"sessions\".\"round_id\", \"sessions\".\"session_number\", \"sessions\".\"title\", \"sessions\".\"description\", \"sessions\".\"date\", \"sessions\".\"start_time\", \"sessions\".\"end_time\", \"sessions\".\"location_type\", \"sessions\".\"location_name\", \"sessions\".\"location_address\", \"sessions\".\"meeting_url\", \"sessions\".\"instructor_id\", \"sessions\".\"recording_url\", \"sessions\".\"status\", \"sessions\".\"is_cancelled\", \"sessions\".\"cancellation_reason\", \"sessions\".\"attendance_count\", \"sessions\".\"attendees_count\", \"sessions\".\"google_event_id\", \"sessions\".\"updated_at\", \"sessions\".\"created_at\", \"sessions__rels\".\"data\" as \"_rels\" from \"sessions\" \"sessions\" left join lateral (select coalesce(json_agg(json_build_array(\"sessions__rels\".\"order\", \"sessions__rels\".\"path\", \"sessions__rels\".\"media_id\") order by \"sessions__rels\".\"order\" asc), '[]'::json) as \"data\" from (select * from \"sessions_rels\" \"sessions__rels\" where \"sessions__rels\".\"parent_id\" = \"sessions\".\"id\" order by \"sessions__rels\".\"order\" asc) \"sessions__rels\") \"sessions__rels\" on true order by \"sessions\".\"created_at\" desc limit $1",
+      "params": [
+        10
+      ]
+    }
+      at async (.next/server/chunks/4266.js:122:23308)
+      at async nm.queryWithCache (.next/server/chunks/4266.js:122:19986)
+      at async (.next/server/chunks/4266.js:122:23099)
+      at async iz (.next/server/chunks/4266.js:90:1334)
+      at async w (.next/server/chunks/4206.js:85:4761)
+      at async B (.next/server/app/(payload)/admin/[[...segments]]/page.js:63:147709)
+      at async C (.next/server/app/(payload)/admin/[[...segments]]/page.js:63:151347) {
+    length: 123,
+    severity: 'ERROR',
+    code: '42703',
+    detail: undefined,
+    hint: undefined,
+    position: '502',
+    internalPosition: undefined,
+    internalQuery: undefined,
+    where: undefined,
+    schema: undefined,
+    table: undefined,
+    column: undefined,
+    dataType: undefined,
+    constraint: undefined,
+    file: 'parse_relation.c',
+    line: '3716',
+    routine: 'errorMissingColumn'
+  }
+}
+Error: Failed query: select "sessions"."id", "sessions"."round_id", "sessions"."session_number", "sessions"."title", "sessions"."description", "sessions"."date", "sessions"."start_time", "sessions"."end_time", "sessions"."location_type", "sessions"."location_name", "sessions"."location_address", "sessions"."meeting_url", "sessions"."instructor_id", "sessions"."recording_url", "sessions"."status", "sessions"."is_cancelled", "sessions"."cancellation_reason", "sessions"."attendance_count", "sessions"."attendees_count", "sessions"."google_event_id", "sessions"."updated_at", "sessions"."created_at", "sessions__rels"."data" as "_rels" from "sessions" "sessions" left join lateral (select coalesce(json_agg(json_build_array("sessions__rels"."order", "sessions__rels"."path", "sessions__rels"."media_id") order by "sessions__rels"."order" asc), '[]'::json) as "data" from (select * from "sessions_rels" "sessions__rels" where "sessions__rels"."parent_id" = "sessions"."id" order by "sessions__rels"."order" asc) "sessions__rels") "sessions__rels" on true order by "sessions"."created_at" desc limit $1
+params: 10
+    at nm.queryWithCache (.next/server/chunks/4266.js:122:20011)
+    at async (.next/server/chunks/4266.js:122:23099)
+    at async iz (.next/server/chunks/4266.js:90:1334)
+    at async w (.next/server/chunks/4206.js:85:4761)
+    at async B (.next/server/app/(payload)/admin/[[...segments]]/page.js:63:147709)
+    at async C (.next/server/app/(payload)/admin/[[...segments]]/page.js:63:151347) {
+  query: `select "sessions"."id", "sessions"."round_id", "sessions"."session_number", "sessions"."title", "sessions"."description", "sessions"."date", "sessions"."start_time", "sessions"."end_time", "sessions"."location_type", "sessions"."location_name", "sessions"."location_address", "sessions"."meeting_url", "sessions"."instructor_id", "sessions"."recording_url", "sessions"."status", "sessions"."is_cancelled", "sessions"."cancellation_reason", "sessions"."attendance_count", "sessions"."attendees_count", "sessions"."google_event_id", "sessions"."updated_at", "sessions"."created_at", "sessions__rels"."data" as "_rels" from "sessions" "sessions" left join lateral (select coalesce(json_agg(json_build_array("sessions__rels"."order", "sessions__rels"."path", "sessions__rels"."media_id") order by "sessions__rels"."order" asc), '[]'::json) as "data" from (select * from "sessions_rels" "sessions__rels" where "sessions__rels"."parent_id" = "sessions"."id" order by "sessions__rels"."order" asc) "sessions__rels") "sessions__rels" on true order by "sessions"."created_at" desc limit $1`,
+  params: [Array],
+  [cause]: error: column sessions.google_event_id does not exist
+      at <unknown> (.next/server/chunks/4266.js:46:734753)
+      at async (.next/server/chunks/4266.js:122:23308)
+      at async nm.queryWithCache (.next/server/chunks/4266.js:122:19986)
+      at async (.next/server/chunks/4266.js:122:23099)
+      at async iz (.next/server/chunks/4266.js:90:1334)
+      at async w (.next/server/chunks/4206.js:85:4761)
+      at async B (.next/server/app/(payload)/admin/[[...segments]]/page.js:63:147709)
+      at async C (.next/server/app/(payload)/admin/[[...segments]]/page.js:63:151347) {
+    length: 123,
+    severity: 'ERROR',
+    code: '42703',
+    detail: undefined,
+    hint: undefined,
+    position: '502',
+    internalPosition: undefined,
+    internalQuery: undefined,
+    where: undefined,
+    schema: undefined,
+    table: undefined,
+    column: undefined,
+    dataType: undefined,
+    constraint: undefined,
+    file: 'parse_relation.c',
+    line: '3716',
+    routine: 'errorMissingColumn'
+  }
+}
+Error: Failed query: select "sessions"."id", "sessions"."round_id", "sessions"."session_number", "sessions"."title", "sessions"."description", "sessions"."date", "sessions"."start_time", "sessions"."end_time", "sessions"."location_type", "sessions"."location_name", "sessions"."location_address", "sessions"."meeting_url", "sessions"."instructor_id", "sessions"."recording_url", "sessions"."status", "sessions"."is_cancelled", "sessions"."cancellation_reason", "sessions"."attendance_count", "sessions"."attendees_count", "sessions"."google_event_id", "sessions"."updated_at", "sessions"."created_at", "sessions__rels"."data" as "_rels" from "sessions" "sessions" left join lateral (select coalesce(json_agg(json_build_array("sessions__rels"."order", "sessions__rels"."path", "sessions__rels"."media_id") order by "sessions__rels"."order" asc), '[]'::json) as "data" from (select * from "sessions_rels" "sessions__rels" where "sessions__rels"."parent_id" = "sessions"."id" order by "sessions__rels"."order" asc) "sessions__rels") "sessions__rels" on true order by "sessions"."created_at" desc limit $1
+params: 10
+    at nm.queryWithCache (.next/server/chunks/4266.js:122:20011)
+    at async (.next/server/chunks/4266.js:122:23099)
+    at async iz (.next/server/chunks/4266.js:90:1334)
+    at async w (.next/server/chunks/4206.js:85:4761)
+    at async B (.next/server/app/(payload)/admin/[[...segments]]/page.js:63:147709)
+    at async C (.next/server/app/(payload)/admin/[[...segments]]/page.js:63:151347) {
+  query: `select "sessions"."id", "sessions"."round_id", "sessions"."session_number", "sessions"."title", "sessions"."description", "sessions"."date", "sessions"."start_time", "sessions"."end_time", "sessions"."location_type", "sessions"."location_name", "sessions"."location_address", "sessions"."meeting_url", "sessions"."instructor_id", "sessions"."recording_url", "sessions"."status", "sessions"."is_cancelled", "sessions"."cancellation_reason", "sessions"."attendance_count", "sessions"."attendees_count", "sessions"."google_event_id", "sessions"."updated_at", "sessions"."created_at", "sessions__rels"."data" as "_rels" from "sessions" "sessions" left join lateral (select coalesce(json_agg(json_build_array("sessions__rels"."order", "sessions__rels"."path", "sessions__rels"."media_id") order by "sessions__rels"."order" asc), '[]'::json) as "data" from (select * from "sessions_rels" "sessions__rels" where "sessions__rels"."parent_id" = "sessions"."id" order by "sessions__rels"."order" asc) "sessions__rels") "sessions__rels" on true order by "sessions"."created_at" desc limit $1`,
+  params: [Array],
+  [cause]: error: column sessions.google_event_id does not exist
+      at <unknown> (.next/server/chunks/4266.js:46:734753)
+      at async (.next/server/chunks/4266.js:122:23308)
+      at async nm.queryWithCache (.next/server/chunks/4266.js:122:19986)
+      at async (.next/server/chunks/4266.js:122:23099)
+      at async iz (.next/server/chunks/4266.js:90:1334)
+      at async w (.next/server/chunks/4206.js:85:4761)
+      at async B (.next/server/app/(payload)/admin/[[...segments]]/page.js:63:147709)
+      at async C (.next/server/app/(payload)/admin/[[...segments]]/page.js:63:151347) {
+    length: 123,
+    severity: 'ERROR',
+    code: '42703',
+    detail: undefined,
+    hint: undefined,
+    position: '502',
+    internalPosition: undefined,
+    internalQuery: undefined,
+    where: undefined,
+    schema: undefined,
+    table: undefined,
+    column: undefined,
+    dataType: undefined,
+    constraint: undefined,
+    file: 'parse_relation.c',
+    line: '3716',
+    routine: 'errorMissingColumn'
+  }
+}
+Error: Failed query: select "sessions"."id", "sessions"."round_id", "sessions"."session_number", "sessions"."title", "sessions"."description", "sessions"."date", "sessions"."start_time", "sessions"."end_time", "sessions"."location_type", "sessions"."location_name", "sessions"."location_address", "sessions"."meeting_url", "sessions"."instructor_id", "sessions"."recording_url", "sessions"."status", "sessions"."is_cancelled", "sessions"."cancellation_reason", "sessions"."attendance_count", "sessions"."attendees_count", "sessions"."google_event_id", "sessions"."updated_at", "sessions"."created_at", "sessions__rels"."data" as "_rels" from "sessions" "sessions" left join lateral (select coalesce(json_agg(json_build_array("sessions__rels"."order", "sessions__rels"."path", "sessions__rels"."media_id") order by "sessions__rels"."order" asc), '[]'::json) as "data" from (select * from "sessions_rels" "sessions__rels" where "sessions__rels"."parent_id" = "sessions"."id" order by "sessions__rels"."order" asc) "sessions__rels") "sessions__rels" on true order by "sessions"."created_at" desc limit $1
+params: 10
+    at nm.queryWithCache (.next/server/chunks/4266.js:122:20011)
+    at async (.next/server/chunks/4266.js:122:23099)
+    at async iz (.next/server/chunks/4266.js:90:1334)
+    at async w (.next/server/chunks/4206.js:85:4761)
+    at async B (.next/server/app/(payload)/admin/[[...segments]]/page.js:63:147709)
+    at async C (.next/server/app/(payload)/admin/[[...segments]]/page.js:63:151347) {
+  query: `select "sessions"."id", "sessions"."round_id", "sessions"."session_number", "sessions"."title", "sessions"."description", "sessions"."date", "sessions"."start_time", "sessions"."end_time", "sessions"."location_type", "sessions"."location_name", "sessions"."location_address", "sessions"."meeting_url", "sessions"."instructor_id", "sessions"."recording_url", "sessions"."status", "sessions"."is_cancelled", "sessions"."cancellation_reason", "sessions"."attendance_count", "sessions"."attendees_count", "sessions"."google_event_id", "sessions"."updated_at", "sessions"."created_at", "sessions__rels"."data" as "_rels" from "sessions" "sessions" left join lateral (select coalesce(json_agg(json_build_array("sessions__rels"."order", "sessions__rels"."path", "sessions__rels"."media_id") order by "sessions__rels"."order" asc), '[]'::json) as "data" from (select * from "sessions_rels" "sessions__rels" where "sessions__rels"."parent_id" = "sessions"."id" order by "sessions__rels"."order" asc) "sessions__rels") "sessions__rels" on true order by "sessions"."created_at" desc limit $1`,
+  params: [Array],
+  [cause]: error: column sessions.google_event_id does not exist
+      at <unknown> (.next/server/chunks/4266.js:46:734753)
+      at async (.next/server/chunks/4266.js:122:23308)
+      at async nm.queryWithCache (.next/server/chunks/4266.js:122:19986)
+      at async (.next/server/chunks/4266.js:122:23099)
+      at async iz (.next/server/chunks/4266.js:90:1334)
+      at async w (.next/server/chunks/4206.js:85:4761)
+      at async B (.next/server/app/(payload)/admin/[[...segments]]/page.js:63:147709)
+      at async C (.next/server/app/(payload)/admin/[[...segments]]/page.js:63:151347) {
+    length: 123,
+    severity: 'ERROR',
+    code: '42703',
+    detail: undefined,
+    hint: undefined,
+    position: '502',
+    internalPosition: undefined,
+    internalQuery: undefined,
+    where: undefined,
+    schema: undefined,
+    table: undefined,
+    column: undefined,
+    dataType: undefined,
+    constraint: undefined,
+    file: 'parse_relation.c',
+    line: '3716',
+    routine: 'errorMissingColumn'
+  }
+}
+[23:08:16] ERROR: There was an error fetching the list view data for collection sessions
+    err: {
+      "type": "me",
+      "message": "Failed query: select \"sessions\".\"id\", \"sessions\".\"round_id\", \"sessions\".\"session_number\", \"sessions\".\"title\", \"sessions\".\"description\", \"sessions\".\"date\", \"sessions\".\"start_time\", \"sessions\".\"end_time\", \"sessions\".\"location_type\", \"sessions\".\"location_name\", \"sessions\".\"location_address\", \"sessions\".\"meeting_url\", \"sessions\".\"instructor_id\", \"sessions\".\"recording_url\", \"sessions\".\"status\", \"sessions\".\"is_cancelled\", \"sessions\".\"cancellation_reason\", \"sessions\".\"attendance_count\", \"sessions\".\"attendees_count\", \"sessions\".\"google_event_id\", \"sessions\".\"updated_at\", \"sessions\".\"created_at\", \"sessions__rels\".\"data\" as \"_rels\" from \"sessions\" \"sessions\" left join lateral (select coalesce(json_agg(json_build_array(\"sessions__rels\".\"order\", \"sessions__rels\".\"path\", \"sessions__rels\".\"media_id\") order by \"sessions__rels\".\"order\" asc), '[]'::json) as \"data\" from (select * from \"sessions_rels\" \"sessions__rels\" where \"sessions__rels\".\"parent_id\" = \"sessions\".\"id\" order by \"sessions__rels\".\"order\" asc) \"sessions__rels\") \"sessions__rels\" on true order by \"sessions\".\"created_at\" desc limit $1\nparams: 10: column sessions.google_event_id does not exist",
+      "stack":
+          Error: Failed query: select "sessions"."id", "sessions"."round_id", "sessions"."session_number", "sessions"."title", "sessions"."description", "sessions"."date", "sessions"."start_time", "sessions"."end_time", "sessions"."location_type", "sessions"."location_name", "sessions"."location_address", "sessions"."meeting_url", "sessions"."instructor_id", "sessions"."recording_url", "sessions"."status", "sessions"."is_cancelled", "sessions"."cancellation_reason", "sessions"."attendance_count", "sessions"."attendees_count", "sessions"."google_event_id", "sessions"."updated_at", "sessions"."created_at", "sessions__rels"."data" as "_rels" from "sessions" "sessions" left join lateral (select coalesce(json_agg(json_build_array("sessions__rels"."order", "sessions__rels"."path", "sessions__rels"."media_id") order by "sessions__rels"."order" asc), '[]'::json) as "data" from (select * from "sessions_rels" "sessions__rels" where "sessions__rels"."parent_id" = "sessions"."id" order by "sessions__rels"."order" asc) "sessions__rels") "sessions__rels" on true order by "sessions"."created_at" desc limit $1
+          params: 10
+              at nm.queryWithCache (/app/.next/server/chunks/4266.js:122:20011)
+              at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+              at async /app/.next/server/chunks/4266.js:122:23099
+              at async iz (/app/.next/server/chunks/4266.js:90:1334)
+              at async w (/app/.next/server/chunks/4206.js:85:4761)
+              at async B (/app/.next/server/app/(payload)/admin/[[...segments]]/page.js:63:147709)
+              at async C (/app/.next/server/app/(payload)/admin/[[...segments]]/page.js:63:151347)
+          caused by: error: column sessions.google_event_id does not exist
+              at /app/.next/server/chunks/4266.js:46:734753
+              at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+              at async /app/.next/server/chunks/4266.js:122:23308
+              at async nm.queryWithCache (/app/.next/server/chunks/4266.js:122:19986)
+              at async /app/.next/server/chunks/4266.js:122:23099
+              at async iz (/app/.next/server/chunks/4266.js:90:1334)
+              at async w (/app/.next/server/chunks/4206.js:85:4761)
+              at async B (/app/.next/server/app/(payload)/admin/[[...segments]]/page.js:63:147709)
+              at async C (/app/.next/server/app/(payload)/admin/[[...segments]]/page.js:63:151347)
+      "query": "select \"sessions\".\"id\", \"sessions\".\"round_id\", \"sessions\".\"session_number\", \"sessions\".\"title\", \"sessions\".\"description\", \"sessions\".\"date\", \"sessions\".\"start_time\", \"sessions\".\"end_time\", \"sessions\".\"location_type\", \"sessions\".\"location_name\", \"sessions\".\"location_address\", \"sessions\".\"meeting_url\", \"sessions\".\"instructor_id\", \"sessions\".\"recording_url\", \"sessions\".\"status\", \"sessions\".\"is_cancelled\", \"sessions\".\"cancellation_reason\", \"sessions\".\"attendance_count\", \"sessions\".\"attendees_count\", \"sessions\".\"google_event_id\", \"sessions\".\"updated_at\", \"sessions\".\"created_at\", \"sessions__rels\".\"data\" as \"_rels\" from \"sessions\" \"sessions\" left join lateral (select coalesce(json_agg(json_build_array(\"sessions__rels\".\"order\", \"sessions__rels\".\"path\", \"sessions__rels\".\"media_id\") order by \"sessions__rels\".\"order\" asc), '[]'::json) as \"data\" from (select * from \"sessions_rels\" \"sessions__rels\" where \"sessions__rels\".\"parent_id\" = \"sessions\".\"id\" order by \"sessions__rels\".\"order\" asc) \"sessions__rels\") \"sessions__rels\" on true order by \"sessions\".\"created_at\" desc limit $1",
+      "params": [
+        10
+      ]
+    }
+Error: Failed query: select "sessions"."id", "sessions"."round_id", "sessions"."session_number", "sessions"."title", "sessions"."description", "sessions"."date", "sessions"."start_time", "sessions"."end_time", "sessions"."location_type", "sessions"."location_name", "sessions"."location_address", "sessions"."meeting_url", "sessions"."instructor_id", "sessions"."recording_url", "sessions"."status", "sessions"."is_cancelled", "sessions"."cancellation_reason", "sessions"."attendance_count", "sessions"."attendees_count", "sessions"."google_event_id", "sessions"."updated_at", "sessions"."created_at", "sessions__rels"."data" as "_rels" from "sessions" "sessions" left join lateral (select coalesce(json_agg(json_build_array("sessions__rels"."order", "sessions__rels"."path", "sessions__rels"."media_id") order by "sessions__rels"."order" asc), '[]'::json) as "data" from (select * from "sessions_rels" "sessions__rels" where "sessions__rels"."parent_id" = "sessions"."id" order by "sessions__rels"."order" asc) "sessions__rels") "sessions__rels" on true order by "sessions"."created_at" desc limit $1
+params: 10
+    at nm.queryWithCache (.next/server/chunks/4266.js:122:20011)
+    at async (.next/server/chunks/4266.js:122:23099)
+    at async iz (.next/server/chunks/4266.js:90:1334)
+    at async w (.next/server/chunks/4206.js:85:4761)
+    at async B (.next/server/app/(payload)/admin/[[...segments]]/page.js:63:147709)
+    at async C (.next/server/app/(payload)/admin/[[...segments]]/page.js:63:151347) {
+  query: `select "sessions"."id", "sessions"."round_id", "sessions"."session_number", "sessions"."title", "sessions"."description", "sessions"."date", "sessions"."start_time", "sessions"."end_time", "sessions"."location_type", "sessions"."location_name", "sessions"."location_address", "sessions"."meeting_url", "sessions"."instructor_id", "sessions"."recording_url", "sessions"."status", "sessions"."is_cancelled", "sessions"."cancellation_reason", "sessions"."attendance_count", "sessions"."attendees_count", "sessions"."google_event_id", "sessions"."updated_at", "sessions"."created_at", "sessions__rels"."data" as "_rels" from "sessions" "sessions" left join lateral (select coalesce(json_agg(json_build_array("sessions__rels"."order", "sessions__rels"."path", "sessions__rels"."media_id") order by "sessions__rels"."order" asc), '[]'::json) as "data" from (select * from "sessions_rels" "sessions__rels" where "sessions__rels"."parent_id" = "sessions"."id" order by "sessions__rels"."order" asc) "sessions__rels") "sessions__rels" on true order by "sessions"."created_at" desc limit $1`,
+  params: [Array],
+  [cause]: error: column sessions.google_event_id does not exist
+      at <unknown> (.next/server/chunks/4266.js:46:734753)
+      at async (.next/server/chunks/4266.js:122:23308)
+      at async nm.queryWithCache (.next/server/chunks/4266.js:122:19986)
+      at async (.next/server/chunks/4266.js:122:23099)
+      at async iz (.next/server/chunks/4266.js:90:1334)
+      at async w (.next/server/chunks/4206.js:85:4761)
+      at async B (.next/server/app/(payload)/admin/[[...segments]]/page.js:63:147709)
+      at async C (.next/server/app/(payload)/admin/[[...segments]]/page.js:63:151347) {
+    length: 123,
+    severity: 'ERROR',
+    code: '42703',
+    detail: undefined,
+    hint: undefined,
+    position: '502',
+    internalPosition: undefined,
+    internalQuery: undefined,
+    where: undefined,
+    schema: undefined,
+    table: undefined,
+    column: undefined,
+    dataType: undefined,
+    constraint: undefined,
+    file: 'parse_relation.c',
+    line: '3716',
+    routine: 'errorMissingColumn'
+  }
+}

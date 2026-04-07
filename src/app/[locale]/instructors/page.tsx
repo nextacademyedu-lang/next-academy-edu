@@ -9,6 +9,7 @@ import { Navbar } from '@/components/layout/navbar';
 import { Footer } from '@/components/layout/footer';
 import { Button } from '@/components/ui/button';
 import styles from './page.module.css';
+import { getInstructorIds } from '@/lib/instructor-helpers';
 
 export const dynamic = 'force-dynamic';
 
@@ -68,17 +69,14 @@ export default async function InstructorsPage() {
     console.error('[InstructorsPage] Failed to fetch data:', error);
   }
 
-  const programInstructorMap = new Map<number, number>();
+  const programInstructorMap = new Map<number, number[]>();
   const programsCountByInstructor = new Map<number, number>();
   for (const program of programs) {
-    const instructorId =
-      typeof program.instructor === 'number'
-        ? program.instructor
-        : program.instructor?.id;
-
-    if (!instructorId) continue;
-    programInstructorMap.set(program.id, instructorId);
-    programsCountByInstructor.set(instructorId, (programsCountByInstructor.get(instructorId) || 0) + 1);
+    const instructorIds = getInstructorIds(program.instructor);
+    programInstructorMap.set(program.id, instructorIds);
+    for (const iid of instructorIds) {
+      programsCountByInstructor.set(iid, (programsCountByInstructor.get(iid) || 0) + 1);
+    }
   }
 
   const learnersCountByInstructor = new Map<number, number>();
@@ -86,11 +84,11 @@ export default async function InstructorsPage() {
     const programId = typeof round.program === 'number' ? round.program : round.program?.id;
     if (!programId) continue;
 
-    const instructorId = programInstructorMap.get(programId);
-    if (!instructorId) continue;
-
-    const currentLearners = learnersCountByInstructor.get(instructorId) || 0;
-    learnersCountByInstructor.set(instructorId, currentLearners + (round.currentEnrollments || 0));
+    const instructorIds = programInstructorMap.get(programId) || [];
+    for (const instructorId of instructorIds) {
+      const currentLearners = learnersCountByInstructor.get(instructorId) || 0;
+      learnersCountByInstructor.set(instructorId, currentLearners + (round.currentEnrollments || 0));
+    }
   }
 
   return (

@@ -1,0 +1,203 @@
+.section {
+    padding: var(--space-xl) var(--container-padding);
+    background: var(--bg-primary); /* Using the existing dark background variable */
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border-top: 1px solid var(--border);
+}
+
+.container {
+    position: relative;
+    width: 100%;
+    max-width: 1000px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: center;
+    padding-top: 2rem;
+    padding-bottom: 4rem;
+}
+
+/* --- MacBook Pro Styling --- */
+.macbookWrapper {
+    position: relative;
+    width: 90%;
+    max-width: 800px;
+    z-index: 1;
+    perspective: 1500px;
+    margin: 0 auto;
+}
+
+.macbookScreen {
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    background: #000;
+    border-radius: 20px 20px 0 0;
+    border: 12px solid #1a1a1a;
+    border-bottom: 18px solid #222;
+    position: relative;
+    box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.5);
+    overflow: hidden;
+    transform-origin: bottom;
+}
+
+.camera {
+    position: absolute;
+    top: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #0a0a0a;
+    border: 1px solid #333;
+    z-index: 10;
+}
+
+.imageContainer {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+    background: #111;
+}
+
+.screenshot {
+    width: 100%;
+    /* Keep it cover to show the top part cleanly if it's long */
+    height: auto;
+    min-height: 100%;
+    object-fit: cover;
+    object-position: top;
+    transition: transform 10s ease;
+}
+
+.macbookScreen:hover .screenshot {
+    transform: translateY(calc(-100% + 100% / 1.6)); 
+    /* Scroll down to see the rest of the page slowly on hover (optional) */
+}
+
+.macbookBase {
+    position: relative;
+    width: 114%;
+    left: -7%;
+    height: 18px;
+    background: linear-gradient(to bottom, #444, #2a2a2a);
+    border-radius: 0 0 20px 20px;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.8), inset 0 2px 5px rgba(255, 255, 255, 0.1);
+    z-index: 2;
+}
+
+.macbookThumb {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 12%;
+    height: 6px;
+    background: #222;
+    border-radius: 0 0 6px 6px;
+}
+
+/* --- iPhone Styling --- */
+.iphoneWrapper {
+    position: absolute;
+    bottom: 10%;
+    right: 0;
+    width: 24%;
+    min-width: 180px;
+    max-width: 250px;
+    aspect-ratio: 9 / 19.5;
+    background: #000;
+    border-radius: 36px;
+    border: 8px solid #1a1a1a;
+    box-shadow: -15px 20px 40px rgba(0, 0, 0, 0.7), inset 0 0 0 2px #333;
+    z-index: 10;
+    overflow: hidden;
+}
+
+.notch {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 45%;
+    height: 24px;
+    background: #1a1a1a;
+    border-radius: 0 0 14px 14px;
+    z-index: 10;
+}
+
+.imageContainerMobile {
+    width: 100%;
+    height: 100%;
+    background: #111;
+    overflow: hidden;
+    border-radius: 26px; /* slightly smaller than wrapper */
+}
+
+.screenshotMobile {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+    object-position: top;
+}
+
+.actionContainer {
+    margin-top: 3rem;
+    text-align: center;
+    position: relative;
+    z-index: 5;
+}
+
+.liveButton {
+    display: inline-flex;
+    align-items: center;
+    padding: 1rem 2.5rem;
+    background: var(--accent);
+    color: #fff;
+    font-family: var(--font-heading);
+    font-size: var(--text-small);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-weight: 700;
+    text-decoration: none;
+    border-radius: 100px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid var(--accent);
+}
+
+.liveButton:hover {
+    background: transparent;
+    color: var(--accent);
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(235, 94, 40, 0.2);
+}
+
+@media (max-width: 1024px) {
+    .iphoneWrapper {
+        right: -5%;
+        width: 30%;
+    }
+}
+
+@media (max-width: 768px) {
+    .container {
+        flex-direction: column;
+        align-items: center;
+    }
+    .macbookWrapper {
+        width: 95%;
+    }
+    .iphoneWrapper {
+        position: relative;
+        bottom: 0;
+        right: 0;
+        margin-top: -15%;
+        width: 45%;
+        min-width: 160px;
+        transform: translateY(20px) !important; /* Override floating for mobile stacked view if needed */
+    }
+}

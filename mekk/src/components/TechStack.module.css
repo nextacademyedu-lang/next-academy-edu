@@ -1,0 +1,30 @@
+@keyframes beam-loop {
+  to {
+    stroke-dashoffset: -20;
+  }
+}
+
+.beam-path {
+  stroke: #e2e8f0; /* لون الخط الثابت */
+  stroke-width: 2;
+  fill: none;
+}
+
+.beam-animated {
+  stroke: url(#beamGradient); /* لون الشعاع المتحرك */
+  stroke-width: 2;
+  fill: none;
+  stroke-dasharray: 10 10;
+  animation: beam-loop 1s linear infinite;
+}
+
+/* تأثير بسيط للدوائر عشان تليق مع الـ Light Mode اللي طلبته قبل كدة */
+.circle-container {
+  transition: transform 0.2s ease;
+  background: white;
+  border: 1px solid #e5e7eb;
+}
+
+.circle-container:hover {
+  transform: scale(1.1);
+}

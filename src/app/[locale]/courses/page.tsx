@@ -10,6 +10,7 @@ import { Footer } from '@/components/layout/footer';
 import { Button } from '@/components/ui/button';
 import { buildYouTubeThumbnailUrl } from '@/lib/youtube';
 import styles from './page.module.css';
+import { getInstructorNames } from '@/lib/instructor-helpers';
 
 export const dynamic = 'force-dynamic';
 
@@ -278,12 +279,10 @@ export default async function CoursesPage({
                       ? 'عام'
                       : 'General';
 
-                const instructorName =
-                  typeof program.instructor === 'object' && program.instructor
-                    ? `${program.instructor.firstName} ${program.instructor.lastName}`.trim()
-                    : locale === 'ar'
-                      ? 'فريق نكست'
-                      : 'Next Academy Team';
+                const instructorName = getInstructorNames(
+                  program.instructor,
+                  locale === 'ar' ? 'فريق نكست' : 'Next Academy Team',
+                );
 
                 const programRounds = roundsByProgram.get(program.id) || [];
                 const nextRound = programRounds.find((round) => round.startDate && new Date(round.startDate) >= now);

@@ -10,6 +10,7 @@ import { Footer } from '@/components/layout/footer';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import styles from './page.module.css';
+import { getInstructorNames } from '@/lib/instructor-helpers';
 
 export const dynamic = 'force-dynamic';
 
@@ -60,7 +61,7 @@ export default async function EventsPage() {
 
   const eventRounds = rounds.filter((round) => {
     const program = typeof round.program === 'object' ? round.program : null;
-    return !!program && program.type !== 'webinar';
+    return !!program && program.type === 'event';
   });
 
   const upcomingEvents = eventRounds
@@ -151,12 +152,10 @@ export default async function EventsPage() {
               {upcomingEvents.slice(0, 8).map((round, index) => {
                 const program = round.program as Program;
                 const imageUrl = getMediaUrl(program.coverImage) || getMediaUrl(program.thumbnail) || fallbackImages[index % fallbackImages.length];
-                const instructor =
-                  typeof program.instructor === 'object' && program.instructor
-                    ? `${program.instructor.firstName} ${program.instructor.lastName}`.trim()
-                    : locale === 'ar'
-                      ? 'فريق نكست'
-                      : 'Next Team';
+                const instructor = getInstructorNames(
+                  program.instructor,
+                  locale === 'ar' ? 'فريق نكست' : 'Next Team',
+                );
 
                 const title =
                   locale === 'ar'

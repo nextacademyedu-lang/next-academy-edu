@@ -1,0 +1,85 @@
+.layout {
+    display: flex;
+    min-height: 100vh;
+    background-color: #000000;
+    color: var(--text-primary);
+}
+
+.sidebar {
+    width: 280px;
+    background-color: #050505;
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    flex-direction: column;
+    padding: 2rem;
+}
+
+.topSection {
+    margin-bottom: 3rem;
+}
+
+.logo {
+    font-family: var(--font-heading);
+    font-size: 1.5rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    margin: 0;
+}
+
+.nav {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    flex: 1;
+}
+
+.navLink {
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-family: var(--font-body);
+    font-size: 1rem;
+    transition: color 0.3s ease;
+    padding: 0.25rem 0;
+}
+
+.navLink:hover {
+    color: var(--text-primary);
+}
+
+.navGroupTitle {
+    color: var(--text-primary);
+    font-family: var(--font-sans);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 700;
+    margin-top: 1.5rem;
+    margin-bottom: 0.5rem;
+    opacity: 0.5;
+}
+
+.bottomSection {
+    margin-top: auto;
+}
+
+.logoutButton {
+    background: transparent;
+    color: #ef4444;
+    border: none;
+    font-family: var(--font-body);
+    font-size: 1rem;
+    cursor: pointer;
+    padding: 0;
+    text-align: left;
+    transition: opacity 0.3s ease;
+}
+
+.logoutButton:hover {
+    opacity: 0.8;
+}
+
+.main {
+    flex: 1;
+    padding: 4rem;
+    overflow-y: auto;
+}

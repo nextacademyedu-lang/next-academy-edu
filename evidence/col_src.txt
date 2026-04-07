@@ -1,0 +1,1847 @@
+
+--- FILE: d:\projects\nextacademy\src\collections\AnnouncementBars.ts ---
+import type { CollectionConfig } from 'payload';
+import { isAdmin, isPublic } from '../lib/access-control.ts';
+
+export const AnnouncementBars: CollectionConfig = {
+  slug: 'announcement-bars',
+  admin: {
+    useAsTitle: 'name',
+    defaultColumns: ['name', 'status', 'position', 'startDate', 'endDate'],
+    group: 'Marketing',
+    preview: (doc) => {
+      const baseUrl = (process.env.NEXT_PUBLIC_APP_URL || process.env.SERVER_URL || '').replace(/\/+$/, '');
+      return `${baseUrl}/ar?previewAnnouncementId=${String(doc.id)}`;
+    },
+  },
+  access: {
+    read: isPublic,
+    create: isAdmin,
+    update: isAdmin,
+    delete: isAdmin,
+  },
+  fields: [
+    { name: 'name', type: 'text', required: true },
+    {
+      name: 'status',
+      type: 'select',
+      required: true,
+      defaultValue: 'draft',
+      options: [
+        { label: 'Draft', value: 'draft' },
+        { label: 'Active', value: 'active' },
+        { label: 'Paused', value: 'paused' },
+      ],
+      admin: { position: 'sidebar' },
+    },
+
+    // ── Messages ───────────────────────────────────────────
+    {
+      name: 'messages',
+      type: 'array',
+      required: true,
+      minRows: 1,
+      fields: [
+        { name: 'textAr', type: 'text', required: true },
+        { name: 'textEn', type: 'text', required: true },
+        { name: 'linkUrl', type: 'text' },
+        { name: 'icon', type: 'text', admin: { description: 'Emoji or icon name' } },
+      ],
+    },
+
+    // ── Appearance ─────────────────────────────────────────
+    {
+      type: 'group',
+      name: 'appearance',
+      label: 'Appearance',
+      fields: [
+        {
+          name: 'position',
+          type: 'select',
+          defaultValue: 'top',
+          options: [
+            { label: 'Top', value: 'top' },
+            { label: 'Bottom', value: 'bottom' },
+          ],
+        },
+        { name: 'bgColor', type: 'text', defaultValue: '#e94560' },
+        {
+          name: 'bgGradient',
+          type: 'text',
+          admin: { descript
+--- FILE: d:\projects\nextacademy\src\collections\BlogPosts.ts ---
+import type { CollectionConfig } from 'payload';
+
+export const BlogPosts: CollectionConfig = {
+  slug: 'blog-posts',
+  admin: {
+    useAsTitle: 'title',
+    defaultColumns: ['title', 'status', 'category', 'publishedAt'],
+    group: 'Content',
+  },
+  access: {
+    read: () => true,
+    create: ({ req: { user } }) => Boolean(user),
+    update: ({ req: { user } }) => Boolean(user),
+    delete: ({ req: { user } }) => Boolean(user),
+  },
+  fields: [
+    {
+      name: 'title',
+      type: 'text',
+      required: true,
+      localized: true,
+    },
+    {
+      name: 'slug',
+      type: 'text',
+      required: true,
+      unique: true,
+      admin: {
+        description: 'URL-friendly identifier (e.g. "how-to-grow-your-business")',
+      },
+    },
+    {
+      name: 'excerpt',
+      type: 'textarea',
+      localized: true,
+      admin: {
+        description: 'Short summary shown on blog listing cards',
+      },
+    },
+    {
+      name: 'content',
+      type: 'richText',
+      localized: true,
+    },
+    {
+      name: 'category',
+      type: 'select',
+      options: [
+        { label: 'Strategy', value: 'strategy' },
+        { label: 'Leadership', value: 'leadership' },
+        { label: 'Marketing', value: 'marketing' },
+        { label: 'Technology', value: 'technology' },
+        { label: 'Finance', value: 'finance' },
+        { label: 'HR', value: 'hr' },
+        { label: 'General', value: 'general' },
+      ],
+    },
+    {
+      name: 'featuredImage',
+      type: 'upload',
+      relationTo: 'media',
+    },
+    {
+      name: 'author',
+      type: 'relationship',
+      relationTo: 'users',
+    },
+    {
+      name: 'tags',
+      type: 'relationship',
+      relationTo: 'tags',
+      hasMany: true,
+    },
+    {
+      name: 'status',
+      type: 'select',
+      required: true,
+      defaultValue: 'draft',
+      options: [
+        { label: 'Draft', value: 'draft' },
+        { label: 'Published', value: 'published' },
+        { label: 'Archived', value: 'archived' },
+      ],
+   
+--- FILE: d:\projects\nextacademy\src\collections\Bookings.ts ---
+import type { CollectionConfig } from 'payload';
+import { isAdmin, isAdminOrOwner, isAuthenticated } from '../lib/access-control.ts';
+import { createCrmDedupeKey } from '../lib/crm/dedupe.ts';
+import { enqueueCrmSyncEvent } from '../lib/crm/queue.ts';
+import { isGoogleCalendarEnabled } from '../lib/google-auth.ts';
+import { addAttendeeToAllEvents, removeAttendeeFromAllEvents } from '../lib/google-calendar.ts';
+
+function resolveBookingAction(params: {
+  operation: 'create' | 'update';
+  status: string;
+  previousStatus?: string;
+}): string {
+  const { operation, status, previousStatus } = params;
+  if (operation === 'create') return 'booking_created';
+  if (previousStatus === status) return 'booking_updated';
+
+  switch (status) {
+    case 'confirmed':
+      return 'booking_confirmed';
+    case 'cancelled':
+      return 'booking_cancelled';
+    case 'refunded':
+      return 'booking_refunded';
+    case 'payment_failed':
+      return 'booking_payment_failed';
+    case 'cancelled_overdue':
+      return 'booking_cancelled_overdue';
+    case 'completed':
+      return 'booking_completed';
+    case 'reserved':
+      return 'booking_reserved';
+    default:
+      return 'booking_status_updated';
+  }
+}
+
+export const Bookings: CollectionConfig = {
+  slug: 'bookings',
+  admin: { useAsTitle: 'bookingCode' },
+  access: {
+    read: isAdminOrOwner,
+    create: isAuthenticated,
+    update: isAdmin,
+    delete: isAdmin,
+  },
+  hooks: {
+    beforeDelete: [
+      async ({ req, id }) => {
+        const deleteByBooking = async (collection: string) => {
+          const found = await req.payload.find({
+            collection: collection as any,
+            where: { booking: { equals: id } },
+            depth: 0,
+            limit: 500,
+            overrideAccess: true,
+            req,
+          });
+          for (const doc of found.docs) {
+            await req.payload.delete({
+              collection: collection as any,
+              id: (doc as { id: number | string }).id,
+            
+--- FILE: d:\projects\nextacademy\src\collections\BulkSeatAllocations.ts ---
+import type { CollectionConfig } from 'payload';
+import { isAdmin, isAdminOrB2BManager } from '../lib/access-control.ts';
+import { createCrmDedupeKey } from '../lib/crm/dedupe.ts';
+import { enqueueCrmSyncEvent } from '../lib/crm/queue.ts';
+
+export const BulkSeatAllocations: CollectionConfig = {
+  slug: 'bulk-seat-allocations',
+  admin: { useAsTitle: 'id' },
+  access: {
+    read: isAdminOrB2BManager,
+    create: isAdmin,
+    update: isAdmin,
+    delete: isAdmin,
+  },
+  hooks: {
+    afterChange: [
+      async ({ req, doc, operation }) => {
+        try {
+          const action = operation === 'create'
+            ? 'bulk_seat_allocation_created'
+            : 'bulk_seat_allocation_updated';
+
+          const activeAllocations = Array.isArray(doc.allocations)
+            ? doc.allocations.filter((entry: { status?: string } | null | undefined) => entry?.status !== 'cancelled').length
+            : 0;
+
+          const fingerprint = [
+            doc.updatedAt || doc.createdAt || '',
+            doc.status || '',
+            doc.totalSeats ?? '',
+            activeAllocations,
+          ].join('|');
+
+          await enqueueCrmSyncEvent({
+            payload: req.payload,
+            req,
+            entityType: 'bulk_seat_allocation',
+            entityId: String(doc.id),
+            action,
+            dedupeKey: createCrmDedupeKey({
+              entityType: 'bulk_seat_allocation',
+              entityId: String(doc.id),
+              action,
+              fingerprint,
+            }),
+            priority: 28,
+            sourceCollection: 'bulk-seat-allocations',
+            payloadSnapshot: {
+              id: doc.id,
+              company: doc.company,
+              round: doc.round,
+              totalSeats: doc.totalSeats,
+              status: doc.status,
+              activeAllocations,
+              updatedAt: doc.updatedAt,
+            },
+          });
+        } catch (err) {
+          console.error('[BulkSeatAllocations] afterChange CRM sync failed (non-blocking
+--- FILE: d:\projects\nextacademy\src\collections\Categories.ts ---
+import type { CollectionConfig } from 'payload';
+import { isAdmin, isPublic } from '../lib/access-control.ts';
+
+export const Categories: CollectionConfig = {
+  slug: 'categories',
+  admin: { useAsTitle: 'nameAr' },
+  access: {
+    read: isPublic,
+    create: isAdmin,
+    update: isAdmin,
+    delete: isAdmin,
+  },
+  fields: [
+    { name: 'nameAr', type: 'text', required: true },
+    { name: 'nameEn', type: 'text' },
+    { name: 'slug', type: 'text', required: true, unique: true },
+    { name: 'descriptionAr', type: 'textarea' },
+    { name: 'descriptionEn', type: 'textarea' },
+    { name: 'icon', type: 'text' },
+    { name: 'parent', type: 'relationship', relationTo: 'categories' },
+    { name: 'order', type: 'number', defaultValue: 0 },
+    { name: 'isActive', type: 'checkbox', defaultValue: true },
+  ],
+};
+
+--- FILE: d:\projects\nextacademy\src\collections\Certificates.ts ---
+import type { CollectionConfig } from 'payload';
+import { isAdminOrOwner, isAdmin } from '../lib/access-control.ts';
+
+export const Certificates: CollectionConfig = {
+  slug: 'certificates',
+  admin: { useAsTitle: 'certificateCode' },
+  access: {
+    read: isAdminOrOwner,
+    create: isAdmin,
+    update: isAdmin,
+    delete: isAdmin,
+  },
+  fields: [
+    { name: 'certificateCode', type: 'text', unique: true, required: true, admin: { readOnly: true } },
+    { name: 'user', type: 'relationship', relationTo: 'users', required: true },
+    { name: 'program', type: 'relationship', relationTo: 'programs', required: true },
+    { name: 'round', type: 'relationship', relationTo: 'rounds', required: true },
+    { name: 'booking', type: 'relationship', relationTo: 'bookings', required: true },
+    { name: 'quizScore', type: 'number' },
+    { name: 'passingScore', type: 'number' },
+    { name: 'issuedAt', type: 'date', required: true },
+    { name: 'pdfUrl', type: 'text' },
+    { name: 'verificationUrl', type: 'text', admin: { readOnly: true } },
+  ],
+};
+
+--- FILE: d:\projects\nextacademy\src\collections\Companies.ts ---
+import type { CollectionConfig } from 'payload';
+import { isAdmin, isAuthenticated, isPublic } from '../lib/access-control.ts';
+import { createCrmDedupeKey } from '../lib/crm/dedupe.ts';
+import { enqueueCrmSyncEvent } from '../lib/crm/queue.ts';
+
+export const Companies: CollectionConfig = {
+  slug: 'companies',
+  admin: { useAsTitle: 'name' },
+  access: {
+    read: isAuthenticated,
+    create: isAuthenticated,
+    update: isAdmin,
+    delete: isAdmin,
+  },
+  hooks: {
+    afterChange: [
+      async ({ req, doc, operation }) => {
+        try {
+          const action = operation === 'create' ? 'company_created' : 'company_updated';
+          const fingerprint = [
+            doc.updatedAt || doc.createdAt || '',
+            doc.name || '',
+            doc.website || '',
+          ].join('|');
+
+          await enqueueCrmSyncEvent({
+            payload: req.payload,
+            req,
+            entityType: 'company',
+            entityId: String(doc.id),
+            action,
+            dedupeKey: createCrmDedupeKey({
+              entityType: 'company',
+              entityId: String(doc.id),
+              action,
+              fingerprint,
+            }),
+            priority: 10,
+            sourceCollection: 'companies',
+            payloadSnapshot: {
+              id: doc.id,
+              name: doc.name,
+              industry: doc.industry,
+              size: doc.size,
+              type: doc.type,
+              updatedAt: doc.updatedAt,
+            },
+          });
+        } catch (err) {
+          console.error('[Companies] afterChange CRM sync failed (non-blocking):', err);
+        }
+      },
+    ],
+  },
+  fields: [
+    { name: 'name', type: 'text', required: true },
+    { name: 'industry', type: 'text' },
+    {
+      name: 'size',
+      type: 'select',
+      options: ['1-10', '11-50', '51-200', '201-500', '500+'],
+    },
+    {
+      name: 'type',
+      type: 'select',
+      options: ['startup', 'sme', 'enterprise', 'government', 'freelancer'],
+    },
+    { nam
+--- FILE: d:\projects\nextacademy\src\collections\CompanyInvitations.ts ---
+import type { CollectionConfig } from 'payload';
+import { isAdmin } from '../lib/access-control.ts';
+
+export const CompanyInvitations: CollectionConfig = {
+  slug: 'company-invitations',
+  admin: {
+    useAsTitle: 'email',
+    defaultColumns: ['email', 'company', 'status', 'invitedBy', 'expiresAt', 'acceptedAt'],
+  },
+  access: {
+    read: isAdmin,
+    create: isAdmin,
+    update: isAdmin,
+    delete: isAdmin,
+  },
+  fields: [
+    { name: 'email', type: 'email', required: true },
+    { name: 'company', type: 'relationship', relationTo: 'companies', required: true },
+    { name: 'invitedBy', type: 'relationship', relationTo: 'users', required: true },
+    { name: 'jobTitle', type: 'text' },
+    { name: 'title', type: 'text' },
+    { name: 'token', type: 'text', required: true, unique: true },
+    {
+      name: 'status',
+      type: 'select',
+      options: ['pending', 'accepted', 'revoked', 'expired'],
+      defaultValue: 'pending',
+      required: true,
+    },
+    { name: 'expiresAt', type: 'date', required: true },
+    { name: 'acceptedAt', type: 'date' },
+    { name: 'acceptedBy', type: 'relationship', relationTo: 'users' },
+    { name: 'revokedAt', type: 'date' },
+  ],
+};
+
+--- FILE: d:\projects\nextacademy\src\collections\ConsultationAvailability.ts ---
+import type { CollectionConfig } from 'payload';
+import { isPublic, isAdminOrOwnInstructor } from '../lib/access-control.ts';
+
+const DAY_TO_INDEX: Record<string, 0 | 1 | 2 | 3 | 4 | 5 | 6> = {
+  sunday: 0,
+  monday: 1,
+  tuesday: 2,
+  wednesday: 3,
+  thursday: 4,
+  friday: 5,
+  saturday: 6,
+};
+
+const INDEX_TO_DAY = [
+  'sunday',
+  'monday',
+  'tuesday',
+  'wednesday',
+  'thursday',
+  'friday',
+  'saturday',
+] as const;
+
+type AvailabilityLike = {
+  dayOfWeek?: string | null;
+  dayIndex?: number | null;
+};
+
+function normalizeDayIndex(value: unknown): 0 | 1 | 2 | 3 | 4 | 5 | 6 | null {
+  const parsed = Number(value);
+  if (!Number.isInteger(parsed) || parsed < 0 || parsed > 6) return null;
+  return parsed as 0 | 1 | 2 | 3 | 4 | 5 | 6;
+}
+
+export const ConsultationAvailability: CollectionConfig = {
+  slug: 'consultation-availability',
+  admin: { useAsTitle: 'dayOfWeek' },
+  access: {
+    read: isPublic,
+    create: isAdminOrOwnInstructor,
+    update: isAdminOrOwnInstructor,
+    delete: isAdminOrOwnInstructor,
+  },
+  hooks: {
+    beforeChange: [
+      ({ data, originalDoc }) => {
+        const next = { ...(data || {}) } as AvailabilityLike;
+        const prev = (originalDoc || {}) as AvailabilityLike;
+
+        const explicitDayIndex = normalizeDayIndex(next.dayIndex);
+        const explicitDayOfWeek =
+          typeof next.dayOfWeek === 'string' ? next.dayOfWeek.toLowerCase() : undefined;
+
+        const resolvedDayOfWeek =
+          explicitDayOfWeek && explicitDayOfWeek in DAY_TO_INDEX
+            ? explicitDayOfWeek
+            : explicitDayIndex !== null
+              ? INDEX_TO_DAY[explicitDayIndex]
+              : typeof prev.dayOfWeek === 'string' && prev.dayOfWeek in DAY_TO_INDEX
+                ? prev.dayOfWeek
+                : undefined;
+
+        const resolvedDayIndex =
+          explicitDayIndex !== null
+            ? explicitDayIndex
+            : resolvedDayOfWeek
+              ? DAY_TO_INDEX[resolvedDayOfWeek]
+              : normalizeDayIndex(prev.dayIndex
+--- FILE: d:\projects\nextacademy\src\collections\ConsultationBookings.ts ---
+import type { CollectionConfig } from 'payload';
+import {
+  isAdmin,
+  isAdminOrOwnerOrOwnInstructor,
+  isAdminOrOwnInstructorForUpdate,
+  isAuthenticated,
+} from '../lib/access-control.ts';
+import { createCrmDedupeKey } from '../lib/crm/dedupe.ts';
+import { enqueueCrmSyncEvent } from '../lib/crm/queue.ts';
+
+export const ConsultationBookings: CollectionConfig = {
+  slug: 'consultation-bookings',
+  admin: { useAsTitle: 'bookingCode' },
+  access: {
+    read: isAdminOrOwnerOrOwnInstructor,
+    create: isAuthenticated,
+    update: isAdminOrOwnInstructorForUpdate,
+    delete: isAdmin,
+  },
+  hooks: {
+    afterChange: [
+      async ({ req, doc, previousDoc, operation }) => {
+        try {
+          let action = operation === 'create'
+            ? 'consultation_booking_created'
+            : 'consultation_booking_updated';
+
+          if (operation === 'update') {
+            if (previousDoc?.paymentStatus !== doc.paymentStatus) {
+              if (doc.paymentStatus === 'paid') action = 'consultation_payment_paid';
+              else if (doc.paymentStatus === 'refunded') action = 'consultation_payment_refunded';
+              else action = 'consultation_payment_status_updated';
+            } else if (previousDoc?.status !== doc.status) {
+              action = 'consultation_status_updated';
+            }
+          }
+
+          const fingerprint = [
+            doc.updatedAt || doc.createdAt || '',
+            doc.status || '',
+            doc.paymentStatus || '',
+            doc.amount ?? '',
+          ].join('|');
+
+          await enqueueCrmSyncEvent({
+            payload: req.payload,
+            req,
+            entityType: 'consultation_booking',
+            entityId: String(doc.id),
+            action,
+            dedupeKey: createCrmDedupeKey({
+              entityType: 'consultation_booking',
+              entityId: String(doc.id),
+              action,
+              fingerprint,
+            }),
+            priority: 32,
+            sourceCollection: 'consultation-b
+--- FILE: d:\projects\nextacademy\src\collections\ConsultationSlots.ts ---
+import type { CollectionConfig } from 'payload';
+import { isAdmin, isPublic } from '../lib/access-control.ts';
+
+export const ConsultationSlots: CollectionConfig = {
+  slug: 'consultation-slots',
+  admin: { useAsTitle: 'date' },
+  access: {
+    read: isPublic,
+    create: isAdmin,
+    update: isAdmin,
+    delete: isAdmin,
+  },
+  fields: [
+    { name: 'consultationType', type: 'relationship', relationTo: 'consultation-types', required: true },
+    { name: 'instructor', type: 'relationship', relationTo: 'instructors', required: true },
+    { name: 'date', type: 'date', required: true },
+    { name: 'startTime', type: 'text', required: true },
+    { name: 'endTime', type: 'text', required: true },
+    {
+      name: 'status',
+      type: 'select',
+      options: ['available', 'booked', 'blocked', 'cancelled'],
+      defaultValue: 'available',
+      required: true,
+    },
+  ],
+};
+
+--- FILE: d:\projects\nextacademy\src\collections\ConsultationTypes.ts ---
+import type { CollectionConfig } from 'payload';
+import { isAdmin, isPublic, isAdminOrOwnInstructor } from '../lib/access-control.ts';
+
+type ConsultationTypeLike = {
+  title?: string | null;
+  titleAr?: string | null;
+  titleEn?: string | null;
+  description?: string | null;
+  descriptionAr?: string | null;
+  descriptionEn?: string | null;
+};
+
+function firstText(values: Array<string | null | undefined>): string | undefined {
+  for (const value of values) {
+    if (typeof value === 'string' && value.trim().length > 0) {
+      return value.trim();
+    }
+  }
+  return undefined;
+}
+
+export const ConsultationTypes: CollectionConfig = {
+  slug: 'consultation-types',
+  admin: { useAsTitle: 'titleAr' },
+  access: {
+    read: isPublic,
+    create: isAdminOrOwnInstructor,
+    update: isAdminOrOwnInstructor,
+    delete: isAdmin,
+  },
+  hooks: {
+    beforeChange: [
+      ({ data, originalDoc }) => {
+        const next = { ...(data || {}) } as ConsultationTypeLike;
+        const prev = (originalDoc || {}) as ConsultationTypeLike;
+
+        const normalizedTitle = firstText([
+          next.title,
+          next.titleEn,
+          next.titleAr,
+          prev.title,
+          prev.titleEn,
+          prev.titleAr,
+        ]);
+
+        const normalizedDescription = firstText([
+          next.description,
+          next.descriptionEn,
+          next.descriptionAr,
+          prev.description,
+          prev.descriptionEn,
+          prev.descriptionAr,
+        ]);
+
+        if (normalizedTitle) {
+          if (!next.titleAr) next.titleAr = normalizedTitle;
+          if (!next.title) next.title = normalizedTitle;
+        }
+
+        if (normalizedDescription) {
+          if (!next.descriptionAr) next.descriptionAr = normalizedDescription;
+          if (!next.description) next.description = normalizedDescription;
+        }
+
+        return next;
+      },
+    ],
+    afterRead: [
+      ({ doc }) => {
+        const current = (doc || {}) as ConsultationTypeLike;
+        const title = firstText([
+--- FILE: d:\projects\nextacademy\src\collections\CrmSyncEvents.ts ---
+import type { CollectionConfig } from 'payload';
+import { isAdmin } from '../lib/access-control.ts';
+
+export const CrmSyncEvents: CollectionConfig = {
+  slug: 'crm-sync-events',
+  admin: {
+    useAsTitle: 'dedupeKey',
+    group: 'System',
+    defaultColumns: [
+      'entityType',
+      'entityId',
+      'action',
+      'status',
+      'attempts',
+      'priority',
+      'nextRetryAt',
+      'updatedAt',
+    ],
+  },
+  access: {
+    read: isAdmin,
+    create: isAdmin,
+    update: isAdmin,
+    delete: isAdmin,
+  },
+  fields: [
+    {
+      name: 'entityType',
+      type: 'select',
+      required: true,
+      options: [
+        'user',
+        'user_profile',
+        'lead',
+        'company',
+        'booking',
+        'payment',
+        'consultation_booking',
+        'bulk_seat_allocation',
+        'waitlist',
+      ],
+      index: true,
+    },
+    { name: 'entityId', type: 'text', required: true, index: true },
+    { name: 'action', type: 'text', required: true, index: true },
+    { name: 'dedupeKey', type: 'text', required: true, unique: true },
+    {
+      name: 'status',
+      type: 'select',
+      required: true,
+      defaultValue: 'pending',
+      index: true,
+      options: ['pending', 'processing', 'done', 'failed', 'dead_letter'],
+    },
+    { name: 'priority', type: 'number', defaultValue: 50, index: true },
+    { name: 'attempts', type: 'number', defaultValue: 0 },
+    { name: 'nextRetryAt', type: 'date', index: true },
+    { name: 'lastError', type: 'textarea' },
+    { name: 'payloadSnapshot', type: 'json' },
+    { name: 'resultSnapshot', type: 'json' },
+    { name: 'sourceCollection', type: 'text' },
+    { name: 'lockedAt', type: 'date', admin: { readOnly: true } },
+    { name: 'processedAt', type: 'date', admin: { readOnly: true } },
+  ],
+};
+
+
+--- FILE: d:\projects\nextacademy\src\collections\DiscountCodes.ts ---
+import type { CollectionConfig } from 'payload';
+import { isAdmin, isAuthenticated } from '../lib/access-control.ts';
+
+export const DiscountCodes: CollectionConfig = {
+  slug: 'discount-codes',
+  admin: { useAsTitle: 'code' },
+  access: {
+    read: isAdmin,
+    create: isAdmin,
+    update: isAdmin,
+    delete: isAdmin,
+  },
+  fields: [
+    { name: 'code', type: 'text', required: true, unique: true },
+    {
+      name: 'type',
+      type: 'select',
+      options: ['percentage', 'fixed'],
+      required: true,
+    },
+    { name: 'value', type: 'number', required: true },
+    { name: 'maxUses', type: 'number' },
+    { name: 'currentUses', type: 'number', defaultValue: 0, admin: { readOnly: true } },
+    { name: 'validFrom', type: 'date', required: true },
+    { name: 'validUntil', type: 'date', required: true },
+    {
+      name: 'applicableTo',
+      type: 'select',
+      options: ['all', 'specific_programs', 'specific_categories', 'consultations'],
+      defaultValue: 'all',
+    },
+    { name: 'programs', type: 'relationship', relationTo: 'programs', hasMany: true },
+    { name: 'categories', type: 'relationship', relationTo: 'categories', hasMany: true },
+    { name: 'minPurchaseAmount', type: 'number' },
+    { name: 'isActive', type: 'checkbox', defaultValue: true },
+    { name: 'createdBy', type: 'relationship', relationTo: 'users' },
+  ],
+};
+
+--- FILE: d:\projects\nextacademy\src\collections\InstallmentRequests.ts ---
+import type { CollectionConfig } from 'payload';
+import { isAdmin, isAdminOrOwner, isAuthenticated } from '../lib/access-control.ts';
+
+export const InstallmentRequests: CollectionConfig = {
+  slug: 'installment-requests',
+  admin: { useAsTitle: 'id' },
+  access: {
+    read: isAdminOrOwner,
+    create: isAuthenticated,
+    update: isAdmin,
+    delete: isAdmin,
+  },
+  fields: [
+    { name: 'user', type: 'relationship', relationTo: 'users', required: true },
+    { name: 'round', type: 'relationship', relationTo: 'rounds', required: true },
+    { name: 'paymentPlan', type: 'relationship', relationTo: 'payment-plans', required: true },
+    {
+      name: 'status',
+      type: 'select',
+      options: ['pending', 'approved', 'rejected', 'expired'],
+      defaultValue: 'pending',
+      required: true,
+    },
+    { name: 'reason', type: 'textarea', required: true },
+    { name: 'nationalIdNumber', type: 'text' },
+    { name: 'nationalIdImage', type: 'upload', relationTo: 'media' },
+    { name: 'userNotes', type: 'textarea' },
+    { name: 'adminNotes', type: 'textarea' },
+    { name: 'reviewedBy', type: 'relationship', relationTo: 'users' },
+    { name: 'reviewedAt', type: 'date' },
+    { name: 'approvalExpiresAt', type: 'date' },
+  ],
+};
+
+--- FILE: d:\projects\nextacademy\src\collections\InstructorBlockedDates.ts ---
+import type { CollectionConfig } from 'payload';
+import { isAdminOrInstructor, isAdminOrOwnInstructor } from '../lib/access-control.ts';
+
+export const InstructorBlockedDates: CollectionConfig = {
+  slug: 'instructor-blocked-dates',
+  admin: { useAsTitle: 'date' },
+  access: {
+    read: isAdminOrOwnInstructor,
+    create: isAdminOrInstructor,
+    update: isAdminOrOwnInstructor,
+    delete: isAdminOrOwnInstructor,
+  },
+  fields: [
+    { name: 'instructor', type: 'relationship', relationTo: 'instructors', required: true },
+    { name: 'date', type: 'date', required: true },
+    { name: 'reason', type: 'text' },
+  ],
+};
+
+--- FILE: d:\projects\nextacademy\src\collections\InstructorProgramSubmissions.ts ---
+import type { CollectionConfig } from 'payload';
+import { isAdmin, isAdminRequest } from '../lib/access-control.ts';
+
+export const InstructorProgramSubmissions: CollectionConfig = {
+  slug: 'instructor-program-submissions',
+  admin: {
+    useAsTitle: 'titleAr',
+    defaultColumns: ['titleAr', 'type', 'sessionsCount', 'status', 'instructor', 'submittedAt'],
+  },
+  access: {
+    read: isAdmin,
+    create: isAdmin,
+    update: isAdmin,
+    delete: isAdmin,
+  },
+  hooks: {
+    beforeChange: [
+      async ({ req, data, originalDoc }) => {
+        const next = { ...(data || {}) } as Record<string, unknown>;
+        const prevStatus =
+          typeof originalDoc?.status === 'string' ? originalDoc.status : 'draft';
+        const nextStatus =
+          typeof next.status === 'string' ? next.status : prevStatus;
+        const isAdminActor = await isAdminRequest(req);
+
+        if (isAdminActor) {
+          if (nextStatus === 'approved' && prevStatus !== 'approved') {
+            next.reviewedAt = new Date().toISOString();
+          } else if (nextStatus === 'rejected' && prevStatus !== 'rejected') {
+            next.reviewedAt = new Date().toISOString();
+          }
+          return next;
+        }
+
+        // Non-admin writes are expected only through server routes with explicit scope checks.
+        // Prevent privilege escalation on direct API calls.
+        if (nextStatus === 'approved' || nextStatus === 'rejected') {
+          next.status = prevStatus;
+        }
+
+        return next;
+      },
+    ],
+  },
+  fields: [
+    { name: 'instructor', type: 'relationship', relationTo: 'instructors', required: true },
+    { name: 'submittedBy', type: 'relationship', relationTo: 'users', required: true },
+    {
+      name: 'status',
+      type: 'select',
+      options: ['draft', 'pending', 'approved', 'rejected'],
+      defaultValue: 'draft',
+      required: true,
+    },
+    { name: 'submittedAt', type: 'date' },
+    { name: 'reviewedAt', type: 'date' },
+    { name: 'reviewNotes', t
+--- FILE: d:\projects\nextacademy\src\collections\Instructors.ts ---
+import type { CollectionConfig } from 'payload';
+import { isAdmin, isAdminRequest, isPublic } from '../lib/access-control.ts';
+import {
+  linkUserToInstructor,
+  normalizeEmail,
+} from '../lib/instructor-account-link.ts';
+
+export const Instructors: CollectionConfig = {
+  slug: 'instructors',
+  admin: { useAsTitle: 'firstName' },
+  access: {
+    read: isPublic,
+    create: isAdmin,
+    update: isAdmin,
+    delete: isAdmin,
+  },
+  hooks: {
+    beforeChange: [
+      async ({ req, data, originalDoc, operation, context }) => {
+        const next = { ...(data || {}) } as Record<string, unknown>;
+        const isAdminActor = await isAdminRequest(req);
+        const isSelfServiceActor = Boolean(
+          (context as { selfServiceInstructorProfile?: boolean } | undefined)?.selfServiceInstructorProfile,
+        );
+        const actorRole =
+          typeof (req as { user?: { role?: unknown } }).user?.role === 'string'
+            ? ((req as { user?: { role?: string } }).user?.role as string)
+            : '';
+        const enforceSelfServiceRules = !isAdminActor && (isSelfServiceActor || actorRole === 'instructor');
+        const previousStatus =
+          typeof originalDoc?.verificationStatus === 'string'
+            ? originalDoc.verificationStatus
+            : 'approved';
+        const nextStatus =
+          typeof next.verificationStatus === 'string'
+            ? next.verificationStatus
+            : previousStatus;
+
+        if (enforceSelfServiceRules) {
+          next.isActive = false;
+          if (!next.verificationStatus) next.verificationStatus = operation === 'create' ? 'draft' : previousStatus;
+          if (nextStatus === 'approved' || nextStatus === 'rejected') {
+            next.verificationStatus = previousStatus;
+          }
+          return next;
+        }
+
+        if (nextStatus === 'approved' && previousStatus !== 'approved') {
+          next.approvedAt = new Date().toISOString();
+          next.rejectedAt = null;
+          next.rejectionReason = null;
+--- FILE: d:\projects\nextacademy\src\collections\Leads.ts ---
+import type { CollectionConfig } from 'payload';
+import { isAdmin } from '../lib/access-control.ts';
+import { createCrmDedupeKey } from '../lib/crm/dedupe.ts';
+import { enqueueCrmSyncEvent } from '../lib/crm/queue.ts';
+
+export const Leads: CollectionConfig = {
+  slug: 'leads',
+  admin: { useAsTitle: 'firstName' },
+  access: {
+    read: isAdmin,
+    create: isAdmin,
+    update: isAdmin,
+    delete: isAdmin,
+  },
+  hooks: {
+    afterChange: [
+      async ({ req, doc, previousDoc, operation }) => {
+        try {
+          let action = operation === 'create' ? 'lead_created' : 'lead_updated';
+          if (operation === 'update') {
+            if (previousDoc?.status !== doc.status) {
+              if (doc.status === 'converted') action = 'lead_converted';
+              else if (doc.status === 'lost') action = 'lead_lost';
+              else action = 'lead_status_updated';
+            }
+          }
+
+          const fingerprint = [
+            doc.updatedAt || doc.createdAt || '',
+            doc.status || '',
+            doc.priority || '',
+            doc.convertedAt || '',
+          ].join('|');
+
+          await enqueueCrmSyncEvent({
+            payload: req.payload,
+            req,
+            entityType: 'lead',
+            entityId: String(doc.id),
+            action,
+            dedupeKey: createCrmDedupeKey({
+              entityType: 'lead',
+              entityId: String(doc.id),
+              action,
+              fingerprint,
+            }),
+            priority: 15,
+            sourceCollection: 'leads',
+            payloadSnapshot: {
+              id: doc.id,
+              status: doc.status,
+              source: doc.source,
+              priority: doc.priority,
+              convertedUser: doc.convertedUser,
+              updatedAt: doc.updatedAt,
+            },
+          });
+        } catch (err) {
+          console.error('[Leads] afterChange CRM sync failed (non-blocking):', err);
+        }
+      },
+    ],
+  },
+  fields: [
+    { name: 'firstName', type
+--- FILE: d:\projects\nextacademy\src\collections\Media.ts ---
+import type { CollectionConfig } from 'payload';
+import { isAdmin, isPublic } from '../lib/access-control.ts';
+
+export const Media: CollectionConfig = {
+  slug: 'media',
+  upload: true,
+  admin: { useAsTitle: 'filename' },
+  access: {
+    read: isPublic,
+    create: isAdmin,
+    update: isAdmin,
+    delete: isAdmin,
+  },
+  fields: [
+    { name: 'alt', type: 'text' },
+  ],
+};
+
+--- FILE: d:\projects\nextacademy\src\collections\Notifications.ts ---
+import type { CollectionConfig } from 'payload';
+import { isAdmin, isAdminOrOwner, isAuthenticated } from '../lib/access-control.ts';
+
+export const Notifications: CollectionConfig = {
+  slug: 'notifications',
+  admin: { useAsTitle: 'title' },
+  access: {
+    read: isAdminOrOwner,
+    create: isAdmin,
+    update: isAuthenticated,
+    delete: isAdmin,
+  },
+  fields: [
+    { name: 'user', type: 'relationship', relationTo: 'users', required: true },
+    {
+      name: 'type',
+      type: 'select',
+      required: true,
+      options: [
+        'booking_confirmed', 'payment_reminder', 'payment_received',
+        'round_starting', 'session_reminder', 'booking_cancelled',
+        'round_cancelled', 'consultation_confirmed', 'consultation_reminder',
+        'installment_approved', 'installment_rejected',
+        'certificate_ready', 'waitlist_available', 'payment_overdue',
+        'access_blocked', 'refund_approved', 'review_request',
+      ],
+    },
+    { name: 'title', type: 'text', required: true },
+    { name: 'message', type: 'textarea', required: true },
+    { name: 'actionUrl', type: 'text' },
+    { name: 'isRead', type: 'checkbox', defaultValue: false },
+    { name: 'readAt', type: 'date' },
+  ],
+};
+
+--- FILE: d:\projects\nextacademy\src\collections\Partners.ts ---
+import type { CollectionConfig } from 'payload';
+import { isAdmin, isPublic } from '../lib/access-control.ts';
+
+export const Partners: CollectionConfig = {
+  slug: 'partners',
+  admin: { useAsTitle: 'name' },
+  access: {
+    read: isPublic,
+    create: isAdmin,
+    update: isAdmin,
+    delete: isAdmin,
+  },
+  fields: [
+    { name: 'name', type: 'text', required: true },
+    { name: 'logo', type: 'upload', relationTo: 'media', required: true },
+    { name: 'website', type: 'text' },
+    { name: 'orderIndex', type: 'number', defaultValue: 0 },
+    { name: 'isActive', type: 'checkbox', defaultValue: true },
+    {
+      name: 'category',
+      type: 'select',
+      defaultValue: 'general',
+      options: [
+        { label: 'General', value: 'general' },
+        { label: 'Media', value: 'media' },
+        { label: 'Strategic', value: 'strategic' },
+      ],
+    },
+  ],
+};
+
+--- FILE: d:\projects\nextacademy\src\collections\PaymentLinks.ts ---
+import type { CollectionConfig } from 'payload';
+import { isAdmin } from '../lib/access-control.ts';
+
+export const PaymentLinks: CollectionConfig = {
+  slug: 'payment-links',
+  admin: { useAsTitle: 'title' },
+  access: {
+    read: isAdmin,
+    create: isAdmin,
+    update: isAdmin,
+    delete: isAdmin,
+  },
+  fields: [
+    { name: 'code', type: 'text', unique: true, required: true },
+    { name: 'title', type: 'text', required: true },
+    { name: 'round', type: 'relationship', relationTo: 'rounds', required: true },
+    { name: 'paymentPlan', type: 'relationship', relationTo: 'payment-plans' },
+    { name: 'discountCode', type: 'text' },
+    { name: 'expiresAt', type: 'date' },
+    { name: 'maxUses', type: 'number' },
+    { name: 'currentUses', type: 'number', defaultValue: 0, admin: { readOnly: true } },
+    { name: 'isActive', type: 'checkbox', defaultValue: true },
+    { name: 'createdBy', type: 'relationship', relationTo: 'users' },
+  ],
+};
+
+--- FILE: d:\projects\nextacademy\src\collections\PaymentPlans.ts ---
+import type { CollectionConfig } from 'payload';
+import { isAdmin, isPublic } from '../lib/access-control.ts';
+
+export const PaymentPlans: CollectionConfig = {
+  slug: 'payment-plans',
+  admin: { useAsTitle: 'name' },
+  access: {
+    read: isPublic,
+    create: isAdmin,
+    update: isAdmin,
+    delete: isAdmin,
+  },
+  fields: [
+    { name: 'round', type: 'relationship', relationTo: 'rounds', required: true },
+    { name: 'name', type: 'text', required: true },
+    { name: 'nameEn', type: 'text' },
+    { name: 'installmentsCount', type: 'number', required: true },
+    { name: 'description', type: 'textarea' },
+    {
+      name: 'installments',
+      type: 'array',
+      required: true,
+      fields: [
+        { name: 'installmentNumber', type: 'number', required: true },
+        { name: 'percentage', type: 'number', required: true },
+        { name: 'dueDaysFromBooking', type: 'number', required: true, defaultValue: 0 },
+        { name: 'description', type: 'text' },
+      ],
+    },
+    { name: 'isActive', type: 'checkbox', defaultValue: true },
+  ],
+};
+
+--- FILE: d:\projects\nextacademy\src\collections\Payments.ts ---
+import type { CollectionConfig } from 'payload';
+import { isAdmin, isAdminOrOwnerByField, isAuthenticated } from '../lib/access-control.ts';
+import { createCrmDedupeKey } from '../lib/crm/dedupe.ts';
+import { enqueueCrmSyncEvent } from '../lib/crm/queue.ts';
+
+export const Payments: CollectionConfig = {
+  slug: 'payments',
+  admin: { useAsTitle: 'paymentCode' },
+  access: {
+    read: isAdminOrOwnerByField('booking.user'),
+    create: isAdmin,
+    update: isAdmin,
+    delete: isAdmin,
+  },
+  hooks: {
+    afterChange: [
+      async ({ req, doc, previousDoc, operation }) => {
+        try {
+          let action = operation === 'create' ? 'payment_created' : 'payment_updated';
+          if (operation === 'update' && previousDoc?.status !== doc.status) {
+            switch (doc.status) {
+              case 'paid':
+                action = 'payment_paid';
+                break;
+              case 'failed':
+                action = 'payment_failed';
+                break;
+              case 'overdue':
+                action = 'payment_overdue';
+                break;
+              case 'refunded':
+                action = 'payment_refunded';
+                break;
+              default:
+                action = 'payment_status_updated';
+            }
+          }
+
+          const fingerprint = [
+            doc.updatedAt || doc.createdAt || '',
+            doc.status || '',
+            doc.amount ?? '',
+            doc.transactionId || '',
+          ].join('|');
+
+          await enqueueCrmSyncEvent({
+            payload: req.payload,
+            req,
+            entityType: 'payment',
+            entityId: String(doc.id),
+            action,
+            dedupeKey: createCrmDedupeKey({
+              entityType: 'payment',
+              entityId: String(doc.id),
+              action,
+              fingerprint,
+            }),
+            priority: 35,
+            sourceCollection: 'payments',
+            payloadSnapshot: {
+              id: doc.id,
+              booking: doc.bo
+--- FILE: d:\projects\nextacademy\src\collections\Popups.ts ---
+import type { CollectionConfig } from 'payload';
+import { isAdmin, isPublic } from '../lib/access-control.ts';
+
+export const Popups: CollectionConfig = {
+  slug: 'popups',
+  admin: {
+    useAsTitle: 'name',
+    defaultColumns: ['name', 'status', 'popupType', 'startDate', 'endDate'],
+    group: 'Marketing',
+    preview: (doc) => {
+      const baseUrl = (process.env.NEXT_PUBLIC_APP_URL || process.env.SERVER_URL || '').replace(/\/+$/, '');
+      return `${baseUrl}/ar?previewPopupId=${String(doc.id)}`;
+    },
+    livePreview: {
+      url: ({ data }) => {
+        const baseUrl = (process.env.NEXT_PUBLIC_APP_URL || process.env.SERVER_URL || '').replace(/\/+$/, '');
+        const normalizedLocale = 'ar';
+        const id = (data as { id?: string | number | null } | undefined)?.id;
+        if (id == null) return `${baseUrl}/${normalizedLocale}`;
+        return `${baseUrl}/${normalizedLocale}?previewPopupId=${String(id)}`;
+      },
+    },
+  },
+  access: {
+    read: isPublic,
+    create: isAdmin,
+    update: isAdmin,
+    delete: isAdmin,
+  },
+  fields: [
+    { name: 'name', type: 'text', required: true },
+    {
+      name: 'status',
+      type: 'select',
+      required: true,
+      defaultValue: 'draft',
+      options: [
+        { label: 'Draft', value: 'draft' },
+        { label: 'Active', value: 'active' },
+        { label: 'Paused', value: 'paused' },
+        { label: 'Archived', value: 'archived' },
+      ],
+      admin: { position: 'sidebar' },
+    },
+
+    // ── Content ────────────────────────────────────────────
+    {
+      type: 'group',
+      name: 'content',
+      label: 'Content',
+      fields: [
+        { name: 'titleAr', type: 'text' },
+        { name: 'titleEn', type: 'text' },
+        { name: 'badgeAr', type: 'text' },
+        { name: 'badgeEn', type: 'text' },
+        { name: 'subtitleAr', type: 'text' },
+        { name: 'subtitleEn', type: 'text' },
+        { name: 'descriptionAr', type: 'richText' },
+        { name: 'descriptionEn', type: 'richText' },
+     
+--- FILE: d:\projects\nextacademy\src\collections\Programs.ts ---
+import type { CollectionConfig } from 'payload';
+import { isAdmin, isPublic } from '../lib/access-control.ts';
+
+type ProgramLike = {
+  id?: number | string;
+  titleAr?: string | null;
+  titleEn?: string | null;
+  roundsCount?: number | null;
+};
+
+function normalizeRoundsCount(value: unknown): number {
+  if (typeof value === 'number' && Number.isFinite(value)) {
+    return Math.max(0, Math.min(200, Math.floor(value)));
+  }
+  if (typeof value === 'string' && value.trim().length > 0) {
+    const asNumber = Number(value);
+    if (Number.isFinite(asNumber)) {
+      return Math.max(0, Math.min(200, Math.floor(asNumber)));
+    }
+  }
+  return 0;
+}
+
+function buildRoundPlaceholderWindow(roundNumber: number): { startDate: string; endDate: string } {
+  const now = new Date();
+  const start = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + (roundNumber - 1), 1, 9, 0, 0, 0));
+  const end = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + (roundNumber + 1), 1, 17, 0, 0, 0));
+  return {
+    startDate: start.toISOString(),
+    endDate: end.toISOString(),
+  };
+}
+
+async function ensureProgramRounds(params: { payload: any; req: unknown; program: ProgramLike }) {
+  const { payload, req, program } = params;
+  if (!program.id) return;
+
+  const targetCount = normalizeRoundsCount(program.roundsCount);
+  if (targetCount <= 0) return;
+
+  const existingRounds = await payload.find({
+    collection: 'rounds',
+    where: { program: { equals: program.id } },
+    depth: 0,
+    limit: 500,
+    sort: 'roundNumber',
+    overrideAccess: true,
+    req: req as any,
+  });
+
+  const existingRoundNumbers = new Set<number>();
+  for (const round of existingRounds.docs as Array<{ roundNumber?: number | null }>) {
+    if (typeof round.roundNumber === 'number' && Number.isFinite(round.roundNumber)) {
+      existingRoundNumbers.add(round.roundNumber);
+    }
+  }
+
+  const programTitle = (program.titleEn || program.titleAr || 'Program').trim();
+  for (let roundNumber = 1; roundNumber <= targetCo
+--- FILE: d:\projects\nextacademy\src\collections\Reviews.ts ---
+import type { CollectionConfig } from 'payload';
+import { isPublic, isAuthenticated, isAdminOrOwner, isAdmin, adminOnlyField } from '../lib/access-control.ts';
+
+export const Reviews: CollectionConfig = {
+  slug: 'reviews',
+  admin: { useAsTitle: 'id' },
+  access: {
+    read: isPublic,
+    create: isAuthenticated,
+    update: isAdminOrOwner,
+    delete: isAdmin,
+  },
+  fields: [
+    { name: 'user', type: 'relationship', relationTo: 'users', required: true },
+    { name: 'program', type: 'relationship', relationTo: 'programs', required: true },
+    { name: 'round', type: 'relationship', relationTo: 'rounds', required: true },
+    { name: 'booking', type: 'relationship', relationTo: 'bookings', required: true },
+    { name: 'rating', type: 'number', required: true, min: 1, max: 5 },
+    { name: 'title', type: 'text' },
+    { name: 'comment', type: 'textarea', required: true },
+    {
+      name: 'status',
+      type: 'select',
+      options: ['pending', 'approved', 'flagged', 'removed'],
+      defaultValue: 'pending',
+      required: true,
+      access: {
+        create: adminOnlyField,
+        update: adminOnlyField,
+      },
+    },
+    { name: 'helpfulCount', type: 'number', defaultValue: 0, admin: { readOnly: true } },
+    { name: 'isVerifiedPurchase', type: 'checkbox', defaultValue: true },
+    { name: 'adminNotes', type: 'textarea' },
+    { name: 'removedReason', type: 'textarea' },
+    // Video testimonial fields
+    { name: 'isVideoTestimonial', type: 'checkbox', defaultValue: false },
+    { name: 'videoUrl', type: 'text', admin: { condition: (data) => data?.isVideoTestimonial } },
+    { name: 'videoThumbnail', type: 'upload', relationTo: 'media', admin: { condition: (data) => data?.isVideoTestimonial } },
+    { name: 'videoCaption', type: 'text', admin: { condition: (data) => data?.isVideoTestimonial } },
+    { name: 'videoSubtitle', type: 'text', admin: { condition: (data) => data?.isVideoTestimonial } },
+  ],
+};
+
+--- FILE: d:\projects\nextacademy\src\collections\Rounds.ts ---
+import type { CollectionConfig } from 'payload';
+import { isAdmin, isPublic } from '../lib/access-control.ts';
+
+type SessionPlanInput = {
+  title?: string | null;
+  date?: string | null;
+  startTime?: string | null;
+  endTime?: string | null;
+  locationType?: 'online' | 'in-person' | 'hybrid' | null;
+  locationName?: string | null;
+  locationAddress?: string | null;
+  meetingUrl?: string | null;
+};
+
+type RoundLike = {
+  id?: number | string;
+  roundNumber?: number | null;
+  title?: string | null;
+  locationType?: 'online' | 'in-person' | 'hybrid' | null;
+  locationName?: string | null;
+  locationAddress?: string | null;
+  meetingUrl?: string | null;
+  sessionPlan?: SessionPlanInput[] | null;
+};
+
+function normalizeSessionPlan(value: unknown): SessionPlanInput[] {
+  if (!Array.isArray(value)) return [];
+  return value
+    .filter((entry) => entry && typeof entry === 'object')
+    .map((entry) => {
+      const record = entry as Record<string, unknown>;
+      const date = typeof record.date === 'string' && record.date.trim().length > 0 ? record.date : null;
+      if (!date) return null;
+
+      const title = typeof record.title === 'string' ? record.title.trim() : '';
+      const startTime = typeof record.startTime === 'string' && record.startTime.trim().length > 0
+        ? record.startTime.trim()
+        : '10:00';
+      const endTime = typeof record.endTime === 'string' && record.endTime.trim().length > 0
+        ? record.endTime.trim()
+        : '12:00';
+      const locationType =
+        record.locationType === 'online' || record.locationType === 'in-person' || record.locationType === 'hybrid'
+          ? record.locationType
+          : null;
+      const locationName = typeof record.locationName === 'string' ? record.locationName.trim() : '';
+      const locationAddress = typeof record.locationAddress === 'string' ? record.locationAddress.trim() : '';
+      const meetingUrl = typeof record.meetingUrl === 'string' ? record.meetingUrl.trim() : '';
+
+      return {
+    
+--- FILE: d:\projects\nextacademy\src\collections\Sessions.ts ---
+import type { CollectionConfig } from 'payload';
+import { isAdmin, isPublic } from '../lib/access-control.ts';
+import { isGoogleCalendarEnabled } from '../lib/google-auth.ts';
+import { createSessionEvent, deleteEvent } from '../lib/google-calendar.ts';
+
+type SessionLike = {
+  date?: string | null;
+  status?: 'scheduled' | 'live' | 'completed' | 'cancelled' | null;
+  isCancelled?: boolean | null;
+  attendanceCount?: number | null;
+  attendeesCount?: number | null;
+};
+
+function normalizeStatus(session: SessionLike): 'scheduled' | 'live' | 'completed' | 'cancelled' {
+  if (session.status) return session.status;
+  if (session.isCancelled) return 'cancelled';
+
+  const dateValue = session.date ? new Date(session.date).getTime() : null;
+  if (dateValue && !Number.isNaN(dateValue) && dateValue < Date.now()) {
+    return 'completed';
+  }
+
+  return 'scheduled';
+}
+
+function normalizeAttendanceCount(session: SessionLike): number {
+  if (typeof session.attendanceCount === 'number' && Number.isFinite(session.attendanceCount)) {
+    return session.attendanceCount;
+  }
+  if (typeof session.attendeesCount === 'number' && Number.isFinite(session.attendeesCount)) {
+    return session.attendeesCount;
+  }
+  return 0;
+}
+
+function normalizeRelationId(value: unknown): number | string | null {
+  if (typeof value === 'number' && Number.isFinite(value)) return value;
+  if (typeof value === 'string' && value.trim().length > 0) {
+    const numeric = Number(value);
+    return Number.isFinite(numeric) ? numeric : value.trim();
+  }
+  if (value && typeof value === 'object' && 'id' in value) {
+    const nested = (value as { id?: unknown }).id;
+    if (typeof nested === 'number' && Number.isFinite(nested)) return nested;
+    if (typeof nested === 'string' && nested.trim().length > 0) {
+      const numeric = Number(nested);
+      return Number.isFinite(numeric) ? numeric : nested.trim();
+    }
+  }
+  return null;
+}
+
+
+
+export const Sessions: CollectionConfig = {
+  slug: 'sessions',
+  admin: { useAsTitle
+--- FILE: d:\projects\nextacademy\src\collections\Tags.ts ---
+import type { CollectionConfig } from 'payload';
+import { isAdmin, isPublic } from '../lib/access-control.ts';
+
+export const Tags: CollectionConfig = {
+  slug: 'tags',
+  admin: { useAsTitle: 'nameAr' },
+  access: {
+    read: isPublic,
+    create: isAdmin,
+    update: isAdmin,
+    delete: isAdmin,
+  },
+  fields: [
+    { name: 'nameAr', type: 'text', required: true },
+    { name: 'nameEn', type: 'text' },
+    { name: 'slug', type: 'text', required: true, unique: true },
+    {
+      name: 'type',
+      type: 'select',
+      options: ['interest', 'skill', 'industry', 'topic'],
+      required: true,
+    },
+    { name: 'usageCount', type: 'number', defaultValue: 0, admin: { readOnly: true } },
+  ],
+};
+
+--- FILE: d:\projects\nextacademy\src\collections\UpcomingEventsConfig.ts ---
+import type { CollectionConfig } from 'payload';
+import { isAdmin, isPublic } from '../lib/access-control.ts';
+
+export const UpcomingEventsConfig: CollectionConfig = {
+  slug: 'upcoming-events-config',
+  admin: {
+    useAsTitle: 'sectionTitleEn',
+    group: 'Marketing',
+  },
+  access: {
+    read: isPublic,
+    create: isAdmin,
+    update: isAdmin,
+    delete: isAdmin,
+  },
+  fields: [
+    { name: 'isEnabled', type: 'checkbox', defaultValue: true },
+
+    // ── Section Titles ─────────────────────────────────────
+    {
+      name: 'sectionTitleAr',
+      type: 'text',
+      defaultValue: 'الفعاليات القادمة',
+    },
+    {
+      name: 'sectionTitleEn',
+      type: 'text',
+      defaultValue: 'Upcoming Events',
+    },
+
+    // ── Mode & Filtering ───────────────────────────────────
+    {
+      name: 'mode',
+      type: 'select',
+      defaultValue: 'automatic',
+      options: [
+        { label: 'Automatic (from Rounds)', value: 'automatic' },
+        { label: 'Manual Selection', value: 'manual' },
+      ],
+    },
+    {
+      name: 'filterType',
+      type: 'select',
+      defaultValue: 'all',
+      options: [
+        { label: 'All Types', value: 'all' },
+        { label: 'Workshop', value: 'workshop' },
+        { label: 'Course', value: 'course' },
+        { label: 'Webinar', value: 'webinar' },
+      ],
+      admin: {
+        condition: (data) => data?.mode === 'automatic',
+      },
+    },
+    {
+      name: 'maxItems',
+      type: 'number',
+      defaultValue: 6,
+      min: 1,
+      max: 20,
+    },
+    {
+      name: 'sortOrder',
+      type: 'select',
+      defaultValue: 'date_asc',
+      options: [
+        { label: 'Date (Soonest First)', value: 'date_asc' },
+        { label: 'Manual Order', value: 'manual' },
+      ],
+    },
+
+    // ── Carousel Settings ──────────────────────────────────
+    {
+      name: 'autoPlaySpeed',
+      type: 'number',
+      defaultValue: 5000,
+      admin: { description: 'Auto-play interval in ms (0 = disabled)' },
+    },
+
+    // ── Card Displa
+--- FILE: d:\projects\nextacademy\src\collections\UserProfiles.ts ---
+import type { CollectionConfig } from 'payload';
+import { isAdmin, isAuthenticated, isPublic } from '../lib/access-control.ts';
+import { createCrmDedupeKey } from '../lib/crm/dedupe.ts';
+import { enqueueCrmSyncEvent } from '../lib/crm/queue.ts';
+
+export const UserProfiles: CollectionConfig = {
+  slug: 'user-profiles',
+  admin: { useAsTitle: 'id' },
+  access: {
+    read: isAuthenticated,
+    create: isAuthenticated,
+    update: isAuthenticated,
+    delete: isAdmin,
+  },
+  hooks: {
+    afterChange: [
+      async ({ req, doc, previousDoc, operation }) => {
+        try {
+          const userId =
+            typeof doc.user === 'object' && doc.user
+              ? doc.user.id
+              : doc.user;
+          if (!userId) return;
+
+          const onboardingCompleted =
+            Boolean(doc.onboardingCompleted) &&
+            !Boolean(previousDoc?.onboardingCompleted);
+
+          const action = onboardingCompleted
+            ? 'onboarding_completed'
+            : operation === 'create'
+              ? 'user_profile_created'
+              : 'user_profile_updated';
+
+          const profileFingerprint = [
+            doc.updatedAt || doc.createdAt || '',
+            doc.onboardingCompleted ? 'completed' : 'incomplete',
+            doc.company || '',
+          ].join('|');
+
+          await enqueueCrmSyncEvent({
+            payload: req.payload,
+            req,
+            entityType: 'user_profile',
+            entityId: String(doc.id),
+            action,
+            dedupeKey: createCrmDedupeKey({
+              entityType: 'user_profile',
+              entityId: String(doc.id),
+              action,
+              fingerprint: profileFingerprint,
+            }),
+            priority: 15,
+            sourceCollection: 'user-profiles',
+            payloadSnapshot: {
+              id: doc.id,
+              userId,
+              company: doc.company,
+              onboardingCompleted: doc.onboardingCompleted,
+              updatedAt: doc.updatedAt,
+            },
+         
+--- FILE: d:\projects\nextacademy\src\collections\Users.ts ---
+import type { CollectionConfig } from 'payload';
+import { isAdmin, isAdminOrSelf, isAdminRequest } from '../lib/access-control.ts';
+import { createCrmDedupeKey } from '../lib/crm/dedupe.ts';
+import { enqueueCrmSyncEvent } from '../lib/crm/queue.ts';
+import {
+  findInstructorIdByEmail,
+  linkUserToInstructor,
+  normalizeEmail,
+  relationToId,
+} from '../lib/instructor-account-link.ts';
+import { autoAcceptInvitationByEmail } from '../lib/company-invitations.ts';
+
+function parseConfiguredAdminEmails(): string[] {
+  const raw = process.env.PAYLOAD_ADMIN_EMAIL || '';
+  return raw
+    .split(/[,\s;]+/)
+    .map((email) => email.trim().toLowerCase())
+    .filter(Boolean);
+}
+
+function isConfiguredAdminEmail(value: unknown): boolean {
+  if (typeof value !== 'string') return false;
+  const email = value.trim().toLowerCase();
+  if (!email) return false;
+  return parseConfiguredAdminEmails().includes(email);
+}
+
+export const Users: CollectionConfig = {
+  slug: 'users',
+  auth: {
+    useAPIKey: true,
+    maxLoginAttempts: 10,
+    lockTime: 600 * 1000, // 10 minutes
+  },
+  admin: { useAsTitle: 'email' },
+  access: {
+    read: isAdminOrSelf,
+    create: () => true,
+    update: isAdminOrSelf,
+    delete: isAdmin,
+    // Only admins can access the admin panel for this collection
+    admin: async ({ req }) => isAdminRequest(req),
+  },
+  hooks: {
+    beforeDelete: [
+      async ({ req, id }) => {
+        const targetUser = await req.payload
+          .findByID({
+            collection: 'users',
+            id,
+            depth: 0,
+            overrideAccess: true,
+            req,
+          })
+          .catch(() => null);
+
+        const normalizedEmail =
+          typeof targetUser?.email === 'string' && targetUser.email.trim()
+            ? targetUser.email.trim().toLowerCase()
+            : null;
+
+        const deleteByFieldValue = async (
+          collection: string,
+          field: string,
+          value: number | string | null,
+        ) => {
+          if (value === null || v
+--- FILE: d:\projects\nextacademy\src\collections\VerificationCodes.ts ---
+import type { CollectionConfig } from 'payload';
+import { isAdmin } from '../lib/access-control.ts';
+
+export const VerificationCodes: CollectionConfig = {
+  slug: 'verification-codes',
+  admin: {
+    useAsTitle: 'email',
+    group: 'System',
+  },
+  access: {
+    read: isAdmin,
+    create: isAdmin,
+    update: isAdmin,
+    delete: isAdmin,
+  },
+  fields: [
+    {
+      name: 'email',
+      type: 'email',
+      required: true,
+      index: true,
+    },
+    {
+      name: 'code',
+      type: 'text',
+      required: true,
+    },
+    {
+      name: 'expiresAt',
+      type: 'date',
+      required: true,
+    },
+    {
+      name: 'used',
+      type: 'checkbox',
+      defaultValue: false,
+    },
+    {
+      name: 'type',
+      type: 'select',
+      options: [
+        { label: 'Email Verification', value: 'email_verification' },
+        { label: 'Password Reset', value: 'password_reset' },
+      ],
+      defaultValue: 'email_verification',
+      required: true,
+    },
+  ],
+};
+
+--- FILE: d:\projects\nextacademy\src\collections\Waitlist.ts ---
+import type { CollectionConfig } from 'payload';
+import { isAdminOrOwner, isAuthenticated, isAdmin } from '../lib/access-control.ts';
+import { createCrmDedupeKey } from '../lib/crm/dedupe.ts';
+import { enqueueCrmSyncEvent } from '../lib/crm/queue.ts';
+
+export const Waitlist: CollectionConfig = {
+  slug: 'waitlist',
+  admin: { useAsTitle: 'id' },
+  access: {
+    read: isAdminOrOwner,
+    create: isAuthenticated,
+    update: isAdmin,
+    delete: isAdmin,
+  },
+  hooks: {
+    afterChange: [
+      async ({ req, doc, previousDoc, operation }) => {
+        try {
+          let action = operation === 'create' ? 'waitlist_joined' : 'waitlist_updated';
+          if (operation === 'update' && previousDoc?.status !== doc.status) {
+            switch (doc.status) {
+              case 'notified':
+                action = 'waitlist_notified';
+                break;
+              case 'expired':
+                action = 'waitlist_expired';
+                break;
+              case 'converted':
+                action = 'waitlist_converted';
+                break;
+              default:
+                action = 'waitlist_status_updated';
+            }
+          }
+
+          const fingerprint = [
+            doc.updatedAt || doc.createdAt || '',
+            doc.status || '',
+            doc.position ?? '',
+            doc.notifiedAt || '',
+            doc.expiresAt || '',
+          ].join('|');
+
+          await enqueueCrmSyncEvent({
+            payload: req.payload,
+            req,
+            entityType: 'waitlist',
+            entityId: String(doc.id),
+            action,
+            dedupeKey: createCrmDedupeKey({
+              entityType: 'waitlist',
+              entityId: String(doc.id),
+              action,
+              fingerprint,
+            }),
+            priority: 40,
+            sourceCollection: 'waitlist',
+            payloadSnapshot: {
+              id: doc.id,
+              user: doc.user,
+              round: doc.round,
+              status: doc.status,
+          

@@ -1,0 +1,190 @@
+.section {
+    background-color: #050505;
+    color: var(--text-primary);
+    padding-bottom: 15vh;
+}
+
+.timelineItem {
+    display: grid;
+    grid-template-columns: minmax(150px, 30%) 1fr;
+    padding: 15vh 5vw 10vh;
+    min-height: 100vh;
+    position: sticky;
+    top: 0;
+    background-color: #050505;
+    gap: 4rem;
+}
+
+.itemNumber {
+    font-family: var(--font-sans);
+    font-size: clamp(8rem, 15vw, 20rem);
+    line-height: 0.8;
+    font-weight: 300;
+    letter-spacing: -0.05em;
+    margin: 0;
+    color: rgba(255, 255, 255, 0.05); /* very faint white */
+}
+
+.itemContentRight {
+    display: flex;
+    flex-direction: column;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.itemHeaderRow {
+    display: flex;
+    gap: 4rem;
+    align-items: flex-start;
+}
+
+.itemTitle {
+    flex: 0 0 40%;
+    font-family: var(--font-sans);
+    font-size: clamp(1.5rem, 3vw, 2.5rem);
+    line-height: 1.1;
+    text-transform: uppercase;
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    margin: 0;
+    max-width: 400px;
+    color: var(--text-primary);
+}
+
+.itemBody {
+    flex: 1;
+    font-family: var(--font-sans);
+    font-size: clamp(1rem, 1.2vw, 1.125rem);
+    line-height: 1.6;
+    color: var(--text-secondary);
+    max-width: 600px;
+}
+
+.itemBody p {
+    margin-bottom: 1.5rem;
+}
+
+.itemBody p:last-child {
+    margin-bottom: 0;
+}
+
+.lessonBlock {
+    display: flex;
+    padding: 15vh 5vw;
+    gap: 4rem;
+    align-items: flex-start;
+    position: relative;
+    background-color: #050505;
+    z-index: 10;
+}
+
+.lessonLabel {
+    flex: 0 0 40%;
+    font-family: var(--font-sans);
+    font-style: italic;
+    font-weight: 600;
+    font-size: 1.125rem;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 1rem;
+    padding-top: 0.5rem;
+    color: var(--text-secondary);
+}
+
+.dot {
+    font-style: normal;
+    font-size: 0.8rem;
+}
+
+.lessonContent {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.lessonQuote {
+    font-family: var(--font-sans);
+    font-weight: 300;
+    font-size: clamp(2rem, 3.5vw, 3.5rem);
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    margin-bottom: 4rem;
+    max-width: 800px;
+    color: var(--text-primary);
+}
+
+.ctaButton {
+    position: relative;
+    background-color: var(--text-primary);
+    color: #050505;
+    border: 1px solid var(--text-primary);
+    border-radius: 100px;
+    padding: 1.25rem 3rem;
+    font-family: var(--font-heading, var(--font-sans));
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    font-size: 0.95rem;
+    cursor: pointer;
+    overflow: hidden;
+    transition: all 0.4s var(--ease-slow, ease);
+    align-self: flex-end;
+    z-index: 1;
+}
+
+.ctaButton::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--accent);
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.5s var(--ease-slow, ease);
+    z-index: -1;
+}
+
+.ctaButton:hover {
+    color: #ffffff;
+    border-color: var(--accent);
+}
+
+.ctaButton:hover::before {
+    transform: scaleX(1);
+    transform-origin: left;
+}
+
+@media (max-width: 900px) {
+    .timelineItem {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+        padding: 10vh 5vw;
+    }
+    
+    .itemHeaderRow {
+        flex-direction: column;
+        gap: 2rem;
+    }
+
+    .itemTitle {
+        flex: none;
+    }
+
+    .lessonBlock {
+        flex-direction: column;
+        padding-top: 4rem;
+        gap: 2rem;
+    }
+    
+    .lessonContent {
+        width: 100%;
+    }
+
+    .ctaButton {
+        align-self: flex-start;
+    }
+}

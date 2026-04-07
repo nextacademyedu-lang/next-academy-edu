@@ -1,0 +1,43 @@
+.section {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #fffcf2;
+    /* Light background */
+    position: relative;
+    overflow: hidden;
+    padding: 5vh 5vw;
+}
+
+.glowBackground {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 70vw;
+    height: 70vh;
+    background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.04) 0%, rgba(255, 252, 242, 0) 70%);
+    z-index: 1;
+    pointer-events: none;
+}
+
+.manifestoText {
+    position: relative;
+    z-index: 10;
+    font-family: var(--font-serif);
+    font-size: clamp(2.5rem, 5vw, 5.5rem);
+    color: #050505;
+    text-align: center;
+    line-height: 1.2;
+    max-width: 1300px;
+    letter-spacing: -0.02em;
+}
+
+/* Base state for split words before animation */
+.manifestoText :global(.word) {
+    opacity: 0;
+    transform: translateY(30px);
+    filter: blur(10px);
+    will-change: transform, opacity, filter;
+}

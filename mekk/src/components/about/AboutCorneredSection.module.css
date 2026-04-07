@@ -1,0 +1,75 @@
+.section {
+    min-height: 100vh;
+    background-color: #fffcf2; /* Light background */
+    color: #050505;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 10vh 15vw;
+    position: relative;
+    z-index: 10;
+}
+
+.quoteWrapper {
+    position: relative;
+    max-width: 800px;
+}
+
+.quoteMark {
+    position: absolute;
+    top: -6rem;
+    left: -2rem;
+    font-family: var(--font-serif);
+    font-size: 15rem;
+    line-height: 1;
+    color: rgba(0, 0, 0, 0.05); /* subtle dark quote mark */
+    user-select: none;
+    pointer-events: none;
+}
+
+.quoteText {
+    font-family: var(--font-sans);
+    font-size: clamp(2rem, 4vw, 4.5rem);
+    font-weight: 300;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    position: relative;
+    z-index: 2;
+    color: #050505;
+}
+
+/* Base styles for split text */
+.quoteText :global(.word) {
+    opacity: 0.2; /* Base state for scrubbing on light bg */
+}
+
+.bottomRightLabel {
+    position: absolute;
+    bottom: 5vh;
+    right: 5vw;
+    font-family: var(--font-sans);
+    font-size: 0.875rem;
+    color: #555;
+    text-align: right;
+    line-height: 1.4;
+}
+
+@media (max-width: 768px) {
+    .section {
+        padding: 10vh 8vw;
+    }
+    
+    .quoteMark {
+        top: -4rem;
+        left: -1rem;
+        font-size: 10rem;
+    }
+    
+    .bottomRightLabel {
+        position: relative;
+        bottom: auto;
+        right: auto;
+        text-align: left;
+        margin-top: 6rem;
+    }
+}

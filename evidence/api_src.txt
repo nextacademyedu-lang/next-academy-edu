@@ -1,0 +1,2536 @@
+
+--- FILE: d:\projects\nextacademy\src\app\api\announcement-bars\active\route.ts ---
+import { NextRequest, NextResponse } from 'next/server';
+import { getPayload } from 'payload';
+import config from '@payload-config';
+
+const PUBLIC_CACHE_HEADERS = {
+  'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=30',
+};
+
+function isAdminViewer(user: { role?: unknown; email?: unknown } | null | undefined): boolean {
+  if (!user) return false;
+  if (user.role === 'admin') return true;
+
+  const configured = (process.env.PAYLOAD_ADMIN_EMAIL || '')
+    .split(',')
+    .map((email) => email.trim().toLowerCase())
+    .filter(Boolean);
+  const userEmail = typeof user.email === 'string' ? user.email.trim().toLowerCase() : '';
+  return Boolean(userEmail && configured.includes(userEmail));
+}
+
+/**
+ * GET /api/announcement-bars/active?page=/ar
+ * Returns the highest-priority active announcement bar for the given page.
+ */
+export async function GET(req: NextRequest) {
+  try {
+    const page = req.nextUrl.searchParams.get('page') || '/';
+    const previewAnnouncementId = req.nextUrl.searchParams.get('previewAnnouncementId');
+    const payload = await getPayload({ config });
+    const { user } = await payload.auth({ headers: req.headers });
+
+    if (previewAnnouncementId) {
+      if (!isAdminViewer(user)) {
+        return NextResponse.json({ error: 'Unauthorized preview access' }, { status: 403 });
+      }
+
+      let bar: unknown = null;
+      try {
+        bar = await payload.findByID({
+          collection: 'announcement-bars',
+          id: previewAnnouncementId,
+        
+--- FILE: d:\projects\nextacademy\src\app\api\auth\google\callback\route.ts ---
+/**
+ * GET /api/auth/google/callback
+ *
+ * Google redirects here with ?code=... & state=...
+ * 1. Exchange code for tokens with Google
+ * 2. Fetch Google user-info
+ * 3. Find-or-create Payload user
+ * 4. Generate JWT using Node.js crypto (no extra deps)
+ * 5. Redirect to the original target
+ */
+import { NextRequest, NextResponse } from 'next/server';
+import { getPayload } from 'payload';
+import config from '@payload-config';
+import crypto from 'node:crypto';
+
+/* ------------------------------------------------------------------ */
+/*  Minimal JWT helpers (HS256) — avoids adding jsonwebtoken dep       */
+/* ------------------------------------------------------------------ */
+
+function base64url(input: string | Buffer): string {
+  const buf = typeof input === 'string' ? Buffer.from(input) : input;
+  return buf.toString('base64url');
+}
+
+function signJwt(
+  payload: Record<string, unknown>,
+  secret: string,
+  expiresInSeconds: number,
+): string {
+  const header = base64url(JSON.stringify({ alg: 'HS256', typ: 'JWT' }));
+  const now = Math.floor(Date.now() / 1000);
+  const body = base64url(
+    JSON.stringify({
+      ...payload,
+      iat: now,
+      exp: now + expiresInSeconds,
+    }),
+  );
+  const signature = base64url(
+    crypto
+      .createHmac('sha256', secret)
+      .update(`${header}.${body}`)
+      .digest(),
+  );
+  return `${header}.${body}.${signature}`;
+}
+
+/* ------------------------------------------------------------------ */
+
+interface GoogleTokenResponse {
+  acce
+--- FILE: d:\projects\nextacademy\src\app\api\auth\google\route.ts ---
+/**
+ * GET /api/auth/google
+ *
+ * Redirects the browser to Google OAuth 2.0 consent screen.
+ * Accepts an optional ?redirect query-param that is forwarded through
+ * the OAuth state so the callback can redirect the user where intended.
+ */
+import { NextRequest, NextResponse } from 'next/server';
+import crypto from 'node:crypto';
+
+function createPkcePair() {
+  const codeVerifier = crypto.randomBytes(32).toString('base64url');
+  const codeChallenge = crypto
+    .createHash('sha256')
+    .update(codeVerifier)
+    .digest('base64url');
+  return { codeVerifier, codeChallenge };
+}
+
+export async function GET(req: NextRequest) {
+  const clientId = process.env.GOOGLE_CLIENT_ID;
+
+  if (!clientId) {
+    return NextResponse.json(
+      { error: 'Google OAuth is not configured.' },
+      { status: 500 },
+    );
+  }
+
+  const { searchParams } = new URL(req.url);
+  const redirect = searchParams.get('redirect') || '/dashboard';
+  const nonce = crypto.randomUUID();
+  const { codeVerifier, codeChallenge } = createPkcePair();
+
+  const callbackUrl = `${process.env.NEXT_PUBLIC_SERVER_URL || req.nextUrl.origin}/api/auth/google/callback`;
+
+  // state carries redirect + one-time nonce to protect OAuth flow from CSRF/login CSRF.
+  const state = Buffer.from(JSON.stringify({ redirect, nonce })).toString('base64url');
+
+  const params = new URLSearchParams({
+    client_id: clientId,
+    redirect_uri: callbackUrl,
+    response_type: 'code',
+    scope: 'openid email profile',
+    access_type: 'offline',
+   
+--- FILE: d:\projects\nextacademy\src\app\api\auth\send-otp\route.ts ---
+import { NextRequest, NextResponse } from 'next/server';
+import { getPayload } from 'payload';
+import config from '@payload-config';
+import { Resend } from 'resend';
+import crypto from 'node:crypto';
+
+// Simple in-memory rate limiter (per-process)
+const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
+const MAX_REQUESTS = 3;
+const RATE_WINDOW_MS = 10 * 60 * 1000; // 10 minutes
+
+function checkRateLimit(email: string): boolean {
+  const now = Date.now();
+  const entry = rateLimitMap.get(email);
+
+  if (!entry || now > entry.resetAt) {
+    rateLimitMap.set(email, { count: 1, resetAt: now + RATE_WINDOW_MS });
+    return true;
+  }
+
+  if (entry.count >= MAX_REQUESTS) {
+    return false;
+  }
+
+  entry.count += 1;
+  return true;
+}
+
+function generateOtp(): string {
+  return crypto.randomInt(100000, 1000000).toString();
+}
+
+export async function POST(request: NextRequest) {
+  try {
+    const body = await request.json();
+    const { email } = body;
+
+    if (!email || typeof email !== 'string') {
+      return NextResponse.json(
+        { error: 'Email is required' },
+        { status: 400 },
+      );
+    }
+
+    const normalizedEmail = email.toLowerCase().trim();
+
+    // Rate limit check
+    if (!checkRateLimit(normalizedEmail)) {
+      return NextResponse.json(
+        { error: 'Too many OTP requests. Please wait before trying again.' },
+        { status: 429 },
+      );
+    }
+
+    const payload = await getPayload({ config });
+
+    // Verify user exists
+    const users 
+--- FILE: d:\projects\nextacademy\src\app\api\auth\verify-otp\route.ts ---
+import { NextRequest, NextResponse } from 'next/server';
+import { getPayload } from 'payload';
+import config from '@payload-config';
+import { rateLimit } from '@/lib/rate-limit';
+import {
+  findInstructorIdByEmail,
+  linkUserToInstructor,
+  normalizeEmail,
+} from '@/lib/instructor-account-link';
+
+const VERIFY_LIMIT = 5;
+const VERIFY_WINDOW_MS = 15 * 60 * 1000;
+
+function buildSlugBase(parts: Array<string | undefined | null>): string {
+  const joined = parts
+    .map((part) => (typeof part === 'string' ? part.trim().toLowerCase() : ''))
+    .filter(Boolean)
+    .join('-');
+
+  const normalized = joined
+    .replace(/[^a-z0-9-]+/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '');
+
+  return normalized || 'instructor';
+}
+
+async function buildUniqueInstructorSlug(params: {
+  payload: Awaited<ReturnType<typeof getPayload>>;
+  req: NextRequest;
+  base: string;
+  userId: string | number;
+}): Promise<string> {
+  const { payload, req, base, userId } = params;
+  const safeBase = base || `instructor-${userId}`;
+
+  for (let i = 0; i < 100; i += 1) {
+    const candidate = i === 0 ? safeBase : `${safeBase}-${i + 1}`;
+    const existing = await payload.find({
+      collection: 'instructors',
+      where: { slug: { equals: candidate } },
+      depth: 0,
+      limit: 1,
+      overrideAccess: true,
+      req,
+    });
+
+    if (existing.docs.length === 0) return candidate;
+  }
+
+  return `instructor-${userId}-${Date.now()}`;
+}
+
+async function ensureInstructorAccountForIntent(params: {
+  pay
+--- FILE: d:\projects\nextacademy\src\app\api\b2b\bookings\route.ts ---
+import { NextRequest, NextResponse } from 'next/server';
+import type { Where } from 'payload';
+import type { Booking, Program, Round, User } from '@/payload-types';
+import {
+  getCompanyUserIds,
+  parsePagination,
+  resolveB2BScope,
+} from '../_scope.ts';
+
+const UPCOMING_STATUSES: Booking['status'][] = ['reserved', 'pending', 'confirmed'];
+
+function mapProgram(programRelation: Round['program']): {
+  id: string;
+  titleAr: string;
+  titleEn?: string;
+  type: string;
+} | string {
+  if (typeof programRelation === 'number') return String(programRelation);
+
+  const program = programRelation as Program;
+  return {
+    id: String(program.id),
+    titleAr: program.titleAr || '',
+    titleEn: program.titleEn || undefined,
+    type: program.type || 'course',
+  };
+}
+
+function mapBooking(booking: Booking) {
+  const user =
+    typeof booking.user === 'number'
+      ? String(booking.user)
+      : {
+          id: String((booking.user as User).id),
+          firstName: (booking.user as User).firstName || 'User',
+          lastName: (booking.user as User).lastName || '',
+          email: (booking.user as User).email || '',
+        };
+
+  const round =
+    typeof booking.round === 'number'
+      ? String(booking.round)
+      : {
+          id: String((booking.round as Round).id),
+          title: (booking.round as Round).title || undefined,
+          startDate: (booking.round as Round).startDate,
+          program: mapProgram((booking.round as Round).program),
+        };
+
+  return {
+    id: Stri
+--- FILE: d:\projects\nextacademy\src\app\api\b2b\dashboard\route.ts ---
+import { NextRequest, NextResponse } from 'next/server';
+import type { Booking, Program, Round, User, UserProfile } from '@/payload-types';
+import {
+  getCompanyUserIds,
+  relationToId,
+  resolveB2BScope,
+} from '../_scope.ts';
+
+const TRACKED_BOOKING_STATUSES: Booking['status'][] = [
+  'reserved',
+  'pending',
+  'confirmed',
+  'completed',
+];
+
+type TeamStat = {
+  bookingsCount: number;
+  lastBookingDate?: string;
+};
+
+function mapTeamUser(userRelation: UserProfile['user']) {
+  if (typeof userRelation === 'number') {
+    return {
+      id: String(userRelation),
+      firstName: 'User',
+      lastName: String(userRelation),
+      email: '',
+    };
+  }
+
+  const user = userRelation as User;
+  return {
+    id: String(user.id),
+    firstName: user.firstName || 'User',
+    lastName: user.lastName || '',
+    email: user.email || '',
+  };
+}
+
+function mapProgram(programRelation: Round['program']): {
+  id: string;
+  titleAr: string;
+  titleEn?: string;
+  type: string;
+} | string {
+  if (typeof programRelation === 'number') return String(programRelation);
+
+  const program = programRelation as Program;
+  return {
+    id: String(program.id),
+    titleAr: program.titleAr || '',
+    titleEn: program.titleEn || undefined,
+    type: program.type || 'course',
+  };
+}
+
+function mapBooking(booking: Booking) {
+  const user =
+    typeof booking.user === 'number'
+      ? String(booking.user)
+      : {
+          id: String(booking.user.id),
+          firstName: booking.user.firstName || 'User',
+       
+--- FILE: d:\projects\nextacademy\src\app\api\b2b\invitations\accept\route.ts ---
+import { NextRequest, NextResponse } from 'next/server';
+import { getPayload } from 'payload';
+import config from '@payload-config';
+import {
+  acceptCompanyInvitation,
+  findInvitationByToken,
+  markInvitationExpiredIfNeeded,
+  type CompanyInvitationDoc,
+} from '@/lib/company-invitations';
+
+type AuthUser = {
+  id: number | string;
+  email?: string | null;
+  role?: string | null;
+  emailVerified?: boolean | null;
+};
+
+function mapAcceptedInvitation(invitation: CompanyInvitationDoc) {
+  const company = invitation.company as { id?: unknown; name?: string } | null;
+  return {
+    id: String(invitation.id),
+    email: invitation.email || '',
+    company: company
+      ? {
+          id: company.id ? String(company.id) : null,
+          name: company.name || 'Company',
+        }
+      : null,
+    status: 'accepted',
+    acceptedAt: new Date().toISOString(),
+  };
+}
+
+export async function POST(req: NextRequest) {
+  try {
+    const payload = await getPayload({ config });
+    const { user } = await payload.auth({ headers: req.headers });
+    const authUser = (user || null) as AuthUser | null;
+
+    if (!authUser) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const body = (await req.json().catch(() => null)) as { token?: unknown } | null;
+    const token = typeof body?.token === 'string' ? body.token.trim() : '';
+    if (!token) {
+      return NextResponse.json({ error: 'token is required' }, { status: 400 });
+    }
+
+    const invitation = await 
+--- FILE: d:\projects\nextacademy\src\app\api\b2b\invitations\route.ts ---
+import crypto from 'node:crypto';
+import { NextRequest, NextResponse } from 'next/server';
+import {
+  normalizeInvitationEmail,
+  relationToId,
+  resolveInvitationStatus,
+  type CompanyInvitationDoc,
+} from '@/lib/company-invitations';
+import { resolveB2BScope } from '../_scope.ts';
+
+const INVITATION_TTL_DAYS = 7;
+
+function sanitizeOptionalText(value: unknown): string | undefined {
+  if (typeof value !== 'string') return undefined;
+  const normalized = value.trim();
+  return normalized.length > 0 ? normalized : undefined;
+}
+
+function resolveCompany(docCompany: unknown, fallbackCompany: { id: number; name: string }) {
+  if (docCompany && typeof docCompany === 'object') {
+    const id = relationToId((docCompany as { id?: unknown }).id);
+    const name =
+      typeof (docCompany as { name?: unknown }).name === 'string'
+        ? ((docCompany as { name?: string }).name as string)
+        : fallbackCompany.name;
+
+    if (id) {
+      return { id: String(id), name: name || fallbackCompany.name };
+    }
+  }
+
+  const id = relationToId(docCompany) || fallbackCompany.id;
+  return { id: String(id), name: fallbackCompany.name };
+}
+
+function mapInvitation(doc: CompanyInvitationDoc, fallbackCompany: { id: number; name: string }) {
+  return {
+    id: String(doc.id),
+    email: doc.email || '',
+    status: resolveInvitationStatus(doc),
+    company: resolveCompany(doc.company, fallbackCompany),
+    jobTitle: doc.jobTitle || null,
+    title: doc.title || null,
+    expiresAt: doc.expiresAt || nu
+--- FILE: d:\projects\nextacademy\src\app\api\b2b\invitations\validate\route.ts ---
+import { NextRequest, NextResponse } from 'next/server';
+import { getPayload } from 'payload';
+import config from '@payload-config';
+import {
+  findInvitationByToken,
+  markInvitationExpiredIfNeeded,
+  relationToId,
+  resolveInvitationStatus,
+} from '@/lib/company-invitations';
+
+function mapCompany(invitationCompany: unknown) {
+  if (!invitationCompany || typeof invitationCompany !== 'object') {
+    const id = relationToId(invitationCompany);
+    return id ? { id: String(id), name: 'Company' } : null;
+  }
+
+  const id = relationToId((invitationCompany as { id?: unknown }).id);
+  const name =
+    typeof (invitationCompany as { name?: unknown }).name === 'string'
+      ? (invitationCompany as { name: string }).name
+      : 'Company';
+
+  if (!id) return { id: null, name };
+  return { id: String(id), name };
+}
+
+export async function GET(req: NextRequest) {
+  try {
+    const token = req.nextUrl.searchParams.get('token')?.trim();
+    if (!token) {
+      return NextResponse.json({ error: 'token is required' }, { status: 400 });
+    }
+
+    const payload = await getPayload({ config });
+    const invitation = await findInvitationByToken({
+      payload,
+      req,
+      token,
+      depth: 1,
+    });
+
+    if (!invitation) {
+      return NextResponse.json({ error: 'Invitation not found' }, { status: 404 });
+    }
+
+    await markInvitationExpiredIfNeeded({ payload, req, invitation });
+    const status = resolveInvitationStatus(invitation);
+
+    return NextResponse.json({
+      invitation:
+--- FILE: d:\projects\nextacademy\src\app\api\b2b\team\route.ts ---
+import { NextRequest, NextResponse } from 'next/server';
+import type { Booking, User, UserProfile } from '@/payload-types';
+import {
+  parsePagination,
+  relationToId,
+  resolveB2BScope,
+} from '../_scope.ts';
+
+const TRACKED_BOOKING_STATUSES: Booking['status'][] = [
+  'reserved',
+  'pending',
+  'confirmed',
+  'completed',
+];
+
+function mapTeamUser(userRelation: UserProfile['user']) {
+  if (typeof userRelation === 'number') {
+    return {
+      id: String(userRelation),
+      firstName: 'User',
+      lastName: String(userRelation),
+      email: '',
+    };
+  }
+
+  const user = userRelation as User;
+  return {
+    id: String(user.id),
+    firstName: user.firstName || 'User',
+    lastName: user.lastName || '',
+    email: user.email || '',
+  };
+}
+
+function normalizeEmail(value: unknown): string | null {
+  if (typeof value !== 'string') return null;
+  const normalized = value.trim().toLowerCase();
+  return normalized.length > 0 ? normalized : null;
+}
+
+function sanitizeText(value: unknown): string | undefined {
+  if (typeof value !== 'string') return undefined;
+  const normalized = value.trim();
+  return normalized.length > 0 ? normalized : undefined;
+}
+
+async function fetchUserBookingStats(
+  payload: Awaited<ReturnType<typeof import('payload').getPayload>>,
+  userIds: number[],
+) {
+  const stats = new Map<number, { bookingsCount: number; lastBookingDate?: string }>();
+  if (!userIds.length) return stats;
+
+  let page = 1;
+  let totalPages = 1;
+
+  do {
+    const result = await payload
+--- FILE: d:\projects\nextacademy\src\app\api\b2b\_scope.ts ---
+import type { NextRequest } from 'next/server';
+import { getPayload } from 'payload';
+import config from '@payload-config';
+
+type PayloadClient = Awaited<ReturnType<typeof getPayload>>;
+
+type AuthUser = {
+  id: number | string;
+  role?: string | null;
+};
+
+type CompanyLite = {
+  id: number;
+  name: string;
+  industry?: string | null;
+  size?: string | null;
+  type?: string | null;
+  country?: string | null;
+  city?: string | null;
+};
+
+export type B2BScopeError = {
+  status: number;
+  error: string;
+};
+
+export type B2BScope = {
+  payload: PayloadClient;
+  user: AuthUser;
+  companyId: number;
+  company: CompanyLite;
+};
+
+const PROFILE_PAGE_SIZE = 200;
+
+export function relationToId(value: unknown): number | null {
+  if (typeof value === 'number') return value;
+  if (typeof value === 'string') {
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : null;
+  }
+  if (value && typeof value === 'object' && 'id' in value) {
+    const idValue = (value as { id?: unknown }).id;
+    if (typeof idValue === 'number') return idValue;
+    if (typeof idValue === 'string') {
+      const parsed = Number(idValue);
+      return Number.isFinite(parsed) ? parsed : null;
+    }
+  }
+  return null;
+}
+
+function parsePositiveInt(input: string | null, fallback: number, max: number): number {
+  const parsed = Number(input);
+  if (!Number.isFinite(parsed)) return fallback;
+  return Math.max(1, Math.min(max, Math.floor(parsed)));
+}
+
+export function parsePagination(req: NextRequest, fall
+--- FILE: d:\projects\nextacademy\src\app\api\bookings\create\route.ts ---
+import { NextRequest, NextResponse } from 'next/server';
+import { getPayload } from 'payload';
+import config from '@payload-config';
+import { authenticateRequestUser } from '@/lib/server-auth';
+import crypto from 'node:crypto';
+import { assertTrustedWriteRequest } from '@/lib/csrf';
+import { atomicIncrement, atomicIncrementWithLimit, atomicIncrementWithCeiling } from '@/lib/atomic-db';
+import { processSuccessfulPayment } from '@/lib/payment-helper';
+
+function generateCode(prefix: string): string {
+  const random = crypto.randomBytes(3).toString('hex').toUpperCase();
+  return `${prefix}-${Date.now().toString(36).toUpperCase()}-${random}`;
+}
+
+function normalizeNumericId(value: unknown): number | null {
+  if (value === null || value === undefined || value === '') return null;
+  if (typeof value === 'number') return Number.isFinite(value) ? value : null;
+  if (typeof value === 'string') {
+    const trimmed = value.trim();
+    if (!trimmed) return null;
+    const asNumber = Number(trimmed);
+    if (Number.isFinite(asNumber)) return asNumber;
+  }
+  return null;
+}
+
+export async function POST(req: NextRequest) {
+  let stage = 'init';
+  try {
+    const csrfError = assertTrustedWriteRequest(req);
+    if (csrfError) return csrfError;
+
+    stage = 'parse_request';
+    const { roundId, paymentPlanId, discountCode } = await req.json() as {
+      roundId: string | number;
+      paymentPlanId?: string | number;
+      discountCode?: string;
+    };
+
+    const normalizedRoundId = normalizeNumer
+--- FILE: d:\projects\nextacademy\src\app\api\bulk-seats\allocate\route.ts ---
+import { NextRequest, NextResponse } from 'next/server';
+import { getPayload } from 'payload';
+import configPromise from '@payload-config';
+
+type AuthUser = {
+  id?: number | string;
+  role?: string | null;
+};
+
+function relationToId(value: unknown): number | null {
+  if (typeof value === 'number') return value;
+  if (typeof value === 'string') {
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : null;
+  }
+  if (value && typeof value === 'object' && 'id' in value) {
+    const idValue = (value as { id?: unknown }).id;
+    if (typeof idValue === 'number') return idValue;
+    if (typeof idValue === 'string') {
+      const parsed = Number(idValue);
+      return Number.isFinite(parsed) ? parsed : null;
+    }
+  }
+  return null;
+}
+
+async function getCompanyIdFromUserProfile(params: {
+  payload: Awaited<ReturnType<typeof getPayload>>;
+  userId: number;
+  req: NextRequest;
+}) {
+  const { payload, userId, req } = params;
+  const profileResult = await payload.find({
+    collection: 'user-profiles',
+    where: { user: { equals: userId } },
+    depth: 0,
+    limit: 1,
+    overrideAccess: true,
+    req,
+  });
+
+  const profile = profileResult.docs[0] as { company?: unknown } | undefined;
+  return relationToId(profile?.company);
+}
+
+const ACTIVE_BOOKING_STATUSES = ['reserved', 'pending', 'confirmed', 'completed'];
+
+/**
+ * POST /api/bulk-seats/allocate
+ *
+ * Auth: admin or b2b_manager
+ * Body: { bulkSeatId: number; userId: number }
+ */
+export async function POST(req
+--- FILE: d:\projects\nextacademy\src\app\api\certificates\generate\route.ts ---
+import { NextRequest, NextResponse } from 'next/server';
+import { getPayload } from 'payload';
+import config from '@payload-config';
+
+function generateCertCode(): string {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let code = 'CERT-';
+  for (let i = 0; i < 12; i++) {
+    if (i === 4 || i === 8) code += '-';
+    code += chars[Math.floor(Math.random() * chars.length)];
+  }
+  return code;
+}
+
+export async function POST(req: NextRequest) {
+  try {
+    const { bookingId, quizScore } = await req.json() as {
+      bookingId: string;
+      quizScore?: number;
+    };
+
+    if (!bookingId) return NextResponse.json({ error: 'bookingId مطلوب' }, { status: 400 });
+
+    const payload = await getPayload({ config });
+
+    // Admin only
+    const { user } = await payload.auth({ headers: req.headers });
+    if (!user || user.role !== 'admin') {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
+
+    // Fetch booking
+    const booking = await payload.findByID({ collection: 'bookings', id: bookingId, depth: 2 });
+    if (!booking) return NextResponse.json({ error: 'الحجز مش موجود' }, { status: 404 });
+    if (booking.status !== 'confirmed' && booking.status !== 'completed') {
+      return NextResponse.json({ error: 'الحجز لازم يكون confirmed أو completed' }, { status: 400 });
+    }
+
+    // Check if certificate already exists
+    const existing = await payload.find({
+      collection: 'certificates',
+      where: { booking: { equals: bookingId } },
+      limit
+--- FILE: d:\projects\nextacademy\src\app\api\checkout\easykash\route.ts ---
+import { NextRequest, NextResponse } from 'next/server';
+import { getPayload } from 'payload';
+import config from '@payload-config';
+import {
+  createEasyKashDirectPay,
+  createEasyKashPayment,
+  extractEasyKashProductCode,
+  getBookingCurrency,
+  getBookingProgramTitle,
+} from '@/lib/payment-api';
+import type { CheckoutSession } from '@/lib/payment-api';
+import { authenticateRequestUser } from '@/lib/server-auth';
+import { assertTrustedWriteRequest } from '@/lib/csrf';
+import { processSuccessfulPayment } from '@/lib/payment-helper';
+
+export async function POST(req: NextRequest) {
+  try {
+    const csrfError = assertTrustedWriteRequest(req);
+    if (csrfError) return csrfError;
+
+    const { bookingId, method, locale } = await req.json() as {
+      bookingId: string;
+      method?: 'card' | 'wallet' | 'fawry' | 'aman';
+      locale?: string;
+    };
+    const selectedMethod = method ?? 'fawry';
+
+    if (!bookingId || !['card', 'wallet', 'fawry', 'aman'].includes(selectedMethod)) {
+      return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
+    }
+
+    const payload = await getPayload({ config });
+
+    // ── 1. Auth check ──────────────────────────────────────────────
+    const user = await authenticateRequestUser(payload, req);
+    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+    // ── 2. Fetch booking ───────────────────────────────────────────
+    const booking = await payload.findByID({
+      collection: 'bookings',
+    
+--- FILE: d:\projects\nextacademy\src\app\api\checkout\paymob\route.ts ---
+import { NextRequest, NextResponse } from 'next/server';
+import { getPayload } from 'payload';
+import config from '@payload-config';
+import {
+  createEasyKashDirectPay,
+  createPaymobIntention,
+  extractEasyKashProductCode,
+  getBookingCurrency,
+  getBookingProgramTitle,
+  getPaymobCheckoutUrl,
+} from '@/lib/payment-api';
+import type { CheckoutSession } from '@/lib/payment-api';
+import { authenticateRequestUser } from '@/lib/server-auth';
+import { assertTrustedWriteRequest } from '@/lib/csrf';
+import { processSuccessfulPayment } from '@/lib/payment-helper';
+
+export async function POST(req: NextRequest) {
+  try {
+    const csrfError = assertTrustedWriteRequest(req);
+    if (csrfError) return csrfError;
+
+    const { bookingId, method, locale } = await req.json() as {
+      bookingId: string;
+      method: 'card' | 'wallet';
+      locale?: string;
+    };
+
+    if (!bookingId || !['card', 'wallet'].includes(method)) {
+      return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
+    }
+
+    const payload = await getPayload({ config });
+
+    // ── 1. Auth check ──────────────────────────────────────────────
+    const user = await authenticateRequestUser(payload, req);
+    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+    // ── 2. Fetch booking ───────────────────────────────────────────
+    const booking = await payload.findByID({
+      collection: 'bookings',
+      id: bookingId,
+      depth: 3,
+    });
+
+    if (!booking) return 
+--- FILE: d:\projects\nextacademy\src\app\api\cron\check-overdue\route.ts ---
+import { NextRequest, NextResponse } from 'next/server';
+import { getPayload } from 'payload';
+import config from '@payload-config';
+import { sendOverdueNotification, sendPaymentReminder } from '@/lib/email';
+
+// Called daily via cron: GET /api/cron/check-overdue
+// Authorization: Bearer <CRON_SECRET>
+export async function GET(req: NextRequest) {
+  if (req.headers.get('authorization') !== `Bearer ${process.env.CRON_SECRET}`) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  const payload = await getPayload({ config });
+  const now = new Date();
+  const results = { overdue: 0, reminded: 0, blocked: 0 };
+
+  // ── 1. Mark overdue payments ──────────────────────────────────────────────
+  const overduePayments = await payload.find({
+    collection: 'payments',
+    where: {
+      status: { equals: 'pending' },
+      dueDate: { less_than: now.toISOString() },
+    },
+    depth: 2,
+    limit: 200,
+  });
+
+  for (const payment of overduePayments.docs) {
+    await payload.update({
+      collection: 'payments',
+      id: payment.id,
+      data: { status: 'overdue' },
+    });
+    results.overdue++;
+
+    // Block booking access
+    const bookingId = typeof payment.booking === 'object' ? payment.booking.id : payment.booking;
+    const booking = await payload.findByID({ collection: 'bookings', id: bookingId, depth: 1 });
+
+    if (booking && !booking.accessBlocked) {
+      await payload.update({
+        collection: 'bookings',
+        id: bookingId,
+        dat
+--- FILE: d:\projects\nextacademy\src\app\api\cron\crm-sync\route.ts ---
+import { NextRequest, NextResponse } from 'next/server';
+import crypto from 'node:crypto';
+import { getPayload } from 'payload';
+import config from '@payload-config';
+import { processCrmSyncQueue } from '@/lib/crm/processor';
+import { parsePositiveInt } from '@/lib/crm/utils';
+
+export const dynamic = 'force-dynamic';
+
+function timingSafeEqualString(a: string, b: string): boolean {
+  const aBuf = Buffer.from(a);
+  const bBuf = Buffer.from(b);
+  if (aBuf.length !== bBuf.length) return false;
+  return crypto.timingSafeEqual(aBuf, bBuf);
+}
+
+export async function GET(req: NextRequest) {
+  const configuredSecret = process.env.CRON_SECRET?.trim();
+  if (!configuredSecret) {
+    return NextResponse.json(
+      { error: 'Cron secret is not configured' },
+      { status: 503 },
+    );
+  }
+
+  const incomingAuth = req.headers.get('authorization') || '';
+  const expectedAuth = `Bearer ${configuredSecret}`;
+  if (!timingSafeEqualString(incomingAuth, expectedAuth)) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  try {
+    const payload = await getPayload({ config });
+    const batchSize = parsePositiveInt(process.env.CRM_SYNC_BATCH_SIZE, 25);
+    const maxAttempts = parsePositiveInt(process.env.CRM_SYNC_MAX_ATTEMPTS, 5);
+
+    const result = await processCrmSyncQueue(payload, { batchSize, maxAttempts });
+    const statusCode = result.success ? 200 : 207;
+
+    return NextResponse.json(
+      {
+        success: true,
+        data: result,
+      },
+      { sta
+--- FILE: d:\projects\nextacademy\src\app\api\cron\waitlist\route.ts ---
+import { NextRequest, NextResponse } from 'next/server';
+import { getPayload } from 'payload';
+import config from '@payload-config';
+import { sendWaitlistNotification } from '@/lib/email';
+
+// Called daily via cron: GET /api/cron/waitlist
+// Authorization: Bearer <CRON_SECRET>
+export async function GET(req: NextRequest) {
+  if (req.headers.get('authorization') !== `Bearer ${process.env.CRON_SECRET}`) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  const payload = await getPayload({ config });
+  const now = new Date();
+  const results = { notified: 0, expired: 0 };
+
+  // ── 1. Expire notified entries that passed their 24h window ──────────────
+  const expiredEntries = await payload.find({
+    collection: 'waitlist',
+    where: {
+      status: { equals: 'notified' },
+      expiresAt: { less_than: now.toISOString() },
+    },
+    limit: 200,
+  });
+
+  for (const entry of expiredEntries.docs) {
+    await payload.update({
+      collection: 'waitlist',
+      id: entry.id,
+      data: { status: 'expired' },
+    });
+    results.expired++;
+  }
+
+  // ── 2. Find rounds with open spots and waiting entries ───────────────────
+  const rounds = await payload.find({
+    collection: 'rounds',
+    where: { status: { in: ['open', 'upcoming'] } },
+    depth: 1,
+    limit: 100,
+  });
+
+  for (const round of rounds.docs) {
+    const hasSpot = (round.currentEnrollments ?? 0) < round.maxCapacity;
+    if (!hasSpot) continue;
+
+    // Check if anyone already notified (do
+--- FILE: d:\projects\nextacademy\src\app\api\discount-codes\remove\route.ts ---
+import { NextRequest, NextResponse } from 'next/server';
+import { getPayload } from 'payload';
+import config from '@payload-config';
+import { isAdminUser } from '@/lib/access-control';
+import { authenticateRequestUser } from '@/lib/server-auth';
+import { assertTrustedWriteRequest } from '@/lib/csrf';
+import { atomicIncrement } from '@/lib/atomic-db';
+
+export async function POST(req: NextRequest) {
+  try {
+    const csrfError = assertTrustedWriteRequest(req);
+    if (csrfError) return csrfError;
+
+    const { bookingId } = await req.json() as { bookingId: string };
+
+    if (!bookingId) {
+      return NextResponse.json({ error: 'بيانات ناقصة' }, { status: 400 });
+    }
+
+    const payload = await getPayload({ config });
+
+    // Auth check
+    const user = await authenticateRequestUser(payload, req);
+    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+    // Fetch booking
+    const booking = await payload.findByID({ collection: 'bookings', id: bookingId, depth: 0 });
+    if (!booking) return NextResponse.json({ error: 'الحجز مش موجود' }, { status: 404 });
+
+    // Verify ownership
+    const ownerId = typeof booking.user === 'object' ? (booking.user as any).id : booking.user;
+    const isOwner = String(ownerId) === String(user.id);
+    const isAdmin = isAdminUser(user as { role?: string | null; email?: string | null });
+    if (!isOwner && !isAdmin) {
+      return NextResponse.json(
+        { error: 'غير مسموح لك بتعديل خصم هذا الحجز.' },
+        { 
+--- FILE: d:\projects\nextacademy\src\app\api\discount-codes\validate\route.ts ---
+import { NextRequest, NextResponse } from 'next/server';
+import { getPayload } from 'payload';
+import config from '@payload-config';
+import { isAdminUser } from '@/lib/access-control';
+import { authenticateRequestUser } from '@/lib/server-auth';
+import { assertTrustedWriteRequest } from '@/lib/csrf';
+import { atomicIncrement, atomicIncrementWithLimit } from '@/lib/atomic-db';
+
+function normalizeCode(value: unknown): string {
+  if (typeof value !== 'string') return '';
+  return value.trim().toUpperCase();
+}
+
+export async function POST(req: NextRequest) {
+  try {
+    const csrfError = assertTrustedWriteRequest(req);
+    if (csrfError) return csrfError;
+
+    const { code, bookingId } = await req.json() as { code: string; bookingId: string };
+
+    if (!code || !bookingId) {
+      return NextResponse.json({ error: 'بيانات ناقصة' }, { status: 400 });
+    }
+
+    const normalizedCode = normalizeCode(code);
+    if (!normalizedCode) {
+      return NextResponse.json({ error: 'كود الخصم غير صالح' }, { status: 400 });
+    }
+
+    const payload = await getPayload({ config });
+
+    // Auth check
+    const user = await authenticateRequestUser(payload, req);
+    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+    // Fetch booking to get the amount + round
+    const booking = await payload.findByID({ collection: 'bookings', id: bookingId, depth: 2 });
+    if (!booking) return NextResponse.json({ error: 'الحجز مش موجود' }, { status: 404 });
+
+    // Verify owners
+--- FILE: d:\projects\nextacademy\src\app\api\google\callback\route.ts ---
+/**
+ * GET /api/google/callback
+ *
+ * Google redirects here after admin consents to Calendar API access.
+ * Exchanges the code for tokens and displays the refresh token
+ * so the admin can store it in GOOGLE_REFRESH_TOKEN env var.
+ */
+import { NextRequest, NextResponse } from 'next/server';
+import { exchangeCodeForTokens } from '@/lib/google-auth.ts';
+
+export async function GET(req: NextRequest) {
+  const { searchParams } = new URL(req.url);
+  const code = searchParams.get('code');
+  const errorParam = searchParams.get('error');
+
+  if (errorParam) {
+    return NextResponse.json(
+      { error: `Google authorization failed: ${errorParam}` },
+      { status: 400 },
+    );
+  }
+
+  if (!code) {
+    return NextResponse.json(
+      { error: 'Missing authorization code' },
+      { status: 400 },
+    );
+  }
+
+  try {
+    const tokens = await exchangeCodeForTokens(code);
+
+    // Return a simple page showing the refresh token
+    const html = `
+      <!DOCTYPE html>
+      <html dir="rtl" lang="ar">
+      <head>
+        <meta charset="utf-8" />
+        <title>Google Calendar Connected</title>
+        <style>
+          body { font-family: system-ui; padding: 2rem; max-width: 600px; margin: 0 auto; background: #0f172a; color: #e2e8f0; }
+          .card { background: #1e293b; padding: 2rem; border-radius: 12px; }
+          h1 { color: #22c55e; }
+          .token-box { background: #0f172a; padding: 1rem; border-radius: 8px; word-break: break-all; font-family: monospace; font-size: 0.85rem; ma
+--- FILE: d:\projects\nextacademy\src\app\api\google\connect\route.ts ---
+/**
+ * GET /api/google/connect
+ *
+ * Redirects admin to Google consent screen for Calendar API authorization.
+ * Only accessible by admin users.
+ */
+import { NextRequest, NextResponse } from 'next/server';
+import { getPayload } from 'payload';
+import config from '@payload-config';
+import { getAuthUrl } from '@/lib/google-auth.ts';
+
+export async function GET(req: NextRequest) {
+  // Verify admin user
+  const payload = await getPayload({ config });
+  const { user } = await payload.auth({ headers: req.headers });
+
+  if (!user || (user as any).role !== 'admin') {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  try {
+    const url = getAuthUrl();
+    return NextResponse.redirect(url);
+  } catch (err) {
+    console.error('[google/connect] Error:', err);
+    return NextResponse.json(
+      { error: 'Google OAuth not configured. Set GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, and GOOGLE_REDIRECT_URI.' },
+      { status: 500 },
+    );
+  }
+}
+
+--- FILE: d:\projects\nextacademy\src\app\api\health\db\route.ts ---
+/**
+ * Database Health Check — verifies all Payload collections have matching tables
+ * GET /api/health/db
+ * Protected by CRON_SECRET
+ */
+import { NextRequest, NextResponse } from 'next/server';
+import { getPayload } from 'payload';
+import config from '@payload-config';
+
+export const dynamic = 'force-dynamic';
+
+export async function GET(req: NextRequest): Promise<NextResponse> {
+  const auth = req.headers.get('authorization');
+  const secret = process.env.CRON_SECRET;
+  if (!secret || auth !== `Bearer ${secret}`) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  try {
+    const payload = await getPayload({ config });
+
+    const collectionSlugs = Object.keys(payload.collections);
+    const results: Record<string, { status: string; count?: number; error?: string }> = {};
+
+    for (const slug of collectionSlugs) {
+      try {
+        const result = await payload.find({
+          collection: slug as any,
+          limit: 0,       // just get count, no docs
+          overrideAccess: true,
+        });
+        results[slug] = { status: 'ok', count: result.totalDocs };
+      } catch (error) {
+        const msg = error instanceof Error ? error.message : String(error);
+        results[slug] = { status: 'error', error: msg.slice(0, 200) };
+      }
+    }
+
+    // Check migration status via raw pool query (avoids drizzle-orm import)
+    let migrationStatus: unknown = null;
+    try {
+      const db = payload.db as any;
+      const pool = db.pool;
+      if (
+--- FILE: d:\projects\nextacademy\src\app\api\health\route.ts ---
+import { NextResponse } from 'next/server'
+
+export const dynamic = 'force-dynamic'
+
+export function GET(): NextResponse {
+  return NextResponse.json({ status: 'ok', timestamp: new Date().toISOString() })
+}
+
+--- FILE: d:\projects\nextacademy\src\app\api\home\blog-posts\route.ts ---
+import { NextResponse } from 'next/server';
+import { getPayload } from 'payload';
+import config from '@payload-config';
+
+const PUBLIC_CACHE_HEADERS = {
+  'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=60',
+};
+
+export async function GET() {
+  try {
+    const payload = await getPayload({ config });
+
+    const { docs } = await payload.find({
+      collection: 'blog-posts',
+      where: { status: { equals: 'published' } },
+      sort: '-publishedAt',
+      limit: 8,
+      depth: 1,
+    });
+
+    const posts = docs.map((doc) => {
+      const image = doc.featuredImage as { url?: string } | undefined;
+      return {
+        id: doc.id,
+        title: doc.title,
+        category: doc.category ?? '',
+        excerpt: doc.excerpt ?? '',
+        date: doc.publishedAt ?? '',
+        slug: doc.slug,
+        image: image?.url ?? null,
+      };
+    });
+
+    return NextResponse.json({ posts }, { headers: PUBLIC_CACHE_HEADERS });
+  } catch {
+    return NextResponse.json({ posts: [] }, { headers: PUBLIC_CACHE_HEADERS });
+  }
+}
+
+--- FILE: d:\projects\nextacademy\src\app\api\home\featured-programs\route.ts ---
+import { NextRequest, NextResponse } from 'next/server';
+import { getPayload } from 'payload';
+import config from '@payload-config';
+import type { Category, Instructor, Media, Program, Review, Round } from '@/payload-types';
+
+type FeaturedCard = {
+  id: string;
+  title: string;
+  kind: string;
+  category: string;
+  enrolledCount: number;
+  rating: number;
+  ratingCount: number;
+  instructor: string;
+  date: string;
+  price: string;
+  image: string | null;
+  href: string;
+};
+
+type ProgramWithDerived = Program & {
+  learnersCount?: number | null;
+};
+
+const PUBLIC_CACHE_HEADERS = {
+  'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=60',
+};
+
+function mediaUrl(value: Program['thumbnail'] | Program['coverImage']): string | null {
+  if (!value || typeof value === 'number') return null;
+  return (value as Media).url || null;
+}
+
+function typeLabel(type: Program['type'], locale: 'ar' | 'en'): string {
+  if (locale === 'ar') {
+    if (type === 'course') return 'دورة';
+    if (type === 'workshop') return 'ورشة';
+    return 'ندوة';
+  }
+
+  if (type === 'course') return 'Course';
+  if (type === 'workshop') return 'Workshop';
+  return 'Webinar';
+}
+
+function categoryLabel(category: Program['category'], locale: 'ar' | 'en'): string {
+  if (!category || typeof category === 'number') return locale === 'ar' ? 'عام' : 'General';
+  const categoryDoc = category as Category;
+  return locale === 'ar'
+    ? categoryDoc.nameAr
+    : categoryDoc.nameEn || categoryDoc.nameAr || 'General';
+}
+
+--- FILE: d:\projects\nextacademy\src\app\api\home\instructors\route.ts ---
+import { NextResponse } from 'next/server';
+import { getPayload } from 'payload';
+import config from '@payload-config';
+
+const PUBLIC_CACHE_HEADERS = {
+  'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=60',
+};
+
+export async function GET() {
+  try {
+    const payload = await getPayload({ config });
+
+    const { docs } = await payload.find({
+      collection: 'instructors',
+      where: { isActive: { equals: true } },
+      sort: 'featuredOrder',
+      limit: 8,
+      depth: 1,
+    });
+
+    const instructors = docs.map((doc) => {
+      const picture = doc.picture as { url?: string } | undefined;
+      return {
+        id: doc.id,
+        name: `${doc.firstName ?? ''} ${doc.lastName ?? ''}`.trim(),
+        title: doc.jobTitle ?? '',
+        tagline: doc.tagline ?? '',
+        image: picture?.url ?? null,
+        slug: doc.slug,
+        linkedinUrl: doc.linkedinUrl ?? null,
+      };
+    });
+
+    return NextResponse.json({ instructors }, { headers: PUBLIC_CACHE_HEADERS });
+  } catch {
+    return NextResponse.json({ instructors: [] });
+  }
+}
+
+--- FILE: d:\projects\nextacademy\src\app\api\home\stats\route.ts ---
+import { NextResponse } from 'next/server';
+import { getPayload } from 'payload';
+import config from '@payload-config';
+
+const PUBLIC_CACHE_HEADERS = {
+  'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=60',
+};
+
+type StatsResponse = {
+  professionals: number;
+  partners: number;
+  instructors: number;
+  completionRate: number;
+};
+
+export async function GET() {
+  try {
+    const payload = await getPayload({ config });
+
+    const results = await Promise.allSettled([
+      payload.find({
+        collection: 'bookings',
+        where: { status: { equals: 'completed' } },
+        depth: 0,
+        limit: 1,
+      }),
+      payload.find({
+        collection: 'bookings',
+        where: { status: { in: ['confirmed', 'completed'] } },
+        depth: 0,
+        limit: 1,
+      }),
+      payload.find({
+        collection: 'companies',
+        depth: 0,
+        limit: 1,
+      }),
+      payload.find({
+        collection: 'instructors',
+        where: { isActive: { equals: true } },
+        depth: 0,
+        limit: 1,
+      }),
+    ]);
+
+    const safeTotal = (r: PromiseSettledResult<{ totalDocs: number }>) =>
+      r.status === 'fulfilled' ? r.value.totalDocs : 0;
+
+    // Log any individual failures without breaking the whole response
+    results.forEach((r, i) => {
+      if (r.status === 'rejected') {
+        const labels = ['completedBookings', 'successfulBookings', 'companies', 'instructors'];
+        console.error(`[api/home/stats] ${labels[i]} query failed:`, r.reason);
+--- FILE: d:\projects\nextacademy\src\app\api\home\testimonials\route.ts ---
+import { NextResponse } from 'next/server';
+import { getPayload } from 'payload';
+import config from '@payload-config';
+
+const PUBLIC_CACHE_HEADERS = {
+  'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=60',
+};
+
+type RelatedUser = {
+  name?: string | null;
+  firstName?: string | null;
+  lastName?: string | null;
+  email?: string | null;
+};
+
+function buildDisplayName(user?: RelatedUser): string {
+  if (!user) return 'Anonymous';
+
+  const explicitName = user.name?.trim();
+  if (explicitName) return explicitName;
+
+  const fullName = [user.firstName, user.lastName].filter(Boolean).join(' ').trim();
+  if (fullName) return fullName;
+
+  const emailName = user.email?.split('@')[0]?.trim();
+  if (emailName) return emailName;
+
+  return 'Anonymous';
+}
+
+function getInitials(name: string): string {
+  return name
+    .split(/\s+/)
+    .filter(Boolean)
+    .map((w) => w[0].toUpperCase())
+    .slice(0, 2)
+    .join('');
+}
+
+export async function GET() {
+  try {
+    const payload = await getPayload({ config });
+
+    const { docs } = await payload.find({
+      collection: 'reviews',
+      where: { status: { equals: 'approved' } },
+      depth: 1,
+      limit: 10,
+      sort: '-createdAt',
+    });
+
+    const testimonials = docs.map((doc) => {
+      const user = typeof doc.user === 'object' && doc.user !== null
+        ? doc.user as RelatedUser
+        : undefined;
+      const name = buildDisplayName(user);
+      const rating = Math.max(1, Math.min(5, Number(doc.rating) || 5));
+
+   
+--- FILE: d:\projects\nextacademy\src\app\api\home\video-testimonials\route.ts ---
+import { NextResponse } from 'next/server';
+import { getPayload } from 'payload';
+import config from '@payload-config';
+
+const PUBLIC_CACHE_HEADERS = {
+  'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=60',
+};
+
+export async function GET() {
+  try {
+    const payload = await getPayload({ config });
+
+    const { docs } = await payload.find({
+      collection: 'reviews',
+      where: {
+        isVideoTestimonial: { equals: true },
+        status: { equals: 'approved' },
+      },
+      depth: 1,
+      limit: 8,
+      sort: '-createdAt',
+    });
+
+    const videos = docs.map((doc) => {
+      const thumbnail = doc.videoThumbnail as { url?: string } | undefined;
+      return {
+        id: doc.id,
+        videoUrl: doc.videoUrl ?? '',
+        thumbnail: thumbnail?.url ?? null,
+        captionTitle: doc.videoCaption ?? '',
+        captionSubtitle: doc.videoSubtitle ?? '',
+      };
+    });
+
+    return NextResponse.json({ videos }, { headers: PUBLIC_CACHE_HEADERS });
+  } catch {
+    return NextResponse.json({ videos: [] }, { headers: PUBLIC_CACHE_HEADERS });
+  }
+}
+
+--- FILE: d:\projects\nextacademy\src\app\api\instructor\availability\route.ts ---
+import { NextRequest, NextResponse } from 'next/server';
+import { getPayload } from 'payload';
+import type { ConsultationAvailability } from '@/payload-types';
+import config from '@payload-config';
+
+const INDEX_TO_DAY = [
+  'sunday',
+  'monday',
+  'tuesday',
+  'wednesday',
+  'thursday',
+  'friday',
+  'saturday',
+] as const;
+
+const DAY_TO_INDEX: Record<(typeof INDEX_TO_DAY)[number], 0 | 1 | 2 | 3 | 4 | 5 | 6> = {
+  sunday: 0,
+  monday: 1,
+  tuesday: 2,
+  wednesday: 3,
+  thursday: 4,
+  friday: 5,
+  saturday: 6,
+};
+
+type ScopeError = { status: number; error: string };
+type InstructorScope = {
+  payload: Awaited<ReturnType<typeof getPayload>>;
+  instructorId: number;
+};
+
+function relationToId(value: unknown): number | null {
+  if (typeof value === 'number') return value;
+  if (typeof value === 'string') {
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : null;
+  }
+  if (value && typeof value === 'object' && 'id' in value) {
+    const rawId = (value as { id?: unknown }).id;
+    if (typeof rawId === 'number') return rawId;
+    if (typeof rawId === 'string') {
+      const parsed = Number(rawId);
+      return Number.isFinite(parsed) ? parsed : null;
+    }
+  }
+  return null;
+}
+
+function parsePositiveInt(input: string | null, fallback: number, max: number): number {
+  const parsed = Number(input);
+  if (!Number.isFinite(parsed)) return fallback;
+  return Math.max(1, Math.min(max, Math.floor(parsed)));
+}
+
+async function resolveInstructorScope(req: NextReque
+--- FILE: d:\projects\nextacademy\src\app\api\instructor\consultation-types\route.ts ---
+import { NextRequest, NextResponse } from 'next/server';
+import { getPayload } from 'payload';
+import config from '@payload-config';
+import type { ConsultationType } from '@/payload-types';
+
+type ScopeError = { status: number; error: string };
+type InstructorScope = {
+  payload: Awaited<ReturnType<typeof getPayload>>;
+  instructorId: number;
+};
+
+function relationToId(value: unknown): number | null {
+  if (typeof value === 'number') return value;
+  if (typeof value === 'string') {
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : null;
+  }
+  if (value && typeof value === 'object' && 'id' in value) {
+    const rawId = (value as { id?: unknown }).id;
+    if (typeof rawId === 'number') return rawId;
+    if (typeof rawId === 'string') {
+      const parsed = Number(rawId);
+      return Number.isFinite(parsed) ? parsed : null;
+    }
+  }
+  return null;
+}
+
+function sanitizeText(value: unknown): string | undefined {
+  if (typeof value !== 'string') return undefined;
+  const normalized = value.trim();
+  return normalized.length > 0 ? normalized : undefined;
+}
+
+async function resolveInstructorScope(req: NextRequest): Promise<InstructorScope | ScopeError> {
+  const payload = await getPayload({ config });
+  const { user } = await payload.auth({ headers: req.headers });
+  const authUser = user as { role?: string | null; instructorId?: unknown } | null;
+
+  if (!authUser) return { status: 401, error: 'Unauthorized' };
+  if (authUser.role !== 'instructor') return 
+--- FILE: d:\projects\nextacademy\src\app\api\instructor\consultation-types\[id]\route.ts ---
+import { NextRequest, NextResponse } from 'next/server';
+import { getPayload } from 'payload';
+import config from '@payload-config';
+import type { ConsultationType } from '@/payload-types';
+
+function relationToId(value: unknown): number | null {
+  if (typeof value === 'number') return value;
+  if (typeof value === 'string') {
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : null;
+  }
+  if (value && typeof value === 'object' && 'id' in value) {
+    const rawId = (value as { id?: unknown }).id;
+    if (typeof rawId === 'number') return rawId;
+    if (typeof rawId === 'string') {
+      const parsed = Number(rawId);
+      return Number.isFinite(parsed) ? parsed : null;
+    }
+  }
+  return null;
+}
+
+function sanitizeText(value: unknown): string | undefined {
+  if (typeof value !== 'string') return undefined;
+  const normalized = value.trim();
+  return normalized.length > 0 ? normalized : undefined;
+}
+
+function mapDoc(doc: ConsultationType) {
+  const title =
+    doc.title ||
+    doc.titleEn ||
+    doc.titleAr ||
+    'Consultation';
+
+  return {
+    id: String(doc.id),
+    title,
+    titleAr: doc.titleAr || title,
+    titleEn: doc.titleEn || '',
+    description: doc.description || doc.descriptionEn || doc.descriptionAr || '',
+    descriptionAr: doc.descriptionAr || '',
+    descriptionEn: doc.descriptionEn || '',
+    durationMinutes: doc.durationMinutes || 30,
+    price: doc.price || 0,
+    currency: doc.currency || 'EGP',
+    meetingType: doc.meetingType 
+--- FILE: d:\projects\nextacademy\src\app\api\instructor\profile\route.ts ---
+import { NextRequest, NextResponse } from 'next/server';
+import { getPayload } from 'payload';
+import config from '@payload-config';
+
+type AuthUser = {
+  role?: string | null;
+  instructorId?: unknown;
+};
+
+function relationToId(value: unknown): number | null {
+  if (typeof value === 'number') return value;
+  if (typeof value === 'string') {
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : null;
+  }
+  if (value && typeof value === 'object' && 'id' in value) {
+    const rawId = (value as { id?: unknown }).id;
+    if (typeof rawId === 'number') return rawId;
+    if (typeof rawId === 'string') {
+      const parsed = Number(rawId);
+      return Number.isFinite(parsed) ? parsed : null;
+    }
+  }
+  return null;
+}
+
+async function resolveInstructorContext(req: NextRequest) {
+  const payload = await getPayload({ config });
+  const { user } = await payload.auth({ headers: req.headers });
+  const authUser = user as AuthUser | null;
+
+  if (!authUser) return { error: 'Unauthorized', status: 401 as const };
+  if (authUser.role !== 'instructor') return { error: 'Forbidden', status: 403 as const };
+
+  const instructorId = relationToId(authUser.instructorId);
+  if (!instructorId) return { error: 'No instructor profile linked to this account', status: 403 as const };
+
+  return { payload, instructorId };
+}
+
+export async function GET(req: NextRequest) {
+  try {
+    const scope = await resolveInstructorContext(req);
+    if ('error' in scope) {
+      return NextRespon
+--- FILE: d:\projects\nextacademy\src\app\api\instructor\profile\submit\route.ts ---
+import { NextRequest, NextResponse } from 'next/server';
+import { getPayload } from 'payload';
+import config from '@payload-config';
+
+type AuthUser = {
+  role?: string | null;
+  instructorId?: unknown;
+};
+
+type InstructorDocLike = {
+  id: number | string;
+  firstName?: string | null;
+  lastName?: string | null;
+  jobTitle?: string | null;
+  tagline?: string | null;
+  bioAr?: unknown;
+  bioEn?: unknown;
+  verificationStatus?: string | null;
+};
+
+function relationToId(value: unknown): number | null {
+  if (typeof value === 'number') return value;
+  if (typeof value === 'string') {
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : null;
+  }
+  if (value && typeof value === 'object' && 'id' in value) {
+    const rawId = (value as { id?: unknown }).id;
+    if (typeof rawId === 'number') return rawId;
+    if (typeof rawId === 'string') {
+      const parsed = Number(rawId);
+      return Number.isFinite(parsed) ? parsed : null;
+    }
+  }
+  return null;
+}
+
+function hasRichTextContent(value: unknown): boolean {
+  if (!value || typeof value !== 'object') return false;
+  const root = (value as { root?: { children?: unknown[] } }).root;
+  if (!root || !Array.isArray(root.children)) return false;
+
+  for (const child of root.children) {
+    if (!child || typeof child !== 'object') continue;
+    const children = (child as { children?: Array<{ text?: unknown }> }).children;
+    if (!Array.isArray(children)) continue;
+    for (const textNode of children) {
+      con
+--- FILE: d:\projects\nextacademy\src\app\api\instructor\program-submissions\route.ts ---
+import { NextRequest, NextResponse } from 'next/server';
+import { getPayload } from 'payload';
+import config from '@payload-config';
+
+type ScopeError = { status: number; error: string };
+type InstructorScope = {
+  payload: Awaited<ReturnType<typeof getPayload>>;
+  instructorId: number;
+  userId: number;
+};
+
+function relationToId(value: unknown): number | null {
+  if (typeof value === 'number') return value;
+  if (typeof value === 'string') {
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : null;
+  }
+  if (value && typeof value === 'object' && 'id' in value) {
+    const rawId = (value as { id?: unknown }).id;
+    if (typeof rawId === 'number') return rawId;
+    if (typeof rawId === 'string') {
+      const parsed = Number(rawId);
+      return Number.isFinite(parsed) ? parsed : null;
+    }
+  }
+  return null;
+}
+
+function sanitizeText(value: unknown): string | undefined {
+  if (typeof value !== 'string') return undefined;
+  const normalized = value.trim();
+  return normalized.length > 0 ? normalized : undefined;
+}
+
+async function resolveInstructorScope(req: NextRequest): Promise<InstructorScope | ScopeError> {
+  const payload = await getPayload({ config });
+  const { user } = await payload.auth({ headers: req.headers });
+  const authUser = user as { id?: unknown; role?: string | null; instructorId?: unknown } | null;
+
+  if (!authUser) return { status: 401, error: 'Unauthorized' };
+  if (authUser.role !== 'instructor') return { status: 403, error: 'Fo
+--- FILE: d:\projects\nextacademy\src\app\api\instructor\program-submissions\[id]\route.ts ---
+import { NextRequest, NextResponse } from 'next/server';
+import { getPayload } from 'payload';
+import config from '@payload-config';
+
+function relationToId(value: unknown): number | null {
+  if (typeof value === 'number') return value;
+  if (typeof value === 'string') {
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : null;
+  }
+  if (value && typeof value === 'object' && 'id' in value) {
+    const rawId = (value as { id?: unknown }).id;
+    if (typeof rawId === 'number') return rawId;
+    if (typeof rawId === 'string') {
+      const parsed = Number(rawId);
+      return Number.isFinite(parsed) ? parsed : null;
+    }
+  }
+  return null;
+}
+
+function sanitizeText(value: unknown): string | undefined {
+  if (typeof value !== 'string') return undefined;
+  const normalized = value.trim();
+  return normalized.length > 0 ? normalized : undefined;
+}
+
+function normalizeSubmissionData(input: Record<string, unknown>) {
+  const next: Record<string, unknown> = {};
+  if (input.type !== undefined) {
+    next.type =
+      input.type === 'workshop' || input.type === 'webinar' || input.type === 'course'
+        ? input.type
+        : 'course';
+  }
+  if (input.titleAr !== undefined) next.titleAr = sanitizeText(input.titleAr);
+  if (input.titleEn !== undefined) next.titleEn = sanitizeText(input.titleEn);
+  if (input.shortDescriptionAr !== undefined) next.shortDescriptionAr = sanitizeText(input.shortDescriptionAr);
+  if (input.shortDescriptionEn !== undefined) next.shor
+--- FILE: d:\projects\nextacademy\src\app\api\instructor\program-submissions\[id]\submit\route.ts ---
+import { NextRequest, NextResponse } from 'next/server';
+import { getPayload } from 'payload';
+import config from '@payload-config';
+
+function relationToId(value: unknown): number | null {
+  if (typeof value === 'number') return value;
+  if (typeof value === 'string') {
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : null;
+  }
+  if (value && typeof value === 'object' && 'id' in value) {
+    const rawId = (value as { id?: unknown }).id;
+    if (typeof rawId === 'number') return rawId;
+    if (typeof rawId === 'string') {
+      const parsed = Number(rawId);
+      return Number.isFinite(parsed) ? parsed : null;
+    }
+  }
+  return null;
+}
+
+async function resolveScope(req: NextRequest) {
+  const payload = await getPayload({ config });
+  const { user } = await payload.auth({ headers: req.headers });
+  const authUser = user as { id?: unknown; role?: string | null; instructorId?: unknown } | null;
+  if (!authUser) return { error: 'Unauthorized', status: 401 as const };
+  if (authUser.role !== 'instructor') return { error: 'Forbidden', status: 403 as const };
+  const userId = relationToId(authUser.id);
+  const instructorId = relationToId(authUser.instructorId);
+  if (!userId || !instructorId) return { error: 'No instructor profile linked to this account', status: 403 as const };
+  return { payload, userId, instructorId };
+}
+
+function isValidSubmission(doc: Record<string, unknown>): { valid: boolean; missing: string[] } {
+  const missing: string[] = [];
+
+--- FILE: d:\projects\nextacademy\src\app\api\instructor\sessions\route.ts ---
+import { NextRequest, NextResponse } from 'next/server';
+import { getPayload } from 'payload';
+import config from '@payload-config';
+
+type ScopeError = { status: number; error: string };
+type InstructorScope = {
+  payload: Awaited<ReturnType<typeof getPayload>>;
+  instructorId: number;
+};
+
+function relationToId(value: unknown): number | null {
+  if (typeof value === 'number') return value;
+  if (typeof value === 'string') {
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : null;
+  }
+  if (value && typeof value === 'object' && 'id' in value) {
+    const rawId = (value as { id?: unknown }).id;
+    if (typeof rawId === 'number') return rawId;
+    if (typeof rawId === 'string') {
+      const parsed = Number(rawId);
+      return Number.isFinite(parsed) ? parsed : null;
+    }
+  }
+  return null;
+}
+
+function parsePositiveInt(input: string | null, fallback: number, max: number): number {
+  const parsed = Number(input);
+  if (!Number.isFinite(parsed)) return fallback;
+  return Math.max(1, Math.min(max, Math.floor(parsed)));
+}
+
+async function resolveInstructorScope(req: NextRequest): Promise<InstructorScope | ScopeError> {
+  const payload = await getPayload({ config });
+  const { user } = await payload.auth({ headers: req.headers });
+  const authUser = user as { role?: string | null; instructorId?: unknown } | null;
+
+  if (!authUser) return { status: 401, error: 'Unauthorized' };
+  if (authUser.role !== 'instructor') return { status: 403, error: 'Forbidden'
+--- FILE: d:\projects\nextacademy\src\app\api\instructor\sessions\[id]\materials\route.ts ---
+import { NextRequest, NextResponse } from 'next/server';
+import { getPayload } from 'payload';
+import config from '@payload-config';
+
+type ScopeError = { status: number; error: string };
+type InstructorScope = {
+  payload: Awaited<ReturnType<typeof getPayload>>;
+  instructorId: number;
+};
+
+type MaterialDoc = {
+  id: number | string;
+  filename?: string | null;
+  alt?: string | null;
+  url?: string | null;
+  mimeType?: string | null;
+  filesize?: number | null;
+};
+
+type SessionDoc = {
+  id: number | string;
+  materials?: Array<number | string | MaterialDoc> | null;
+};
+
+function relationToId(value: unknown): number | null {
+  if (typeof value === 'number') return value;
+  if (typeof value === 'string') {
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : null;
+  }
+  if (value && typeof value === 'object' && 'id' in value) {
+    const rawId = (value as { id?: unknown }).id;
+    if (typeof rawId === 'number') return rawId;
+    if (typeof rawId === 'string') {
+      const parsed = Number(rawId);
+      return Number.isFinite(parsed) ? parsed : null;
+    }
+  }
+  return null;
+}
+
+function normalizeMaterialRow(value: number | string | MaterialDoc) {
+  if (typeof value === 'number' || typeof value === 'string') {
+    return {
+      id: String(value),
+      name: `Material ${value}`,
+      url: null as string | null,
+      mimeType: null as string | null,
+      filesize: null as number | null,
+    };
+  }
+
+  const fallbackName =
+    (typeof value.alt === 'stri
+--- FILE: d:\projects\nextacademy\src\app\api\notifications\read-all\route.ts ---
+import { NextRequest, NextResponse } from 'next/server';
+import { getPayload } from 'payload';
+import config from '@payload-config';
+
+export async function PUT(req: NextRequest) {
+  const payload = await getPayload({ config });
+  const { user } = await payload.auth({ headers: req.headers });
+  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+  await payload.update({
+    collection: 'notifications',
+    where: { and: [{ user: { equals: user.id } }, { isRead: { equals: false } }] },
+    data: { isRead: true },
+  });
+
+  return NextResponse.json({ success: true });
+}
+
+--- FILE: d:\projects\nextacademy\src\app\api\notifications\[id]\read\route.ts ---
+import { NextRequest, NextResponse } from 'next/server';
+import { getPayload } from 'payload';
+import config from '@payload-config';
+
+export async function PUT(
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
+) {
+  const payload = await getPayload({ config });
+  const { user } = await payload.auth({ headers: req.headers });
+  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+  const { id } = await params;
+
+  const doc = await payload.findByID({ collection: 'notifications', id });
+  const notifUser = typeof doc.user === 'object' ? doc.user?.id : doc.user;
+  if (String(notifUser) !== String(user.id)) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+  }
+
+  await payload.update({ collection: 'notifications', id, data: { isRead: true } });
+
+  return NextResponse.json({ success: true });
+}
+
+--- FILE: d:\projects\nextacademy\src\app\api\popups\active\route.ts ---
+import { NextRequest, NextResponse } from 'next/server';
+import { getPayload } from 'payload';
+import config from '@payload-config';
+import { authenticateRequestUser } from '@/lib/server-auth';
+
+const PURCHASED_BOOKING_STATUSES = ['confirmed', 'completed'];
+
+type PopupTargeting = {
+  displayPages?: 'all' | 'specific' | null;
+  specificPages?: Array<{ url?: string | null }> | null;
+  targetAudience?: 'all' | 'guests_only' | 'logged_in' | 'specific_role' | null;
+  targetRole?: 'student' | 'user' | 'instructor' | 'b2b_manager' | null;
+  visitorCondition?: 'all' | 'first_visit' | 'returning_visitor' | null;
+  purchaseCondition?: 'all' | 'no_purchase' | 'has_purchase' | null;
+  emailCaptureCondition?: 'all' | 'email_captured' | 'email_not_captured' | null;
+  minSessionPageViews?: number | null;
+};
+
+type ViewerContext = {
+  isLoggedIn: boolean;
+  role?: string;
+  hasPurchase: boolean;
+  firstVisit: boolean;
+  emailCaptured: boolean;
+  sessionPageViews: number;
+};
+
+function parseBooleanParam(value: string | null): boolean {
+  return value === '1' || value === 'true';
+}
+
+function normalizeRole(role?: string): string | undefined {
+  if (!role) return undefined;
+  if (role === 'student') return 'user';
+  return role;
+}
+
+function isAdminViewer(user: { role?: unknown; email?: unknown } | null | undefined): boolean {
+  if (!user) return false;
+  if (user.role === 'admin') return true;
+
+  const configured = (process.env.PAYLOAD_ADMIN_EMAIL || '')
+    .split(',')
+    .map((email) => email.t
+--- FILE: d:\projects\nextacademy\src\app\api\reviews\moderate\route.ts ---
+import { NextRequest, NextResponse } from 'next/server';
+import { getPayload } from 'payload';
+import config from '@payload-config';
+
+type Action = 'approve' | 'flag' | 'remove';
+
+export async function POST(req: NextRequest) {
+  try {
+    const { reviewId, action, reason } = await req.json() as {
+      reviewId: string;
+      action: Action;
+      reason?: string;
+    };
+
+    if (!reviewId || !['approve', 'flag', 'remove'].includes(action)) {
+      return NextResponse.json({ error: 'بيانات غير صحيحة' }, { status: 400 });
+    }
+
+    const payload = await getPayload({ config });
+
+    // Admin only
+    const { user } = await payload.auth({ headers: req.headers });
+    if (!user || user.role !== 'admin') {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
+
+    const statusMap = {
+      approve: 'approved',
+      flag: 'flagged',
+      remove: 'removed',
+    } as const;
+
+    await payload.update({
+      collection: 'reviews',
+      id: reviewId,
+      data: {
+        status: statusMap[action],
+        adminNotes: reason,
+        removedReason: action === 'remove' ? reason : undefined,
+      },
+    });
+
+    // Recalculate program average rating after approve/remove
+    if (action === 'approve' || action === 'remove') {
+      const review = await payload.findByID({ collection: 'reviews', id: reviewId });
+      const programId = typeof review.program === 'object' ? review.program.id : review.program;
+
+      const approvedReviews = await payload.find({
+   
+--- FILE: d:\projects\nextacademy\src\app\api\seed-admin\route.ts ---
+/**
+ * Emergency admin seed endpoint.
+ *
+ * POST /api/seed-admin
+ * Body: { email, password, firstName, lastName }
+ *
+ * Security:
+ * - Disabled by default (ENABLE_ADMIN_SEED_ENDPOINT must be "true")
+ * - Requires Authorization: Bearer <CRON_SECRET>
+ */
+import crypto from 'node:crypto';
+import { getPayload } from 'payload';
+import config from '@payload-config';
+import { NextRequest, NextResponse } from 'next/server';
+
+export const dynamic = 'force-dynamic';
+
+function timingSafeEqualString(a: string, b: string): boolean {
+  const aBuf = Buffer.from(a);
+  const bBuf = Buffer.from(b);
+  if (aBuf.length !== bBuf.length) return false;
+  return crypto.timingSafeEqual(aBuf, bBuf);
+}
+
+export async function POST(req: NextRequest) {
+  try {
+    if (process.env.ENABLE_ADMIN_SEED_ENDPOINT !== 'true') {
+      return NextResponse.json({ error: 'Not found' }, { status: 404 });
+    }
+
+    const configuredSecret = process.env.CRON_SECRET?.trim();
+    if (!configuredSecret) {
+      return NextResponse.json(
+        { error: 'CRON_SECRET is not configured' },
+        { status: 503 },
+      );
+    }
+
+    const incomingAuth = req.headers.get('authorization') || '';
+    const expectedAuth = `Bearer ${configuredSecret}`;
+    if (!timingSafeEqualString(incomingAuth, expectedAuth)) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const body = await req.json();
+    const { email, password, firstName, lastName } = body;
+
+    if (!email || !password || !firstName 
+--- FILE: d:\projects\nextacademy\src\app\api\seed-instructors\route.ts ---
+import { NextResponse } from 'next/server';
+import { getPayload } from 'payload';
+import config from '@payload-config';
+
+// ─── Data from old site (consaltants file) ────────────────────────────────
+const consultants = [
+  {
+    firstName: 'عبدالرحمن',
+    lastName: 'قنديل',
+    slug: 'abdelrahman-kandeel',
+    jobTitle: 'Founder of Next Academy',
+    tagline: 'مؤسس Next Academy وخبير في ريادة الأعمال',
+    bioAr: 'مؤسس Next Academy وخبير في ريادة الأعمال مع خبرة تزيد عن 10 سنوات في مساعدة رواد الأعمال على تحويل أفكارهم إلى مشاريع ناجحة.',
+    bioEn: 'Founder of Next Academy and entrepreneurship expert with 10+ years helping entrepreneurs turn ideas into successful ventures.',
+    imageUrl: 'https://afokabguqrexeqkfretn.supabase.co/storage/v1/object/public/cms_images/1767190502873-9mawjex543.png',
+    featuredOrder: 1,
+  },
+  {
+    firstName: 'أحمد',
+    lastName: 'عثمان',
+    slug: 'ahmed-othman',
+    jobTitle: 'Marketing Expert',
+    tagline: 'خبير تسويق رقمي ونمو سريع',
+    bioAr: 'خبير تسويق رقمي مع سجل حافل في مساعدة الشركات الناشئة على تحقيق نمو سريع من خلال استراتيجيات تسويقية مبتكرة.',
+    bioEn: 'Digital marketing expert with a track record of helping startups achieve rapid growth through innovative marketing strategies.',
+    imageUrl: 'https://afokabguqrexeqkfretn.supabase.co/storage/v1/object/public/cms_images/1767190517471-2kdskj6g33x.png',
+    featuredOrder: 2,
+  },
+  {
+    firstName: 'كريم',
+    lastName: 'تركي',
+    slug: 'karim-turky',
+    jobTitle: 'Operatio
+--- FILE: d:\projects\nextacademy\src\app\api\seed-partners\route.ts ---
+import { NextResponse } from 'next/server';
+import { getPayload } from 'payload';
+import config from '@payload-config';
+
+// ─── Partners from old site ────────────────────────────────────────────────
+const partners = [
+  {
+    name: 'Bedaya',
+    logoUrl: 'https://afokabguqrexeqkfretn.supabase.co/storage/v1/object/public/cms_images/1768945505696-1awc98w14f4.png',
+    website: '',
+    orderIndex: 2,
+  },
+  {
+    name: 'EBC',
+    logoUrl: 'https://afokabguqrexeqkfretn.supabase.co/storage/v1/object/public/cms_images/1768945608097-j08bjln35nq.png',
+    website: '',
+    orderIndex: 0,
+  },
+  {
+    name: 'Ex Agency',
+    logoUrl: 'https://afokabguqrexeqkfretn.supabase.co/storage/v1/object/public/cms_images/1768945556068-1vn0l3a7knc.png',
+    website: '',
+    orderIndex: 1,
+  },
+  {
+    name: 'Green Studio',
+    logoUrl: 'https://afokabguqrexeqkfretn.supabase.co/storage/v1/object/public/cms_images/1768945539049-zilhh9vcub.png',
+    website: '',
+    orderIndex: 4,
+  },
+  {
+    name: 'Bendary',
+    logoUrl: 'https://afokabguqrexeqkfretn.supabase.co/storage/v1/object/public/cms_images/1768945528091-dsegfp6tccn.png',
+    website: '',
+    orderIndex: 3,
+  },
+  {
+    name: 'Eventocity',
+    logoUrl: 'https://afokabguqrexeqkfretn.supabase.co/storage/v1/object/public/cms_images/1768945632639-81ndj22rxvo.png',
+    website: 'https://eventocity.com',
+    orderIndex: 1,
+  },
+  {
+    name: 'We Event',
+    logoUrl: 'https://afokabguqrexeqkfretn.supabase.co/storage/v1/object/public/cms_images/1768
+--- FILE: d:\projects\nextacademy\src\app\api\seed-test-data\route.ts ---
+import { NextResponse } from 'next/server';
+import { getPayload } from 'payload';
+import config from '@payload-config';
+import crypto from 'node:crypto';
+
+function timingSafeEqualString(a: string, b: string): boolean {
+  const aBuf = Buffer.from(a);
+  const bBuf = Buffer.from(b);
+  if (aBuf.length !== bBuf.length) return false;
+  return crypto.timingSafeEqual(aBuf, bBuf);
+}
+
+export async function POST(req: Request) {
+  try {
+    if (process.env.ENABLE_TEST_SEED_ENDPOINT !== 'true') {
+      return NextResponse.json({ error: 'Not found' }, { status: 404 });
+    }
+
+    const configuredSecret = process.env.CRON_SECRET?.trim();
+    if (!configuredSecret) {
+      return NextResponse.json({ error: 'Server misconfigured' }, { status: 503 });
+    }
+
+    const incomingAuth = req.headers.get('authorization') || '';
+    const expectedAuth = `Bearer ${configuredSecret}`;
+    if (!timingSafeEqualString(incomingAuth, expectedAuth)) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const payload = await getPayload({ config });
+
+    // Step 1: Create or find category
+    let category;
+    const existingCats = await payload.find({
+      collection: 'categories',
+      where: { slug: { equals: 'test-workshops' } },
+      limit: 1,
+    });
+
+    if (existingCats.docs.length > 0) {
+      category = existingCats.docs[0];
+    } else {
+      category = await payload.create({
+        collection: 'categories',
+        data: {
+          nameAr: 'ورش تجريبية',
+     
+--- FILE: d:\projects\nextacademy\src\app\api\upcoming-events\route.ts ---
+import { NextResponse } from 'next/server';
+import { getPayload } from 'payload';
+import type { Where } from 'payload';
+import config from '@payload-config';
+import type { Media, Program, Round } from '@/payload-types';
+
+const PUBLIC_CACHE_HEADERS = {
+  'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=60',
+};
+
+type EventCard = {
+  id: string | number;
+  titleAr: string;
+  titleEn: string;
+  startDate: string;
+  endDate?: string;
+  location?: string;
+  isOnline?: boolean;
+  price?: number;
+  currency?: string;
+  isFree?: boolean;
+  registrationUrl?: string;
+  image?: string;
+};
+
+function extractMediaUrl(value: unknown): string | undefined {
+  if (!value || typeof value === 'number') return undefined;
+  return (value as Media).url || undefined;
+}
+
+function buildEventCard(input: {
+  program: Program;
+  round: Round | null;
+  customImage?: unknown;
+  customUrl?: string;
+}): EventCard {
+  const { program, round, customImage, customUrl } = input;
+  const location = round?.locationName || round?.locationAddress || undefined;
+  const image = extractMediaUrl(customImage)
+    || extractMediaUrl(program.coverImage)
+    || extractMediaUrl(program.thumbnail);
+
+  return {
+    id: round?.id || program.id,
+    titleAr: program.titleAr || 'برنامج',
+    titleEn: program.titleEn || program.titleAr || 'Program',
+    startDate: round?.startDate || new Date().toISOString(),
+    endDate: round?.endDate || undefined,
+    location,
+    isOnline: round?.locationType === 'online',
+    pri
+--- FILE: d:\projects\nextacademy\src\app\api\users\login\route.ts ---
+import { NextRequest, NextResponse } from 'next/server';
+import { getPayload } from 'payload';
+import config from '@payload-config';
+import { rateLimit } from '@/lib/rate-limit';
+
+// 5 requests per minute per IP.
+const LIMIT = 5;
+const WINDOW_MS = 60_000;
+// Defense-in-depth: limit attempts against the same email across IPs.
+const EMAIL_LIMIT = 8;
+const EMAIL_WINDOW_MS = 10 * 60_000;
+
+function parseConfiguredAdminEmails(): string[] {
+  const raw = process.env.PAYLOAD_ADMIN_EMAIL || '';
+  return raw
+    .split(/[,\s;]+/)
+    .map((email) => email.trim().toLowerCase())
+    .filter(Boolean);
+}
+
+function isConfiguredAdminEmail(email: string): boolean {
+  const normalizedEmail = email.trim().toLowerCase();
+  if (!normalizedEmail) return false;
+  return parseConfiguredAdminEmails().includes(normalizedEmail);
+}
+
+function resolveCookieDomain(hostname: string): string | undefined {
+  if (hostname === 'nextacademyedu.com' || hostname.endsWith('.nextacademyedu.com')) {
+    return '.nextacademyedu.com';
+  }
+
+  return undefined;
+}
+
+async function syncConfiguredAdminBeforeLogin(payload: any, email: string): Promise<void> {
+  const normalizedEmail = email.trim().toLowerCase();
+  if (!isConfiguredAdminEmail(normalizedEmail)) {
+    return;
+  }
+
+  const existing = await payload.find({
+    collection: 'users',
+    where: { email: { equals: normalizedEmail } },
+    limit: 1,
+    overrideAccess: true,
+  });
+
+  if (!existing.docs?.length) return;
+  const user = existing.docs[0];
+  const shouldProm
+--- FILE: d:\projects\nextacademy\src\app\api\webhooks\easykash\redirect\route.ts ---
+import { NextRequest, NextResponse } from 'next/server';
+import { getPayload } from 'payload';
+import config from '@payload-config';
+
+function resolveBaseUrl(req: NextRequest): string {
+  return process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_SERVER_URL || req.nextUrl.origin;
+}
+
+function normalizeLocale(value: string | null): 'ar' | 'en' {
+  return value === 'en' ? 'en' : 'ar';
+}
+
+function normalizeStatus(value: string | null): 'success' | 'pending' | 'failed' {
+  const normalized = (value || '').trim().toLowerCase();
+  if (normalized === 'success' || normalized === 'paid') return 'success';
+  if (normalized === 'pending' || normalized === 'new') return 'pending';
+  return 'failed';
+}
+
+async function resolveBookingIdByPaymentRef(paymentRef: string, req: NextRequest): Promise<string | null> {
+  try {
+    const payload = await getPayload({ config });
+
+    // customerReference is stored as `paymentId-timestamp` — query the stored value first
+    const results = await payload.find({
+      collection: 'payments',
+      where: {
+        'paymentGatewayResponse.customerReference': { equals: paymentRef },
+      },
+      depth: 0,
+      limit: 1,
+      overrideAccess: true,
+      req: req as any,
+    });
+    let payment: any = results.docs[0] ?? null;
+
+    // Fallback: extract the Payload payment ID from the prefix (e.g. "68-1719500000000" → "68")
+    if (!payment) {
+      const idPrefix = paymentRef.split('-')[0];
+      if (idPrefix) {
+        try {
+          payment = awa
+--- FILE: d:\projects\nextacademy\src\app\api\webhooks\easykash\route.ts ---
+import { NextRequest, NextResponse } from 'next/server';
+import { getPayload } from 'payload';
+import config from '@payload-config';
+import { verifyEasyKashHmac } from '@/lib/payment-api';
+import { processSuccessfulPayment } from '@/lib/payment-helper';
+
+export async function POST(req: NextRequest) {
+  try {
+    const body = await req.json() as Record<string, unknown>;
+
+    // ── 1. HMAC verification ───────────────────────────────────────
+    if (!verifyEasyKashHmac(body)) {
+      console.warn('[webhook/easykash] HMAC mismatch');
+      return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
+    }
+
+    const easykashRef = String(body.easykashRef || '');
+    const amountRaw = String(body.Amount || '');
+    const status = String(body.status || '');
+    const customerReference = String(body.customerReference || '');
+
+    if (status !== 'PAID') {
+      return NextResponse.json({ received: true }); // only process PAID
+    }
+
+    const payload = await getPayload({ config });
+    let payment: any = null;
+
+    // ── 2. Resolve payment (easykashRef first) ─────────────────────
+    if (easykashRef) {
+      const result = await payload.find({
+        collection: 'payments',
+        where: { transactionId: { equals: easykashRef } },
+        depth: 1,
+        limit: 1,
+        overrideAccess: true,
+        req: req as any,
+      });
+      payment = result.docs[0];
+    }
+
+    // Direct Pay flow stores customerReference as `paymentId-timestamp` in
+    // paymentGatewayRe
+--- FILE: d:\projects\nextacademy\src\app\api\webhooks\paymob\redirect\route.ts ---
+import { NextRequest, NextResponse } from 'next/server';
+
+// Paymob redirects here after checkout with query params:
+// ?success=true&id=<txn_id>&order=<order_id>&locale=ar&...
+export async function GET(req: NextRequest) {
+  const { searchParams } = req.nextUrl;
+  const success = searchParams.get('success');
+  const pending = searchParams.get('pending');
+  const bookingId = searchParams.get('merchant_order_id') ?? searchParams.get('order');
+  const locale = searchParams.get('locale') === 'en' ? 'en' : 'ar';
+
+  const base = process.env.NEXT_PUBLIC_APP_URL!;
+
+  if (success === 'true') {
+    return NextResponse.redirect(`${base}/${locale}/checkout/success?bookingId=${bookingId}`);
+  }
+  if (pending === 'true') {
+    return NextResponse.redirect(`${base}/${locale}/checkout/pending?bookingId=${bookingId}`);
+  }
+  return NextResponse.redirect(`${base}/${locale}/checkout/failed?bookingId=${bookingId}`);
+}
+
+--- FILE: d:\projects\nextacademy\src\app\api\webhooks\paymob\route.ts ---
+import { NextRequest, NextResponse } from 'next/server';
+import { verifyPaymobHmac } from '@/lib/payment-api';
+import { processSuccessfulPayment } from '@/lib/payment-helper';
+import { getPayload } from 'payload';
+import config from '@payload-config';
+
+export async function POST(req: NextRequest) {
+  try {
+    const body = await req.json();
+
+    // ── 1. HMAC verification ───────────────────────────────────────
+    const hmac = body.hmac as string;
+    if (!hmac || !verifyPaymobHmac(body.obj ?? body, hmac)) {
+      console.warn('[webhook/paymob] HMAC mismatch');
+      return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
+    }
+
+    const obj = body.obj ?? body;
+    const success: boolean = obj.success === true || obj.success === 'true';
+    const transactionId = String(obj.id);
+    const amountCents: number = parseInt(obj.amount_cents ?? '0');
+    const bookingId: string = obj.special_reference ?? obj.extras?.booking_id;
+    const paymentId: string = obj.extras?.payment_id;
+
+    if (!bookingId) {
+      console.warn('[webhook/paymob] No booking_id in webhook');
+      return NextResponse.json({ received: true });
+    }
+
+    // ── 2. Handle non-success ──────────────────────────────────────
+    if (!success) {
+      if (paymentId) {
+        const payload = await getPayload({ config });
+        await payload.update({
+          collection: 'payments',
+          id: paymentId,
+          data: {
+            status: 'failed',
+            transactionId,
+          

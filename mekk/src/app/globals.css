@@ -1,0 +1,152 @@
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Syne:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,600;1,400;1,600&display=swap');
+@import "tailwindcss/preflight";
+@tailwind utilities;
+
+/* ═══════════════════════════════════════
+   DESIGN TOKENS - LUXURY/EDITORIAL VIBE
+   ═══════════════════════════════════════ */
+:root {
+  /* Colors */
+  --bg-primary: #050505;
+  --bg-surface: #1a1a1a; 
+  --text-primary: #FFFCF2;
+  --text-secondary: #CCC5B9;
+  --text-muted: rgba(255, 252, 242, 0.15);
+  --accent: #EB5E28;
+  --border: rgba(255, 252, 242, 0.08);
+
+  /* Typography Scale (Golden Ratio ~1.618 adjusted) */
+  --text-massive: clamp(2.5rem, 8vw, 8rem);
+  --text-huge: clamp(2.2rem, 6vw, 6rem); 
+  --text-display: clamp(1.8rem, 4vw, 4.5rem);
+  --text-heading: clamp(1.4rem, 2.5vw, 2.8rem);
+  --text-body: clamp(1rem, 1.2vw, 1.25rem);
+  --text-small: clamp(0.8rem, 0.9vw, 1rem);
+  --text-label: 0.75rem;
+
+  /* Fonts */
+  --font-heading: 'Syne', sans-serif;
+  --font-serif: 'Playfair Display', serif;
+  --font-body: 'Inter', sans-serif;
+  --font-accent: 'Bebas Neue', cursive;
+
+  /* Whitespace / Padding - Extreme Spacing */
+  --space-sm: 1rem;
+  --space-md: 2rem;
+  --space-lg: 5rem;
+  --space-xl: 10rem;
+  --space-2xl: 20vh;
+  --space-3xl: 30vh;
+
+  /* Layout */
+  --container-padding: clamp(1rem, 4vw, 4rem);
+
+  /* Transitions */
+  --ease-slow: cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body {
+  width: 100%;
+}
+
+body {
+  font-family: var(--font-body);
+  font-size: var(--text-body);
+  color: var(--text-secondary);
+  background-color: var(--bg-primary);
+  -webkit-font-smoothing: antialiased;
+}
+
+[data-lenis-prevent] { overscroll-behavior: contain; }
+html.lenis, html.lenis body { height: auto; }
+.lenis.lenis-smooth { scroll-behavior: auto !important; }
+.lenis.lenis-stopped { overflow: hidden; }
+
+/* ═══════════════════════════════════════
+   GLOBAL ANIMATION UTILITIES
+   ═══════════════════════════════════════ */
+.marker-highlight {
+  background: linear-gradient(120deg, var(--accent) 0%, var(--accent) 100%);
+  background-repeat: no-repeat;
+  background-size: 0% 100%;
+  transition: background-size 0.8s var(--ease-slow);
+}
+
+.marker-highlight.active {
+  background-size: 100% 100%;
+}
+
+.reveal-up {
+  opacity: 0;
+  transform: translateY(30px);
+  will-change: transform, opacity;
+}
+
+/* ═══════════════════════════════════════
+   TYPOGRAPHY
+   ═══════════════════════════════════════ */
+.text-massive {
+  font-family: var(--font-heading);
+  font-size: var(--text-massive);
+  font-weight: 800;
+  line-height: 0.85;
+  letter-spacing: -0.04em;
+  text-transform: uppercase;
+  color: var(--text-primary);
+}
+
+.text-serif {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 400;
+}
+
+/* Base structural classes */
+.section {
+  position: relative;
+  width: 100vw;
+  padding: var(--space-2xl) 0;
+}
+
+/* Base layouts */
+.page-wrapper {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  z-index: 1;
+}
+
+/* Navigation - Reset standard links */
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* Utility for hiding scrollbar during custom lenis scroll */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-primary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+@keyframes infinite-scroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+.animate-infinite-scroll {
+  animation: infinite-scroll 20s linear infinite;
+}

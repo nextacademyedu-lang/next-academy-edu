@@ -1,0 +1,165 @@
+.wrapper {
+    width: 100%;
+    height: 100vh;
+    background-color: #000000;
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.pinContent {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    padding: 0 5%;
+}
+
+.wordWrapper {
+    font-family: var(--font-serif);
+    font-size: clamp(60px, 12vw, 180px); /* Slightly refined base */
+    line-height: 0.8;
+    font-weight: 500;
+    text-transform: uppercase;
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    white-space: nowrap;
+    margin-bottom: 2vh;
+    letter-spacing: -0.01em;
+}
+
+ /* Handled in consolidated media query at the bottom */
+
+.blurLetter {
+    display: inline-block;
+    color: rgba(255, 255, 255, 0.4);
+    will-change: filter, opacity, transform;
+}
+
+.sharpPart {
+    color: #ffffff;
+    will-change: transform, color, letter-spacing;
+}
+
+.topLabel {
+    font-size: 12px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.3);
+    margin-bottom: 6rem;
+    font-weight: 500;
+    position: relative;
+    z-index: 10;
+}
+
+.teleprompter {
+    position: relative;
+    width: 100%;
+    max-width: 1100px;
+    height: 340px; /* Taller for bigger text */
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.spotlightGlow {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 800px;
+    height: 120px;
+    background: radial-gradient(ellipse at center, rgba(255, 255, 255, 0.12) 0%, transparent 80%);
+    filter: blur(30px);
+    z-index: 1;
+    pointer-events: none;
+}
+
+.maskTop, .maskBottom {
+    position: absolute;
+    left: 0;
+    width: 100%;
+    height: 150px;
+    z-index: 5;
+    pointer-events: none;
+}
+
+.maskTop {
+    top: 0;
+    background: linear-gradient(to bottom, #000000 0%, #000000 30%, transparent 100%);
+}
+
+.maskBottom {
+    bottom: 0;
+    background: linear-gradient(to top, #000000 0%, #000000 30%, transparent 100%);
+}
+
+.list {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 125px 0; /* Centering first question in 340px area */
+}
+
+.question {
+    font-size: clamp(20px, 4vw, 38px); /* Slightly refined size */
+    height: 90px; /* FIXED HEIGHT FOR SCROLL ALIGNMENT */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    font-weight: 500;
+    color: #ffffff;
+    opacity: 0.1;
+    width: 100%;
+    transform: scale(0.85);
+    will-change: transform, opacity, filter;
+    transition: color 0.4s var(--ease-slow);
+}
+
+.bottomNote {
+    margin-top: 6rem;
+    font-size: 14px;
+    font-style: italic;
+    color: rgba(255, 255, 255, 0.3);
+    font-family: var(--font-serif);
+    opacity: 0;
+    will-change: opacity, transform;
+}
+
+@media (max-width: 768px) {
+    .wordWrapper {
+        font-size: clamp(2rem, 12vw, 4.2rem); /* Strictly smaller to prevent overflow */
+        letter-spacing: -0.01em;
+    }
+    
+    .question {
+        font-size: 18px;
+        height: 70px; /* Aligned with list padding */
+        padding: 10px 10px;
+    }
+    
+    .teleprompter {
+        height: 240px;
+    }
+    
+    .list {
+        padding: 85px 0;
+    }
+
+    .topLabel {
+        margin-bottom: 3rem;
+        font-size: 10px;
+    }
+
+    .bottomNote {
+        margin-top: 3rem;
+    }
+}

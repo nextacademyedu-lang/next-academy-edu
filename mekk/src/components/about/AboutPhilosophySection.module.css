@@ -1,0 +1,211 @@
+.section {
+    background-color: #050505; /* Black/dark background to match story */
+    color: var(--text-primary); /* Light text */
+    padding: 15vh 5vw;
+    position: relative;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    gap: 20vh; /* Large spacing between major blocks */
+}
+
+/* ================= Top Header Grid ================= */
+.topHeader {
+    display: grid;
+    grid-template-columns: minmax(80px, 1fr) 2fr 1fr;
+    gap: 2rem;
+    align-items: flex-start;
+}
+
+.topNumber {
+    font-family: var(--font-sans);
+    font-size: 1rem;
+    font-weight: 500;
+    padding-top: 0.5rem;
+    color: var(--text-secondary);
+}
+
+.mainHeadline {
+    font-family: var(--font-sans);
+    font-size: clamp(3rem, 6vw, 7rem);
+    line-height: 1;
+    font-weight: 400;
+    text-transform: uppercase;
+    letter-spacing: -0.04em;
+    margin: 0;
+    color: var(--text-primary);
+}
+
+.mainHeadline :global(.line) {
+    overflow: hidden;
+}
+
+.mainHeadline :global(.word) {
+    transform: translateY(110%);
+    opacity: 0;
+    will-change: transform, opacity;
+}
+
+.topLabel {
+    font-family: var(--font-sans);
+    font-size: 0.875rem;
+    text-align: right;
+    padding-top: 1rem;
+    color: var(--text-secondary);
+}
+
+/* ================= Images Grid ================= */
+.imagesGrid {
+    display: grid;
+    grid-template-columns: 1fr 3fr;
+    gap: 4rem;
+    align-items: flex-start;
+}
+
+.imagesLeft {
+    font-family: var(--font-sans);
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    padding-top: 2rem;
+}
+
+.imagesRight {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+}
+
+.imageBox {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.imageOverflow {
+    width: 100%;
+    aspect-ratio: 3/4;
+    overflow: hidden;
+    position: relative;
+    background-color: #1a1a1a;
+}
+
+.imageOverflow img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: grayscale(100%) contrast(1.1);
+}
+
+.imageCaption {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: clamp(1rem, 1.2vw, 1.25rem);
+    color: rgba(255, 255, 255, 0.5);
+}
+
+/* ================= Content Text Grid ================= */
+.contentGrid {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 4rem;
+    align-items: flex-start;
+}
+
+.contentLeft {
+    font-family: var(--font-sans);
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+}
+
+.contentRight {
+    display: flex;
+    flex-direction: column;
+    gap: 5rem;
+    max-width: 800px;
+}
+
+.normalText {
+    font-family: var(--font-sans);
+    font-size: clamp(1rem, 1.2vw, 1.25rem);
+    line-height: 1.6;
+    color: var(--text-secondary);
+}
+
+.mediumHeadline {
+    font-family: var(--font-sans);
+    font-weight: 300;
+    font-size: clamp(2rem, 3.5vw, 4rem);
+    line-height: 1.1;
+    letter-spacing: -0.03em;
+    margin: 0;
+    color: var(--text-primary);
+}
+
+.normalTextStack {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    font-family: var(--font-sans);
+    font-size: clamp(0.9rem, 1.1vw, 1.125rem);
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.7);
+    max-width: 600px;
+}
+
+/* ================= Transition Text ================= */
+.transitionText {
+    font-family: var(--font-sans);
+    font-weight: 300;
+    font-size: clamp(2rem, 3vw, 3rem);
+    line-height: 1.2;
+    text-align: center;
+    max-width: 1000px;
+    margin: 0 auto;
+    color: var(--text-primary);
+    padding-bottom: 10vh;
+}
+
+/* ================= Mobile Queries ================= */
+@media (max-width: 900px) {
+    .section {
+        gap: 10vh;
+    }
+
+    .topHeader {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .topNumber {
+        padding-top: 0;
+        margin-bottom: 1rem;
+    }
+
+    .topLabel {
+        text-align: left;
+        padding-top: 0;
+    }
+
+    .imagesGrid {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+
+    .imagesRight {
+        grid-template-columns: 1fr;
+        gap: 4rem;
+    }
+
+    .contentGrid {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+
+    .contentRight {
+        gap: 3rem;
+    }
+
+    .transitionText {
+        text-align: left;
+    }
+}

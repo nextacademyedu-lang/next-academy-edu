@@ -1,0 +1,161 @@
+/* ── Section ── */
+.hero {
+  position: relative;
+  height: 250vh; 
+  width: 100%;
+}
+
+/* ── Container ── */
+.stickyContainer {
+  position: relative;
+  height: 100vh;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #000000; 
+  overflow: hidden;
+}
+
+/* ── Text Layers ── */
+.textLayer {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  pointer-events: none;
+  padding: 0 5%; /* حماية للنص عشان ما يلزقش في حواف الموبايل */
+}
+
+.bgLayer  { z-index: 10; }
+.fgLayer  { z-index: 30; }
+
+/* ── BG Text (STOP PLAYING SMALL) ── */
+.massiveTextBg {
+  font-family: var(--font-heading, sans-serif); 
+  /* تم التعديل لتناسب الموبايل */
+  font-size: clamp(1.8rem, 6vw, 8rem);
+  font-weight: 700;
+  color: #ffffff;
+  text-transform: uppercase;
+  white-space: nowrap;
+  margin: 0;
+}
+
+/* ── FG Text (START SCALING SMART) ── */
+.massiveTextFg {
+  font-family: var(--font-heading, sans-serif);
+  color: #ffffff;
+  text-transform: uppercase;
+  margin: 0;
+  line-height: 1.1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.massiveTextFg span:first-child {
+  /* تم التعديل لتناسب الموبايل */
+  font-size: clamp(2rem, 5vw, 5rem);
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  margin-bottom: -5px; /* تقليل المسافة في الموبايل */
+}
+
+.massiveTextFg span:last-child {
+  /* تم التعديل لتناسب الموبايل */
+  font-size: clamp(2.2rem, 7vw, 9rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+}
+
+.fgContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ── Portrait ── */
+.portraitWrapper {
+  position: absolute;
+  top: 45%; 
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 20; 
+  /* تم التعديل لتناسب عرض الموبايل (80vw) */
+  width: clamp(250px, 80vw, 550px);
+  height: clamp(350px, 60vh, 850px);
+  pointer-events: none;
+}
+
+.portrait {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center; 
+  mask-image: linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%);
+}
+
+/* ── Sub Text ── */
+.subText {
+  font-family: var(--font-body, sans-serif);
+  font-size: clamp(0.75rem, 2vw, 0.9rem); /* ريسبونسيف */
+  font-weight: 400;
+  color: #a0a0a0;
+  text-align: center;
+  line-height: 1.6;
+  margin-top: 1.5rem;
+  max-width: 500px;
+}
+
+/* ── Scroll Hint ── */
+.scrollHintBox {
+  position: absolute;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-body, sans-serif);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: #ffffff;
+  z-index: 40;
+}
+
+.scrollLine {
+  width: 1px;
+  height: 30px;
+  background: currentColor;
+  animation: scrollPulse 1.8s ease-in-out infinite;
+}
+
+@keyframes scrollPulse {
+  0%, 100% { opacity: 0.3; transform: scaleY(1); }
+  50%       { opacity: 1;   transform: scaleY(1.2); }
+}
+
+@media (max-width: 768px) {
+  .massiveTextBg {
+    font-size: clamp(1.5rem, 8vw, 3rem);
+  }
+  .massiveTextFg span:first-child {
+    font-size: clamp(1.2rem, 5vw, 2rem);
+  }
+  .massiveTextFg span:last-child {
+    font-size: clamp(1.8rem, 10vw, 4rem);
+    white-space: normal;
+  }
+  .portraitWrapper {
+    width: clamp(200px, 70vw, 400px);
+    height: clamp(280px, 55vh, 600px);
+  }
+}

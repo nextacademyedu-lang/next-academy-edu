@@ -1,0 +1,23 @@
+.cta {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    z-index: var(--z-sticky);
+    padding: 0.875rem 2rem;
+    font-family: var(--font-body);
+    font-size: var(--text-small);
+    font-weight: 500;
+    letter-spacing: var(--tracking-wide);
+    color: var(--text-primary);
+    background: var(--bg-deep);
+    border: 1px solid var(--border);
+    text-decoration: none;
+    transition: all 0.3s var(--ease-out);
+    cursor: pointer;
+}
+
+.cta:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+    transform: scale(1.05);
+}

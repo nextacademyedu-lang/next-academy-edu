@@ -1,0 +1,129 @@
+
+> nextacademy-scaffold@0.1.0 build D:\projects\nextacademy
+> payload generate:importmap && next build
+
+Generating import map
+No new imports found, skipping writing import map
+   ▲ Next.js 15.4.11
+   - Environments: .env.local, .env
+
+   Creating an optimized production build ...
+<w> [webpack.cache.PackFileCacheStrategy] Skipped not serializable cache item 'Compilation/modules|javascript/auto|D:\projects\nextacademy\node_modules\.pnpm\next@15.4.11_react-dom@19.2_17c7648a026a5bf8543ec2b594eef02e\node_modules\next\dist\build\webpack\loaders\next-flight-css-loader.js??ruleSet[1].rules[13].oneOf[5].use[0]!D:\projects\nextacademy\node_modules\.pnpm\next@15.4.11_react-dom@19.2_17c7648a026a5bf8543ec2b594eef02e\node_modules\next\dist\build\webpack\loaders\css-loader\src\index.js??ruleSet[1].rules[13].oneOf[5].use[1]!D:\projects\nextacademy\node_modules\.pnpm\next@15.4.11_react-dom@19.2_17c7648a026a5bf8543ec2b594eef02e\node_modules\next\dist\build\webpack\loaders\postcss-loader\src\index.js??ruleSet[1].rules[13].oneOf[5].use[2]!D:\projects\nextacademy\src\components\ui\card.module.css|rsc': No serializer registered for Warning
+<w> while serializing webpack/lib/cache/PackFileCacheStrategy.PackContentItems -> webpack/lib/NormalModule -> Array { 1 items } -> webpack/lib/ModuleWarning -> Warning
+<w> [webpack.cache.PackFileCacheStrategy] Skipped not serializable cache item 'Compilation/modules|javascript/auto|D:\projects\nextacademy\node_modules\.pnpm\next@15.4.11_react-dom@19.2_17c7648a026a5bf8543ec2b594eef02e\node_modules\next\dist\build\webpack\loaders\next-flight-css-loader.js??ruleSet[1].rules[13].oneOf[5].use[0]!D:\projects\nextacademy\node_modules\.pnpm\next@15.4.11_react-dom@19.2_17c7648a026a5bf8543ec2b594eef02e\node_modules\next\dist\build\webpack\loaders\css-loader\src\index.js??ruleSet[1].rules[13].oneOf[5].use[1]!D:\projects\nextacademy\node_modules\.pnpm\next@15.4.11_react-dom@19.2_17c7648a026a5bf8543ec2b594eef02e\node_modules\next\dist\build\webpack\loaders\postcss-loader\src\index.js??ruleSet[1].rules[13].oneOf[5].use[2]!D:\projects\nextacademy\src\components\ui\card.module.css|ssr': No serializer registered for Warning
+<w> while serializing webpack/lib/cache/PackFileCacheStrategy.PackContentItems -> webpack/lib/NormalModule -> Array { 1 items } -> webpack/lib/ModuleWarning -> Warning
+<w> [webpack.cache.PackFileCacheStrategy] Skipped not serializable cache item 'Compilation/modules|D:\projects\nextacademy\node_modules\.pnpm\next@15.4.11_react-dom@19.2_17c7648a026a5bf8543ec2b594eef02e\node_modules\next\dist\build\webpack\loaders\css-loader\src\index.js??ruleSet[1].rules[13].oneOf[5].use[2]!D:\projects\nextacademy\node_modules\.pnpm\next@15.4.11_react-dom@19.2_17c7648a026a5bf8543ec2b594eef02e\node_modules\next\dist\build\webpack\loaders\postcss-loader\src\index.js??ruleSet[1].rules[13].oneOf[5].use[3]!D:\projects\nextacademy\src\components\ui\card.module.css': No serializer registered for Warning
+<w> while serializing webpack/lib/cache/PackFileCacheStrategy.PackContentItems -> webpack/lib/NormalModule -> Array { 1 items } -> webpack/lib/ModuleWarning -> Warning
+ ⚠ Compiled with warnings in 98s
+
+
+   Linting and checking validity of types ...
+   Collecting page data ...
+   Generating static pages (0/41) ...
+   Generating static pages (10/41) 
+   Generating static pages (20/41) 
+   Generating static pages (30/41) 
+ ✓ Generating static pages (41/41)
+   Finalizing page optimization ...
+   Collecting build traces ...
+
+Route (app)                                     Size  First Load JS
+┌ ○ /_not-found                                259 B         103 kB
+├ ƒ /[locale]                                67.8 kB         247 kB
+├ ƒ /[locale]/about                          4.28 kB         183 kB
+├ ƒ /[locale]/b2b-dashboard                  4.58 kB         107 kB
+├ ƒ /[locale]/b2b-dashboard/bookings         3.42 kB         106 kB
+├ ƒ /[locale]/b2b-dashboard/bulk-seats       4.22 kB         107 kB
+├ ƒ /[locale]/b2b-dashboard/team             3.42 kB         106 kB
+├ ƒ /[locale]/blog                           3.55 kB         129 kB
+├ ƒ /[locale]/blog/[slug]                    2.97 kB         128 kB
+├ ƒ /[locale]/certificates/[code]              259 B         103 kB
+├ ƒ /[locale]/checkout/[bookingId]           5.38 kB         120 kB
+├ ƒ /[locale]/checkout/failed                 1.9 kB         120 kB
+├ ƒ /[locale]/checkout/pending               2.58 kB         121 kB
+├ ƒ /[locale]/checkout/success               1.81 kB         120 kB
+├ ƒ /[locale]/contact                         3.4 kB         128 kB
+├ ƒ /[locale]/courses                          699 B         133 kB
+├ ƒ /[locale]/dashboard                      5.37 kB         123 kB
+├ ƒ /[locale]/dashboard/bookings             4.03 kB         122 kB
+├ ƒ /[locale]/dashboard/notifications        3.64 kB         106 kB
+├ ƒ /[locale]/dashboard/payments             4.54 kB         122 kB
+├ ƒ /[locale]/dashboard/profile              5.78 kB         108 kB
+├ ƒ /[locale]/events                           781 B         133 kB
+├ ƒ /[locale]/faq                            3.12 kB         128 kB
+├ ƒ /[locale]/for-business                   3.18 kB         128 kB
+├ ƒ /[locale]/forgot-password                3.64 kB         164 kB
+├ ƒ /[locale]/instructor                     5.25 kB         108 kB
+├ ƒ /[locale]/instructor/availability        5.13 kB         108 kB
+├ ƒ /[locale]/instructor/bookings            1.91 kB         107 kB
+├ ƒ /[locale]/instructor/consultation-types  4.17 kB         107 kB
+├ ƒ /[locale]/instructor/earnings            6.34 kB         121 kB
+├ ƒ /[locale]/instructor/sessions            1.84 kB         107 kB
+├ ƒ /[locale]/instructors                      599 B         133 kB
+├ ƒ /[locale]/instructors/[slug]               919 B         134 kB
+├ ƒ /[locale]/login                          4.59 kB         165 kB
+├ ƒ /[locale]/onboarding                     6.76 kB         164 kB
+├ ƒ /[locale]/privacy                        3.08 kB         128 kB
+├ ƒ /[locale]/programs                         699 B         133 kB
+├ ƒ /[locale]/programs/[slug]                 3.3 kB         136 kB
+├ ƒ /[locale]/refund-policy                  3.09 kB         128 kB
+├ ƒ /[locale]/register                       4.68 kB         165 kB
+├ ƒ /[locale]/reset-password                 4.33 kB         165 kB
+├ ƒ /[locale]/terms                          3.09 kB         128 kB
+├ ƒ /[locale]/verify-email                   3.66 kB         161 kB
+├ ƒ /[locale]/webinars                         794 B         133 kB
+├ ƒ /[locale]/workshops                      3.21 kB         128 kB
+├ ƒ /admin/[[...segments]]                   11.9 kB         730 kB
+├ ƒ /api/[...slug]                             175 B         103 kB
+├ ƒ /api/announcement-bars/active              259 B         103 kB
+├ ƒ /api/auth/google                           259 B         103 kB
+├ ƒ /api/auth/google/callback                  259 B         103 kB
+├ ƒ /api/auth/send-otp                         259 B         103 kB
+├ ƒ /api/auth/verify-otp                       259 B         103 kB
+├ ƒ /api/b2b/bookings                          259 B         103 kB
+├ ƒ /api/b2b/dashboard                         259 B         103 kB
+├ ƒ /api/b2b/team                              259 B         103 kB
+├ ƒ /api/bookings/create                       259 B         103 kB
+├ ƒ /api/bulk-seats/allocate                   259 B         103 kB
+├ ƒ /api/certificates/generate                 259 B         103 kB
+├ ƒ /api/checkout/easykash                     259 B         103 kB
+├ ƒ /api/checkout/paymob                       259 B         103 kB
+├ ƒ /api/cron/check-overdue                    259 B         103 kB
+├ ƒ /api/cron/crm-sync                         259 B         103 kB
+├ ƒ /api/cron/waitlist                         259 B         103 kB
+├ ƒ /api/discount-codes/remove                 259 B         103 kB
+├ ƒ /api/discount-codes/validate               259 B         103 kB
+├ ƒ /api/health                                259 B         103 kB
+├ ƒ /api/home/blog-posts                       259 B         103 kB
+├ ƒ /api/home/featured-programs                259 B         103 kB
+├ ƒ /api/home/instructors                      259 B         103 kB
+├ ƒ /api/home/stats                            259 B         103 kB
+├ ƒ /api/home/testimonials                     259 B         103 kB
+├ ƒ /api/home/video-testimonials               259 B         103 kB
+├ ƒ /api/instructor/availability               259 B         103 kB
+├ ƒ /api/notifications/[id]/read               259 B         103 kB
+├ ƒ /api/notifications/read-all                259 B         103 kB
+├ ƒ /api/popups/active                         259 B         103 kB
+├ ƒ /api/reviews/moderate                      259 B         103 kB
+├ ƒ /api/seed-admin                            259 B         103 kB
+├ ƒ /api/seed-instructors                      259 B         103 kB
+├ ƒ /api/seed-partners                         259 B         103 kB
+├ ƒ /api/seed-test-data                        259 B         103 kB
+├ ƒ /api/upcoming-events                       259 B         103 kB
+├ ƒ /api/users/login                           259 B         103 kB
+├ ƒ /api/webhooks/easykash                     259 B         103 kB
+├ ƒ /api/webhooks/easykash/redirect            259 B         103 kB
+├ ƒ /api/webhooks/paymob                       259 B         103 kB
+├ ƒ /api/webhooks/paymob/redirect              259 B         103 kB
+└ ○ /privacy-policy                            259 B         103 kB
++ First Load JS shared by all                 102 kB
+  ├ chunks/863a4a08-7a3726b3ecba5cbc.js      54.1 kB
+  ├ chunks/9598-886a37abf96b17a3.js          44.8 kB
+  └ other shared chunks (total)              3.44 kB
+
+
+ƒ Middleware                                 79.7 kB
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+

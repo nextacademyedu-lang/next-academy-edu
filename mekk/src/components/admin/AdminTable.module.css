@@ -1,0 +1,149 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+}
+
+.title {
+    font-family: var(--font-heading);
+    font-size: 2.5rem;
+    font-weight: 800;
+    margin: 0;
+    letter-spacing: -0.02em;
+}
+
+.description {
+    color: var(--text-secondary);
+    font-family: var(--font-body);
+    font-size: 1.1rem;
+    margin-top: 0.5rem;
+}
+
+.newButton {
+    background: var(--text-primary);
+    color: var(--bg-primary);
+    padding: 0.75rem 1.5rem;
+    border-radius: 999px;
+    font-family: var(--font-sans);
+    font-weight: 600;
+    text-decoration: none;
+    transition: transform 0.3s ease;
+}
+
+.newButton:hover {
+    transform: scale(1.05);
+}
+
+.tableWrapper {
+    background: #0a0a0a;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    overflow: hidden;
+    width: 100%;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+    font-family: var(--font-body);
+}
+
+.table th {
+    background: rgba(255, 255, 255, 0.03);
+    padding: 1rem 1.5rem;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-secondary);
+    font-weight: 600;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.table td {
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    vertical-align: middle;
+}
+
+.table tr:last-child td {
+    border-bottom: none;
+}
+
+.primaryCell {
+    color: var(--text-primary);
+    font-weight: 500;
+}
+
+.secondaryCell {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+}
+
+.badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.badgeActive {
+    background: rgba(16, 185, 129, 0.15);
+    color: #10b981;
+}
+
+.badgeInactive {
+    background: rgba(161, 161, 170, 0.15);
+    color: #a1a1aa;
+}
+
+.actionsCell {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.editBtn {
+    color: var(--accent-light);
+    text-decoration: none;
+    font-size: 0.95rem;
+    font-weight: 500;
+}
+
+.editBtn:hover {
+    text-decoration: underline;
+}
+
+.deleteBtn {
+    background: transparent;
+    border: none;
+    color: #ef4444;
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    font-family: inherit;
+    padding: 0;
+}
+
+.deleteBtn:hover {
+    text-decoration: underline;
+}
+
+.deleteBtn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.empty {
+    text-align: center;
+    color: var(--text-secondary);
+    padding: 3rem !important;
+}

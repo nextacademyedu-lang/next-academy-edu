@@ -1,0 +1,170 @@
+/* ═══════════════════════════════════════
+   PORTFOLIO HERO — TEXT ONLY
+   ═══════════════════════════════════════ */
+
+.hero {
+  position: relative;
+  min-height: 100vh;
+  background-color: var(--bg-primary);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  overflow: hidden;
+}
+
+/* ── Text ── */
+.textContainer {
+  position: relative;
+  padding: 0 5%;
+  z-index: 20;
+}
+
+.label {
+  font-family: var(--font-body);
+  font-size: var(--text-label);
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--accent);
+  margin-bottom: 1rem;
+  display: block;
+}
+
+.title {
+  font-family: var(--font-heading);
+  font-size: clamp(3rem, 10vw, 8rem);
+  font-weight: 800;
+  line-height: 0.85;
+  color: var(--text-primary);
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+
+.subtitle {
+  font-family: var(--font-serif);
+  font-size: clamp(1.2rem, 2.5vw, 2.2rem);
+  font-style: italic;
+  color: var(--text-secondary);
+  margin-top: 2rem;
+  max-width: 600px;
+}
+
+/* ═══════════════════════════════════════
+   INTERSECTING TAPES — BELOW HERO
+   ═══════════════════════════════════════ */
+
+.tapesSection {
+  position: relative;
+  background-color: var(--bg-primary);
+  padding: 6rem 0;
+  overflow: hidden;
+}
+
+.tapesContainer {
+  position: relative;
+  width: 100%;
+  height: clamp(200px, 30vw, 360px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.tape {
+  position: absolute;
+  display: flex;
+  width: 250vw;
+  padding: 1.2rem 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+/* Tape 1: tilted up-left, scrolls left */
+.tape1 {
+  transform: rotate(-8deg);
+  top: 15%;
+}
+
+/* Tape 2: tilted down-right, scrolls right */
+.tape2 {
+  transform: rotate(8deg);
+  bottom: 15%;
+}
+
+.trackLeft {
+  display: flex;
+  gap: 2.5rem;
+  white-space: nowrap;
+  animation: scrollLeft 40s linear infinite;
+  align-items: center;
+}
+
+.trackRight {
+  display: flex;
+  gap: 2.5rem;
+  white-space: nowrap;
+  animation: scrollRight 40s linear infinite;
+  align-items: center;
+}
+
+.logoItem {
+  font-family: var(--font-heading);
+  font-size: clamp(2rem, 4.5vw, 4.5rem);
+  font-weight: 900;
+  text-transform: uppercase;
+  /* Outlined text style */
+  color: transparent;
+  -webkit-text-stroke: 1.5px rgba(255, 255, 255, 0.5);
+  letter-spacing: 0.05em;
+  flex-shrink: 0;
+  transition: all 0.4s ease;
+}
+
+/* Star separator between words */
+.separator {
+  font-size: clamp(1.2rem, 2vw, 2.5rem);
+  color: var(--accent);
+  -webkit-text-stroke: 0;
+  flex-shrink: 0;
+  opacity: 0.6;
+}
+
+@keyframes scrollLeft {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+@keyframes scrollRight {
+  0% { transform: translateX(-50%); }
+  100% { transform: translateX(0); }
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .hero {
+    min-height: 80vh;
+  }
+
+  .title {
+    font-size: clamp(2.5rem, 12vw, 5rem);
+  }
+
+  .tapesSection {
+    padding: 4rem 0;
+  }
+
+  .tapesContainer {
+    height: 180px;
+  }
+
+  .tape1 { transform: rotate(-12deg); }
+  .tape2 { transform: rotate(12deg); }
+
+  .logoItem {
+    font-size: clamp(2rem, 8vw, 3.5rem);
+  }
+
+  .subtitle {
+    margin-top: 1.5rem;
+  }
+}

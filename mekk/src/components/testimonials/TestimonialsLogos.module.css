@@ -1,0 +1,72 @@
+/* ════════════════════
+   LOGOS SECTION
+   ════════════════════ */
+
+.section {
+  background-color: var(--bg-primary);
+  padding: var(--space-lg) var(--container-padding);
+  border-top: 1px solid var(--border);
+}
+
+.label {
+  font-family: var(--font-body);
+  font-size: var(--text-label);
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: var(--text-secondary);
+  opacity: 0.4;
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  justify-content: center;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.logoItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  width: 90px;
+  cursor: default;
+  transition: opacity 0.3s ease;
+  opacity: 0.5;
+}
+
+.logoItem:hover { opacity: 1; }
+
+.logoLetter {
+  font-family: var(--font-heading);
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  width: 56px;
+  height: 56px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.3s ease, background 0.3s ease;
+}
+
+.logoItem:hover .logoLetter {
+  border-color: var(--accent);
+  background: rgba(235, 94, 40, 0.06);
+  color: var(--accent);
+}
+
+.logoName {
+  font-family: var(--font-body);
+  font-size: var(--text-label);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-secondary);
+  text-align: center;
+}

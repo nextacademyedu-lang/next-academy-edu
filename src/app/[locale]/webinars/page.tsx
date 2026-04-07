@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { buildYouTubeThumbnailUrl } from '@/lib/youtube';
 import styles from './page.module.css';
+import { getInstructorNames } from '@/lib/instructor-helpers';
 
 export const dynamic = 'force-dynamic';
 
@@ -161,12 +162,10 @@ export default async function WebinarsPage() {
                   getMediaUrl(webinar.thumbnail) ||
                   youtubeThumbnail ||
                   fallbackImages[index % fallbackImages.length];
-                const instructor =
-                  typeof webinar.instructor === 'object' && webinar.instructor
-                    ? `${webinar.instructor.firstName} ${webinar.instructor.lastName}`.trim()
-                    : locale === 'ar'
-                      ? 'فريق نكست'
-                      : 'Next Team';
+                const instructor = getInstructorNames(
+                  webinar.instructor,
+                  locale === 'ar' ? 'فريق نكست' : 'Next Team',
+                );
 
                 return (
                   <article key={round.id} className={styles.sessionCard}>

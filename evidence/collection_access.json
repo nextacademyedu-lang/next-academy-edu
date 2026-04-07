@@ -1,0 +1,218 @@
+[
+  {
+    "file": "AnnouncementBars.ts",
+    "slug": "announcement-bars",
+    "accessImports": "isAdmin, isPublic",
+    "accessBlock": "read: isPublic,\n    create: isAdmin,\n    update: isAdmin,\n    delete: isAdmin,"
+  },
+  {
+    "file": "BlogPosts.ts",
+    "slug": "blog-posts",
+    "accessImports": "",
+    "accessBlock": "read: () => true,\n    create: ({ req: { user"
+  },
+  {
+    "file": "Bookings.ts",
+    "slug": "bookings",
+    "accessImports": "isAdmin, isAdminOrOwner, isAuthenticated",
+    "accessBlock": "read: isAdminOrOwner,\n    create: isAuthenticated,\n    update: isAdmin,\n    delete: isAdmin,"
+  },
+  {
+    "file": "BulkSeatAllocations.ts",
+    "slug": "bulk-seat-allocations",
+    "accessImports": "isAdmin, isAdminOrB2BManager",
+    "accessBlock": "read: isAdminOrB2BManager,\n    create: isAdmin,\n    update: isAdmin,\n    delete: isAdmin,"
+  },
+  {
+    "file": "Categories.ts",
+    "slug": "categories",
+    "accessImports": "isAdmin, isPublic",
+    "accessBlock": "read: isPublic,\n    create: isAdmin,\n    update: isAdmin,\n    delete: isAdmin,"
+  },
+  {
+    "file": "Certificates.ts",
+    "slug": "certificates",
+    "accessImports": "isAdminOrOwner, isAdmin",
+    "accessBlock": "read: isAdminOrOwner,\n    create: isAdmin,\n    update: isAdmin,\n    delete: isAdmin,"
+  },
+  {
+    "file": "Companies.ts",
+    "slug": "companies",
+    "accessImports": "isAdmin, isAuthenticated, isPublic",
+    "accessBlock": "read: isAuthenticated,\n    create: isAuthenticated,\n    update: isAdmin,\n    delete: isAdmin,"
+  },
+  {
+    "file": "CompanyInvitations.ts",
+    "slug": "company-invitations",
+    "accessImports": "isAdmin",
+    "accessBlock": "read: isAdmin,\n    create: isAdmin,\n    update: isAdmin,\n    delete: isAdmin,"
+  },
+  {
+    "file": "ConsultationAvailability.ts",
+    "slug": "consultation-availability",
+    "accessImports": "isPublic, isAdminOrOwnInstructor",
+    "accessBlock": "read: isPublic,\n    create: isAdminOrOwnInstructor,\n    update: isAdminOrOwnInstructor,\n    delete: isAdminOrOwnInstructor,"
+  },
+  {
+    "file": "ConsultationBookings.ts",
+    "slug": "consultation-bookings",
+    "accessImports": "isAdmin,\n  isAdminOrOwnerOrOwnInstructor,\n  isAdminOrOwnInstructorForUpdate,\n  isAuthenticated,",
+    "accessBlock": "read: isAdminOrOwnerOrOwnInstructor,\n    create: isAuthenticated,\n    update: isAdminOrOwnInstructorForUpdate,\n    delete: isAdmin,"
+  },
+  {
+    "file": "ConsultationSlots.ts",
+    "slug": "consultation-slots",
+    "accessImports": "isAdmin, isPublic",
+    "accessBlock": "read: isPublic,\n    create: isAdmin,\n    update: isAdmin,\n    delete: isAdmin,"
+  },
+  {
+    "file": "ConsultationTypes.ts",
+    "slug": "consultation-types",
+    "accessImports": "isAdmin, isPublic, isAdminOrOwnInstructor",
+    "accessBlock": "read: isPublic,\n    create: isAdminOrOwnInstructor,\n    update: isAdminOrOwnInstructor,\n    delete: isAdmin,"
+  },
+  {
+    "file": "CrmSyncEvents.ts",
+    "slug": "crm-sync-events",
+    "accessImports": "isAdmin",
+    "accessBlock": "read: isAdmin,\n    create: isAdmin,\n    update: isAdmin,\n    delete: isAdmin,"
+  },
+  {
+    "file": "DiscountCodes.ts",
+    "slug": "discount-codes",
+    "accessImports": "isAdmin, isAuthenticated",
+    "accessBlock": "read: isAdmin,\n    create: isAdmin,\n    update: isAdmin,\n    delete: isAdmin,"
+  },
+  {
+    "file": "InstallmentRequests.ts",
+    "slug": "installment-requests",
+    "accessImports": "isAdmin, isAdminOrOwner, isAuthenticated",
+    "accessBlock": "read: isAdminOrOwner,\n    create: isAuthenticated,\n    update: isAdmin,\n    delete: isAdmin,"
+  },
+  {
+    "file": "InstructorBlockedDates.ts",
+    "slug": "instructor-blocked-dates",
+    "accessImports": "isAdminOrInstructor, isAdminOrOwnInstructor",
+    "accessBlock": "read: isAdminOrOwnInstructor,\n    create: isAdminOrInstructor,\n    update: isAdminOrOwnInstructor,\n    delete: isAdminOrOwnInstructor,"
+  },
+  {
+    "file": "InstructorProgramSubmissions.ts",
+    "slug": "instructor-program-submissions",
+    "accessImports": "isAdmin, isAdminRequest",
+    "accessBlock": "read: isAdmin,\n    create: isAdmin,\n    update: isAdmin,\n    delete: isAdmin,"
+  },
+  {
+    "file": "Instructors.ts",
+    "slug": "instructors",
+    "accessImports": "isAdmin, isAdminRequest, isPublic",
+    "accessBlock": "read: isPublic,\n    create: isAdmin,\n    update: isAdmin,\n    delete: isAdmin,"
+  },
+  {
+    "file": "Leads.ts",
+    "slug": "leads",
+    "accessImports": "isAdmin",
+    "accessBlock": "read: isAdmin,\n    create: isAdmin,\n    update: isAdmin,\n    delete: isAdmin,"
+  },
+  {
+    "file": "Media.ts",
+    "slug": "media",
+    "accessImports": "isAdmin, isPublic",
+    "accessBlock": "read: isPublic,\n    create: isAdmin,\n    update: isAdmin,\n    delete: isAdmin,"
+  },
+  {
+    "file": "Notifications.ts",
+    "slug": "notifications",
+    "accessImports": "isAdmin, isAdminOrOwner, isAuthenticated",
+    "accessBlock": "read: isAdminOrOwner,\n    create: isAdmin,\n    update: isAuthenticated,\n    delete: isAdmin,"
+  },
+  {
+    "file": "Partners.ts",
+    "slug": "partners",
+    "accessImports": "isAdmin, isPublic",
+    "accessBlock": "read: isPublic,\n    create: isAdmin,\n    update: isAdmin,\n    delete: isAdmin,"
+  },
+  {
+    "file": "PaymentLinks.ts",
+    "slug": "payment-links",
+    "accessImports": "isAdmin",
+    "accessBlock": "read: isAdmin,\n    create: isAdmin,\n    update: isAdmin,\n    delete: isAdmin,"
+  },
+  {
+    "file": "PaymentPlans.ts",
+    "slug": "payment-plans",
+    "accessImports": "isAdmin, isPublic",
+    "accessBlock": "read: isPublic,\n    create: isAdmin,\n    update: isAdmin,\n    delete: isAdmin,"
+  },
+  {
+    "file": "Payments.ts",
+    "slug": "payments",
+    "accessImports": "isAdmin, isAdminOrOwnerByField, isAuthenticated",
+    "accessBlock": "read: isAdminOrOwnerByField('booking.user'),\n    create: isAdmin,\n    update: isAdmin,\n    delete: isAdmin,"
+  },
+  {
+    "file": "Popups.ts",
+    "slug": "popups",
+    "accessImports": "isAdmin, isPublic",
+    "accessBlock": "read: isPublic,\n    create: isAdmin,\n    update: isAdmin,\n    delete: isAdmin,"
+  },
+  {
+    "file": "Programs.ts",
+    "slug": "programs",
+    "accessImports": "isAdmin, isPublic",
+    "accessBlock": "read: isPublic,\n    create: isAdmin,\n    update: isAdmin,\n    delete: isAdmin,"
+  },
+  {
+    "file": "Reviews.ts",
+    "slug": "reviews",
+    "accessImports": "isPublic, isAuthenticated, isAdminOrOwner, isAdmin, adminOnlyField",
+    "accessBlock": "read: isPublic,\n    create: isAuthenticated,\n    update: isAdminOrOwner,\n    delete: isAdmin,"
+  },
+  {
+    "file": "Rounds.ts",
+    "slug": "rounds",
+    "accessImports": "isAdmin, isPublic",
+    "accessBlock": "read: isPublic,\n    create: isAdmin,\n    update: isAdmin,\n    delete: isAdmin,"
+  },
+  {
+    "file": "Sessions.ts",
+    "slug": "sessions",
+    "accessImports": "isAdmin, isPublic",
+    "accessBlock": "read: isPublic,\n    create: isAdmin,\n    update: isAdmin,\n    delete: isAdmin,"
+  },
+  {
+    "file": "Tags.ts",
+    "slug": "tags",
+    "accessImports": "isAdmin, isPublic",
+    "accessBlock": "read: isPublic,\n    create: isAdmin,\n    update: isAdmin,\n    delete: isAdmin,"
+  },
+  {
+    "file": "UpcomingEventsConfig.ts",
+    "slug": "upcoming-events-config",
+    "accessImports": "isAdmin, isPublic",
+    "accessBlock": "read: isPublic,\n    create: isAdmin,\n    update: isAdmin,\n    delete: isAdmin,"
+  },
+  {
+    "file": "UserProfiles.ts",
+    "slug": "user-profiles",
+    "accessImports": "isAdmin, isAuthenticated, isPublic",
+    "accessBlock": "read: isAuthenticated,\n    create: isAuthenticated,\n    update: isAuthenticated,\n    delete: isAdmin,"
+  },
+  {
+    "file": "Users.ts",
+    "slug": "users",
+    "accessImports": "isAdmin, isAdminOrSelf, isAdminRequest",
+    "accessBlock": "read: isAdminOrSelf,\n    create: () => true,\n    update: isAdminOrSelf,\n    delete: isAdmin,\n    // Only admins can access the admin panel for this collection\n    admin: async ({ req"
+  },
+  {
+    "file": "VerificationCodes.ts",
+    "slug": "verification-codes",
+    "accessImports": "isAdmin",
+    "accessBlock": "read: isAdmin,\n    create: isAdmin,\n    update: isAdmin,\n    delete: isAdmin,"
+  },
+  {
+    "file": "Waitlist.ts",
+    "slug": "waitlist",
+    "accessImports": "isAdminOrOwner, isAuthenticated, isAdmin",
+    "accessBlock": "read: isAdminOrOwner,\n    create: isAuthenticated,\n    update: isAdmin,\n    delete: isAdmin,"
+  }
+]

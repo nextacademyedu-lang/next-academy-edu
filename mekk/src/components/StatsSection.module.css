@@ -1,0 +1,135 @@
+.stats {
+  padding: 12vh 5%;
+  background-color: #ffffff;
+  min-height: 80vh;
+  display: flex;
+  align-items: center;
+  color: #111111;
+  position: relative;
+  overflow: hidden;
+}
+
+.container {
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.statement {
+  margin-bottom: 12vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.lineWrapper {
+  overflow: hidden; 
+  padding-bottom: 10px;
+}
+
+.serifText {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: clamp(1.8rem, 3vw, 3rem);
+  font-weight: 400;
+  font-style: italic;
+  color: #666666;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.boldText {
+  font-family: var(--font-syne, sans-serif);
+  /* صغرنا الحجم شوية عشان ميكسرش في الشاشات المتوسطة */
+  font-size: clamp(2.5rem, 5vw, 5.5rem); 
+  font-weight: 800;
+  text-transform: uppercase;
+  color: #111111;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  margin-top: -10px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
+}
+
+.statItem {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  transition: transform 0.3s ease;
+}
+
+.statItem:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  right: -0.75rem;
+  top: 20%;
+  height: 60%;
+  width: 1px;
+  background-color: rgba(0, 0, 0, 0.08); 
+}
+
+.statItem:hover {
+  transform: translateY(-5px);
+}
+
+.statNumberGroup {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  flex-wrap: nowrap; /* عشان الـ + متقعش في سطر تاني */
+  line-height: 0.8;
+  margin-bottom: 1.2rem;
+  gap: 2px;
+}
+
+.prefix, .suffix {
+  font-family: var(--font-syne, sans-serif);
+  font-size: clamp(1.5rem, 2.5vw, 2.5rem);
+  color: var(--accent, #EB5E28);
+  font-weight: 700;
+}
+
+.number {
+  font-family: var(--font-syne, sans-serif);
+  /* قللنا الـ vw عشان ميكبرش بغباء في الـ 1080p */
+  font-size: clamp(3rem, 5vw, 5.5rem); 
+  color: #111111;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+}
+
+.statLabel {
+  font-family: var(--font-body, sans-serif);
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: #777777;
+  text-align: center;
+}
+
+/* هنكسر الجريد بدري شوية عند 1200 بدل 1024 عشان الأرقام تاخد راحتها */
+@media (max-width: 1200px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+    row-gap: 5rem;
+  }
+  .statItem:nth-child(2)::after { display: none; }
+  .statItem:not(:last-child)::after { right: -0.75rem; }
+}
+
+@media (max-width: 600px) {
+  .grid {
+    grid-template-columns: 1fr;
+    row-gap: 4rem;
+  }
+  .statItem::after { display: none !important; }
+  .boldText { margin-top: 0; }
+}

@@ -1,0 +1,32 @@
+.preloader {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--bg-deep);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: var(--z-preloader);
+}
+
+.counter {
+  display: flex;
+  align-items: baseline;
+  gap: 0.25rem;
+}
+
+.number {
+  font-family: var(--font-accent);
+  font-size: clamp(5rem, 15vw, 12rem);
+  color: var(--text-primary);
+  line-height: 1;
+}
+
+.percent {
+  font-family: var(--font-accent);
+  font-size: clamp(2rem, 5vw, 4rem);
+  color: var(--accent);
+  line-height: 1;
+}

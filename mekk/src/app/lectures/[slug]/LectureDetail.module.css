@@ -1,0 +1,541 @@
+/* ═══════════════════════════════════════
+   LECTURE DETAIL — COURSERA-STYLE LAYOUT
+   ═══════════════════════════════════════ */
+
+/* ── Video Hero ── */
+.videoHero {
+  position: relative;
+  background-color: var(--bg-primary);
+  width: 100%;
+}
+
+.videoWrapper {
+  position: relative;
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  aspect-ratio: 16 / 9;
+}
+
+.videoWrapper iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+/* ── Content Layout (2 columns like Coursera) ── */
+.contentLayout {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 3rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--space-lg) var(--container-padding);
+}
+
+/* ── Main Column (Left) ── */
+.mainColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+}
+
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-body);
+  font-size: var(--text-small);
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.backLink:hover { color: var(--accent); }
+
+.headerBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.workshopBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-body);
+  font-size: var(--text-label);
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--accent);
+  background: var(--text-muted);
+  border: 1px solid var(--border);
+  border-radius: 100px;
+  padding: 0.4rem 1rem;
+  width: fit-content;
+}
+
+.title {
+  font-family: var(--font-heading);
+  font-size: clamp(2rem, 4vw, 3.5rem);
+  font-weight: 800;
+  line-height: 1.05;
+  color: var(--text-primary);
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+
+/* ── Description ── */
+.descriptionBlock {
+  padding: 2rem 0;
+  border-top: 1px solid var(--border);
+}
+
+.sectionLabel {
+  font-family: var(--font-body);
+  font-size: var(--text-label);
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--accent);
+  margin-bottom: 1rem;
+  display: block;
+}
+
+.descriptionText {
+  font-family: var(--font-body);
+  font-size: var(--text-body);
+  color: var(--text-secondary);
+  line-height: 1.8;
+}
+
+/* ── Curriculum / Topics ── */
+.curriculumBlock {
+  padding: 2rem 0;
+  border-top: 1px solid var(--border);
+}
+
+.topicsList {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.topicItem {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  padding: 1.2rem 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.topicItem:first-child {
+  border-top: 1px solid var(--border);
+}
+
+.topicNumber {
+  font-family: var(--font-accent);
+  font-size: 1.5rem;
+  color: var(--accent);
+  opacity: 0.6;
+  width: 40px;
+  flex-shrink: 0;
+  text-align: center;
+}
+
+.topicIcon {
+  font-size: 1.2rem;
+  color: var(--text-secondary);
+  flex-shrink: 0;
+}
+
+.topicName {
+  font-family: var(--font-body);
+  font-size: var(--text-body);
+  color: var(--text-primary);
+}
+
+/* ── Sidebar (Right Column) ── */
+.sidebar {
+  position: sticky;
+  top: 100px;
+  align-self: start;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.sidebarCard {
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.sidebarTitle {
+  font-family: var(--font-heading);
+  font-size: 1.2rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+/* Meta info rows */
+.metaList {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.metaRow {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.metaIcon {
+  font-size: 1.2rem;
+  width: 24px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.metaLabel {
+  font-family: var(--font-body);
+  font-size: var(--text-small);
+  color: var(--text-secondary);
+}
+
+.metaValue {
+  font-family: var(--font-body);
+  font-size: var(--text-small);
+  color: var(--text-primary);
+  font-weight: 600;
+  margin-left: auto;
+}
+
+/* CTA Button */
+.ctaButton {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-family: var(--font-heading);
+  font-size: 0.95rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #fff;
+  background: var(--accent);
+  border: 1px solid var(--accent);
+  border-radius: 100px;
+  padding: 1rem 2rem;
+  cursor: pointer;
+  text-decoration: none;
+  overflow: hidden;
+  transition: all 0.4s var(--ease-slow, ease);
+  z-index: 1;
+}
+
+.ctaButton::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #ffffff;
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.5s var(--ease-slow, ease);
+  z-index: -1;
+}
+
+.ctaButton:hover {
+  color: #000;
+  border-color: #ffffff;
+  transform: translateY(-2px);
+}
+
+.ctaButton:hover::before {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+.ctaButtonOutline {
+  composes: ctaButton;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+}
+
+.ctaButtonOutline::before {
+  background: var(--text-primary);
+}
+
+.ctaButtonOutline:hover {
+  border-color: var(--text-primary);
+  color: #000;
+}
+
+/* ── Instructor Card ── */
+.instructorCard {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border);
+}
+
+.instructorAvatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--accent);
+}
+
+.instructorInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.instructorName {
+  font-family: var(--font-heading);
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  text-transform: uppercase;
+}
+
+.instructorRole {
+  font-family: var(--font-body);
+  font-size: var(--text-label);
+  color: var(--text-secondary);
+  letter-spacing: 0.05em;
+}
+
+/* ── 404 ── */
+.notFound {
+  min-height: 80vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.notFoundTitle {
+  color: var(--text-primary);
+  font-family: var(--font-heading);
+  font-size: 3rem;
+}
+
+/* ── Quote block ── */
+.quoteBlock {
+  margin: 0;
+  padding: 2rem;
+  border-left: 3px solid var(--accent);
+  background: var(--text-muted);
+  border-radius: 0 12px 12px 0;
+}
+
+.quoteText {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: clamp(1rem, 1.4vw, 1.3rem);
+  color: var(--text-primary);
+  line-height: 1.7;
+  display: block;
+  margin-bottom: 1rem;
+}
+
+.quoteAuthor {
+  font-family: var(--font-body);
+  font-size: var(--text-label);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--accent);
+}
+
+/* ── Share Row ── */
+.shareRow {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  padding: 1rem 0;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+.shareLabel {
+  font-family: var(--font-body);
+  font-size: var(--text-label);
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--text-secondary);
+  margin-right: 0.5rem;
+}
+
+.shareBtn {
+  font-family: var(--font-body);
+  font-size: var(--text-label);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-secondary);
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: 100px;
+  padding: 0.4rem 1rem;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.shareBtn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* ── Other Workshops ── */
+.otherSection {
+  background-color: var(--bg-primary);
+  padding: var(--space-xl) var(--container-padding);
+  border-top: 1px solid var(--border);
+}
+
+.otherInner {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.otherLabel {
+  font-family: var(--font-body);
+  font-size: var(--text-label);
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--accent);
+  display: block;
+  margin-bottom: 1rem;
+}
+
+.otherHeading {
+  font-family: var(--font-heading);
+  font-size: clamp(2.5rem, 6vw, 7rem);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: -0.03em;
+  color: var(--text-primary);
+  margin: 0 0 3rem 0;
+  line-height: 0.9;
+}
+
+.otherGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+}
+
+.otherCard {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+  text-decoration: none;
+  transition: border-color 0.4s ease, transform 0.4s ease;
+  background: var(--bg-primary);
+}
+
+.otherCard:hover {
+  border-color: rgba(235, 94, 40, 0.3);
+  transform: translateY(-6px);
+}
+
+.otherCardImg {
+  position: relative;
+  aspect-ratio: 16/9;
+  overflow: hidden;
+}
+
+.otherCardImg img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.7;
+  transition: opacity 0.4s ease, transform 0.6s ease;
+}
+
+.otherCard:hover .otherCardImg img {
+  opacity: 1;
+  transform: scale(1.05);
+}
+
+.otherCardContent {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  flex: 1;
+}
+
+.otherDuration {
+  font-family: var(--font-body);
+  font-size: var(--text-label);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--accent);
+}
+
+.otherTitle {
+  font-family: var(--font-heading);
+  font-size: 1.1rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-primary);
+  margin: 0;
+  line-height: 1.2;
+}
+
+.otherDesc {
+  font-family: var(--font-body);
+  font-size: var(--text-small);
+  color: var(--text-secondary);
+  line-height: 1.5;
+  flex: 1;
+}
+
+.otherLink {
+  font-family: var(--font-body);
+  font-size: var(--text-label);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--text-primary);
+  margin-top: 0.5rem;
+}
+
+@media (max-width: 768px) {
+  .otherGrid { grid-template-columns: 1fr; }
+}
+
+/* ── Responsive ── */
+@media (max-width: 900px) {
+  .contentLayout {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar {
+    position: static;
+    order: -1;
+  }
+}

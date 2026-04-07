@@ -1,0 +1,146 @@
+/* ═══════════════════════════════════════
+   LECTURES CTA SECTION 
+   ═══════════════════════════════════════ */
+
+.section {
+  background-color: var(--bg-primary);
+  padding: var(--space-xl) var(--container-padding);
+  border-top: 1px solid var(--border);
+}
+
+.inner {
+  max-width: 1000px;
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+}
+
+.eyebrow {
+  font-family: var(--font-body);
+  font-size: var(--text-label);
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--accent);
+}
+
+.heading {
+  font-family: var(--font-heading);
+  font-size: clamp(3rem, 9vw, 10rem);
+  font-weight: 800;
+  line-height: 0.9;
+  text-transform: uppercase;
+  letter-spacing: -0.04em;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.outlined {
+  color: transparent;
+  -webkit-text-stroke: 2px var(--text-primary);
+}
+
+.body {
+  font-family: var(--font-body);
+  font-size: var(--text-body);
+  color: var(--text-secondary);
+  line-height: 1.7;
+  max-width: 520px;
+}
+
+.actions {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-top: 0.5rem;
+}
+
+.btnPrimary {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-heading);
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #fff;
+  background: var(--accent);
+  border: 1px solid var(--accent);
+  border-radius: 100px;
+  padding: 1rem 2.5rem;
+  text-decoration: none;
+  overflow: hidden;
+  transition: all 0.4s var(--ease-slow, ease);
+  z-index: 1;
+}
+
+.btnPrimary::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #ffffff;
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.5s var(--ease-slow, ease);
+  z-index: -1;
+}
+
+.btnPrimary:hover {
+  color: #000;
+  border-color: #ffffff;
+  box-shadow: 0 15px 30px rgba(255, 255, 255, 0.1);
+  transform: translateY(-2px);
+}
+
+.btnPrimary:hover::before {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+.btnSecondary {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--font-heading);
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+  border-radius: 100px;
+  padding: 1rem 2.5rem;
+  text-decoration: none;
+  overflow: hidden;
+  transition: all 0.4s var(--ease-slow, ease);
+  z-index: 1;
+}
+
+.btnSecondary::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--text-primary);
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.5s var(--ease-slow, ease);
+  z-index: -1;
+}
+
+.btnSecondary:hover {
+  color: #000;
+  border-color: var(--text-primary);
+  transform: translateY(-2px);
+}
+
+.btnSecondary:hover::before {
+  transform: scaleX(1);
+  transform-origin: left;
+}

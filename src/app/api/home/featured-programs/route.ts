@@ -62,13 +62,21 @@ function categoryLabel(category: Program['category'], locale: 'ar' | 'en'): stri
 }
 
 function instructorLabel(instructor: Program['instructor'], locale: 'ar' | 'en'): string {
-  if (!instructor || typeof instructor === 'number') {
-    return locale === 'ar' ? 'فريق نكست' : 'Next Team';
+  const fallback = locale === 'ar' ? 'فريق نكست' : 'Next Team';
+  if (!instructor) return fallback;
+
+  // hasMany field: instructor is an array
+  const items = Array.isArray(instructor) ? instructor : [instructor];
+  const names: string[] = [];
+  for (const item of items) {
+    if (item && typeof item === 'object' && 'firstName' in item) {
+      const doc = item as Instructor;
+      const fullName = `${doc.firstName || ''} ${doc.lastName || ''}`.trim();
+      if (fullName) names.push(fullName);
+    }
   }
 
-  const doc = instructor as Instructor;
-  const fullName = `${doc.firstName || ''} ${doc.lastName || ''}`.trim();
-  return fullName || (locale === 'ar' ? 'فريق نكست' : 'Next Team');
+  return names.length > 0 ? names.join(', ') : fallback;
 }
 
 function roundLabel(round: Round | null, locale: 'ar' | 'en'): string {

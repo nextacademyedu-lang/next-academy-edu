@@ -290,6 +290,11 @@ export async function cleanupRunId(apiContext: APIRequestContext, runId: string)
 
   const summary: Record<string, number> = {
     users: 0,
+    userProfiles: 0,
+    companies: 0,
+    bulkSeatAllocations: 0,
+    bookings: 0,
+    rounds: 0,
     instructors: 0,
     verificationCodes: 0,
     consultationTypes: 0,
@@ -298,6 +303,66 @@ export async function cleanupRunId(apiContext: APIRequestContext, runId: string)
     instructorBlockedDates: 0,
     consultationSlots: 0,
   };
+
+  const bookingsRes = await queryCollection(
+    apiContext,
+    'bookings',
+    `where[internalNotes][contains]=${encodeURIComponent(runIdToken)}&limit=200&depth=0`,
+  );
+  for (const b of bookingsRes.docs) {
+    const id = relationToId(b.id);
+    if (id !== null) {
+      try {
+        await deleteDocumentAsAdmin(apiContext, 'bookings', id);
+        summary.bookings += 1;
+      } catch {}
+    }
+  }
+
+  const allocRes = await queryCollection(
+    apiContext,
+    'bulk-seat-allocations',
+    `where[notes][contains]=${encodeURIComponent(runIdToken)}&limit=200&depth=0`,
+  );
+  for (const a of allocRes.docs) {
+    const id = relationToId(a.id);
+    if (id !== null) {
+      try {
+        await deleteDocumentAsAdmin(apiContext, 'bulk-seat-allocations', id);
+        summary.bulkSeatAllocations += 1;
+      } catch {}
+    }
+  }
+
+  const roundsRes = await queryCollection(
+    apiContext,
+    'rounds',
+    `where[title][contains]=${encodeURIComponent(runIdToken)}&limit=200&depth=0`,
+  );
+  for (const r of roundsRes.docs) {
+    const id = relationToId(r.id);
+    if (id !== null) {
+      try {
+        await deleteDocumentAsAdmin(apiContext, 'rounds', id);
+        summary.rounds += 1;
+      } catch {}
+    }
+  }
+
+  const companiesRes = await queryCollection(
+    apiContext,
+    'companies',
+    `where[name][contains]=${encodeURIComponent(runIdToken)}&limit=200&depth=0`,
+  );
+  for (const c of companiesRes.docs) {
+    const id = relationToId(c.id);
+    if (id !== null) {
+      try {
+        await deleteDocumentAsAdmin(apiContext, 'companies', id);
+        summary.companies += 1;
+      } catch {}
+    }
+  }
 
   const usersResult = await queryCollection(
     apiContext,
@@ -345,6 +410,23 @@ export async function cleanupRunId(apiContext: APIRequestContext, runId: string)
   for (const user of usersResult.docs) {
     const id = relationToId(user.id);
     if (id === null) continue;
+
+    // Delete user-profile linked to user
+    try {
+      const profilesResult = await queryCollection(
+        apiContext,
+        'user-profiles',
+        `where[user][equals]=${id}&limit=1&depth=0`,
+      );
+      if (profilesResult.docs[0]) {
+        const pid = relationToId(profilesResult.docs[0].id);
+        if (pid !== null) {
+          await deleteDocumentAsAdmin(apiContext, 'user-profiles', pid);
+          summary.userProfiles += 1;
+        }
+      }
+    } catch {}
+
     try {
       await deleteDocumentAsAdmin(apiContext, 'users', id);
       summary.users += 1;

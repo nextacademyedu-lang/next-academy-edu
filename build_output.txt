@@ -1,0 +1,76 @@
+
+> nextacademy-scaffold@0.1.0 build D:\projects\nextacademy
+> payload generate:importmap && next build
+
+Generating import map
+No new imports found, skipping writing import map
+   ▲ Next.js 15.4.11
+   - Environments: .env.local, .env
+
+   Creating an optimized production build ...
+<w> [webpack.cache.PackFileCacheStrategy] Skipped not serializable cache item 'Compilation/modules|javascript/auto|D:\projects\nextacademy\node_modules\.pnpm\next@15.4.11_react-dom@19.2_17c7648a026a5bf8543ec2b594eef02e\node_modules\next\dist\build\webpack\loaders\next-flight-css-loader.js??ruleSet[1].rules[13].oneOf[5].use[0]!D:\projects\nextacademy\node_modules\.pnpm\next@15.4.11_react-dom@19.2_17c7648a026a5bf8543ec2b594eef02e\node_modules\next\dist\build\webpack\loaders\css-loader\src\index.js??ruleSet[1].rules[13].oneOf[5].use[1]!D:\projects\nextacademy\node_modules\.pnpm\next@15.4.11_react-dom@19.2_17c7648a026a5bf8543ec2b594eef02e\node_modules\next\dist\build\webpack\loaders\postcss-loader\src\index.js??ruleSet[1].rules[13].oneOf[5].use[2]!D:\projects\nextacademy\src\components\ui\card.module.css|rsc': No serializer registered for Warning
+<w> while serializing webpack/lib/cache/PackFileCacheStrategy.PackContentItems -> webpack/lib/NormalModule -> Array { 1 items } -> webpack/lib/ModuleWarning -> Warning
+<w> [webpack.cache.PackFileCacheStrategy] Skipped not serializable cache item 'Compilation/modules|javascript/auto|D:\projects\nextacademy\node_modules\.pnpm\next@15.4.11_react-dom@19.2_17c7648a026a5bf8543ec2b594eef02e\node_modules\next\dist\build\webpack\loaders\next-flight-css-loader.js??ruleSet[1].rules[13].oneOf[5].use[0]!D:\projects\nextacademy\node_modules\.pnpm\next@15.4.11_react-dom@19.2_17c7648a026a5bf8543ec2b594eef02e\node_modules\next\dist\build\webpack\loaders\css-loader\src\index.js??ruleSet[1].rules[13].oneOf[5].use[1]!D:\projects\nextacademy\node_modules\.pnpm\next@15.4.11_react-dom@19.2_17c7648a026a5bf8543ec2b594eef02e\node_modules\next\dist\build\webpack\loaders\postcss-loader\src\index.js??ruleSet[1].rules[13].oneOf[5].use[2]!D:\projects\nextacademy\src\components\ui\card.module.css|ssr': No serializer registered for Warning
+<w> while serializing webpack/lib/cache/PackFileCacheStrategy.PackContentItems -> webpack/lib/NormalModule -> Array { 1 items } -> webpack/lib/ModuleWarning -> Warning
+ ⚠ Compiled with warnings in 82s
+
+./src/components/ui/card.module.css
+Warning
+
+(51:3) autoprefixer: end value has mixed support, consider using flex-end instead
+
+Import trace for requested module:
+./src/components/ui/card.module.css
+./src/components/ui/card.tsx
+./src/app/[locale]/contact/page.tsx
+
+./src/components/ui/card.module.css
+Warning
+
+(51:3) autoprefixer: end value has mixed support, consider using flex-end instead
+
+Import trace for requested module:
+./src/components/ui/card.module.css
+./src/components/ui/card.tsx
+./src/components/sections/blogs-preview.tsx
+
+   Linting and checking validity of types ...
+   Collecting page data ...
+   Generating static pages (0/41) ...
+   Generating static pages (10/41) 
+   Generating static pages (20/41) 
+   Generating static pages (30/41) 
+ ✓ Generating static pages (41/41)
+   Finalizing page optimization ...
+   Collecting build traces ...
+ ⚠ Failed to copy traced files for D:\projects\nextacademy\.next\server\pages\_app.js [Error: EPERM: operation not permitted, symlink 'D:\projects\nextacademy\node_modules\.pnpm\react@19.2.3\node_modules\react' -> 'D:\projects\nextacademy\.next\standalone\node_modules\react'] {
+  errno: -4048,
+  code: 'EPERM',
+  syscall: 'symlink',
+  path: 'D:\\projects\\nextacademy\\node_modules\\.pnpm\\react@19.2.3\\node_modules\\react',
+  dest: 'D:\\projects\\nextacademy\\.next\\standalone\\node_modules\\react'
+}
+ ⚠ Failed to copy traced files for D:\projects\nextacademy\.next\server\pages\_error.js [Error: EPERM: operation not permitted, symlink 'D:\projects\nextacademy\node_modules\.pnpm\@swc+helpers@0.5.15\node_modules\@swc\helpers' -> 'D:\projects\nextacademy\.next\standalone\node_modules\.pnpm\next@15.4.11_react-dom@19.2_17c7648a026a5bf8543ec2b594eef02e\node_modules\@swc\helpers'] {
+  errno: -4048,
+  code: 'EPERM',
+  syscall: 'symlink',
+  path: 'D:\\projects\\nextacademy\\node_modules\\.pnpm\\@swc+helpers@0.5.15\\node_modules\\@swc\\helpers',
+  dest: 'D:\\projects\\nextacademy\\.next\\standalone\\node_modules\\.pnpm\\next@15.4.11_react-dom@19.2_17c7648a026a5bf8543ec2b594eef02e\\node_modules\\@swc\\helpers'
+}
+ ⚠ Failed to copy traced files for D:\projects\nextacademy\.next\server\pages\_document.js [Error: EPERM: operation not permitted, symlink 'D:\projects\nextacademy\node_modules\.pnpm\react@19.2.3\node_modules\react' -> 'D:\projects\nextacademy\.next\standalone\node_modules\.pnpm\next@15.4.11_react-dom@19.2_17c7648a026a5bf8543ec2b594eef02e\node_modules\react'] {
+  errno: -4048,
+  code: 'EPERM',
+  syscall: 'symlink',
+  path: 'D:\\projects\\nextacademy\\node_modules\\.pnpm\\react@19.2.3\\node_modules\\react',
+  dest: 'D:\\projects\\nextacademy\\.next\\standalone\\node_modules\\.pnpm\\next@15.4.11_react-dom@19.2_17c7648a026a5bf8543ec2b594eef02e\\node_modules\\react'
+}
+
+> Build error occurred
+[Error: EPERM: operation not permitted, symlink 'D:\projects\nextacademy\node_modules\.pnpm\@next+env@15.4.11\node_modules\@next\env' -> 'D:\projects\nextacademy\.next\standalone\node_modules\.pnpm\next@15.4.11_react-dom@19.2_17c7648a026a5bf8543ec2b594eef02e\node_modules\@next\env'] {
+  errno: -4048,
+  code: 'EPERM',
+  syscall: 'symlink',
+  path: 'D:\\projects\\nextacademy\\node_modules\\.pnpm\\@next+env@15.4.11\\node_modules\\@next\\env',
+  dest: 'D:\\projects\\nextacademy\\.next\\standalone\\node_modules\\.pnpm\\next@15.4.11_react-dom@19.2_17c7648a026a5bf8543ec2b594eef02e\\node_modules\\@next\\env'
+}
+ ELIFECYCLE  Command failed with exit code 1.

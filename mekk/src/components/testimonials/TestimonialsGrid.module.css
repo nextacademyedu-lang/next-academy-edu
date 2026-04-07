@@ -1,0 +1,99 @@
+/* ═══════════════════════════════════════
+   TESTIMONIALS GRID — MASONRY QUOTES
+   ═══════════════════════════════════════ */
+
+.section {
+  position: relative;
+  background-color: var(--bg-primary);
+  padding: var(--space-xl) var(--container-padding);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  gap: 2rem;
+}
+
+/* ── Quote Card ── */
+.card {
+  position: relative;
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 2.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  transition: transform 0.5s var(--ease-slow), border-color 0.4s ease;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(235, 94, 40, 0.3);
+}
+
+/* Giant opening quote mark */
+.quoteMark {
+  font-family: var(--font-serif);
+  font-size: 5rem;
+  line-height: 0.6;
+  color: var(--accent);
+  opacity: 0.3;
+  user-select: none;
+}
+
+.quoteText {
+  font-family: var(--font-serif);
+  font-size: clamp(1.1rem, 1.5vw, 1.4rem);
+  font-style: italic;
+  color: var(--text-primary);
+  line-height: 1.6;
+}
+
+/* Author area */
+.authorRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: auto;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border);
+}
+
+.authorInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.authorName {
+  font-family: var(--font-heading);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.authorRole {
+  font-family: var(--font-body);
+  font-size: var(--text-label);
+  color: var(--text-secondary);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+/* Star rating */
+.stars {
+  display: flex;
+  gap: 0.2rem;
+  color: var(--accent);
+  font-size: 1rem;
+}
+
+/* ── Responsive ── */
+@media (max-width: 640px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}

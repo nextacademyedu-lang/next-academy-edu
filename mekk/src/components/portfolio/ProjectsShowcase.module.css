@@ -1,0 +1,26 @@
+/* ═══════════════════════════════════════
+   PROJECTS SHOWCASE — ORCHESTRATOR
+   ═══════════════════════════════════════ */
+
+.showcase {
+    position: relative;
+    width: 100%;
+}
+
+/* Divider between sections */
+.divider {
+    padding: 0 var(--container-padding, 2rem);
+}
+
+.dividerLine {
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(
+        90deg,
+        transparent 0%,
+        var(--text-secondary) 20%,
+        var(--text-secondary) 80%,
+        transparent 100%
+    );
+    opacity: 0.15;
+}

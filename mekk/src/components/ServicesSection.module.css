@@ -1,0 +1,90 @@
+.services {
+  padding: var(--space-xl) var(--container-padding);
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  min-height: 100vh;
+}
+
+.container {
+  width: 100%;
+}
+
+.topMeta {
+  display: flex;
+  gap: 2rem;
+  font-family: var(--font-body);
+  font-size: var(--text-label);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  opacity: 0.6;
+  margin-bottom: var(--space-lg);
+}
+
+.title {
+  font-family: var(--font-heading);
+  font-size: var(--text-massive);
+  font-weight: 800;
+  line-height: 0.85;
+  letter-spacing: -0.04em;
+  margin-bottom: var(--space-xl);
+  overflow: hidden;
+}
+
+.list {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  row-gap: var(--space-xl);
+  column-gap: var(--space-lg);
+  border-top: 1px solid var(--border);
+  padding-top: var(--space-lg);
+}
+
+.serviceItem {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.serviceHeader {
+  display: flex;
+  align-items: baseline;
+  gap: 1.5rem;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 1.5rem;
+}
+
+.serviceIndex {
+  font-family: var(--font-accent);
+  font-size: 3rem;
+  color: var(--accent);
+  line-height: 1;
+}
+
+.serviceTitle {
+  font-family: var(--font-heading);
+  font-size: var(--text-heading);
+  font-weight: 600;
+  line-height: 1.1;
+  text-transform: uppercase;
+}
+
+.serviceDesc {
+  font-family: var(--font-body);
+  font-size: var(--text-body);
+  line-height: 1.6;
+  color: var(--text-secondary);
+  max-width: 450px;
+}
+
+@media (max-width: 1024px) {
+  .list {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .title {
+    font-size: clamp(2.5rem, 12vw, 4rem);
+    word-break: break-word;
+  }
+}

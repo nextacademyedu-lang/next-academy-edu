@@ -1,0 +1,167 @@
+/* ═══════════════════════════════════════
+   LECTURES HERO — EDITORIAL GIANT
+   ═══════════════════════════════════════ */
+
+.hero {
+  position: relative;
+  min-height: 100vh;
+  background-color: var(--bg-primary);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: var(--space-lg) var(--container-padding);
+  padding-bottom: 6rem;
+  overflow: hidden;
+}
+
+.bgNumber {
+  position: absolute;
+  top: -2rem;
+  right: -5rem;
+  font-family: var(--font-accent);
+  font-size: clamp(12rem, 30vw, 35rem);
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(255, 252, 242, 0.03);
+  line-height: 1;
+  pointer-events: none;
+  user-select: none;
+  will-change: transform;
+}
+
+.topMeta {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  margin-bottom: 3rem;
+}
+
+.sectionNum,
+.sectionLabel {
+  font-family: var(--font-body);
+  font-size: clamp(0.7rem, 1vw, 0.85rem);
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--text-secondary);
+  opacity: 0.6;
+}
+
+.titleBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+}
+
+.subline {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: clamp(0.9rem, 1.5vw, 1.4rem);
+  color: var(--accent);
+  letter-spacing: 0.02em;
+}
+
+.title {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.titleLine {
+  display: block;
+  font-family: var(--font-heading);
+  font-size: clamp(3.2rem, 11vw, 13.5rem);
+  font-weight: 800;
+  line-height: 0.9;
+  text-transform: uppercase;
+  letter-spacing: -0.04em;
+  color: var(--text-primary);
+  word-break: break-word;
+}
+
+.titleLineAccent {
+  color: transparent;
+  -webkit-text-stroke: 1.5px var(--text-primary);
+}
+
+.descriptor {
+  font-family: var(--font-body);
+  font-size: clamp(0.9rem, 1.1vw, 1.2rem);
+  color: var(--text-secondary);
+  max-width: 420px;
+  line-height: 1.6;
+  margin-bottom: 3rem;
+}
+
+.scrollHint {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.scrollLine {
+  display: block;
+  width: 32px;
+  height: 1px;
+  background: rgba(255, 252, 242, 0.2);
+}
+
+.scrollText {
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: var(--text-secondary);
+  opacity: 0.5;
+}
+
+@media (max-width: 1024px) {
+  .titleLine {
+    font-size: clamp(3rem, 10vw, 8rem);
+  }
+
+  .bgNumber {
+    right: -4rem;
+    top: 2rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .hero {
+    min-height: auto;
+    padding-top: 10rem;
+    padding-bottom: 4rem;
+    justify-content: flex-start;
+  }
+
+  .titleLine {
+    font-size: clamp(2.8rem, 14vw, 5.5rem);
+    line-height: 1;
+  }
+
+  .bgNumber {
+    font-size: 15rem;
+    right: -2rem;
+    top: 0;
+    opacity: 0.4;
+  }
+
+  .descriptor {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .titleLine {
+    font-size: clamp(2.4rem, 16vw, 4rem);
+  }
+
+  .topMeta {
+    margin-bottom: 2rem;
+    gap: 1rem;
+  }
+
+  .bgNumber {
+    font-size: 12rem;
+    top: -2rem;
+  }
+}

@@ -15,6 +15,7 @@ import { EarlyBirdCountdown } from '@/components/ui/early-bird-countdown';
 import { InstructorCard } from '@/components/sections/instructor-card';
 import { buildYouTubeEmbedUrl, buildYouTubeThumbnailUrl } from '@/lib/youtube';
 import { MediaPlayer } from '@/components/ui/media-player';
+import { getInstructorNames, getFirstInstructor } from '@/lib/instructor-helpers';
 import styles from './page.module.css';
 
 export default async function ProgramDetailsPage({
@@ -57,14 +58,9 @@ export default async function ProgramDetailsPage({
 
   const coverImageUrlFromMedia = getMediaUrl(program.coverImage) || getMediaUrl(program.thumbnail);
 
-  // Instructor — may be a populated Instructor object or just a number (FK)
-  const instructor: Instructor | null =
-    typeof program.instructor === 'object' && program.instructor !== null
-      ? program.instructor
-      : null;
-  const instructorName = instructor
-    ? `${instructor.firstName ?? ''} ${instructor.lastName ?? ''}`.trim()
-    : '';
+  // Instructor — hasMany field, extract first instructor and combined names
+  const instructor = getFirstInstructor(program.instructor);
+  const instructorName = getInstructorNames(program.instructor);
 
   // Fetch rounds for this program from the separate "rounds" collection
   const { docs: roundDocs } = await payload.find({

@@ -1,0 +1,106 @@
+.section {
+  position: relative;
+  background-color: #000000; /* خلفية بيضاء نقية */
+  padding: 15vh 5%;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.container {
+  position: relative;
+  z-index: 1;
+  max-width: 900px;
+  width: 100%;
+  text-align: left; /* المحاذاة لليسار بتدي شكل مقالات المجلات الفخمة */
+}
+
+/* العنصر اللي بيخفي النص جواه للأنيميشن */
+.revealWrapper {
+  overflow: hidden;
+  padding-bottom: 5px;
+  margin-bottom: 1.5rem;
+}
+
+.tagLabel {
+  font-family: var(--font-body, sans-serif);
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--accent, #EB5E28);
+  margin-bottom: 2rem;
+  display: block;
+}
+
+.headline {
+  font-family: var(--font-syne, sans-serif);
+  font-size: clamp(2.5rem, 5vw, 4.5rem);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: -0.03em;
+  color: #fafafa; /* أسود قوي جداً للتباين */
+  margin: 0 0 4rem 0;
+  line-height: 1.05;
+}
+
+.storyWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin-bottom: 4rem;
+  max-width: 800px;
+}
+
+.paragraph {
+  font-family: var(--font-body, sans-serif);
+  font-size: clamp(1.1rem, 1.8vw, 1.35rem);
+  line-height: 1.7;
+  color: #555555; /* رمادي غامق للقراءة المريحة */
+  margin: 0;
+}
+
+.paragraph strong {
+  color: #c8c8c8;
+  font-weight: 700;
+}
+
+.ctaButton {
+  display: inline-flex;
+  font-family: var(--font-syne, sans-serif);
+  font-size: 0.95rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #000000;
+  background-color: #ffffff; /* زرار أسود سوليد */
+  padding: 1.2rem 3rem;
+  border-radius: 100px;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  border: 1px solid #000000;
+}
+
+.ctaButton:hover {
+  background-color: var(--accent, #EB5E28);
+  border-color: var(--accent, #EB5E28);
+  transform: translateY(-4px);
+  box-shadow: 0 10px 20px rgba(235, 94, 40, 0.2);
+}
+
+@media (max-width: 768px) {
+  .section {
+    padding: 10vh 5%;
+  }
+  
+  .headline {
+    margin-bottom: 3rem;
+  }
+  
+  .ctaButton {
+    padding: 1rem 2rem;
+    width: 100%;
+    justify-content: center;
+  }
+}

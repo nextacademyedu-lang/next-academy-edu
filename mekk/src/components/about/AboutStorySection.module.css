@@ -1,0 +1,81 @@
+.section {
+    position: relative;
+    min-height: 100vh;
+    background-color: #050505; /* Black to blend smoothly with manifesto */
+    color: var(--text-primary);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.textContent {
+    padding: 15vh 10vw 0;
+    position: relative;
+    z-index: 10;
+    max-width: 1200px;
+}
+
+.introText {
+    font-family: var(--font-sans);
+    font-size: clamp(1rem, 2vw, 1.25rem);
+    color: var(--text-secondary);
+    max-width: 400px;
+    margin-bottom: 2rem;
+    line-height: 1.5;
+}
+
+.headline {
+    font-family: var(--font-sans);
+    font-size: clamp(3rem, 7vw, 7rem);
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    text-transform: uppercase;
+    margin-bottom: 2rem;
+    max-width: 800px;
+}
+
+.keepReading {
+    font-family: var(--font-sans);
+    font-size: clamp(1rem, 1.5vw, 1.25rem);
+    font-style: italic;
+    color: var(--text-secondary);
+}
+
+/* Globe Container Strategy */
+.globeContainer {
+    position: absolute;
+    bottom: -50vh; /* Half hidden below the viewport */
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 5;
+    pointer-events: none; /* Let clicks pass through if needed, though globe has interactions */
+}
+
+/* We need to restrict the width/height to make a perfect circle for the globe context initially */
+.globeWrapper {
+    width: clamp(600px, 80vw, 1200px);
+    height: clamp(600px, 80vw, 1200px);
+    border-radius: 50%;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: auto; /* Enable globe interaction */
+}
+
+/* On mobile adjustments */
+@media (max-width: 768px) {
+    .textContent {
+        padding: 10vh 5vw 0;
+    }
+    
+    .globeContainer {
+        bottom: -30vh;
+    }
+}

@@ -1,4 +1,8 @@
 import { defineConfig, devices } from '@playwright/test';
+import * as path from 'path';
+
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+require('dotenv').config({ path: path.resolve(__dirname, '.env') });
 
 const baseURL = process.env.E2E_BASE_URL || 'https://nextacademyedu.com';
 

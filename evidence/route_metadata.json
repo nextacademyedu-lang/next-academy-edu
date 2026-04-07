@@ -1,0 +1,1517 @@
+[
+  {
+    "path": "/api/announcement-bars/active",
+    "methods": [
+      "GET"
+    ],
+    "auth": {
+      "payloadAuth": true,
+      "authenticateReq": false,
+      "resolveB2B": false,
+      "roleAdminCheck": true,
+      "roleB2BCheck": false,
+      "csrf": false,
+      "cronSecret": false
+    },
+    "collections": [
+      "announcement-bars"
+    ],
+    "sideEffects": {
+      "email": false,
+      "payloadEmail": false,
+      "crm": false,
+      "atomicDb": false,
+      "paymentProcess": false,
+      "gcal": false
+    },
+    "file": "announcement-bars/active/route.ts"
+  },
+  {
+    "path": "/api/auth/google/callback",
+    "methods": [
+      "GET"
+    ],
+    "auth": {
+      "payloadAuth": false,
+      "authenticateReq": false,
+      "resolveB2B": false,
+      "roleAdminCheck": false,
+      "roleB2BCheck": false,
+      "csrf": false,
+      "cronSecret": false
+    },
+    "collections": [
+      "users"
+    ],
+    "sideEffects": {
+      "email": false,
+      "payloadEmail": false,
+      "crm": false,
+      "atomicDb": false,
+      "paymentProcess": false,
+      "gcal": false
+    },
+    "file": "auth/google/callback/route.ts"
+  },
+  {
+    "path": "/api/auth/google",
+    "methods": [
+      "GET"
+    ],
+    "auth": {
+      "payloadAuth": false,
+      "authenticateReq": false,
+      "resolveB2B": false,
+      "roleAdminCheck": false,
+      "roleB2BCheck": false,
+      "csrf": false,
+      "cronSecret": false
+    },
+    "collections": [],
+    "sideEffects": {
+      "email": false,
+      "payloadEmail": false,
+      "crm": false,
+      "atomicDb": false,
+      "paymentProcess": false,
+      "gcal": false
+    },
+    "file": "auth/google/route.ts"
+  },
+  {
+    "path": "/api/auth/send-otp",
+    "methods": [
+      "POST"
+    ],
+    "auth": {
+      "payloadAuth": false,
+      "authenticateReq": false,
+      "resolveB2B": false,
+      "roleAdminCheck": false,
+      "roleB2BCheck": false,
+      "csrf": false,
+      "cronSecret": false
+    },
+    "collections": [
+      "users",
+      "verification-codes"
+    ],
+    "sideEffects": {
+      "email": true,
+      "payloadEmail": false,
+      "crm": false,
+      "atomicDb": false,
+      "paymentProcess": false,
+      "gcal": false
+    },
+    "file": "auth/send-otp/route.ts"
+  },
+  {
+    "path": "/api/auth/verify-otp",
+    "methods": [
+      "POST"
+    ],
+    "auth": {
+      "payloadAuth": false,
+      "authenticateReq": false,
+      "resolveB2B": false,
+      "roleAdminCheck": false,
+      "roleB2BCheck": true,
+      "csrf": false,
+      "cronSecret": false
+    },
+    "collections": [
+      "instructors",
+      "users",
+      "verification-codes"
+    ],
+    "sideEffects": {
+      "email": false,
+      "payloadEmail": false,
+      "crm": false,
+      "atomicDb": false,
+      "paymentProcess": false,
+      "gcal": false
+    },
+    "file": "auth/verify-otp/route.ts"
+  },
+  {
+    "path": "/api/b2b/bookings",
+    "methods": [
+      "GET"
+    ],
+    "auth": {
+      "payloadAuth": false,
+      "authenticateReq": false,
+      "resolveB2B": true,
+      "roleAdminCheck": false,
+      "roleB2BCheck": false,
+      "csrf": false,
+      "cronSecret": false
+    },
+    "collections": [
+      "bookings"
+    ],
+    "sideEffects": {
+      "email": false,
+      "payloadEmail": false,
+      "crm": false,
+      "atomicDb": false,
+      "paymentProcess": false,
+      "gcal": false
+    },
+    "file": "b2b/bookings/route.ts"
+  },
+  {
+    "path": "/api/b2b/dashboard",
+    "methods": [
+      "GET"
+    ],
+    "auth": {
+      "payloadAuth": false,
+      "authenticateReq": false,
+      "resolveB2B": true,
+      "roleAdminCheck": false,
+      "roleB2BCheck": false,
+      "csrf": false,
+      "cronSecret": false
+    },
+    "collections": [
+      "bookings",
+      "user-profiles"
+    ],
+    "sideEffects": {
+      "email": false,
+      "payloadEmail": false,
+      "crm": false,
+      "atomicDb": false,
+      "paymentProcess": false,
+      "gcal": false
+    },
+    "file": "b2b/dashboard/route.ts"
+  },
+  {
+    "path": "/api/b2b/invitations/accept",
+    "methods": [
+      "POST"
+    ],
+    "auth": {
+      "payloadAuth": true,
+      "authenticateReq": false,
+      "resolveB2B": false,
+      "roleAdminCheck": false,
+      "roleB2BCheck": false,
+      "csrf": false,
+      "cronSecret": false
+    },
+    "collections": [],
+    "sideEffects": {
+      "email": false,
+      "payloadEmail": false,
+      "crm": false,
+      "atomicDb": false,
+      "paymentProcess": false,
+      "gcal": false
+    },
+    "file": "b2b/invitations/accept/route.ts"
+  },
+  {
+    "path": "/api/b2b/invitations",
+    "methods": [
+      "GET",
+      "POST",
+      "DELETE"
+    ],
+    "auth": {
+      "payloadAuth": false,
+      "authenticateReq": false,
+      "resolveB2B": true,
+      "roleAdminCheck": true,
+      "roleB2BCheck": false,
+      "csrf": false,
+      "cronSecret": false
+    },
+    "collections": [
+      "company-invitations",
+      "users",
+      "user-profiles"
+    ],
+    "sideEffects": {
+      "email": false,
+      "payloadEmail": true,
+      "crm": false,
+      "atomicDb": false,
+      "paymentProcess": false,
+      "gcal": false
+    },
+    "file": "b2b/invitations/route.ts"
+  },
+  {
+    "path": "/api/b2b/invitations/validate",
+    "methods": [
+      "GET"
+    ],
+    "auth": {
+      "payloadAuth": false,
+      "authenticateReq": false,
+      "resolveB2B": false,
+      "roleAdminCheck": false,
+      "roleB2BCheck": false,
+      "csrf": false,
+      "cronSecret": false
+    },
+    "collections": [],
+    "sideEffects": {
+      "email": false,
+      "payloadEmail": false,
+      "crm": false,
+      "atomicDb": false,
+      "paymentProcess": false,
+      "gcal": false
+    },
+    "file": "b2b/invitations/validate/route.ts"
+  },
+  {
+    "path": "/api/b2b/team",
+    "methods": [
+      "GET",
+      "POST",
+      "DELETE"
+    ],
+    "auth": {
+      "payloadAuth": false,
+      "authenticateReq": false,
+      "resolveB2B": true,
+      "roleAdminCheck": true,
+      "roleB2BCheck": false,
+      "csrf": false,
+      "cronSecret": false
+    },
+    "collections": [
+      "bookings",
+      "user-profiles",
+      "users"
+    ],
+    "sideEffects": {
+      "email": false,
+      "payloadEmail": false,
+      "crm": false,
+      "atomicDb": false,
+      "paymentProcess": false,
+      "gcal": false
+    },
+    "file": "b2b/team/route.ts"
+  },
+  {
+    "path": "/api/bookings/create",
+    "methods": [
+      "POST"
+    ],
+    "auth": {
+      "payloadAuth": false,
+      "authenticateReq": true,
+      "resolveB2B": false,
+      "roleAdminCheck": false,
+      "roleB2BCheck": false,
+      "csrf": true,
+      "cronSecret": false
+    },
+    "collections": [
+      "rounds",
+      "bookings",
+      "discount-codes",
+      "payments",
+      "payment-plans"
+    ],
+    "sideEffects": {
+      "email": false,
+      "payloadEmail": false,
+      "crm": false,
+      "atomicDb": true,
+      "paymentProcess": true,
+      "gcal": false
+    },
+    "file": "bookings/create/route.ts"
+  },
+  {
+    "path": "/api/bulk-seats/allocate",
+    "methods": [
+      "POST"
+    ],
+    "auth": {
+      "payloadAuth": true,
+      "authenticateReq": false,
+      "resolveB2B": false,
+      "roleAdminCheck": true,
+      "roleB2BCheck": true,
+      "csrf": false,
+      "cronSecret": false
+    },
+    "collections": [
+      "user-profiles",
+      "bulk-seat-allocations",
+      "bookings"
+    ],
+    "sideEffects": {
+      "email": false,
+      "payloadEmail": false,
+      "crm": false,
+      "atomicDb": false,
+      "paymentProcess": false,
+      "gcal": false
+    },
+    "file": "bulk-seats/allocate/route.ts"
+  },
+  {
+    "path": "/api/certificates/generate",
+    "methods": [
+      "POST"
+    ],
+    "auth": {
+      "payloadAuth": true,
+      "authenticateReq": false,
+      "resolveB2B": false,
+      "roleAdminCheck": true,
+      "roleB2BCheck": false,
+      "csrf": false,
+      "cronSecret": false
+    },
+    "collections": [
+      "bookings",
+      "certificates"
+    ],
+    "sideEffects": {
+      "email": false,
+      "payloadEmail": false,
+      "crm": false,
+      "atomicDb": false,
+      "paymentProcess": false,
+      "gcal": false
+    },
+    "file": "certificates/generate/route.ts"
+  },
+  {
+    "path": "/api/checkout/easykash",
+    "methods": [
+      "POST"
+    ],
+    "auth": {
+      "payloadAuth": false,
+      "authenticateReq": true,
+      "resolveB2B": false,
+      "roleAdminCheck": false,
+      "roleB2BCheck": false,
+      "csrf": true,
+      "cronSecret": false
+    },
+    "collections": [
+      "bookings",
+      "payments"
+    ],
+    "sideEffects": {
+      "email": false,
+      "payloadEmail": false,
+      "crm": false,
+      "atomicDb": false,
+      "paymentProcess": true,
+      "gcal": false
+    },
+    "file": "checkout/easykash/route.ts"
+  },
+  {
+    "path": "/api/checkout/paymob",
+    "methods": [
+      "POST"
+    ],
+    "auth": {
+      "payloadAuth": false,
+      "authenticateReq": true,
+      "resolveB2B": false,
+      "roleAdminCheck": false,
+      "roleB2BCheck": false,
+      "csrf": true,
+      "cronSecret": false
+    },
+    "collections": [
+      "bookings",
+      "payments"
+    ],
+    "sideEffects": {
+      "email": false,
+      "payloadEmail": false,
+      "crm": false,
+      "atomicDb": false,
+      "paymentProcess": true,
+      "gcal": false
+    },
+    "file": "checkout/paymob/route.ts"
+  },
+  {
+    "path": "/api/cron/check-overdue",
+    "methods": [
+      "GET"
+    ],
+    "auth": {
+      "payloadAuth": false,
+      "authenticateReq": false,
+      "resolveB2B": false,
+      "roleAdminCheck": false,
+      "roleB2BCheck": false,
+      "csrf": false,
+      "cronSecret": true
+    },
+    "collections": [
+      "payments",
+      "bookings",
+      "users"
+    ],
+    "sideEffects": {
+      "email": false,
+      "payloadEmail": false,
+      "crm": false,
+      "atomicDb": false,
+      "paymentProcess": false,
+      "gcal": false
+    },
+    "file": "cron/check-overdue/route.ts"
+  },
+  {
+    "path": "/api/cron/crm-sync",
+    "methods": [
+      "GET"
+    ],
+    "auth": {
+      "payloadAuth": false,
+      "authenticateReq": false,
+      "resolveB2B": false,
+      "roleAdminCheck": false,
+      "roleB2BCheck": false,
+      "csrf": false,
+      "cronSecret": true
+    },
+    "collections": [],
+    "sideEffects": {
+      "email": false,
+      "payloadEmail": false,
+      "crm": false,
+      "atomicDb": false,
+      "paymentProcess": false,
+      "gcal": false
+    },
+    "file": "cron/crm-sync/route.ts"
+  },
+  {
+    "path": "/api/cron/waitlist",
+    "methods": [
+      "GET"
+    ],
+    "auth": {
+      "payloadAuth": false,
+      "authenticateReq": false,
+      "resolveB2B": false,
+      "roleAdminCheck": false,
+      "roleB2BCheck": false,
+      "csrf": false,
+      "cronSecret": true
+    },
+    "collections": [
+      "waitlist",
+      "rounds",
+      "users"
+    ],
+    "sideEffects": {
+      "email": false,
+      "payloadEmail": false,
+      "crm": false,
+      "atomicDb": false,
+      "paymentProcess": false,
+      "gcal": false
+    },
+    "file": "cron/waitlist/route.ts"
+  },
+  {
+    "path": "/api/discount-codes/remove",
+    "methods": [
+      "POST"
+    ],
+    "auth": {
+      "payloadAuth": false,
+      "authenticateReq": true,
+      "resolveB2B": false,
+      "roleAdminCheck": false,
+      "roleB2BCheck": false,
+      "csrf": true,
+      "cronSecret": false
+    },
+    "collections": [
+      "bookings",
+      "payments"
+    ],
+    "sideEffects": {
+      "email": false,
+      "payloadEmail": false,
+      "crm": false,
+      "atomicDb": true,
+      "paymentProcess": false,
+      "gcal": false
+    },
+    "file": "discount-codes/remove/route.ts"
+  },
+  {
+    "path": "/api/discount-codes/validate",
+    "methods": [
+      "POST"
+    ],
+    "auth": {
+      "payloadAuth": false,
+      "authenticateReq": true,
+      "resolveB2B": false,
+      "roleAdminCheck": false,
+      "roleB2BCheck": false,
+      "csrf": true,
+      "cronSecret": false
+    },
+    "collections": [
+      "bookings",
+      "discount-codes",
+      "payments"
+    ],
+    "sideEffects": {
+      "email": false,
+      "payloadEmail": false,
+      "crm": false,
+      "atomicDb": true,
+      "paymentProcess": false,
+      "gcal": false
+    },
+    "file": "discount-codes/validate/route.ts"
+  },
+  {
+    "path": "/api/google/callback",
+    "methods": [
+      "GET"
+    ],
+    "auth": {
+      "payloadAuth": false,
+      "authenticateReq": false,
+      "resolveB2B": false,
+      "roleAdminCheck": false,
+      "roleB2BCheck": false,
+      "csrf": false,
+      "cronSecret": false
+    },
+    "collections": [],
+    "sideEffects": {
+      "email": false,
+      "payloadEmail": false,
+      "crm": false,
+      "atomicDb": false,
+      "paymentProcess": false,
+      "gcal": false
+    },
+    "file": "google/callback/route.ts"
+  },
+  {
+    "path": "/api/google/connect",
+    "methods": [
+      "GET"
+    ],
+    "auth": {
+      "payloadAuth": true,
+      "authenticateReq": false,
+      "resolveB2B": false,
+      "roleAdminCheck": true,
+      "roleB2BCheck": false,
+      "csrf": false,
+      "cronSecret": false
+    },
+    "collections": [],
+    "sideEffects": {
+      "email": false,
+      "payloadEmail": false,
+      "crm": false,
+      "atomicDb": false,
+      "paymentProcess": false,
+      "gcal": false
+    },
+    "file": "google/connect/route.ts"
+  },
+  {
+    "path": "/api/health/db",
+    "methods": [
+      "GET"
+    ],
+    "auth": {
+      "payloadAuth": false,
+      "authenticateReq": false,
+      "resolveB2B": false,
+      "roleAdminCheck": false,
+      "roleB2BCheck": false,
+      "csrf": false,
+      "cronSecret": true
+    },
+    "collections": [],
+    "sideEffects": {
+      "email": false,
+      "payloadEmail": false,
+      "crm": false,
+      "atomicDb": false,
+      "paymentProcess": false,
+      "gcal": false
+    },
+    "file": "health/db/route.ts"
+  },
+  {
+    "path": "/api/health",
+    "methods": [],
+    "auth": {
+      "payloadAuth": false,
+      "authenticateReq": false,
+      "resolveB2B": false,
+      "roleAdminCheck": false,
+      "roleB2BCheck": false,
+      "csrf": false,
+      "cronSecret": false
+    },
+    "collections": [],
+    "sideEffects": {
+      "email": false,
+      "payloadEmail": false,
+      "crm": false,
+      "atomicDb": false,
+      "paymentProcess": false,
+      "gcal": false
+    },
+    "file": "health/route.ts"
+  },
+  {
+    "path": "/api/home/blog-posts",
+    "methods": [
+      "GET"
+    ],
+    "auth": {
+      "payloadAuth": false,
+      "authenticateReq": false,
+      "resolveB2B": false,
+      "roleAdminCheck": false,
+      "roleB2BCheck": false,
+      "csrf": false,
+      "cronSecret": false
+    },
+    "collections": [
+      "blog-posts"
+    ],
+    "sideEffects": {
+      "email": false,
+      "payloadEmail": false,
+      "crm": false,
+      "atomicDb": false,
+      "paymentProcess": false,
+      "gcal": false
+    },
+    "file": "home/blog-posts/route.ts"
+  },
+  {
+    "path": "/api/home/featured-programs",
+    "methods": [
+      "GET"
+    ],
+    "auth": {
+      "payloadAuth": false,
+      "authenticateReq": false,
+      "resolveB2B": false,
+      "roleAdminCheck": false,
+      "roleB2BCheck": false,
+      "csrf": false,
+      "cronSecret": false
+    },
+    "collections": [
+      "programs",
+      "rounds",
+      "reviews"
+    ],
+    "sideEffects": {
+      "email": false,
+      "payloadEmail": false,
+      "crm": false,
+      "atomicDb": false,
+      "paymentProcess": false,
+      "gcal": false
+    },
+    "file": "home/featured-programs/route.ts"
+  },
+  {
+    "path": "/api/home/instructors",
+    "methods": [
+      "GET"
+    ],
+    "auth": {
+      "payloadAuth": false,
+      "authenticateReq": false,
+      "resolveB2B": false,
+      "roleAdminCheck": false,
+      "roleB2BCheck": false,
+      "csrf": false,
+      "cronSecret": false
+    },
+    "collections": [
+      "instructors"
+    ],
+    "sideEffects": {
+      "email": false,
+      "payloadEmail": false,
+      "crm": false,
+      "atomicDb": false,
+      "paymentProcess": false,
+      "gcal": false
+    },
+    "file": "home/instructors/route.ts"
+  },
+  {
+    "path": "/api/home/stats",
+    "methods": [
+      "GET"
+    ],
+    "auth": {
+      "payloadAuth": false,
+      "authenticateReq": false,
+      "resolveB2B": false,
+      "roleAdminCheck": false,
+      "roleB2BCheck": false,
+      "csrf": false,
+      "cronSecret": false
+    },
+    "collections": [
+      "bookings",
+      "companies",
+      "instructors"
+    ],
+    "sideEffects": {
+      "email": false,
+      "payloadEmail": false,
+      "crm": false,
+      "atomicDb": false,
+      "paymentProcess": false,
+      "gcal": false
+    },
+    "file": "home/stats/route.ts"
+  },
+  {
+    "path": "/api/home/testimonials",
+    "methods": [
+      "GET"
+    ],
+    "auth": {
+      "payloadAuth": false,
+      "authenticateReq": false,
+      "resolveB2B": false,
+      "roleAdminCheck": false,
+      "roleB2BCheck": false,
+      "csrf": false,
+      "cronSecret": false
+    },
+    "collections": [
+      "reviews"
+    ],
+    "sideEffects": {
+      "email": false,
+      "payloadEmail": false,
+      "crm": false,
+      "atomicDb": false,
+      "paymentProcess": false,
+      "gcal": false
+    },
+    "file": "home/testimonials/route.ts"
+  },
+  {
+    "path": "/api/home/video-testimonials",
+    "methods": [
+      "GET"
+    ],
+    "auth": {
+      "payloadAuth": false,
+      "authenticateReq": false,
+      "resolveB2B": false,
+      "roleAdminCheck": false,
+      "roleB2BCheck": false,
+      "csrf": false,
+      "cronSecret": false
+    },
+    "collections": [
+      "reviews"
+    ],
+    "sideEffects": {
+      "email": false,
+      "payloadEmail": false,
+      "crm": false,
+      "atomicDb": false,
+      "paymentProcess": false,
+      "gcal": false
+    },
+    "file": "home/video-testimonials/route.ts"
+  },
+  {
+    "path": "/api/instructor/availability",
+    "methods": [
+      "GET",
+      "PUT"
+    ],
+    "auth": {
+      "payloadAuth": true,
+      "authenticateReq": false,
+      "resolveB2B": false,
+      "roleAdminCheck": true,
+      "roleB2BCheck": false,
+      "csrf": false,
+      "cronSecret": false
+    },
+    "collections": [
+      "consultation-availability"
+    ],
+    "sideEffects": {
+      "email": false,
+      "payloadEmail": false,
+      "crm": false,
+      "atomicDb": false,
+      "paymentProcess": false,
+      "gcal": false
+    },
+    "file": "instructor/availability/route.ts"
+  },
+  {
+    "path": "/api/instructor/consultation-types",
+    "methods": [
+      "GET",
+      "POST"
+    ],
+    "auth": {
+      "payloadAuth": true,
+      "authenticateReq": false,
+      "resolveB2B": false,
+      "roleAdminCheck": false,
+      "roleB2BCheck": false,
+      "csrf": false,
+      "cronSecret": false
+    },
+    "collections": [
+      "consultation-types"
+    ],
+    "sideEffects": {
+      "email": false,
+      "payloadEmail": false,
+      "crm": false,
+      "atomicDb": false,
+      "paymentProcess": false,
+      "gcal": false
+    },
+    "file": "instructor/consultation-types/route.ts"
+  },
+  {
+    "path": "/api/instructor/consultation-types/[id]",
+    "methods": [
+      "PATCH",
+      "DELETE"
+    ],
+    "auth": {
+      "payloadAuth": true,
+      "authenticateReq": false,
+      "resolveB2B": false,
+      "roleAdminCheck": false,
+      "roleB2BCheck": false,
+      "csrf": false,
+      "cronSecret": false
+    },
+    "collections": [
+      "consultation-types"
+    ],
+    "sideEffects": {
+      "email": false,
+      "payloadEmail": false,
+      "crm": false,
+      "atomicDb": false,
+      "paymentProcess": false,
+      "gcal": false
+    },
+    "file": "instructor/consultation-types/[id]/route.ts"
+  },
+  {
+    "path": "/api/instructor/profile",
+    "methods": [
+      "GET",
+      "PATCH"
+    ],
+    "auth": {
+      "payloadAuth": true,
+      "authenticateReq": false,
+      "resolveB2B": false,
+      "roleAdminCheck": false,
+      "roleB2BCheck": false,
+      "csrf": false,
+      "cronSecret": false
+    },
+    "collections": [
+      "instructors"
+    ],
+    "sideEffects": {
+      "email": false,
+      "payloadEmail": false,
+      "crm": false,
+      "atomicDb": false,
+      "paymentProcess": false,
+      "gcal": false
+    },
+    "file": "instructor/profile/route.ts"
+  },
+  {
+    "path": "/api/instructor/profile/submit",
+    "methods": [
+      "POST"
+    ],
+    "auth": {
+      "payloadAuth": true,
+      "authenticateReq": false,
+      "resolveB2B": false,
+      "roleAdminCheck": false,
+      "roleB2BCheck": false,
+      "csrf": false,
+      "cronSecret": false
+    },
+    "collections": [
+      "instructors"
+    ],
+    "sideEffects": {
+      "email": false,
+      "payloadEmail": false,
+      "crm": false,
+      "atomicDb": false,
+      "paymentProcess": false,
+      "gcal": false
+    },
+    "file": "instructor/profile/submit/route.ts"
+  },
+  {
+    "path": "/api/instructor/program-submissions",
+    "methods": [
+      "GET",
+      "POST"
+    ],
+    "auth": {
+      "payloadAuth": true,
+      "authenticateReq": false,
+      "resolveB2B": false,
+      "roleAdminCheck": false,
+      "roleB2BCheck": false,
+      "csrf": false,
+      "cronSecret": false
+    },
+    "collections": [
+      "instructor-program-submissions"
+    ],
+    "sideEffects": {
+      "email": false,
+      "payloadEmail": false,
+      "crm": false,
+      "atomicDb": false,
+      "paymentProcess": false,
+      "gcal": false
+    },
+    "file": "instructor/program-submissions/route.ts"
+  },
+  {
+    "path": "/api/instructor/program-submissions/[id]",
+    "methods": [
+      "PATCH",
+      "DELETE"
+    ],
+    "auth": {
+      "payloadAuth": true,
+      "authenticateReq": false,
+      "resolveB2B": false,
+      "roleAdminCheck": false,
+      "roleB2BCheck": false,
+      "csrf": false,
+      "cronSecret": false
+    },
+    "collections": [
+      "instructor-program-submissions"
+    ],
+    "sideEffects": {
+      "email": false,
+      "payloadEmail": false,
+      "crm": false,
+      "atomicDb": false,
+      "paymentProcess": false,
+      "gcal": false
+    },
+    "file": "instructor/program-submissions/[id]/route.ts"
+  },
+  {
+    "path": "/api/instructor/program-submissions/[id]/submit",
+    "methods": [
+      "POST"
+    ],
+    "auth": {
+      "payloadAuth": true,
+      "authenticateReq": false,
+      "resolveB2B": false,
+      "roleAdminCheck": false,
+      "roleB2BCheck": false,
+      "csrf": false,
+      "cronSecret": false
+    },
+    "collections": [
+      "instructor-program-submissions"
+    ],
+    "sideEffects": {
+      "email": false,
+      "payloadEmail": false,
+      "crm": false,
+      "atomicDb": false,
+      "paymentProcess": false,
+      "gcal": false
+    },
+    "file": "instructor/program-submissions/[id]/submit/route.ts"
+  },
+  {
+    "path": "/api/instructor/sessions",
+    "methods": [
+      "GET"
+    ],
+    "auth": {
+      "payloadAuth": true,
+      "authenticateReq": false,
+      "resolveB2B": false,
+      "roleAdminCheck": false,
+      "roleB2BCheck": false,
+      "csrf": false,
+      "cronSecret": false
+    },
+    "collections": [
+      "sessions"
+    ],
+    "sideEffects": {
+      "email": false,
+      "payloadEmail": false,
+      "crm": false,
+      "atomicDb": false,
+      "paymentProcess": false,
+      "gcal": false
+    },
+    "file": "instructor/sessions/route.ts"
+  },
+  {
+    "path": "/api/instructor/sessions/[id]/materials",
+    "methods": [
+      "GET",
+      "PATCH",
+      "POST"
+    ],
+    "auth": {
+      "payloadAuth": true,
+      "authenticateReq": false,
+      "resolveB2B": false,
+      "roleAdminCheck": false,
+      "roleB2BCheck": false,
+      "csrf": false,
+      "cronSecret": false
+    },
+    "collections": [
+      "sessions",
+      "media"
+    ],
+    "sideEffects": {
+      "email": false,
+      "payloadEmail": false,
+      "crm": false,
+      "atomicDb": false,
+      "paymentProcess": false,
+      "gcal": false
+    },
+    "file": "instructor/sessions/[id]/materials/route.ts"
+  },
+  {
+    "path": "/api/notifications/read-all",
+    "methods": [
+      "PUT"
+    ],
+    "auth": {
+      "payloadAuth": true,
+      "authenticateReq": false,
+      "resolveB2B": false,
+      "roleAdminCheck": false,
+      "roleB2BCheck": false,
+      "csrf": false,
+      "cronSecret": false
+    },
+    "collections": [
+      "notifications"
+    ],
+    "sideEffects": {
+      "email": false,
+      "payloadEmail": false,
+      "crm": false,
+      "atomicDb": false,
+      "paymentProcess": false,
+      "gcal": false
+    },
+    "file": "notifications/read-all/route.ts"
+  },
+  {
+    "path": "/api/notifications/[id]/read",
+    "methods": [
+      "PUT"
+    ],
+    "auth": {
+      "payloadAuth": true,
+      "authenticateReq": false,
+      "resolveB2B": false,
+      "roleAdminCheck": false,
+      "roleB2BCheck": false,
+      "csrf": false,
+      "cronSecret": false
+    },
+    "collections": [
+      "notifications"
+    ],
+    "sideEffects": {
+      "email": false,
+      "payloadEmail": false,
+      "crm": false,
+      "atomicDb": false,
+      "paymentProcess": false,
+      "gcal": false
+    },
+    "file": "notifications/[id]/read/route.ts"
+  },
+  {
+    "path": "/api/popups/active",
+    "methods": [
+      "GET"
+    ],
+    "auth": {
+      "payloadAuth": false,
+      "authenticateReq": true,
+      "resolveB2B": false,
+      "roleAdminCheck": true,
+      "roleB2BCheck": true,
+      "csrf": false,
+      "cronSecret": false
+    },
+    "collections": [
+      "popups",
+      "bookings"
+    ],
+    "sideEffects": {
+      "email": false,
+      "payloadEmail": false,
+      "crm": false,
+      "atomicDb": false,
+      "paymentProcess": false,
+      "gcal": false
+    },
+    "file": "popups/active/route.ts"
+  },
+  {
+    "path": "/api/reviews/moderate",
+    "methods": [
+      "POST"
+    ],
+    "auth": {
+      "payloadAuth": true,
+      "authenticateReq": false,
+      "resolveB2B": false,
+      "roleAdminCheck": true,
+      "roleB2BCheck": false,
+      "csrf": false,
+      "cronSecret": false
+    },
+    "collections": [
+      "reviews",
+      "programs"
+    ],
+    "sideEffects": {
+      "email": false,
+      "payloadEmail": false,
+      "crm": false,
+      "atomicDb": false,
+      "paymentProcess": false,
+      "gcal": false
+    },
+    "file": "reviews/moderate/route.ts"
+  },
+  {
+    "path": "/api/seed-admin",
+    "methods": [
+      "POST"
+    ],
+    "auth": {
+      "payloadAuth": false,
+      "authenticateReq": false,
+      "resolveB2B": false,
+      "roleAdminCheck": false,
+      "roleB2BCheck": false,
+      "csrf": false,
+      "cronSecret": true
+    },
+    "collections": [
+      "users"
+    ],
+    "sideEffects": {
+      "email": false,
+      "payloadEmail": false,
+      "crm": false,
+      "atomicDb": false,
+      "paymentProcess": false,
+      "gcal": false
+    },
+    "file": "seed-admin/route.ts"
+  },
+  {
+    "path": "/api/seed-instructors",
+    "methods": [
+      "POST"
+    ],
+    "auth": {
+      "payloadAuth": false,
+      "authenticateReq": false,
+      "resolveB2B": false,
+      "roleAdminCheck": false,
+      "roleB2BCheck": false,
+      "csrf": false,
+      "cronSecret": false
+    },
+    "collections": [
+      "media",
+      "instructors"
+    ],
+    "sideEffects": {
+      "email": false,
+      "payloadEmail": false,
+      "crm": false,
+      "atomicDb": false,
+      "paymentProcess": false,
+      "gcal": false
+    },
+    "file": "seed-instructors/route.ts"
+  },
+  {
+    "path": "/api/seed-partners",
+    "methods": [
+      "POST"
+    ],
+    "auth": {
+      "payloadAuth": false,
+      "authenticateReq": false,
+      "resolveB2B": false,
+      "roleAdminCheck": false,
+      "roleB2BCheck": false,
+      "csrf": false,
+      "cronSecret": false
+    },
+    "collections": [
+      "media",
+      "partners"
+    ],
+    "sideEffects": {
+      "email": false,
+      "payloadEmail": false,
+      "crm": false,
+      "atomicDb": false,
+      "paymentProcess": false,
+      "gcal": false
+    },
+    "file": "seed-partners/route.ts"
+  },
+  {
+    "path": "/api/seed-test-data",
+    "methods": [
+      "POST"
+    ],
+    "auth": {
+      "payloadAuth": false,
+      "authenticateReq": false,
+      "resolveB2B": false,
+      "roleAdminCheck": false,
+      "roleB2BCheck": false,
+      "csrf": false,
+      "cronSecret": true
+    },
+    "collections": [
+      "categories",
+      "programs",
+      "rounds",
+      "discount-codes"
+    ],
+    "sideEffects": {
+      "email": false,
+      "payloadEmail": false,
+      "crm": false,
+      "atomicDb": false,
+      "paymentProcess": false,
+      "gcal": false
+    },
+    "file": "seed-test-data/route.ts"
+  },
+  {
+    "path": "/api/upcoming-events",
+    "methods": [
+      "GET"
+    ],
+    "auth": {
+      "payloadAuth": false,
+      "authenticateReq": false,
+      "resolveB2B": false,
+      "roleAdminCheck": false,
+      "roleB2BCheck": false,
+      "csrf": false,
+      "cronSecret": false
+    },
+    "collections": [
+      "upcoming-events-config",
+      "programs",
+      "rounds"
+    ],
+    "sideEffects": {
+      "email": false,
+      "payloadEmail": false,
+      "crm": false,
+      "atomicDb": false,
+      "paymentProcess": false,
+      "gcal": false
+    },
+    "file": "upcoming-events/route.ts"
+  },
+  {
+    "path": "/api/users/login",
+    "methods": [
+      "POST"
+    ],
+    "auth": {
+      "payloadAuth": false,
+      "authenticateReq": false,
+      "resolveB2B": false,
+      "roleAdminCheck": true,
+      "roleB2BCheck": false,
+      "csrf": false,
+      "cronSecret": false
+    },
+    "collections": [
+      "users"
+    ],
+    "sideEffects": {
+      "email": false,
+      "payloadEmail": false,
+      "crm": false,
+      "atomicDb": false,
+      "paymentProcess": false,
+      "gcal": false
+    },
+    "file": "users/login/route.ts"
+  },
+  {
+    "path": "/api/webhooks/easykash/redirect",
+    "methods": [
+      "GET"
+    ],
+    "auth": {
+      "payloadAuth": false,
+      "authenticateReq": false,
+      "resolveB2B": false,
+      "roleAdminCheck": false,
+      "roleB2BCheck": false,
+      "csrf": false,
+      "cronSecret": false
+    },
+    "collections": [
+      "payments"
+    ],
+    "sideEffects": {
+      "email": false,
+      "payloadEmail": false,
+      "crm": false,
+      "atomicDb": false,
+      "paymentProcess": false,
+      "gcal": false
+    },
+    "file": "webhooks/easykash/redirect/route.ts"
+  },
+  {
+    "path": "/api/webhooks/easykash",
+    "methods": [
+      "POST"
+    ],
+    "auth": {
+      "payloadAuth": false,
+      "authenticateReq": false,
+      "resolveB2B": false,
+      "roleAdminCheck": false,
+      "roleB2BCheck": false,
+      "csrf": false,
+      "cronSecret": false
+    },
+    "collections": [
+      "payments"
+    ],
+    "sideEffects": {
+      "email": false,
+      "payloadEmail": false,
+      "crm": false,
+      "atomicDb": false,
+      "paymentProcess": true,
+      "gcal": false
+    },
+    "file": "webhooks/easykash/route.ts"
+  },
+  {
+    "path": "/api/webhooks/paymob/redirect",
+    "methods": [
+      "GET"
+    ],
+    "auth": {
+      "payloadAuth": false,
+      "authenticateReq": false,
+      "resolveB2B": false,
+      "roleAdminCheck": false,
+      "roleB2BCheck": false,
+      "csrf": false,
+      "cronSecret": false
+    },
+    "collections": [],
+    "sideEffects": {
+      "email": false,
+      "payloadEmail": false,
+      "crm": false,
+      "atomicDb": false,
+      "paymentProcess": false,
+      "gcal": false
+    },
+    "file": "webhooks/paymob/redirect/route.ts"
+  },
+  {
+    "path": "/api/webhooks/paymob",
+    "methods": [
+      "POST"
+    ],
+    "auth": {
+      "payloadAuth": false,
+      "authenticateReq": false,
+      "resolveB2B": false,
+      "roleAdminCheck": false,
+      "roleB2BCheck": false,
+      "csrf": false,
+      "cronSecret": false
+    },
+    "collections": [
+      "payments"
+    ],
+    "sideEffects": {
+      "email": false,
+      "payloadEmail": false,
+      "crm": false,
+      "atomicDb": false,
+      "paymentProcess": true,
+      "gcal": false
+    },
+    "file": "webhooks/paymob/route.ts"
+  }
+]
