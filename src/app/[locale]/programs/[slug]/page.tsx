@@ -1,11 +1,10 @@
 import React from 'react';
 import Image from 'next/image';
-import type { Media } from '@/payload-types';
 import { notFound } from 'next/navigation';
 import { getLocale, getTranslations } from 'next-intl/server';
 import { getPayload } from 'payload';
 import config from '@payload-config';
-import type { Program, Round, Instructor, Session } from '@/payload-types';
+import type { Program, Round, Instructor, Session, Partner, Media } from '@/payload-types';
 import { Navbar } from '@/components/layout/navbar';
 import { Footer } from '@/components/layout/footer';
 import { Card, CardHeader, CardContent } from '@/components/ui/card';
@@ -160,6 +159,173 @@ export default async function ProgramDetailsPage({
 
             {instructor && (
               <InstructorCard instructor={instructor} locale={locale} />
+            )}
+
+            {/* Speakers / Hosts */}
+            {program.speakers && program.speakers.length > 0 && (
+              <section className={styles.sectionBlock}>
+                <h2 className={styles.sectionTitle}>
+                  {locale === 'ar' ? 'المتحدثون' : 'Speakers & Hosts'}
+                </h2>
+                <div className={styles.speakersGrid}>
+                  {program.speakers.map((speaker, i) => {
+                    const photoUrl = speaker.photo && typeof speaker.photo === 'object'
+                      ? (speaker.photo as Media).url
+                      : null;
+                    const roleLabels: Record<string, string> = locale === 'ar'
+                      ? { speaker: 'متحدث', host: 'مقدم', panelist: 'عضو لجنة', moderator: 'مدير جلسة' }
+                      : { speaker: 'Speaker', host: 'Host', panelist: 'Panelist', moderator: 'Moderator' };
+                    return (
+                      <div key={speaker.id ?? i} className={styles.speakerCard}>
+                        {photoUrl ? (
+                          <Image src={photoUrl} alt={speaker.name} width={64} height={64} className={styles.speakerAvatar} />
+                        ) : (
+                          <div className={styles.speakerAvatarFallback}>
+                            {speaker.name[0]?.toUpperCase() || '?'}
+                          </div>
+                        )}
+                        <div>
+                          <p className={styles.speakerName}>{speaker.name}</p>
+                          {speaker.title && <p className={styles.speakerTitle}>{speaker.title}</p>}
+                          {speaker.role && (
+                            <Badge variant="outline">{roleLabels[speaker.role] || speaker.role}</Badge>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </section>
+            )}
+
+            {/* Event Agenda */}
+            {program.agenda && program.agenda.length > 0 && (
+              <section className={styles.sectionBlock}>
+                <h2 className={styles.sectionTitle}>
+                  {locale === 'ar' ? 'جدول الأعمال' : 'Agenda'}
+                </h2>
+                <div className={styles.agendaList}>
+                  {program.agenda.map((slot, i) => (
+                    <div key={slot.id ?? i} className={styles.agendaItem}>
+                      <span className={styles.agendaTime}>{slot.time}</span>
+                      <div className={styles.agendaContent}>
+                        <p className={styles.agendaTitle}>
+                          {locale === 'ar' ? slot.titleAr : (slot.titleEn || slot.titleAr)}
+                        </p>
+                        {slot.descriptionAr && (
+                          <p className={styles.agendaDesc}>
+                            {locale === 'ar' ? slot.descriptionAr : slot.descriptionAr}
+                          </p>
+                        )}
+                        {slot.speaker && (
+                          <span className={styles.agendaSpeaker}>👤 {slot.speaker}</span>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </section>
+            )}
+
+            {/* Retreat Itinerary */}
+            {program.itinerary && program.itinerary.length > 0 && (
+              <section className={styles.sectionBlock}>
+                <h2 className={styles.sectionTitle}>
+                  {locale === 'ar' ? 'البرنامج اليومي' : 'Daily Itinerary'}
+                </h2>
+                <div className={styles.itineraryList}>
+                  {program.itinerary.map((day, i) => (
+                    <div key={day.id ?? i} className={styles.itineraryDay}>
+                      <div className={styles.itineraryDayHeader}>
+                        <span className={styles.dayTag}>
+                          {locale === 'ar' ? `اليوم ${day.dayNumber}` : `Day ${day.dayNumber}`}
+                        </span>
+                        <h3 className={styles.itineraryDayTitle}>
+                          {locale === 'ar' ? day.titleAr : (day.titleEn || day.titleAr)}
+                        </h3>
+                      </div>
+                      {day.activities && day.activities.length > 0 && (
+                        <ul className={styles.activityList}>
+                          {day.activities.map((activity, j) => (
+                            <li key={activity.id ?? j} className={styles.activityItem}>
+                              {activity.time && (
+                                <span className={styles.activityTime}>{activity.time}</span>
+                              )}
+                              <span className={styles.activityText}>
+                                {locale === 'ar' ? activity.activityAr : (activity.activityEn || activity.activityAr)}
+                              </span>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </section>
+            )}
+
+            {/* Includes / Excludes */}
+            {((program.includes && program.includes.length > 0) || (program.excludes && program.excludes.length > 0)) && (
+              <section className={styles.sectionBlock}>
+                <h2 className={styles.sectionTitle}>
+                  {locale === 'ar' ? 'ماذا يشمل' : 'What\'s Included'}
+                </h2>
+                <div className={styles.includesExcludesGrid}>
+                  {program.includes && program.includes.length > 0 && (
+                    <div>
+                      <h3 className={styles.subTitle}>{locale === 'ar' ? '✅ يشمل' : '✅ Includes'}</h3>
+                      <ul className={styles.list}>
+                        {program.includes.map((inc, i) => (
+                          <li key={inc.id ?? i} className={styles.listItem}>{inc.item}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                  {program.excludes && program.excludes.length > 0 && (
+                    <div>
+                      <h3 className={styles.subTitle}>{locale === 'ar' ? '❌ لا يشمل' : '❌ Not Included'}</h3>
+                      <ul className={styles.excludeList}>
+                        {program.excludes.map((exc, i) => (
+                          <li key={exc.id ?? i} className={styles.excludeItem}>{exc.item}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+              </section>
+            )}
+
+            {/* Sponsors */}
+            {program.sponsors && program.sponsors.length > 0 && (
+              <section className={styles.sectionBlock}>
+                <h2 className={styles.sectionTitle}>
+                  {locale === 'ar' ? 'الرعاة والشركاء' : 'Sponsors & Partners'}
+                </h2>
+                <div className={styles.sponsorsGrid}>
+                  {program.sponsors.map((sponsor) => {
+                    if (typeof sponsor === 'number') return null;
+                    const partnerDoc = sponsor as Partner;
+                    const logoUrl = partnerDoc.logo && typeof partnerDoc.logo === 'object'
+                      ? (partnerDoc.logo as Media).url
+                      : null;
+                    return (
+                      <a
+                        key={partnerDoc.id}
+                        href={partnerDoc.website || '#'}
+                        target="_blank"
+                        rel="noreferrer"
+                        className={styles.sponsorCard}
+                      >
+                        {logoUrl ? (
+                          <Image src={logoUrl} alt={partnerDoc.name} width={120} height={48} className={styles.sponsorLogo} />
+                        ) : (
+                          <span className={styles.sponsorName}>{partnerDoc.name}</span>
+                        )}
+                      </a>
+                    );
+                  })}
+                </div>
+              </section>
             )}
           </div>
 

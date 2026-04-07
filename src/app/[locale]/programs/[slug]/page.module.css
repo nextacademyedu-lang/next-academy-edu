@@ -409,6 +409,247 @@
 }
 
 /* ═══════════════════════════════════════════════════════
+   SPEAKERS GRID
+   ═══════════════════════════════════════════════════════ */
+.speakersGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: var(--space-lg, 20px);
+}
+
+.speakerCard {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  background: var(--card-bg);
+  transition: border-color 0.2s ease;
+}
+
+.speakerCard:hover {
+  border-color: var(--accent-primary);
+}
+
+.speakerAvatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.speakerAvatarFallback {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--accent-primary-15);
+  color: var(--accent-text);
+  font-size: 22px;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+
+.speakerName {
+  margin: 0;
+  color: var(--text-primary);
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.speakerTitle {
+  margin: 2px 0 6px;
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+
+/* ═══════════════════════════════════════════════════════
+   AGENDA
+   ═══════════════════════════════════════════════════════ */
+.agendaList {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.agendaItem {
+  display: grid;
+  grid-template-columns: 100px 1fr;
+  gap: 16px;
+  padding: 18px 0;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.agendaItem:last-child {
+  border-bottom: none;
+}
+
+.agendaTime {
+  color: var(--accent-text);
+  font-weight: 700;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.agendaContent {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.agendaTitle {
+  margin: 0;
+  color: var(--text-primary);
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.agendaDesc {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.agendaSpeaker {
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+/* ═══════════════════════════════════════════════════════
+   ITINERARY
+   ═══════════════════════════════════════════════════════ */
+.itineraryList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg, 20px);
+}
+
+.itineraryDay {
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: var(--card-bg);
+}
+
+.itineraryDayHeader {
+  padding: 16px;
+  background: linear-gradient(135deg, rgba(197, 27, 27, 0.06) 0%, transparent 60%);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.itineraryDayTitle {
+  margin: 4px 0 0;
+  color: var(--text-primary);
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.activityList {
+  list-style: none;
+  margin: 0;
+  padding: 8px 16px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.activityItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-main);
+  font-size: 14px;
+}
+
+.activityTime {
+  color: var(--accent-text);
+  font-weight: 700;
+  white-space: nowrap;
+  min-width: 60px;
+}
+
+.activityText {
+  color: var(--text-secondary);
+}
+
+/* ═══════════════════════════════════════════════════════
+   INCLUDES / EXCLUDES
+   ═══════════════════════════════════════════════════════ */
+.includesExcludesGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: var(--space-xl, 32px);
+}
+
+.excludeList {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm, 8px);
+}
+
+.excludeItem {
+  font-size: var(--text-body, 16px);
+  color: var(--text-secondary);
+  position: relative;
+  padding-inline-start: 24px;
+}
+
+.excludeItem::before {
+  content: '✕';
+  position: absolute;
+  inset-inline-start: 0;
+  color: var(--error, #ef4444);
+}
+
+/* ═══════════════════════════════════════════════════════
+   SPONSORS
+   ═══════════════════════════════════════════════════════ */
+.sponsorsGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: center;
+}
+
+.sponsorCard {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 14px 24px;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  background: var(--card-bg);
+  text-decoration: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  min-height: 64px;
+}
+
+.sponsorCard:hover {
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 12px rgba(197, 27, 27, 0.08);
+}
+
+.sponsorLogo {
+  object-fit: contain;
+  max-height: 48px;
+}
+
+.sponsorName {
+  color: var(--text-primary);
+  font-weight: 600;
+  font-size: 14px;
+}
+
+/* ═══════════════════════════════════════════════════════
    RESPONSIVE BREAKPOINTS
    ═══════════════════════════════════════════════════════ */
 @media (min-width: 768px) {
@@ -429,5 +670,16 @@
     position: static;
     max-height: none;
     overflow-y: visible;
+  }
+}
+
+@media (max-width: 768px) {
+  .agendaItem {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+
+  .speakersGrid {
+    grid-template-columns: 1fr;
   }
 }
