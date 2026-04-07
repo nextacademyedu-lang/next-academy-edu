@@ -14,6 +14,7 @@ import { BookRoundButton } from '@/components/checkout/book-round-button';
 import { EarlyBirdCountdown } from '@/components/ui/early-bird-countdown';
 import { InstructorCard } from '@/components/sections/instructor-card';
 import { buildYouTubeEmbedUrl, buildYouTubeThumbnailUrl } from '@/lib/youtube';
+import { MediaPlayer } from '@/components/ui/media-player';
 import styles from './page.module.css';
 
 export default async function ProgramDetailsPage({
@@ -208,7 +209,7 @@ export default async function ProgramDetailsPage({
                         {startDate && (
                           <span className={styles.roundDate}>{startDate}{endDate ? ` – ${endDate}` : ''}</span>
                         )}
-                        {round.maxCapacity > 0 && (
+                        {round.maxCapacity > 0 && !isPastRound && round.status !== 'completed' && (
                           <Badge variant="success">{t('seatsLeft', { count: seatsLeft })}</Badge>
                         )}
                       </CardHeader>
@@ -216,7 +217,33 @@ export default async function ProgramDetailsPage({
                         {round.locationType && (
                           <div className={styles.roundInfo}>
                             <span className={styles.label}>{t('format')}</span>
-                            <span className={styles.value}>{round.locationType}</span>
+                            <span className={styles.value}>
+                              {round.locationType === 'online'
+                                ? (locale === 'ar' ? 'أونلاين' : 'Online')
+                                : round.locationType === 'in-person'
+                                  ? (locale === 'ar' ? 'حضوري' : 'In-Person')
+                                  : (locale === 'ar' ? 'حضوري + أونلاين' : 'Hybrid')}
+                            </span>
+                          </div>
+                        )}
+                        {(round.locationType === 'in-person' || round.locationType === 'hybrid') && round.locationName && (
+                          <div className={styles.roundInfo}>
+                            <span className={styles.label}>{locale === 'ar' ? 'المكان' : 'Venue'}</span>
+                            <span className={styles.value}>{round.locationName}</span>
+                          </div>
+                        )}
+                        {(round.locationType === 'in-person' || round.locationType === 'hybrid') && round.locationAddress && (
+                          <div className={styles.roundInfo}>
+                            <span className={styles.label}>{locale === 'ar' ? 'العنوان' : 'Address'}</span>
+                            <span className={styles.value}>
+                              {round.locationMapUrl ? (
+                                <a href={round.locationMapUrl} target="_blank" rel="noreferrer" className={styles.mapLink}>
+                                  {round.locationAddress} 📍
+                                </a>
+                              ) : (
+                                round.locationAddress
+                              )}
+                            </span>
                           </div>
                         )}
                         <div className={styles.roundInfo}>
@@ -260,14 +287,10 @@ export default async function ProgramDetailsPage({
                         {showWebinarRecording && (
                           <div id={recordingAnchorId} className={styles.recordingWrap}>
                             {recordingEmbedUrl ? (
-                              <iframe
+                              <MediaPlayer
                                 src={recordingEmbedUrl}
                                 title={`${title} - ${watchRecordingLabel}`}
-                                className={styles.recordingFrame}
-                                loading="lazy"
-                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                                referrerPolicy="strict-origin-when-cross-origin"
-                                allowFullScreen
+                                thumbnailUrl={round.meetingUrl ? (buildYouTubeThumbnailUrl(round.meetingUrl) ?? undefined) : undefined}
                               />
                             ) : (
                               <p className={styles.recordingFallback}>{noRecordingEmbedLabel}</p>

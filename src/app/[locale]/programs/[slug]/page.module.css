@@ -397,6 +397,17 @@
   font-size: 13px;
 }
 
+.mapLink {
+  color: var(--accent-text);
+  text-decoration: none;
+  transition: opacity 0.2s ease;
+}
+
+.mapLink:hover {
+  text-decoration: underline;
+  opacity: 0.85;
+}
+
 /* ═══════════════════════════════════════════════════════
    RESPONSIVE BREAKPOINTS
    ═══════════════════════════════════════════════════════ */

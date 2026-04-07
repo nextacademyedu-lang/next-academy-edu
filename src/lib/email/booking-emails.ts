@@ -18,19 +18,42 @@ export async function sendBookingConfirmation(data: {
   amountPaid: number;
   startDate: string;
   locale?: Locale;
+  location?: {
+    type?: string;
+    name?: string;
+    address?: string;
+  } | null;
 }): Promise<void> {
   const locale = data.locale ?? 'ar';
   const s = t(locale).bookingConfirmation;
   const cur = t(locale).currency;
+
+  const infoRows: [string, string][] = [
+    [s.labelProgram, data.programTitle],
+    [s.labelBookingCode, data.bookingCode],
+    [s.labelAmountPaid, `${data.amountPaid} ${cur}`],
+    [s.labelStartDate, data.startDate],
+  ];
+
+  // Add location info for in-person / hybrid programs
+  if (data.location && data.location.type && data.location.type !== 'online') {
+    const formatLabel =
+      data.location.type === 'in-person'
+        ? (locale === 'ar' ? '\u062d\u0636\u0648\u0631\u064a' : 'In-Person')
+        : (locale === 'ar' ? '\u062d\u0636\u0648\u0631\u064a + \u0623\u0648\u0646\u0644\u0627\u064a\u0646' : 'Hybrid');
+    infoRows.push([s.labelFormat, formatLabel]);
+    if (data.location.name) {
+      infoRows.push([s.labelLocation, data.location.name]);
+    }
+    if (data.location.address) {
+      infoRows.push([s.labelAddress, data.location.address]);
+    }
+  }
+
   const html = buildEmailLayout({
     title: s.title,
     body: `${greeting(data.userName, locale)}\n\n${s.body}`,
-    infoBox: [
-      [s.labelProgram, data.programTitle],
-      [s.labelBookingCode, data.bookingCode],
-      [s.labelAmountPaid, `${data.amountPaid} ${cur}`],
-      [s.labelStartDate, data.startDate],
-    ],
+    infoBox: infoRows,
     cta: { text: s.cta, url: `${APP_URL()}/dashboard/bookings` },
   }, { locale });
   await send(data.to, s.subject(data.programTitle), html);

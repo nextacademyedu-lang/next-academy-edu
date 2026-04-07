@@ -51,7 +51,9 @@ async function resolveInstructorScope(req: NextRequest): Promise<InstructorScope
 function normalizeSubmissionData(input: Record<string, unknown>) {
   return {
     type:
-      input.type === 'workshop' || input.type === 'webinar' || input.type === 'course'
+      input.type === 'workshop' || input.type === 'webinar' || input.type === 'course' ||
+      input.type === 'event' || input.type === 'camp' || input.type === 'retreat' ||
+      input.type === 'corporate_training'
         ? input.type
         : 'course',
     titleAr: sanitizeText(input.titleAr),

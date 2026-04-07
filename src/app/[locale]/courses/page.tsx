@@ -19,7 +19,7 @@ type PageSearchParams = {
   level?: string | string[];
 };
 
-const TYPE_FILTERS = ['all', 'course', 'workshop', 'webinar'] as const;
+const TYPE_FILTERS = ['all', 'course', 'workshop', 'webinar', 'camp'] as const;
 const LEVEL_FILTERS = ['all', 'beginner', 'intermediate', 'advanced'] as const;
 
 function pickFirst(value: string | string[] | undefined): string | undefined {
@@ -37,11 +37,19 @@ function buildPlainTypeLabel(type: Program['type'], locale: string): string {
   if (locale === 'ar') {
     if (type === 'course') return 'دورة';
     if (type === 'workshop') return 'ورشة';
+    if (type === 'event') return 'فعالية';
+    if (type === 'camp') return 'معسكر';
+    if (type === 'retreat') return 'خلوة';
+    if (type === 'corporate_training') return 'تدريب مؤسسي';
     return 'ندوة';
   }
 
   if (type === 'course') return 'Course';
   if (type === 'workshop') return 'Workshop';
+  if (type === 'event') return 'Event';
+  if (type === 'camp') return 'Camp';
+  if (type === 'retreat') return 'Retreat';
+  if (type === 'corporate_training') return 'Corporate Training';
   return 'Webinar';
 }
 

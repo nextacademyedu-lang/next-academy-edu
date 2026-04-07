@@ -29,7 +29,9 @@ function normalizeSubmissionData(input: Record<string, unknown>) {
   const next: Record<string, unknown> = {};
   if (input.type !== undefined) {
     next.type =
-      input.type === 'workshop' || input.type === 'webinar' || input.type === 'course'
+      input.type === 'workshop' || input.type === 'webinar' || input.type === 'course' ||
+      input.type === 'event' || input.type === 'camp' || input.type === 'retreat' ||
+      input.type === 'corporate_training'
         ? input.type
         : 'course';
   }

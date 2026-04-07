@@ -82,6 +82,9 @@ export interface EmailStrings {
     labelBookingCode: string;
     labelAmountPaid: string;
     labelStartDate: string;
+    labelFormat: string;
+    labelLocation: string;
+    labelAddress: string;
   };
   bookingCancelled: {
     subject: (program: string) => string;
@@ -330,6 +333,9 @@ const ar: EmailStrings = {
     labelBookingCode: 'رقم الحجز',
     labelAmountPaid: 'المبلغ المدفوع',
     labelStartDate: 'تاريخ البدء',
+    labelFormat: 'الشكل',
+    labelLocation: 'الموقع',
+    labelAddress: 'العنوان',
   },
   bookingCancelled: {
     subject: (p) => `❌ تم إلغاء حجزك — ${p}`,
@@ -578,6 +584,9 @@ const en: EmailStrings = {
     labelBookingCode: 'Booking Code',
     labelAmountPaid: 'Amount Paid',
     labelStartDate: 'Start Date',
+    labelFormat: 'Format',
+    labelLocation: 'Venue',
+    labelAddress: 'Address',
   },
   bookingCancelled: {
     subject: (p) => `❌ Booking Cancelled — ${p}`,

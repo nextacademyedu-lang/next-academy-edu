@@ -165,12 +165,19 @@ export async function processSuccessfulPayment(opts: {
       await sendBookingConfirmation({
         to: user.email,
         userName: `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.email,
-        programTitle: program?.titleAr || program?.titleEn || 'البرنامج',
+        programTitle: program?.titleAr || program?.titleEn || '\u0627\u0644\u0628\u0631\u0646\u0627\u0645\u062c',
         bookingCode: booking.bookingCode || String(booking.id),
         amountPaid: booking.finalAmount,
         startDate: round?.startDate
           ? new Date(round.startDate).toLocaleDateString('ar-EG')
           : '',
+        location: round?.locationType
+          ? {
+              type: round.locationType as string,
+              name: (round as any).locationName || undefined,
+              address: (round as any).locationAddress || undefined,
+            }
+          : null,
       });
 
       await payload.update({

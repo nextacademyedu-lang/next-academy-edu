@@ -56,7 +56,7 @@ export const InstructorProgramSubmissions: CollectionConfig = {
     { name: 'reviewedAt', type: 'date' },
     { name: 'reviewNotes', type: 'textarea' },
 
-    { name: 'type', type: 'select', options: ['workshop', 'course', 'webinar'], required: true },
+    { name: 'type', type: 'select', options: ['workshop', 'course', 'webinar', 'event', 'camp', 'retreat', 'corporate_training'], required: true },
     { name: 'titleAr', type: 'text', required: true },
     { name: 'titleEn', type: 'text' },
     { name: 'shortDescriptionAr', type: 'textarea', required: true },

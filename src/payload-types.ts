@@ -404,7 +404,7 @@ export interface Category {
  */
 export interface Program {
   id: number;
-  type: 'workshop' | 'course' | 'webinar';
+  type: 'workshop' | 'course' | 'webinar' | 'event' | 'camp' | 'retreat' | 'corporate_training';
   titleAr: string;
   titleEn?: string | null;
   slug: string;
@@ -1031,15 +1031,22 @@ export interface BulkSeatAllocation {
   company: number | Company;
   round: number | Round;
   /**
-   * Number of seats purchased for this round
+   * Total seats purchased for this round
    */
   totalSeats: number;
+  /**
+   * How many seats are available as open pool (self-claim by company members). Rest are manager-assigned.
+   */
+  openPoolSeats?: number | null;
+  allocationMode: 'assigned' | 'open_pool' | 'mixed';
   status: 'active' | 'expired' | 'cancelled';
+  createdByManager?: (number | null) | User;
   allocations?:
     | {
         user: number | User;
         allocatedAt?: string | null;
         status: 'pending' | 'enrolled' | 'cancelled';
+        source?: ('assigned' | 'pool_claim') | null;
         id?: string | null;
       }[]
     | null;
@@ -1274,7 +1281,7 @@ export interface UpcomingEventsConfig {
   sectionTitleAr?: string | null;
   sectionTitleEn?: string | null;
   mode?: ('automatic' | 'manual') | null;
-  filterType?: ('all' | 'workshop' | 'course' | 'webinar') | null;
+  filterType?: ('all' | 'workshop' | 'course' | 'webinar' | 'event' | 'camp' | 'retreat' | 'corporate_training') | null;
   maxItems?: number | null;
   sortOrder?: ('date_asc' | 'manual') | null;
   /**
@@ -1384,7 +1391,7 @@ export interface InstructorProgramSubmission {
   submittedAt?: string | null;
   reviewedAt?: string | null;
   reviewNotes?: string | null;
-  type: 'workshop' | 'course' | 'webinar';
+  type: 'workshop' | 'course' | 'webinar' | 'event' | 'camp' | 'retreat' | 'corporate_training';
   titleAr: string;
   titleEn?: string | null;
   shortDescriptionAr: string;
@@ -2371,13 +2378,17 @@ export interface BulkSeatAllocationsSelect<T extends boolean = true> {
   company?: T;
   round?: T;
   totalSeats?: T;
+  openPoolSeats?: T;
+  allocationMode?: T;
   status?: T;
+  createdByManager?: T;
   allocations?:
     | T
     | {
         user?: T;
         allocatedAt?: T;
         status?: T;
+        source?: T;
         id?: T;
       };
   purchaseDate?: T;
