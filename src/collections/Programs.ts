@@ -31,13 +31,11 @@ function buildRoundPlaceholderWindow(roundNumber: number): { startDate: string; 
   };
 }
 
-async function ensureProgramRounds(params: { payload: any; req: unknown; program: ProgramLike & { type?: string } }) {
+async function ensureProgramRounds(params: { payload: any; req: unknown; program: ProgramLike }) {
   const { payload, req, program } = params;
   if (!program.id) return;
 
-  // Events auto-create exactly 1 round (ignore roundsCount)
-  const isEvent = program.type === 'event';
-  const targetCount = isEvent ? 1 : normalizeRoundsCount(program.roundsCount);
+  const targetCount = normalizeRoundsCount(program.roundsCount);
   if (targetCount <= 0) return;
 
   const existingRounds = await payload.find({
@@ -57,9 +55,6 @@ async function ensureProgramRounds(params: { payload: any; req: unknown; program
     }
   }
 
-  // For events, skip if any round already exists
-  if (isEvent && existingRoundNumbers.size > 0) return;
-
   const programTitle = (program.titleEn || program.titleAr || 'Program').trim();
   for (let roundNumber = 1; roundNumber <= targetCount; roundNumber += 1) {
     if (existingRoundNumbers.has(roundNumber)) continue;
@@ -71,7 +66,7 @@ async function ensureProgramRounds(params: { payload: any; req: unknown; program
       data: {
         program: program.id,
         roundNumber,
-        title: isEvent ? programTitle : `${programTitle} - Round ${roundNumber}`,
+        title: `${programTitle} - Round ${roundNumber}`,
         startDate,
         endDate,
         timezone: 'Africa/Cairo',
@@ -88,16 +83,6 @@ async function ensureProgramRounds(params: { payload: any; req: unknown; program
   }
 }
 
-/* ── Condition helpers for admin field visibility ──────────────── */
-const isEducational = (data: Record<string, unknown>) =>
-  !['event', 'retreat'].includes(data?.type as string);
-
-const isEventLike = (data: Record<string, unknown>) =>
-  ['event', 'retreat', 'camp'].includes(data?.type as string);
-
-const isRetreatOrCamp = (data: Record<string, unknown>) =>
-  ['retreat', 'camp'].includes(data?.type as string);
-
 export const Programs: CollectionConfig = {
   slug: 'programs',
   admin: { useAsTitle: 'titleAr' },
@@ -110,7 +95,6 @@ export const Programs: CollectionConfig = {
   hooks: {
     beforeDelete: [
       async ({ req, id }) => {
-        // Delete all rounds first (each round's beforeDelete will cascade to its sessions).
         const existingRounds = await req.payload.find({
           collection: 'rounds',
           where: { program: { equals: id } },
@@ -127,7 +111,6 @@ export const Programs: CollectionConfig = {
             req,
           });
         }
-        // Clean up reviews referencing this program.
         const reviews = await req.payload.find({
           collection: 'reviews',
           where: { program: { equals: id } },
@@ -144,7 +127,6 @@ export const Programs: CollectionConfig = {
             req,
           });
         }
-        // Clean up certificates referencing this program.
         const certificates = await req.payload.find({
           collection: 'certificates',
           where: { program: { equals: id } },
@@ -162,20 +144,18 @@ export const Programs: CollectionConfig = {
           });
         }
       },
-
     ],
     afterChange: [
       async ({ req, doc }) => {
         await ensureProgramRounds({
           payload: req.payload,
           req,
-          program: doc as ProgramLike & { type?: string },
+          program: doc as ProgramLike,
         });
       },
     ],
   },
   fields: [
-    /* ── Core fields (all types) ─────────────────────────────── */
     {
       name: 'type',
       type: 'select',
@@ -183,10 +163,7 @@ export const Programs: CollectionConfig = {
         { label: 'Workshop', value: 'workshop' },
         { label: 'Course', value: 'course' },
         { label: 'Webinar', value: 'webinar' },
-        { label: 'Event', value: 'event' },
         { label: 'Camp', value: 'camp' },
-        { label: 'Retreat', value: 'retreat' },
-        { label: 'Corporate Training', value: 'corporate_training' },
       ],
       required: true,
     },
@@ -215,73 +192,29 @@ export const Programs: CollectionConfig = {
       name: 'featuredPriority',
       type: 'number',
       defaultValue: 0,
-      admin: {
-        description: 'Controls ordering in featured cards (lower appears first)',
-      },
+      admin: { description: 'Controls ordering in featured cards (lower appears first)' },
     },
     { name: 'isActive', type: 'checkbox', defaultValue: true },
 
-    /* ── Educational fields (course/workshop/webinar/camp/corporate) ── */
+    /* ── Educational fields ──────────────────────────────────── */
     {
       name: 'roundsCount',
       type: 'number',
       defaultValue: 0,
-      admin: {
-        description:
-          'Total rounds planned. Missing rounds are auto-created as drafts. Events get 1 round automatically.',
-        condition: (data) => (data?.type as string) !== 'event',
-      },
+      admin: { description: 'Total rounds planned. Missing rounds are auto-created as drafts.' },
     },
-    {
-      name: 'sessionsCount',
-      type: 'number',
-      admin: {
-        condition: (data) => (data?.type as string) !== 'event',
-      },
-    },
-    {
-      name: 'level',
-      type: 'select',
-      options: ['beginner', 'intermediate', 'advanced'],
-      admin: {
-        condition: (data) => isEducational(data as Record<string, unknown>),
-      },
-    },
-    {
-      name: 'objectives',
-      type: 'array',
-      fields: [{ name: 'item', type: 'text' }],
-      admin: {
-        condition: (data) => (data?.type as string) !== 'event',
-      },
-    },
-    {
-      name: 'requirements',
-      type: 'array',
-      fields: [{ name: 'item', type: 'text' }],
-      admin: {
-        condition: (data) => (data?.type as string) !== 'event',
-      },
-    },
+    { name: 'sessionsCount', type: 'number' },
+    { name: 'level', type: 'select', options: ['beginner', 'intermediate', 'advanced'] },
+    { name: 'objectives', type: 'array', fields: [{ name: 'item', type: 'text' }] },
+    { name: 'requirements', type: 'array', fields: [{ name: 'item', type: 'text' }] },
 
-
-    /* ── New fields temporarily disabled until DB migration is planned ─── */
-    /* speakers, sponsors, agenda, registrationDeadline, itinerary,
-       programIncludes, programExcludes will be re-added after proper
-       DB migration on production. */
-
-    /* ── Stats (read-only, all types) ────────────────────────── */
-    {
-      name: 'learnersCount',
-      type: 'number',
-      defaultValue: 0,
-      admin: { readOnly: true },
-    },
+    /* ── Stats (read-only) ───────────────────────────────────── */
+    { name: 'learnersCount', type: 'number', defaultValue: 0, admin: { readOnly: true } },
     { name: 'viewCount', type: 'number', defaultValue: 0, admin: { readOnly: true } },
     { name: 'averageRating', type: 'number', defaultValue: 0, admin: { readOnly: true } },
     { name: 'reviewCount', type: 'number', defaultValue: 0, admin: { readOnly: true } },
 
-    /* ── SEO (all types) ─────────────────────────────────────── */
+    /* ── SEO ──────────────────────────────────────────────────── */
     { name: 'seoTitle', type: 'text' },
     { name: 'seoDescription', type: 'textarea' },
     { name: 'seoKeywords', type: 'array', fields: [{ name: 'keyword', type: 'text' }] },

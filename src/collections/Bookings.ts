@@ -338,7 +338,8 @@ export const Bookings: CollectionConfig = {
   fields: [
     { name: 'bookingCode', type: 'text', unique: true, admin: { readOnly: true } },
     { name: 'user', type: 'relationship', relationTo: 'users', required: true },
-    { name: 'round', type: 'relationship', relationTo: 'rounds', required: true },
+    { name: 'round', type: 'relationship', relationTo: 'rounds' },
+    { name: 'event', type: 'relationship', relationTo: 'events' },
     { name: 'paymentPlan', type: 'relationship', relationTo: 'payment-plans' },
     { name: 'installmentRequest', type: 'relationship', relationTo: 'installment-requests' },
     {

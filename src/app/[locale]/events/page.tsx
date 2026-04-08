@@ -4,40 +4,32 @@ import Link from 'next/link';
 import { getLocale } from 'next-intl/server';
 import { getPayload } from 'payload';
 import config from '@payload-config';
-import type { Media, Program, Round } from '@/payload-types';
+import type { Event, Media } from '@/payload-types';
 import { Navbar } from '@/components/layout/navbar';
 import { Footer } from '@/components/layout/footer';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import styles from './page.module.css';
-import { getInstructorNames } from '@/lib/instructor-helpers';
 
 export const dynamic = 'force-dynamic';
 
-function getMediaUrl(media: Program['coverImage'] | Program['thumbnail']): string | null {
+function getMediaUrl(media: Event['coverImage'] | Event['thumbnail']): string | null {
   if (!media || typeof media === 'number') return null;
   const typedMedia = media as Media;
   return typedMedia.url || null;
 }
 
-function buildTypeLabel(type: Program['type'], locale: string): string {
+function buildTypeLabel(type: Event['type'], locale: string): string {
   if (locale === 'ar') {
-    if (type === 'course') return 'دورة';
-    if (type === 'workshop') return 'ورشة';
     if (type === 'event') return 'فعالية';
-    if (type === 'camp') return 'معسكر';
     if (type === 'retreat') return 'خلوة';
     if (type === 'corporate_training') return 'تدريب مؤسسي';
-    return 'ندوة';
+    return 'فعالية';
   }
-
-  if (type === 'course') return 'Course';
-  if (type === 'workshop') return 'Workshop';
   if (type === 'event') return 'Event';
-  if (type === 'camp') return 'Camp';
   if (type === 'retreat') return 'Retreat';
   if (type === 'corporate_training') return 'Corporate Training';
-  return 'Webinar';
+  return 'Event';
 }
 
 export default async function EventsPage() {
@@ -45,37 +37,32 @@ export default async function EventsPage() {
   const payload = await getPayload({ config });
   const now = new Date();
 
-  let rounds: Round[] = [];
+  let events: Event[] = [];
   try {
-    const roundsResult = await payload.find({
-      collection: 'rounds',
-      depth: 2,
-      limit: 300,
-      sort: '-startDate',
-      where: { isActive: { equals: true } },
+    const result = await payload.find({
+      collection: 'events',
+      depth: 1,
+      limit: 100,
+      sort: '-eventDate',
+      where: {
+        isActive: { equals: true },
+        type: { equals: 'event' },
+      },
     });
-    rounds = roundsResult.docs as Round[];
+    events = result.docs as Event[];
   } catch (error) {
-    console.error('[EventsPage] Failed to load rounds:', error);
+    console.error('[EventsPage] Failed to load events:', error);
   }
 
-  const eventRounds = rounds.filter((round) => {
-    const program = typeof round.program === 'object' ? round.program : null;
-    return !!program && program.type === 'event';
-  });
+  const upcomingEvents = events
+    .filter((e) => e.eventDate && new Date(e.eventDate) >= now)
+    .sort((a, b) => new Date(a.eventDate).getTime() - new Date(b.eventDate).getTime());
 
-  const upcomingEvents = eventRounds
-    .filter((round) => round.startDate && new Date(round.startDate) >= now)
-    .sort((a, b) => new Date(a.startDate!).getTime() - new Date(b.startDate!).getTime());
+  const pastEvents = events
+    .filter((e) => e.eventDate && new Date(e.eventDate) < now)
+    .sort((a, b) => new Date(b.eventDate).getTime() - new Date(a.eventDate).getTime());
 
-  const pastEvents = eventRounds
-    .filter((round) => round.startDate && new Date(round.startDate) < now)
-    .sort((a, b) => new Date(b.startDate!).getTime() - new Date(a.startDate!).getTime());
-
-  const totalAttendees = eventRounds.reduce((sum, round) => sum + (round.currentEnrollments || 0), 0);
-  const uniquePrograms = new Set(
-    eventRounds.map((round) => (typeof round.program === 'object' ? round.program.id : null)).filter(Boolean),
-  ).size;
+  const totalAttendees = events.reduce((sum, e) => sum + (e.attendeesCount || 0), 0);
 
   const fallbackImages = [
     '/images/about/story-workshop.png',
@@ -116,8 +103,8 @@ export default async function EventsPage() {
                 <small>{locale === 'ar' ? 'إجمالي حضور' : 'Total Attendees'}</small>
               </div>
               <div className={styles.heroStat}>
-                <span>{uniquePrograms}</span>
-                <small>{locale === 'ar' ? 'برامج مستضافة' : 'Hosted Programs'}</small>
+                <span>{events.length}</span>
+                <small>{locale === 'ar' ? 'فعاليات مستضافة' : 'Hosted Events'}</small>
               </div>
             </div>
 
@@ -149,21 +136,19 @@ export default async function EventsPage() {
                 </p>
               )}
 
-              {upcomingEvents.slice(0, 8).map((round, index) => {
-                const program = round.program as Program;
-                const imageUrl = getMediaUrl(program.coverImage) || getMediaUrl(program.thumbnail) || fallbackImages[index % fallbackImages.length];
-                const instructor = getInstructorNames(
-                  program.instructor,
-                  locale === 'ar' ? 'فريق نكست' : 'Next Team',
-                );
-
+              {upcomingEvents.slice(0, 8).map((event, index) => {
+                const imageUrl = getMediaUrl(event.coverImage) || getMediaUrl(event.thumbnail) || fallbackImages[index % fallbackImages.length];
                 const title =
                   locale === 'ar'
-                    ? program.titleAr || program.titleEn || 'Program'
-                    : program.titleEn || program.titleAr || 'Program';
+                    ? event.titleAr || event.titleEn || 'فعالية'
+                    : event.titleEn || event.titleAr || 'Event';
+
+                const locationLabel = event.locationType === 'online'
+                  ? (locale === 'ar' ? 'أونلاين' : 'Online')
+                  : event.venue || (locale === 'ar' ? 'حضوري' : 'In Person');
 
                 return (
-                  <article key={round.id} className={styles.eventCard}>
+                  <article key={event.id} className={styles.eventCard}>
                     <div className={styles.eventImageWrap}>
                       <Image
                         src={imageUrl}
@@ -172,21 +157,21 @@ export default async function EventsPage() {
                         className={styles.eventImage}
                         sizes="(max-width: 768px) 100vw, 33vw"
                       />
-                      <span className={styles.typeBadge}>{buildTypeLabel(program.type, locale)}</span>
+                      <span className={styles.typeBadge}>{buildTypeLabel(event.type, locale)}</span>
                     </div>
 
                     <div className={styles.eventBody}>
                       <h3>{title}</h3>
                       <div className={styles.meta}>
-                        <span>{round.startDate ? new Date(round.startDate).toLocaleDateString(locale === 'ar' ? 'ar-EG' : 'en-US') : ''}</span>
-                        <span>{round.locationType || (locale === 'ar' ? 'أونلاين' : 'Online')}</span>
-                        <span>{instructor}</span>
+                        <span>{new Date(event.eventDate).toLocaleDateString(locale === 'ar' ? 'ar-EG' : 'en-US')}</span>
+                        <span>{locationLabel}</span>
+                        <span>{event.price === 0 ? (locale === 'ar' ? 'مجاني' : 'Free') : `${(event.price || 0).toLocaleString()} ${event.currency || 'EGP'}`}</span>
                       </div>
                     </div>
 
                     <div className={styles.eventFooter}>
-                      <span>{(round.price || 0).toLocaleString()} EGP</span>
-                      <Link href={`/${locale}/programs/${program.slug || program.id}`}>
+                      <span>{event.price === 0 ? (locale === 'ar' ? 'مجاني' : 'Free') : `${(event.price || 0).toLocaleString()} ${event.currency || 'EGP'}`}</span>
+                      <Link href={`/${locale}/events/${event.slug || event.id}`}>
                         <Button variant="primary" size="sm">
                           {locale === 'ar' ? 'تفاصيل' : 'Details'}
                         </Button>
@@ -212,68 +197,33 @@ export default async function EventsPage() {
                 </p>
               )}
 
-              {pastEvents.slice(0, 10).map((round) => {
-                const program = round.program as Program;
+              {pastEvents.slice(0, 10).map((event) => {
                 const title =
                   locale === 'ar'
-                    ? program.titleAr || program.titleEn || 'Program'
-                    : program.titleEn || program.titleAr || 'Program';
-                const learners = round.currentEnrollments || 0;
+                    ? event.titleAr || event.titleEn || 'فعالية'
+                    : event.titleEn || event.titleAr || 'Event';
+                const attendees = event.attendeesCount || 0;
 
                 return (
-                  <article key={`past-${round.id}`} className={styles.pastItem}>
+                  <article key={`past-${event.id}`} className={styles.pastItem}>
                     <div>
                       <h3>{title}</h3>
                       <p>
-                        {round.startDate ? new Date(round.startDate).toLocaleDateString(locale === 'ar' ? 'ar-EG' : 'en-US') : ''} •{' '}
-                        {round.locationType || (locale === 'ar' ? 'أونلاين' : 'Online')}
+                        {new Date(event.eventDate).toLocaleDateString(locale === 'ar' ? 'ar-EG' : 'en-US')} •{' '}
+                        {event.venue || (locale === 'ar' ? 'أونلاين' : 'Online')}
                       </p>
                     </div>
                     <div className={styles.pastMeta}>
-                      <Badge variant="outline">{learners.toLocaleString()} {locale === 'ar' ? 'حضور' : 'attendees'}</Badge>
-                      <Link href={`/${locale}/programs/${program.slug || program.id}`}>
+                      <Badge variant="outline">{attendees.toLocaleString()} {locale === 'ar' ? 'حضور' : 'attendees'}</Badge>
+                      <Link href={`/${locale}/events/${event.slug || event.id}`}>
                         <Button variant="ghost" size="sm">
-                          {locale === 'ar' ? 'عرض البرنامج' : 'View Program'}
+                          {locale === 'ar' ? 'عرض التفاصيل' : 'View Details'}
                         </Button>
                       </Link>
                     </div>
                   </article>
                 );
               })}
-            </div>
-          </div>
-        </section>
-
-        <section className={styles.section}>
-          <div className={styles.container}>
-            <div className={styles.sectionHeader}>
-              <h2>{locale === 'ar' ? 'معرض الصور والفيديو' : 'Photo And Video Gallery'}</h2>
-            </div>
-
-            <div className={styles.gallery}>
-              {fallbackImages.map((image, index) => (
-                <div key={image} className={styles.galleryItem}>
-                  <Image
-                    src={image}
-                    alt={`Event gallery ${index + 1}`}
-                    fill
-                    className={styles.galleryImage}
-                    sizes="(max-width: 768px) 100vw, 33vw"
-                  />
-                </div>
-              ))}
-              <div className={styles.videoCard}>
-                <span className={styles.playIcon}>▶</span>
-                <p>{locale === 'ar' ? 'مشاهد من فعاليات نكست' : 'Highlights From Next Events'}</p>
-              </div>
-              <div className={styles.videoCard}>
-                <span className={styles.playIcon}>▶</span>
-                <p>{locale === 'ar' ? 'لقاءات الخبراء' : 'Expert Meetups Recap'}</p>
-              </div>
-              <div className={styles.videoCard}>
-                <span className={styles.playIcon}>▶</span>
-                <p>{locale === 'ar' ? 'ورش العمل التطبيقية' : 'Hands-on Workshops'}</p>
-              </div>
             </div>
           </div>
         </section>

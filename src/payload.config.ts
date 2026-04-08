@@ -17,6 +17,7 @@ import { Tags } from './collections/Tags.ts';
 import { Categories } from './collections/Categories.ts';
 import { Instructors } from './collections/Instructors.ts';
 import { Programs } from './collections/Programs.ts';
+import { Events } from './collections/Events.ts';
 import { Rounds } from './collections/Rounds.ts';
 import { Sessions } from './collections/Sessions.ts';
 import { PaymentPlans } from './collections/PaymentPlans.ts';
@@ -205,6 +206,7 @@ export default buildConfig({
     Categories,
     Instructors,
     Programs,
+    Events,
     Rounds,
     Sessions,
     PaymentPlans,

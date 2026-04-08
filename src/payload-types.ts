@@ -75,6 +75,7 @@ export interface Config {
     categories: Category;
     instructors: Instructor;
     programs: Program;
+    events: Event;
     rounds: Round;
     sessions: Session;
     'payment-plans': PaymentPlan;
@@ -121,6 +122,7 @@ export interface Config {
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
     instructors: InstructorsSelect<false> | InstructorsSelect<true>;
     programs: ProgramsSelect<false> | ProgramsSelect<true>;
+    events: EventsSelect<false> | EventsSelect<true>;
     rounds: RoundsSelect<false> | RoundsSelect<true>;
     sessions: SessionsSelect<false> | SessionsSelect<true>;
     'payment-plans': PaymentPlansSelect<false> | PaymentPlansSelect<true>;
@@ -404,7 +406,7 @@ export interface Category {
  */
 export interface Program {
   id: number;
-  type: 'workshop' | 'course' | 'webinar' | 'event' | 'camp' | 'retreat' | 'corporate_training';
+  type: 'workshop' | 'course' | 'webinar' | 'camp';
   titleAr: string;
   titleEn?: string | null;
   slug: string;
@@ -460,7 +462,7 @@ export interface Program {
   featuredPriority?: number | null;
   isActive?: boolean | null;
   /**
-   * Total rounds planned. Missing rounds are auto-created as drafts. Events get 1 round automatically.
+   * Total rounds planned. Missing rounds are auto-created as drafts.
    */
   roundsCount?: number | null;
   sessionsCount?: number | null;
@@ -489,6 +491,198 @@ export interface Program {
         id?: string | null;
       }[]
     | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "events".
+ */
+export interface Event {
+  id: number;
+  type: 'event' | 'retreat' | 'corporate_training';
+  titleAr: string;
+  titleEn?: string | null;
+  slug: string;
+  descriptionAr?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  descriptionEn?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  shortDescriptionAr?: string | null;
+  shortDescriptionEn?: string | null;
+  category?: (number | null) | Category;
+  thumbnail?: (number | null) | Media;
+  coverImage?: (number | null) | Media;
+  tags?: (number | Tag)[] | null;
+  /**
+   * Start date/time
+   */
+  eventDate: string;
+  /**
+   * End date/time (optional)
+   */
+  eventEndDate?: string | null;
+  durationHours?: number | null;
+  registrationDeadline?: string | null;
+  locationType?: ('online' | 'in_person' | 'hybrid') | null;
+  /**
+   * Venue / Location name
+   */
+  venue?: string | null;
+  /**
+   * Full address
+   */
+  venueAddress?: string | null;
+  /**
+   * Zoom / Meet / etc. link
+   */
+  onlineLink?: string | null;
+  /**
+   * Maximum attendees (0 = unlimited)
+   */
+  maxCapacity?: number | null;
+  /**
+   * 0 = Free event
+   */
+  price?: number | null;
+  currency?: ('EGP' | 'USD' | 'EUR' | 'SAR') | null;
+  language?: ('ar' | 'en' | 'both') | null;
+  /**
+   * Add custom fields to the registration form. Standard fields (name, email, phone) are always included.
+   */
+  customRegistrationFields?:
+    | {
+        fieldLabel: string;
+        fieldType?: ('text' | 'email' | 'phone' | 'textarea' | 'select' | 'checkbox') | null;
+        /**
+         * Comma-separated options (for Select type only)
+         */
+        selectOptions?: string | null;
+        isRequired?: boolean | null;
+        id?: string | null;
+      }[]
+    | null;
+  speakers?:
+    | {
+        name: string;
+        title?: string | null;
+        bio?: string | null;
+        photo?: (number | null) | Media;
+        role?: ('speaker' | 'host' | 'panelist' | 'moderator') | null;
+        id?: string | null;
+      }[]
+    | null;
+  sponsors?: (number | Partner)[] | null;
+  agenda?:
+    | {
+        time: string;
+        titleAr: string;
+        titleEn?: string | null;
+        descriptionAr?: string | null;
+        speaker?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Day-by-day itinerary for retreats.
+   */
+  itinerary?:
+    | {
+        dayNumber: number;
+        titleAr: string;
+        titleEn?: string | null;
+        activities?:
+          | {
+              time?: string | null;
+              activityAr: string;
+              activityEn?: string | null;
+              id?: string | null;
+            }[]
+          | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * What's included (accommodation, meals, etc.)
+   */
+  eventIncludes?:
+    | {
+        item?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * What's NOT included.
+   */
+  eventExcludes?:
+    | {
+        item?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  targetAudience?:
+    | {
+        item?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  isFeatured?: boolean | null;
+  /**
+   * Lower = appears first
+   */
+  featuredPriority?: number | null;
+  isActive?: boolean | null;
+  attendeesCount?: number | null;
+  viewCount?: number | null;
+  seoTitle?: string | null;
+  seoDescription?: string | null;
+  seoKeywords?:
+    | {
+        keyword?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "partners".
+ */
+export interface Partner {
+  id: number;
+  name: string;
+  logo: number | Media;
+  website?: string | null;
+  orderIndex?: number | null;
+  isActive?: boolean | null;
+  category?: ('general' | 'media' | 'strategic' | 'sponsor') | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -610,7 +804,8 @@ export interface Booking {
   id: number;
   bookingCode?: string | null;
   user: number | User;
-  round: number | Round;
+  round?: (number | null) | Round;
+  event?: (number | null) | Event;
   paymentPlan?: (number | null) | PaymentPlan;
   installmentRequest?: (number | null) | InstallmentRequest;
   status:
@@ -1366,21 +1561,6 @@ export interface CrmSyncEvent {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "partners".
- */
-export interface Partner {
-  id: number;
-  name: string;
-  logo: number | Media;
-  website?: string | null;
-  orderIndex?: number | null;
-  isActive?: boolean | null;
-  category?: ('general' | 'media' | 'strategic' | 'sponsor') | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "instructor-program-submissions".
  */
 export interface InstructorProgramSubmission {
@@ -1556,6 +1736,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'programs';
         value: number | Program;
+      } | null)
+    | ({
+        relationTo: 'events';
+        value: number | Event;
       } | null)
     | ({
         relationTo: 'rounds';
@@ -1945,6 +2129,115 @@ export interface ProgramsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "events_select".
+ */
+export interface EventsSelect<T extends boolean = true> {
+  type?: T;
+  titleAr?: T;
+  titleEn?: T;
+  slug?: T;
+  descriptionAr?: T;
+  descriptionEn?: T;
+  shortDescriptionAr?: T;
+  shortDescriptionEn?: T;
+  category?: T;
+  thumbnail?: T;
+  coverImage?: T;
+  tags?: T;
+  eventDate?: T;
+  eventEndDate?: T;
+  durationHours?: T;
+  registrationDeadline?: T;
+  locationType?: T;
+  venue?: T;
+  venueAddress?: T;
+  onlineLink?: T;
+  maxCapacity?: T;
+  price?: T;
+  currency?: T;
+  language?: T;
+  customRegistrationFields?:
+    | T
+    | {
+        fieldLabel?: T;
+        fieldType?: T;
+        selectOptions?: T;
+        isRequired?: T;
+        id?: T;
+      };
+  speakers?:
+    | T
+    | {
+        name?: T;
+        title?: T;
+        bio?: T;
+        photo?: T;
+        role?: T;
+        id?: T;
+      };
+  sponsors?: T;
+  agenda?:
+    | T
+    | {
+        time?: T;
+        titleAr?: T;
+        titleEn?: T;
+        descriptionAr?: T;
+        speaker?: T;
+        id?: T;
+      };
+  itinerary?:
+    | T
+    | {
+        dayNumber?: T;
+        titleAr?: T;
+        titleEn?: T;
+        activities?:
+          | T
+          | {
+              time?: T;
+              activityAr?: T;
+              activityEn?: T;
+              id?: T;
+            };
+        id?: T;
+      };
+  eventIncludes?:
+    | T
+    | {
+        item?: T;
+        id?: T;
+      };
+  eventExcludes?:
+    | T
+    | {
+        item?: T;
+        id?: T;
+      };
+  targetAudience?:
+    | T
+    | {
+        item?: T;
+        id?: T;
+      };
+  isFeatured?: T;
+  featuredPriority?: T;
+  isActive?: T;
+  attendeesCount?: T;
+  viewCount?: T;
+  seoTitle?: T;
+  seoDescription?: T;
+  seoKeywords?:
+    | T
+    | {
+        keyword?: T;
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "rounds_select".
  */
 export interface RoundsSelect<T extends boolean = true> {
@@ -2045,6 +2338,7 @@ export interface BookingsSelect<T extends boolean = true> {
   bookingCode?: T;
   user?: T;
   round?: T;
+  event?: T;
   paymentPlan?: T;
   installmentRequest?: T;
   status?: T;
