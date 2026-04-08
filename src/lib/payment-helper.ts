@@ -144,8 +144,13 @@ export async function processSuccessfulPayment(opts: {
   // ── 7. Send confirmation email (once) ────────────────────────────
   if (isFullyPaid && !booking.confirmationEmailSent) {
     try {
-      const userId = typeof booking.user === 'object' ? (booking.user as unknown as { id: string | number }).id : booking.user;
-      const roundId = typeof booking.round === 'object' ? (booking.round as unknown as { id: string | number }).id : booking.round;
+      const userId = typeof booking.user === 'object' ? (booking.user as unknown as { id: string | number })?.id : booking.user;
+      const roundId = typeof booking.round === 'object' ? (booking.round as unknown as { id: string | number })?.id : booking.round;
+
+      if (!userId || !roundId) {
+        console.warn('[payment-helper] Missing userId or roundId for confirmation email', { userId, roundId });
+        return true;
+      }
 
       const user = await payload.findByID({
         collection: 'users',
