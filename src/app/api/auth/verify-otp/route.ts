@@ -257,33 +257,43 @@ export async function POST(request: NextRequest) {
       req: request as any,
     });
 
-    const intentAdjustedUser = await ensureB2BManagerAccountForIntent({
-      payload,
-      req: request,
-      user: updatedUser as {
-        id: number | string;
-        role?: string | null;
-        signupIntent?: string | null;
-      },
-    });
+    // ── Intent-based role assignment (non-blocking) ──────────────────
+    // Email is already verified at this point. If the instructor/b2b
+    // account provisioning fails, we still return success so the user
+    // isn't stuck with a used code and no verification feedback.
+    let roleAssigned = true;
+    try {
+      const intentAdjustedUser = await ensureB2BManagerAccountForIntent({
+        payload,
+        req: request,
+        user: updatedUser as {
+          id: number | string;
+          role?: string | null;
+          signupIntent?: string | null;
+        },
+      });
 
-    await ensureInstructorAccountForIntent({
-      payload,
-      req: request,
-      user: intentAdjustedUser as {
-        id: number | string;
-        email?: string | null;
-        firstName?: string | null;
-        lastName?: string | null;
-        role?: string | null;
-        emailVerified?: boolean | null;
-        instructorId?: unknown;
-        signupIntent?: string | null;
-      },
-    });
+      await ensureInstructorAccountForIntent({
+        payload,
+        req: request,
+        user: intentAdjustedUser as {
+          id: number | string;
+          email?: string | null;
+          firstName?: string | null;
+          lastName?: string | null;
+          role?: string | null;
+          emailVerified?: boolean | null;
+          instructorId?: unknown;
+          signupIntent?: string | null;
+        },
+      });
+    } catch (roleErr) {
+      roleAssigned = false;
+      console.error('[verify-otp] Role assignment failed (email IS verified):', roleErr);
+    }
 
     return NextResponse.json(
-      { verified: true, message: 'Email verified successfully' },
+      { verified: true, message: 'Email verified successfully', roleAssigned },
       {
         status: 200,
         headers: {
