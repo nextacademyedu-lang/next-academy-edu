@@ -66,14 +66,16 @@ function mapBooking(booking: Booking) {
         };
 
   const round =
-    typeof booking.round === 'number'
-      ? String(booking.round)
-      : {
-          id: String(booking.round.id),
-          title: booking.round.title || undefined,
-          startDate: booking.round.startDate,
-          program: mapProgram(booking.round.program),
-        };
+    !booking.round
+      ? undefined
+      : typeof booking.round === 'number'
+        ? String(booking.round)
+        : {
+            id: String(booking.round.id),
+            title: booking.round.title || undefined,
+            startDate: booking.round.startDate,
+            program: mapProgram(booking.round.program),
+          };
 
   return {
     id: String(booking.id),
@@ -165,7 +167,7 @@ export async function GET(req: NextRequest) {
 
       totalSpent += booking.paidAmount || 0;
 
-      if (typeof booking.round !== 'number') {
+      if (booking.round && typeof booking.round !== 'number') {
         const programId = relationToId(booking.round.program);
         if (programId) activeProgramIds.add(programId);
       }
