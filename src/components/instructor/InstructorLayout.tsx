@@ -35,6 +35,27 @@ export function InstructorLayout({ children }: { children: React.ReactNode }) {
     }
   }, [isLoading, isAuthenticated, user, router, locale]);
 
+  // Onboarding gate: redirect if instructor hasn't completed onboarding
+  const isOnboardingPage = pathname.includes('/instructor/onboarding');
+  const [onboardingChecked, setOnboardingChecked] = React.useState(false);
+
+  React.useEffect(() => {
+    if (!isLoading && isAuthenticated && user?.role === 'instructor' && !isOnboardingPage) {
+      fetch('/api/instructor/profile', { credentials: 'include' })
+        .then((r) => r.json())
+        .then((data) => {
+          if (data.profile && !data.profile.onboardingCompleted) {
+            router.push(`/${locale}/instructor/onboarding`);
+          } else {
+            setOnboardingChecked(true);
+          }
+        })
+        .catch(() => setOnboardingChecked(true));
+    } else if (isOnboardingPage) {
+      setOnboardingChecked(true);
+    }
+  }, [isLoading, isAuthenticated, user, isOnboardingPage, router, locale]);
+
   const displayName   = user ? `${user.firstName} ${user.lastName}`.trim() : '…';
   const avatarInitial = user?.firstName?.[0]?.toUpperCase() ?? '?';
 

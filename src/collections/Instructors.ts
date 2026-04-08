@@ -180,5 +180,30 @@ export const Instructors: CollectionConfig = {
     { name: 'rejectedAt', type: 'date' },
     { name: 'rejectionReason', type: 'textarea' },
     { name: 'isActive', type: 'checkbox', defaultValue: true },
+
+    /* ── Onboarding & Agreement ──────────────────────────────── */
+    { name: 'onboardingCompleted', type: 'checkbox', defaultValue: false },
+    { name: 'agreementAccepted', type: 'checkbox', defaultValue: false },
+    { name: 'agreementAcceptedAt', type: 'date' },
+    {
+      name: 'agreementVersion',
+      type: 'text',
+      defaultValue: 'v1.0',
+      admin: { description: 'Version of agreement terms accepted' },
+    },
+
+    /* ── Revenue Share ────────────────────────────────────────── */
+    {
+      name: 'courseRevenueShare',
+      type: 'number',
+      defaultValue: 33,
+      admin: { description: 'Instructor\'s percentage from course/workshop sales (default: ثلث = 33%)' },
+    },
+    {
+      name: 'consultationRevenueShare',
+      type: 'number',
+      defaultValue: 50,
+      admin: { description: 'Instructor\'s percentage from consultation revenue (default: 50%)' },
+    },
   ],
 };

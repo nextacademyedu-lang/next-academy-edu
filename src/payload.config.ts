@@ -45,6 +45,7 @@ import { UpcomingEventsConfig } from './collections/UpcomingEventsConfig.ts';
 import { CrmSyncEvents } from './collections/CrmSyncEvents.ts';
 import { Partners } from './collections/Partners.ts';
 import { InstructorProgramSubmissions } from './collections/InstructorProgramSubmissions.ts';
+import { InstructorAgreements } from './collections/InstructorAgreements.ts';
 import { CompanyInvitations } from './collections/CompanyInvitations.ts';
 import { CompanyGroups } from './collections/CompanyGroups.ts';
 import { CompanyGroupMembers } from './collections/CompanyGroupMembers.ts';
@@ -234,6 +235,7 @@ export default buildConfig({
     CrmSyncEvents,
     Partners,
     InstructorProgramSubmissions,
+    InstructorAgreements,
     CompanyInvitations,
     CompanyGroups,
     CompanyGroupMembers,

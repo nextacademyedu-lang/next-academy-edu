@@ -83,5 +83,13 @@ export const InstructorProgramSubmissions: CollectionConfig = {
       ],
     },
     { name: 'extraNotes', type: 'textarea' },
+    { name: 'roundsCount', type: 'number', admin: { description: 'How many rounds/cohorts planned' } },
+    {
+      name: 'attachments',
+      type: 'upload',
+      relationTo: 'media',
+      hasMany: true,
+      admin: { description: 'Supporting files: syllabus, slides, sample materials' },
+    },
   ],
 };

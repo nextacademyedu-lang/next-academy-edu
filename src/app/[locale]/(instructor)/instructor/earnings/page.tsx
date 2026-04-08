@@ -17,6 +17,7 @@ import { useRouter } from "next/navigation";
 import { useLocale } from "next-intl";
 import {
   getInstructorEarnings,
+  getInstructorProfile,
   getEarningStudentName,
   getEarningTypeTitle,
   getEarningDuration,
@@ -55,6 +56,7 @@ export default function InstructorEarningsPage() {
   const [loading, setLoading] = useState(true);
   const [query, setQuery] = useState("");
   const [filterStatus, setFilterStatus] = useState<FilterStatus>("all");
+  const [revenueShares, setRevenueShares] = useState({ course: 33, consultation: 50 });
 
   // Auth guard — instructor or admin only
   useEffect(() => {
@@ -71,6 +73,16 @@ export default function InstructorEarningsPage() {
       if (res.success && res.data) setEarnings(res.data.docs);
       setLoading(false);
     });
+    // Fetch instructor revenue shares
+    getInstructorProfile().then((res) => {
+      if (res.success && res.data?.profile) {
+        const p = res.data.profile as any;
+        setRevenueShares({
+          course: p.courseRevenueShare ?? 33,
+          consultation: p.consultationRevenueShare ?? 50,
+        });
+      }
+    });
   }, []);
 
   // ── Stats ──────────────────────────────────────────────────────────────
@@ -79,13 +91,20 @@ export default function InstructorEarningsPage() {
     const pending  = earnings.filter((e) => e.paymentStatus === "pending");
     const thisMonth = paid.filter((e) => getMonthKey(getEarningDate(e)) === getMonthKey(new Date().toISOString()));
 
+    const totalRevenue = paid.reduce((s, e) => s + e.amount, 0);
+    const yourShare    = totalRevenue * (revenueShares.consultation / 100);
+    const thisMonthRevenue = thisMonth.reduce((s, e) => s + e.amount, 0);
+    const thisMonthShare   = thisMonthRevenue * (revenueShares.consultation / 100);
+
     return {
-      totalEarned:   paid.reduce((s, e) => s + e.amount, 0),
+      totalEarned:   totalRevenue,
+      yourShare,
       pendingAmount: pending.reduce((s, e) => s + e.amount, 0),
-      thisMonth:     thisMonth.reduce((s, e) => s + e.amount, 0),
+      thisMonth:     thisMonthRevenue,
+      thisMonthShare,
       totalSessions: earnings.length,
     };
-  }, [earnings]);
+  }, [earnings, revenueShares]);
 
   // ── Filter + Search ────────────────────────────────────────────────────
   const filtered = useMemo(() => {
@@ -104,10 +123,16 @@ export default function InstructorEarningsPage() {
 
   const STAT_CARDS = [
     {
-      label: "Total Earned",
+      label: "Total Revenue",
       value: formatEGP(stats.totalEarned),
       icon: DollarSign,
       color: "#C51B1B",
+    },
+    {
+      label: `Your Share (${revenueShares.consultation}%)`,
+      value: formatEGP(stats.yourShare),
+      icon: TrendingUp,
+      color: "#22c55e",
     },
     {
       label: "This Month",
@@ -220,7 +245,7 @@ export default function InstructorEarningsPage() {
                 <table className={styles.table}>
                   <thead>
                     <tr className={styles.tableHead}>
-                      {["Date", "Student", "Service", "Duration", "Amount", "Status"].map((h) => (
+                      {["Date", "Student", "Service", "Duration", "Amount", "Your Share", "Status"].map((h) => (
                         <th key={h} className={styles.th}>{h}</th>
                       ))}
                     </tr>
@@ -256,6 +281,9 @@ export default function InstructorEarningsPage() {
                                 -{formatEGP(e.discountAmount)}
                               </span>
                             )}
+                          </td>
+                          <td className={styles.td} style={{ fontWeight: 600, color: "#22c55e", whiteSpace: "nowrap" }}>
+                            {formatEGP(e.amount * (revenueShares.consultation / 100))}
                           </td>
                           <td className={styles.td}>
                             <span

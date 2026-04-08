@@ -21,6 +21,16 @@ type WeeklyHours = Record<number, TimeSlot[]>;
 
 const DEFAULT_HOURS: WeeklyHours = { 0: [], 1: [], 2: [], 3: [], 4: [], 5: [], 6: [] };
 
+/** Convert 24h time string to 12h AM/PM format */
+function formatAMPM(time: string): string {
+  if (!time) return '';
+  const [h, m] = time.split(':').map(Number);
+  if (!Number.isFinite(h)) return time;
+  const period = h >= 12 ? 'PM' : 'AM';
+  const hour12 = h % 12 || 12;
+  return `${hour12}:${String(m).padStart(2, '0')} ${period}`;
+}
+
 export default function InstructorAvailabilityPage() {
   const [activeTab,    setActiveTab]    = useState<'weekly' | 'overrides'>('weekly');
   const [hours,        setHours]        = useState<WeeklyHours>(DEFAULT_HOURS);
@@ -161,10 +171,12 @@ export default function InstructorAvailabilityPage() {
                     ) : (
                       <>
                         {slots.map((slot, idx) => (
-                          <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+                          <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
                             <Input type="time" value={slot.start} onChange={e => updateSlot(day, idx, 'start', e.target.value)} style={{ width: '120px', minWidth: '100px' }} />
+                            <span style={{ color: 'var(--text-muted)', fontSize: '12px', minWidth: '60px' }}>{formatAMPM(slot.start)}</span>
                             <span style={{ color: 'var(--text-muted)' }}>-</span>
                             <Input type="time" value={slot.end} onChange={e => updateSlot(day, idx, 'end', e.target.value)} style={{ width: '120px', minWidth: '100px' }} />
+                            <span style={{ color: 'var(--text-muted)', fontSize: '12px', minWidth: '60px' }}>{formatAMPM(slot.end)}</span>
                             <Button variant="ghost" size="sm" onClick={() => removeSlot(day, idx)} style={{ color: 'var(--text-muted)', padding: '0 8px' }}>
                               <Trash2 size={16} />
                             </Button>
