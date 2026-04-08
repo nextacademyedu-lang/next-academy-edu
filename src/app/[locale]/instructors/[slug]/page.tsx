@@ -55,19 +55,15 @@ function buildProgramTypeLabel(type: Program['type'], locale: string): string {
   if (locale === 'ar') {
     if (type === 'course') return 'دورة';
     if (type === 'workshop') return 'ورشة';
-    if (type === 'event') return 'فعالية';
     if (type === 'camp') return 'معسكر';
-    if (type === 'retreat') return 'خلوة';
-    if (type === 'corporate_training') return 'تدريب مؤسسي';
-    return 'ندوة';
+    if (type === 'webinar') return 'ندوة';
+    return type ?? 'برنامج';
   }
   if (type === 'course') return 'Course';
   if (type === 'workshop') return 'Workshop';
-  if (type === 'event') return 'Event';
   if (type === 'camp') return 'Camp';
-  if (type === 'retreat') return 'Retreat';
-  if (type === 'corporate_training') return 'Corporate Training';
-  return 'Webinar';
+  if (type === 'webinar') return 'Webinar';
+  return type ?? 'Program';
 }
 
 function dayLabel(day: string, locale: string): string {
