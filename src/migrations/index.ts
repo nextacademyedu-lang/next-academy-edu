@@ -13,6 +13,7 @@ import * as migration_20260329_010500_add_company_invitations from './20260329_0
 import * as migration_20260403_034751_add_b2b_groups_policies_seats from './20260403_034751_add_b2b_groups_policies_seats';
 import * as migration_20260403_195416_add_b2b_allocation_mode_fields from './20260403_195416_add_b2b_allocation_mode_fields';
 import * as migration_20260408_230000_add_events_collection from './20260408_230000_add_events_collection';
+import * as migration_20260409_010000_add_instructor_agreement_and_revenue_fields from './20260409_010000_add_instructor_agreement_and_revenue_fields';
 
 export const migrations = [
   {
@@ -90,4 +91,10 @@ export const migrations = [
     down: migration_20260408_230000_add_events_collection.down,
     name: '20260408_230000_add_events_collection',
   },
+  {
+    up: migration_20260409_010000_add_instructor_agreement_and_revenue_fields.up,
+    down: migration_20260409_010000_add_instructor_agreement_and_revenue_fields.down,
+    name: '20260409_010000_add_instructor_agreement_and_revenue_fields',
+  },
 ];
+
