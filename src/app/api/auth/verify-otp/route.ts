@@ -217,6 +217,8 @@ export async function POST(request: NextRequest) {
       },
       limit: 1,
       sort: '-createdAt',
+      overrideAccess: true,
+      req: request as any,
     });
 
     if (verificationCodes.docs.length === 0) {
@@ -233,6 +235,8 @@ export async function POST(request: NextRequest) {
       collection: 'verification-codes',
       id: verificationCode.id,
       data: { used: true },
+      overrideAccess: true,
+      req: request as any,
     });
 
     // Find and update user's emailVerified status
@@ -240,6 +244,8 @@ export async function POST(request: NextRequest) {
       collection: 'users',
       where: { email: { equals: normalizedEmail } },
       limit: 1,
+      overrideAccess: true,
+      req: request as any,
     });
 
     if (users.docs.length === 0) {

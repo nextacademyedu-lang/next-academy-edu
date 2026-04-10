@@ -59,6 +59,8 @@ export async function POST(request: NextRequest) {
       collection: 'users',
       where: { email: { equals: normalizedEmail } },
       limit: 1,
+      overrideAccess: true,
+      req: request as any,
     });
 
     if (users.docs.length === 0) {
@@ -89,6 +91,8 @@ export async function POST(request: NextRequest) {
           { type: { equals: 'email_verification' } },
         ],
       },
+      overrideAccess: true,
+      req: request as any,
     });
 
     for (const code of existingCodes.docs) {
@@ -96,6 +100,8 @@ export async function POST(request: NextRequest) {
         collection: 'verification-codes',
         id: code.id,
         data: { used: true },
+        overrideAccess: true,
+        req: request as any,
       });
     }
 
@@ -112,6 +118,8 @@ export async function POST(request: NextRequest) {
         used: false,
         type: 'email_verification',
       },
+      overrideAccess: true,
+      req: request as any,
     });
 
     // Send OTP via Resend
