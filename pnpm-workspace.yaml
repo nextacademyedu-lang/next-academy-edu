@@ -1,0 +1,9 @@
+packages:
+  - "."
+
+# Allow selected dependency build scripts needed for native tooling (e.g. SWC, esbuild, sharp).
+allowBuilds:
+  "@swc/core": true
+  esbuild: true
+  sharp: true
+  "@parcel/watcher": true
