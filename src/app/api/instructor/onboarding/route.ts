@@ -24,7 +24,7 @@ function relationToId(value: unknown): number | null {
   return null;
 }
 
-const AGREEMENT_VERSION = 'v1.1';
+const AGREEMENT_VERSION = 'v1.2';
 
 interface OnboardingPayload {
   // Step 1: Profile
@@ -192,7 +192,7 @@ export async function POST(req: NextRequest) {
         tagline: profile.tagline?.trim() || undefined,
         linkedinUrl: profile.linkedinUrl?.trim() || undefined,
         twitterUrl: profile.twitterUrl?.trim() || undefined,
-        courseRevenueShare: 30,
+        courseRevenueShare: 33,
         onboardingCompleted: true,
         agreementAccepted: true,
         agreementAcceptedAt: now,

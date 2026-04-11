@@ -35,26 +35,62 @@ export function InstructorLayout({ children }: { children: React.ReactNode }) {
     }
   }, [isLoading, isAuthenticated, user, router, locale]);
 
-  // Onboarding gate: redirect if instructor hasn't completed onboarding
+  // Onboarding + approval gate:
+  // Instructor dashboard navigation is available only after onboarding is completed
+  // and instructor profile is approved by admin.
   const isOnboardingPage = pathname.includes('/instructor/onboarding');
-  const [onboardingChecked, setOnboardingChecked] = React.useState(false);
+  const [accessGate, setAccessGate] = React.useState<{
+    loading: boolean;
+    onboardingCompleted: boolean;
+    verificationStatus: string | null;
+  }>({
+    loading: true,
+    onboardingCompleted: false,
+    verificationStatus: null,
+  });
 
   React.useEffect(() => {
-    if (!isLoading && isAuthenticated && user?.role === 'instructor' && !isOnboardingPage) {
+    if (!isLoading && isAuthenticated && user?.role === 'instructor') {
       fetch('/api/instructor/profile', { credentials: 'include' })
         .then((r) => r.json())
         .then((data) => {
-          if (data.profile && !data.profile.onboardingCompleted) {
+          const onboardingCompleted = Boolean(data?.profile?.onboardingCompleted);
+          const verificationStatus =
+            typeof data?.profile?.verificationStatus === 'string'
+              ? data.profile.verificationStatus
+              : null;
+
+          setAccessGate({
+            loading: false,
+            onboardingCompleted,
+            verificationStatus,
+          });
+
+          const isApproved = verificationStatus === 'approved';
+
+          if (!isOnboardingPage && (!onboardingCompleted || !isApproved)) {
             router.push(`/${locale}/instructor/onboarding`);
-          } else {
-            setOnboardingChecked(true);
+            return;
+          }
+
+          if (isOnboardingPage && onboardingCompleted && isApproved) {
+            router.push(`/${locale}/instructor`);
           }
         })
-        .catch(() => setOnboardingChecked(true));
-    } else if (isOnboardingPage) {
-      setOnboardingChecked(true);
+        .catch(() =>
+          setAccessGate({
+            loading: false,
+            onboardingCompleted: false,
+            verificationStatus: null,
+          }),
+        );
+    } else if (!isLoading) {
+      setAccessGate((prev) => ({ ...prev, loading: false }));
     }
   }, [isLoading, isAuthenticated, user, isOnboardingPage, router, locale]);
+
+  const canAccessInstructorNav =
+    accessGate.onboardingCompleted && accessGate.verificationStatus === 'approved';
 
   const displayName   = user ? `${user.firstName} ${user.lastName}`.trim() : '…';
   const avatarInitial = user?.firstName?.[0]?.toUpperCase() ?? '?';
@@ -66,7 +102,7 @@ export function InstructorLayout({ children }: { children: React.ReactNode }) {
 
   const isActive = (href: string) => pathname.includes(href);
 
-  if (isLoading) return (
+  if (isLoading || accessGate.loading) return (
     <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg-primary)' }}>
       <div style={{ color: 'var(--text-muted)', fontSize: '14px' }}>Loading…</div>
     </div>
@@ -75,44 +111,46 @@ export function InstructorLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className={styles.layoutContainer}>
       {/* Sidebar */}
-      <aside className={styles.sidebar}>
-        <div className={styles.sidebarHeader}>
-          <Link href={`/${locale}`} className={styles.logo}>
-            Next Academy
-          </Link>
-        </div>
+      {canAccessInstructorNav && (
+        <aside className={styles.sidebar}>
+          <div className={styles.sidebarHeader}>
+            <Link href={`/${locale}`} className={styles.logo}>
+              Next Academy
+            </Link>
+          </div>
 
-        <nav className={styles.navLinks}>
-          {INSTRUCTOR_NAV_LINKS.map((link) => {
-            const Icon = link.icon;
-            const isDashboardRoot = link.href === '/instructor' && pathname.endsWith('/instructor');
-            const isSubPage = link.href !== '/instructor' && isActive(link.href);
-            const activeClass = isDashboardRoot || isSubPage ? styles.navLinkActive : '';
+          <nav className={styles.navLinks}>
+            {INSTRUCTOR_NAV_LINKS.map((link) => {
+              const Icon = link.icon;
+              const isDashboardRoot = link.href === '/instructor' && pathname.endsWith('/instructor');
+              const isSubPage = link.href !== '/instructor' && isActive(link.href);
+              const activeClass = isDashboardRoot || isSubPage ? styles.navLinkActive : '';
 
-            return (
-              <Link
-                key={link.name}
-                href={`/${locale}${link.href}`}
-                className={`${styles.navLink} ${activeClass}`}
-              >
-                <Icon size={20} />
-                {link.name}
-              </Link>
-            );
-          })}
-        </nav>
+              return (
+                <Link
+                  key={link.name}
+                  href={`/${locale}${link.href}`}
+                  className={`${styles.navLink} ${activeClass}`}
+                >
+                  <Icon size={20} />
+                  {link.name}
+                </Link>
+              );
+            })}
+          </nav>
 
-        <div className={styles.sidebarFooter}>
-          <button
-            onClick={handleLogout}
-            className={styles.navLink}
-            style={{ width: '100%', border: 'none', background: 'transparent', cursor: 'pointer' }}
-          >
-            <LogOut size={20} />
-            Sign Out
-          </button>
-        </div>
-      </aside>
+          <div className={styles.sidebarFooter}>
+            <button
+              onClick={handleLogout}
+              className={styles.navLink}
+              style={{ width: '100%', border: 'none', background: 'transparent', cursor: 'pointer' }}
+            >
+              <LogOut size={20} />
+              Sign Out
+            </button>
+          </div>
+        </aside>
+      )}
 
       {/* Main Content Area */}
       <main className={styles.mainContent}>
@@ -151,28 +189,30 @@ export function InstructorLayout({ children }: { children: React.ReactNode }) {
       </Link>
 
       {/* Mobile Bottom Bar (Hidden on Desktop via CSS) */}
-      <nav className={styles.mobileBottomBar}>
-        {INSTRUCTOR_NAV_LINKS.map((link) => {
-          const Icon = link.icon;
-          const isDashboardRoot = link.href === '/instructor' && pathname.endsWith('/instructor');
-          const isSubPage = link.href !== '/instructor' && isActive(link.href);
-          const activeClass = isDashboardRoot || isSubPage ? styles.mobileNavLinkActive : '';
+      {canAccessInstructorNav && (
+        <nav className={styles.mobileBottomBar}>
+          {INSTRUCTOR_NAV_LINKS.map((link) => {
+            const Icon = link.icon;
+            const isDashboardRoot = link.href === '/instructor' && pathname.endsWith('/instructor');
+            const isSubPage = link.href !== '/instructor' && isActive(link.href);
+            const activeClass = isDashboardRoot || isSubPage ? styles.mobileNavLinkActive : '';
 
-          return (
-            <Link
-              key={link.name}
-              href={`/${locale}${link.href}`}
-              className={`${styles.mobileNavLink} ${activeClass}`}
-              aria-label={link.name}
-            >
-              <span className={styles.mobileNavIconWrap}>
-                <Icon size={20} />
-              </span>
-              <span className={styles.mobileNavLabel}>{link.mobileLabel}</span>
-            </Link>
-          );
-        })}
-      </nav>
+            return (
+              <Link
+                key={link.name}
+                href={`/${locale}${link.href}`}
+                className={`${styles.mobileNavLink} ${activeClass}`}
+                aria-label={link.name}
+              >
+                <span className={styles.mobileNavIconWrap}>
+                  <Icon size={20} />
+                </span>
+                <span className={styles.mobileNavLabel}>{link.mobileLabel}</span>
+              </Link>
+            );
+          })}
+        </nav>
+      )}
     </div>
   );
 }

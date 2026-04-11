@@ -188,7 +188,7 @@ export const Instructors: CollectionConfig = {
     {
       name: 'agreementVersion',
       type: 'text',
-      defaultValue: 'v1.1',
+      defaultValue: 'v1.2',
       admin: { description: 'Version of agreement terms accepted' },
     },
 
@@ -196,8 +196,8 @@ export const Instructors: CollectionConfig = {
     {
       name: 'courseRevenueShare',
       type: 'number',
-      defaultValue: 30,
-      admin: { description: 'Instructor\'s percentage from course/workshop sales (default: 30%)' },
+      defaultValue: 33,
+      admin: { description: 'Instructor\'s percentage from total course/workshop price (default: 33%)' },
     },
     {
       name: 'consultationRevenueShare',

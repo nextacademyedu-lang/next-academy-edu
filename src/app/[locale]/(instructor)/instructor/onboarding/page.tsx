@@ -15,9 +15,9 @@ const AGREEMENT_CLAUSES = [
     titleAr: 'بند الشراكة المالية',
     titleEn: 'Financial Partnership',
     textAr:
-      'أوافق على أن تكون حصتي كمحاضر وشريك نجاح هي 30% من صافي أرباح الكورسات أو الورش، ويتم تسويتها حسب النظام المالي المعتمد في نكست أكاديمي.',
+      'أوافق على أن تكون حصتي كمحاضر وشريك نجاح هي 33% من إجمالي سعر الكورس أو الورشة (وليس من صافي الربح)، ويتم تسويتها حسب النظام المالي المعتمد في نكست أكاديمي.',
     textEn:
-      'I agree that my share as an instructor and success partner is 30% of net course/workshop profits, settled per Next Academy\'s approved financial system.',
+      'I agree that my share as an instructor and success partner is 33% of the total course/workshop price (not net profit), settled per Next Academy\'s approved financial system.',
   },
   {
     id: 'co_marketing',
