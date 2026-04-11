@@ -40,6 +40,8 @@ export default function ContactPage() {
   const payment = searchParams.get('payment');
   const consultationBookingId = searchParams.get('consultationBookingId');
   const isConsultationMode = intent === 'consultation' && Boolean(instructorSlug);
+  const whatsappUrl =
+    process.env.NEXT_PUBLIC_WHATSAPP_URL || 'https://wa.me/97141234567';
 
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -482,7 +484,7 @@ export default function ContactPage() {
               <div className={styles.infoBlock}>
                 <h3 className={styles.infoTitle}>Direct Contact</h3>
                 <p className={styles.infoText}>
-                  <strong>Email:</strong> admissions@nextacademy.com<br />
+                  <strong>Email:</strong> admissions@nextacademyedu.com<br />
                   <strong>Phone:</strong> +971 4 123 4567
                 </p>
               </div>
@@ -493,7 +495,9 @@ export default function ContactPage() {
                   Need a faster response? Chat with our admission specialists directly on WhatsApp.
                 </p>
                 <div style={{ marginTop: '16px' }}>
-                  <Button variant="outline" size="md">Chat on WhatsApp</Button>
+                  <a href={whatsappUrl} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none' }}>
+                    <Button variant="outline" size="md">Chat on WhatsApp</Button>
+                  </a>
                 </div>
               </div>
             </div>

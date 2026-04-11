@@ -12,7 +12,7 @@ export default function PrivacyPolicyPage() {
         <div className={styles.container}>
           <div className={styles.header}>
             <h1 className={styles.title}>Privacy Policy</h1>
-            <p className={styles.lastUpdated}>Last Updated: October 2026</p>
+            <p className={styles.lastUpdated}>Last Updated: April 2026</p>
           </div>
 
           <div className={styles.contentLayout}>
@@ -62,7 +62,7 @@ export default function PrivacyPolicyPage() {
 
               <section id="rights" className={styles.docSection}>
                 <h2>5. Your Rights</h2>
-                <p>Depending on your location, you may have the right to access, correct, or delete your personal data. You may also object to processing or request data portability. To exercise these rights, please contact us at privacy@nextacademy.com.</p>
+                <p>Depending on your location, you may have the right to access, correct, or delete your personal data. You may also object to processing or request data portability. To exercise these rights, please contact us at privacy@nextacademyedu.com.</p>
               </section>
             </article>
           </div>

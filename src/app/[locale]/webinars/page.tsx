@@ -78,6 +78,7 @@ export default async function WebinarsPage() {
 
   const totalLearners = rounds.reduce((sum, round) => sum + (round.currentEnrollments || 0), 0);
   const totalViews = webinars.reduce((sum, webinar) => sum + (webinar.viewCount || 0), 0);
+  const highlightRounds = archivedRounds.slice(0, 3);
 
   const fallbackImages = [
     '/images/about/hero-bg.png',
@@ -278,24 +279,51 @@ export default async function WebinarsPage() {
             </div>
 
             <div className={styles.highlights}>
-              {fallbackImages.map((image, index) => (
-                <article key={image} className={styles.highlightCard}>
-                  <div className={styles.highlightMedia}>
-                    <Image
-                      src={image}
-                      alt={`Webinar highlight ${index + 1}`}
-                      fill
-                      className={styles.highlightImage}
-                      sizes="(max-width: 768px) 100vw, 33vw"
-                    />
-                    <span className={styles.play}>▶</span>
-                  </div>
-                  <div className={styles.highlightBody}>
-                    <h3>{locale === 'ar' ? `لقطة مميزة ${index + 1}` : `Highlight Session ${index + 1}`}</h3>
-                    <p>{locale === 'ar' ? 'ملخص سريع لأهم النقاط العملية.' : 'Quick recap of practical key takeaways.'}</p>
-                  </div>
-                </article>
-              ))}
+              {highlightRounds.length === 0 && (
+                <p className={styles.emptyText}>
+                  {locale === 'ar' ? 'لا توجد تسجيلات مميزة متاحة حالياً.' : 'No featured recordings available right now.'}
+                </p>
+              )}
+
+              {highlightRounds.map((round, index) => {
+                const programId = typeof round.program === 'number' ? round.program : round.program?.id;
+                const webinar = webinars.find((item) => item.id === programId);
+                if (!webinar) return null;
+                const title = locale === 'ar'
+                  ? webinar.titleAr || webinar.titleEn || 'Webinar'
+                  : webinar.titleEn || webinar.titleAr || 'Webinar';
+                const description = locale === 'ar'
+                  ? webinar.shortDescriptionAr || webinar.shortDescriptionEn || ''
+                  : webinar.shortDescriptionEn || webinar.shortDescriptionAr || '';
+                const image =
+                  getMediaUrl(webinar.coverImage) ||
+                  getMediaUrl(webinar.thumbnail) ||
+                  (round.meetingUrl ? buildYouTubeThumbnailUrl(round.meetingUrl, 'hqdefault') : null) ||
+                  fallbackImages[index % fallbackImages.length];
+
+                return (
+                  <article key={`highlight-${round.id}`} className={styles.highlightCard}>
+                    <div className={styles.highlightMedia}>
+                      <Image
+                        src={image}
+                        alt={title}
+                        fill
+                        className={styles.highlightImage}
+                        sizes="(max-width: 768px) 100vw, 33vw"
+                      />
+                      <span className={styles.play}>▶</span>
+                    </div>
+                    <div className={styles.highlightBody}>
+                      <h3>{title}</h3>
+                      <p>
+                        {description
+                          ? description.slice(0, 120)
+                          : (locale === 'ar' ? 'ملخص سريع لأهم النقاط العملية.' : 'Quick recap of practical key takeaways.')}
+                      </p>
+                    </div>
+                  </article>
+                );
+              })}
             </div>
           </div>
         </section>

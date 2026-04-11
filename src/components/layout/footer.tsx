@@ -6,6 +6,12 @@ import styles from './footer.module.css';
 export async function Footer() {
   const t = await getTranslations('Footer');
   const locale = await getLocale();
+  const socialLinks = [
+    { label: 'LinkedIn', href: process.env.NEXT_PUBLIC_SOCIAL_LINKEDIN_URL || '' },
+    { label: 'X / Twitter', href: process.env.NEXT_PUBLIC_SOCIAL_X_URL || '' },
+    { label: 'Facebook', href: process.env.NEXT_PUBLIC_SOCIAL_FACEBOOK_URL || '' },
+    { label: 'Instagram', href: process.env.NEXT_PUBLIC_SOCIAL_INSTAGRAM_URL || '' },
+  ].filter((item) => item.href.trim().length > 0);
 
   return (
     <footer className={styles.footer}>
@@ -36,10 +42,23 @@ export async function Footer() {
             </div>
             <div className={styles.column}>
               <h4 className={styles.heading}>{t('socials')}</h4>
-              <Link href="#" className={styles.link}>LinkedIn</Link>
-              <Link href="#" className={styles.link}>Twitter</Link>
-              <Link href="#" className={styles.link}>Facebook</Link>
-              <Link href="#" className={styles.link}>Instagram</Link>
+              {socialLinks.length > 0 ? (
+                socialLinks.map((item) => (
+                  <Link
+                    key={item.label}
+                    href={item.href}
+                    className={styles.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {item.label}
+                  </Link>
+                ))
+              ) : (
+                <span className={styles.link}>
+                  {locale === 'ar' ? 'تتوفر الروابط قريباً' : 'Social links coming soon'}
+                </span>
+              )}
             </div>
             <div className={styles.column}>
               <h4 className={styles.heading}>{t('legal')}</h4>

@@ -12,7 +12,7 @@ export default function RefundPolicyPage() {
         <div className={styles.container}>
           <div className={styles.header}>
             <h1 className={styles.title}>Refund Policy</h1>
-            <p className={styles.lastUpdated}>Last Updated: October 2026</p>
+            <p className={styles.lastUpdated}>Last Updated: April 2026</p>
           </div>
 
           <div className={styles.contentLayout}>

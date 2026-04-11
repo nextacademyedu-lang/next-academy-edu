@@ -1,16 +1,17 @@
+import type React from 'react';
 import { getPayload } from 'payload';
 import config from '@payload-config';
-import { CheckCircle, XCircle, Award } from 'lucide-react';
+import { Award, CheckCircle, XCircle } from 'lucide-react';
 
 interface Props {
   params: Promise<{ code: string; locale: string }>;
 }
 
 export default async function CertificateVerifyPage({ params }: Props) {
-  const { code } = await params;
+  const { code, locale } = await params;
+  const isAr = locale === 'ar';
 
   const payload = await getPayload({ config });
-
   const result = await payload.find({
     collection: 'certificates',
     where: { certificateCode: { equals: code } },
@@ -19,14 +20,28 @@ export default async function CertificateVerifyPage({ params }: Props) {
   });
 
   const cert = result.docs[0];
+  const dateLocale = isAr ? 'ar-EG' : 'en-US';
+  const labels = {
+    invalidTitle: isAr ? 'شهادة غير صالحة' : 'Invalid Certificate',
+    invalidMessage: isAr ? 'لم يتم العثور على شهادة بهذا الرمز.' : 'No certificate was found for this code.',
+    verified: isAr ? 'شهادة موثقة ✓' : 'Verified Certificate ✓',
+    completion: isAr ? 'شهادة إتمام' : 'Certificate Of Completion',
+    awardedTo: isAr ? 'تُقدَّم هذه الشهادة إلى' : 'This certificate is awarded to',
+    completedProgram: isAr ? 'لإتمامه/ها بنجاح برنامج' : 'for successfully completing',
+    traineeFallback: isAr ? 'المتدرب' : 'Learner',
+    programFallback: isAr ? 'البرنامج' : 'Program',
+    score: isAr ? 'الدرجة' : 'Score',
+    issuedAt: isAr ? 'تاريخ الإصدار' : 'Issued at',
+    verificationCode: isAr ? 'رمز التحقق' : 'Verification code',
+  };
 
   if (!cert) {
     return (
       <div style={styles.container}>
-        <div style={styles.card}>
+        <div style={{ ...styles.card, direction: isAr ? 'rtl' : 'ltr', textAlign: 'center' }}>
           <XCircle size={64} color="#C51B1B" style={{ margin: '0 auto 16px' }} />
-          <h1 style={{ ...styles.title, color: '#C51B1B' }}>شهادة غير صالحة</h1>
-          <p style={styles.subtitle}>لم يتم العثور على شهادة بهذا الرمز.</p>
+          <h1 style={{ ...styles.title, color: '#C51B1B' }}>{labels.invalidTitle}</h1>
+          <p style={styles.subtitle}>{labels.invalidMessage}</p>
           <code style={styles.code}>{code}</code>
         </div>
       </div>
@@ -35,42 +50,45 @@ export default async function CertificateVerifyPage({ params }: Props) {
 
   const user = cert.user as any;
   const program = cert.program as any;
-  const round = cert.round as any;
-  const userName = `${user?.firstName || ''} ${user?.lastName || ''}`.trim() || 'المتدرب';
-  const programTitle = program?.titleAr || program?.titleEn || 'البرنامج';
-  const issuedDate = new Date(cert.issuedAt).toLocaleDateString('ar-EG', {
-    year: 'numeric', month: 'long', day: 'numeric',
+  const userName = `${user?.firstName || ''} ${user?.lastName || ''}`.trim() || labels.traineeFallback;
+  const programTitle = isAr
+    ? program?.titleAr || program?.titleEn || labels.programFallback
+    : program?.titleEn || program?.titleAr || labels.programFallback;
+  const issuedDate = new Date(cert.issuedAt).toLocaleDateString(dateLocale, {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
   });
 
   return (
     <div style={styles.container}>
-      <div style={styles.card}>
+      <div style={{ ...styles.card, direction: isAr ? 'rtl' : 'ltr', textAlign: 'center' }}>
         <Award size={64} color="#D6A32B" style={{ margin: '0 auto 16px' }} />
         <CheckCircle size={28} color="#00e397" style={{ margin: '0 auto 8px' }} />
-        <p style={{ color: '#00e397', fontWeight: 600, marginBottom: '24px' }}>شهادة موثقة ✓</p>
+        <p style={{ color: '#00e397', fontWeight: 600, marginBottom: '24px' }}>{labels.verified}</p>
 
-        <h1 style={styles.title}>شهادة إتمام</h1>
-        <p style={styles.subtitle}>تُقدَّم هذه الشهادة إلى</p>
+        <h1 style={styles.title}>{labels.completion}</h1>
+        <p style={styles.subtitle}>{labels.awardedTo}</p>
         <h2 style={{ fontSize: '28px', fontWeight: 700, color: '#D6A32B', margin: '8px 0 24px' }}>
           {userName}
         </h2>
 
-        <p style={styles.subtitle}>لإتمامه/ها بنجاح برنامج</p>
+        <p style={styles.subtitle}>{labels.completedProgram}</p>
         <h3 style={{ fontSize: '20px', fontWeight: 600, color: 'var(--text-primary, #fff)', margin: '8px 0 24px' }}>
           {programTitle}
         </h3>
 
         {cert.quizScore != null && (
           <div style={styles.badge}>
-            <span>الدرجة: {cert.quizScore}%</span>
+            <span>{labels.score}: {cert.quizScore}%</span>
           </div>
         )}
 
         <div style={styles.divider} />
 
         <div style={styles.meta}>
-          <span>تاريخ الإصدار: {issuedDate}</span>
-          <span>رمز التحقق:</span>
+          <span>{labels.issuedAt}: {issuedDate}</span>
+          <span>{labels.verificationCode}:</span>
           <code style={styles.code}>{cert.certificateCode}</code>
         </div>
 
@@ -98,8 +116,6 @@ const styles: Record<string, React.CSSProperties> = {
     border: '1px solid rgba(214,163,43,0.3)',
     borderRadius: '16px',
     padding: '48px 32px',
-    textAlign: 'center',
-    direction: 'rtl',
   },
   title: {
     fontSize: '24px',

@@ -3,7 +3,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import useEmblaCarousel from 'embla-carousel-react';
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -22,6 +22,7 @@ type BlogPost = {
 
 export function BlogsPreviewSection() {
   const t = useTranslations('Blogs');
+  const locale = useLocale();
   const [emblaRef, emblaApi] = useEmblaCarousel({ align: 'center', loop: true, startIndex: 1, dragFree: true });
   const [selectedIndex, setSelectedIndex] = React.useState(1);
   const [posts, setPosts] = useState<BlogPost[]>([]);
@@ -76,7 +77,7 @@ export function BlogsPreviewSection() {
             <p className={styles.subtitle}>{t('subtitle')}</p>
           </div>
           <div className={styles.actions}>
-            <Link href="/blog" className={styles.viewAllWrapper}>
+            <Link href={`/${locale}/blog`} className={styles.viewAllWrapper}>
               <Button variant="outline" className={styles.viewAllBtn}>{t('viewAll')} &rarr;</Button>
             </Link>
           </div>
@@ -88,7 +89,7 @@ export function BlogsPreviewSection() {
             <div className={styles.embla__container}>
               {displayPosts.map((post, index) => (
                 <div key={post.id} className={`${styles.embla__slide} ${index === selectedIndex ? styles.activeSlide : ''}`}>
-                  <Link href={`/blog/${post.slug}`} className={styles.cardLink}>
+                  <Link href={`/${locale}/blog/${post.slug}`} className={styles.cardLink}>
                     <Card interactive className={styles.postCard}>
                       {post.image ? (
                         <div className={styles.postImage} style={{ backgroundImage: `url(${post.image})`, backgroundSize: 'cover', backgroundPosition: 'center' }} />

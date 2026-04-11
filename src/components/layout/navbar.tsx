@@ -61,6 +61,8 @@ export function Navbar() {
     { href: `/${locale}/workshops`, label: t('workshops') },
     { href: `/${locale}/events`, label: t('events') },
     { href: `/${locale}/webinars`, label: t('webinars') },
+    { href: `/${locale}/retreats`, label: t('retreats') },
+    { href: `/${locale}/corporate-training`, label: t('corporateTraining') },
   ];
 
   const resourceLinks: NavItem[] = [
@@ -75,6 +77,8 @@ export function Navbar() {
     { href: `/${locale}/workshops`, label: t('workshops') },
     { href: `/${locale}/events`, label: t('events') },
     { href: `/${locale}/webinars`, label: t('webinars') },
+    { href: `/${locale}/retreats`, label: t('retreats') },
+    { href: `/${locale}/corporate-training`, label: t('corporateTraining') },
     { href: `/${locale}/instructors`, label: t('instructors') },
     { href: `/${locale}/for-business`, label: t('forBusiness') },
   ];
