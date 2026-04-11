@@ -1,12 +1,30 @@
 import React from 'react';
+import type { Metadata } from 'next';
 import { getLocale } from 'next-intl/server';
 import { getPayload } from 'payload';
 import config from '@payload-config';
 import type { Category, Program, Round } from '@/payload-types';
 import { CatalogPage, type CatalogCard } from '@/components/pages/catalog-page';
 import { getInstructorNames } from '@/lib/instructor-helpers';
+import { buildPageMetadata } from '@/lib/seo/metadata';
 
 export const dynamic = 'force-dynamic';
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  return buildPageMetadata({
+    locale,
+    path: '/workshops',
+    titleAr: 'ورش العمل',
+    titleEn: 'Workshops',
+    descriptionAr: 'ورش تطبيقية مباشرة مع مدربين خبراء لتنفيذ المهارات بسرعة.',
+    descriptionEn: 'Live practical workshops with expert instructors for fast skill execution.',
+  });
+}
 
 function getCategoryLabel(category: Program['category'], locale: string): string {
   if (!category || typeof category === 'number') return locale === 'ar' ? 'عام' : 'General';

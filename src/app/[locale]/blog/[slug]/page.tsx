@@ -2,6 +2,7 @@ import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import type { Metadata } from 'next';
 import { getLocale } from 'next-intl/server';
 import { getPayload } from 'payload';
 import config from '@payload-config';
@@ -9,6 +10,7 @@ import type { BlogPost, Media, User } from '@/payload-types';
 import { Navbar } from '@/components/layout/navbar';
 import { Footer } from '@/components/layout/footer';
 import { Badge } from '@/components/ui/badge';
+import { buildPageMetadata } from '@/lib/seo/metadata';
 
 function getAuthorName(author: BlogPost['author']): string {
   if (!author || typeof author === 'number') return '';
@@ -95,6 +97,59 @@ function renderNodes(nodes: LexicalNode[] | undefined, keyPrefix = 'node'): Reac
         return <React.Fragment key={key}>{children}</React.Fragment>;
     }
   });
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string; slug: string }>;
+}): Promise<Metadata> {
+  const { locale, slug } = await params;
+
+  try {
+    const payload = await getPayload({ config });
+    const { docs } = await payload.find({
+      collection: 'blog-posts',
+      where: {
+        and: [
+          { status: { equals: 'published' } },
+          { or: [{ slug: { equals: slug } }, { id: { equals: slug } }] },
+        ],
+      },
+      depth: 0,
+      limit: 1,
+    });
+
+    const post = docs[0] as BlogPost | undefined;
+    if (!post) {
+      return buildPageMetadata({
+        locale,
+        path: `/blog/${slug}`,
+        titleAr: 'تفاصيل المقال',
+        titleEn: 'Article Details',
+        descriptionAr: 'صفحة تفاصيل المقال.',
+        descriptionEn: 'Article details page.',
+      });
+    }
+
+    return buildPageMetadata({
+      locale,
+      path: `/blog/${post.slug || post.id}`,
+      titleAr: post.title || 'تفاصيل المقال',
+      titleEn: post.title || 'Article Details',
+      descriptionAr: post.excerpt || 'مقال من مدونة Next Academy.',
+      descriptionEn: post.excerpt || 'Article from Next Academy blog.',
+    });
+  } catch {
+    return buildPageMetadata({
+      locale,
+      path: `/blog/${slug}`,
+      titleAr: 'تفاصيل المقال',
+      titleEn: 'Article Details',
+      descriptionAr: 'صفحة تفاصيل المقال.',
+      descriptionEn: 'Article details page.',
+    });
+  }
 }
 
 export default async function BlogPostPage({

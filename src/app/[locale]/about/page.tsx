@@ -9,11 +9,23 @@ import { AboutPartners } from '@/components/sections/about-partners';
 import { AboutEvents } from '@/components/sections/about-events';
 import { AboutTeam } from '@/components/sections/about-team';
 import { AboutCta } from '@/components/sections/about-cta';
+import { buildPageMetadata } from '@/lib/seo/metadata';
 
-export const metadata: Metadata = {
-  title: 'About Us | Next Academy',
-  description: 'Next Academy is a digital training platform helping entrepreneurs and small business owners grow with practical tools and modern strategies.',
-};
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  return buildPageMetadata({
+    locale,
+    path: '/about',
+    titleAr: 'من نحن',
+    titleEn: 'About Us',
+    descriptionAr: 'تعرف على قصة Next Academy ورسالتها وفريقها وشركائها.',
+    descriptionEn: 'Learn about Next Academy story, mission, team, and partners.',
+  });
+}
 
 export default function AboutPage() {
   return (

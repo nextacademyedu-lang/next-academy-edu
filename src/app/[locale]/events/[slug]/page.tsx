@@ -2,6 +2,7 @@ import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import type { Metadata } from 'next';
 import { getLocale } from 'next-intl/server';
 import { getPayload } from 'payload';
 import config from '@payload-config';
@@ -10,6 +11,7 @@ import { Navbar } from '@/components/layout/navbar';
 import { Footer } from '@/components/layout/footer';
 import { Badge } from '@/components/ui/badge';
 import styles from './page.module.css';
+import { buildPageMetadata } from '@/lib/seo/metadata';
 
 export const dynamic = 'force-dynamic';
 
@@ -32,6 +34,54 @@ const ROLE_LABELS: Record<string, Record<string, string>> = {
   ar: { speaker: 'متحدث', host: 'مقدم', panelist: 'عضو لجنة', moderator: 'مدير جلسة' },
   en: { speaker: 'Speaker', host: 'Host', panelist: 'Panelist', moderator: 'Moderator' },
 };
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string; slug: string }>;
+}): Promise<Metadata> {
+  const { locale, slug } = await params;
+
+  try {
+    const payload = await getPayload({ config });
+    const { docs } = await payload.find({
+      collection: 'events',
+      where: { or: [{ slug: { equals: slug } }, { id: { equals: slug } }] },
+      depth: 0,
+      limit: 1,
+    });
+
+    const event = docs[0] as Event | undefined;
+    if (!event) {
+      return buildPageMetadata({
+        locale,
+        path: `/events/${slug}`,
+        titleAr: 'تفاصيل الفعالية',
+        titleEn: 'Event Details',
+        descriptionAr: 'صفحة تفاصيل الفعالية.',
+        descriptionEn: 'Event details page.',
+      });
+    }
+
+    return buildPageMetadata({
+      locale,
+      path: `/events/${event.slug || event.id}`,
+      titleAr: event.titleAr || event.titleEn || 'تفاصيل الفعالية',
+      titleEn: event.titleEn || event.titleAr || 'Event Details',
+      descriptionAr: event.shortDescriptionAr || event.shortDescriptionEn || 'تفاصيل الفعالية وجدولها.',
+      descriptionEn: event.shortDescriptionEn || event.shortDescriptionAr || 'Event details and schedule.',
+    });
+  } catch {
+    return buildPageMetadata({
+      locale,
+      path: `/events/${slug}`,
+      titleAr: 'تفاصيل الفعالية',
+      titleEn: 'Event Details',
+      descriptionAr: 'صفحة تفاصيل الفعالية.',
+      descriptionEn: 'Event details page.',
+    });
+  }
+}
 
 export default async function EventDetailPage({
   params,

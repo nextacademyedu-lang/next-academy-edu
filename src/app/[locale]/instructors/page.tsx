@@ -1,6 +1,7 @@
 import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import type { Metadata } from 'next';
 import { getLocale } from 'next-intl/server';
 import { getPayload } from 'payload';
 import config from '@payload-config';
@@ -10,8 +11,25 @@ import { Footer } from '@/components/layout/footer';
 import { Button } from '@/components/ui/button';
 import styles from './page.module.css';
 import { getInstructorIds } from '@/lib/instructor-helpers';
+import { buildPageMetadata } from '@/lib/seo/metadata';
 
 export const dynamic = 'force-dynamic';
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  return buildPageMetadata({
+    locale,
+    path: '/instructors',
+    titleAr: 'المدربون',
+    titleEn: 'Instructors',
+    descriptionAr: 'تعرّف على مدربي Next Academy وخبراتهم العملية وبرامجهم المتاحة.',
+    descriptionEn: 'Meet Next Academy instructors, their practical experience, and available programs.',
+  });
+}
 
 function getInstructorPictureUrl(picture: Instructor['picture']): string | null {
   if (!picture || typeof picture === 'number') return null;

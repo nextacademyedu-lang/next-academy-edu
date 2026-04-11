@@ -1,11 +1,29 @@
 import React from 'react';
 import Link from 'next/link';
+import type { Metadata } from 'next';
 import { getLocale } from 'next-intl/server';
 import { Navbar } from '@/components/layout/navbar';
 import { Footer } from '@/components/layout/footer';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import styles from './page.module.css';
+import { buildPageMetadata } from '@/lib/seo/metadata';
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  return buildPageMetadata({
+    locale,
+    path: '/for-business',
+    titleAr: 'حلول الشركات',
+    titleEn: 'For Business',
+    descriptionAr: 'حلول تعلم مؤسسي لتطوير فرق العمل مع قياس الأداء والنتائج.',
+    descriptionEn: 'Enterprise learning solutions to upskill teams with measurable outcomes.',
+  });
+}
 
 export default async function ForBusinessPage() {
   const locale = await getLocale();

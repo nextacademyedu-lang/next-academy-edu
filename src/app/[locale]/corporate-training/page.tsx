@@ -1,6 +1,7 @@
 import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import type { Metadata } from 'next';
 import { getLocale } from 'next-intl/server';
 import { getPayload } from 'payload';
 import config from '@payload-config';
@@ -10,8 +11,25 @@ import { Footer } from '@/components/layout/footer';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import styles from './page.module.css';
+import { buildPageMetadata } from '@/lib/seo/metadata';
 
 export const dynamic = 'force-dynamic';
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  return buildPageMetadata({
+    locale,
+    path: '/corporate-training',
+    titleAr: 'التدريب المؤسسي',
+    titleEn: 'Corporate Training',
+    descriptionAr: 'برامج تدريب مؤسسي مصممة حسب احتياجات شركتك وأهداف فريقك.',
+    descriptionEn: 'Tailored corporate training programs aligned with your company goals.',
+  });
+}
 
 function getMediaUrl(media: Event['coverImage'] | Event['thumbnail']): string | null {
   if (!media || typeof media === 'number') return null;

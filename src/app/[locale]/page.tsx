@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import { Navbar } from '@/components/layout/navbar';
 import { Footer } from '@/components/layout/footer';
 import { AnnouncementBar } from '@/components/layout/announcement-bar';
@@ -11,6 +12,23 @@ import { TextTestimonialsSection } from '@/components/sections/text-testimonials
 import { InstructorsPreview } from '@/components/sections/instructors-preview';
 import { VideoTestimonialsSection } from '@/components/sections/video-testimonials';
 import { BlogsPreviewSection } from '@/components/sections/blogs-preview';
+import { buildPageMetadata } from '@/lib/seo/metadata';
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  return buildPageMetadata({
+    locale,
+    path: '',
+    titleAr: 'الصفحة الرئيسية',
+    titleEn: 'Home',
+    descriptionAr: 'منصة Next Academy لتطوير الأفراد والفرق من خلال برامج تطبيقية يقودها خبراء السوق.',
+    descriptionEn: 'Next Academy platform for practical upskilling programs led by market practitioners.',
+  });
+}
 
 export default async function HomePage({
   params,

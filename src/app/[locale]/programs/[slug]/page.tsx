@@ -1,6 +1,7 @@
 import React from 'react';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
+import type { Metadata } from 'next';
 import { getLocale, getTranslations } from 'next-intl/server';
 import { getPayload } from 'payload';
 import config from '@payload-config';
@@ -16,6 +17,60 @@ import { buildYouTubeEmbedUrl, buildYouTubeThumbnailUrl } from '@/lib/youtube';
 import { MediaPlayer } from '@/components/ui/media-player';
 import { getInstructorNames, getFirstInstructor } from '@/lib/instructor-helpers';
 import styles from './page.module.css';
+import { buildPageMetadata } from '@/lib/seo/metadata';
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string; slug: string }>;
+}): Promise<Metadata> {
+  const { locale, slug } = await params;
+
+  try {
+    const payload = await getPayload({ config });
+    const { docs } = await payload.find({
+      collection: 'programs',
+      where: { or: [{ slug: { equals: slug } }, { id: { equals: slug } }] },
+      depth: 0,
+      limit: 1,
+    });
+    const program = docs[0] as Program | undefined;
+
+    if (!program) {
+      return buildPageMetadata({
+        locale,
+        path: `/programs/${slug}`,
+        titleAr: 'تفاصيل البرنامج',
+        titleEn: 'Program Details',
+        descriptionAr: 'صفحة تفاصيل البرنامج.',
+        descriptionEn: 'Program details page.',
+      });
+    }
+
+    const titleAr = program.titleAr || program.titleEn || 'تفاصيل البرنامج';
+    const titleEn = program.titleEn || program.titleAr || 'Program Details';
+    const descriptionAr = program.shortDescriptionAr || program.shortDescriptionEn || 'تفاصيل البرنامج التدريبي.';
+    const descriptionEn = program.shortDescriptionEn || program.shortDescriptionAr || 'Program details and enrollment information.';
+
+    return buildPageMetadata({
+      locale,
+      path: `/programs/${program.slug || program.id}`,
+      titleAr,
+      titleEn,
+      descriptionAr,
+      descriptionEn,
+    });
+  } catch {
+    return buildPageMetadata({
+      locale,
+      path: `/programs/${slug}`,
+      titleAr: 'تفاصيل البرنامج',
+      titleEn: 'Program Details',
+      descriptionAr: 'صفحة تفاصيل البرنامج.',
+      descriptionEn: 'Program details page.',
+    });
+  }
+}
 
 export default async function ProgramDetailsPage({
   params,

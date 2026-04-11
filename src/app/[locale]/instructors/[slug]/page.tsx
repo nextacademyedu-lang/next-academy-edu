@@ -2,6 +2,7 @@ import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import type { Metadata } from 'next';
 import { getLocale } from 'next-intl/server';
 import { getPayload } from 'payload';
 import config from '@payload-config';
@@ -19,6 +20,7 @@ import { Footer } from '@/components/layout/footer';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import styles from './page.module.css';
+import { buildPageMetadata } from '@/lib/seo/metadata';
 
 function getMediaUrl(media: Instructor['picture'] | Program['thumbnail'] | Program['coverImage']): string | null {
   if (!media || typeof media === 'number') return null;
@@ -88,6 +90,59 @@ function dayLabel(day: string, locale: string): string {
   };
 
   return locale === 'ar' ? mapAr[normalized] || normalized : mapEn[normalized] || normalized;
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string; slug: string }>;
+}): Promise<Metadata> {
+  const { locale, slug } = await params;
+
+  try {
+    const payload = await getPayload({ config });
+    const { docs } = await payload.find({
+      collection: 'instructors',
+      where: { or: [{ slug: { equals: slug } }, { id: { equals: slug } }] },
+      depth: 0,
+      limit: 1,
+    });
+
+    const instructor = docs[0] as Instructor | undefined;
+    if (!instructor) {
+      return buildPageMetadata({
+        locale,
+        path: `/instructors/${slug}`,
+        titleAr: 'ملف المدرب',
+        titleEn: 'Instructor Profile',
+        descriptionAr: 'تفاصيل المدرب وبرامجه المتاحة.',
+        descriptionEn: 'Instructor details and available programs.',
+      });
+    }
+
+    const fullName = `${instructor.firstName || ''} ${instructor.lastName || ''}`.trim();
+    const titleAr = fullName ? `${fullName} - ملف المدرب` : 'ملف المدرب';
+    const titleEn = fullName ? `${fullName} - Instructor Profile` : 'Instructor Profile';
+    const role = instructor.jobTitle || instructor.tagline || '';
+
+    return buildPageMetadata({
+      locale,
+      path: `/instructors/${instructor.slug || instructor.id}`,
+      titleAr,
+      titleEn,
+      descriptionAr: role || 'تفاصيل المدرب وبرامجه المتاحة.',
+      descriptionEn: role || 'Instructor details and available programs.',
+    });
+  } catch {
+    return buildPageMetadata({
+      locale,
+      path: `/instructors/${slug}`,
+      titleAr: 'ملف المدرب',
+      titleEn: 'Instructor Profile',
+      descriptionAr: 'تفاصيل المدرب وبرامجه المتاحة.',
+      descriptionEn: 'Instructor details and available programs.',
+    });
+  }
 }
 
 export default async function InstructorProfilePage({

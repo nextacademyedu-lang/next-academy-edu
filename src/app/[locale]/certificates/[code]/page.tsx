@@ -1,10 +1,29 @@
 import type React from 'react';
+import type { Metadata } from 'next';
 import { getPayload } from 'payload';
 import config from '@payload-config';
 import { Award, CheckCircle, XCircle } from 'lucide-react';
+import { buildPageMetadata } from '@/lib/seo/metadata';
 
 interface Props {
   params: Promise<{ code: string; locale: string }>;
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ code: string; locale: string }>;
+}): Promise<Metadata> {
+  const { code, locale } = await params;
+  return buildPageMetadata({
+    locale,
+    path: `/certificates/${code}`,
+    titleAr: 'التحقق من الشهادة',
+    titleEn: 'Certificate Verification',
+    descriptionAr: 'التحقق من صحة شهادة Next Academy برمز الشهادة.',
+    descriptionEn: 'Verify a Next Academy certificate by verification code.',
+    noIndex: true,
+  });
 }
 
 export default async function CertificateVerifyPage({ params }: Props) {

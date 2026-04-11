@@ -1,5 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
+import type { Metadata } from 'next';
 import { getLocale } from 'next-intl/server';
 import { getPayload } from 'payload';
 import config from '@payload-config';
@@ -9,8 +10,25 @@ import { Footer } from '@/components/layout/footer';
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import styles from './page.module.css';
+import { buildPageMetadata } from '@/lib/seo/metadata';
 
 export const dynamic = 'force-dynamic';
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  return buildPageMetadata({
+    locale,
+    path: '/blog',
+    titleAr: 'المدونة',
+    titleEn: 'Blog',
+    descriptionAr: 'مقالات تطبيقية ورؤى عملية من فريق Next Academy وخبراء السوق.',
+    descriptionEn: 'Practical insights and actionable articles from Next Academy and market experts.',
+  });
+}
 
 function formatCategory(category: BlogPost['category'], locale: string): string {
   const value = (category || 'general').toString();

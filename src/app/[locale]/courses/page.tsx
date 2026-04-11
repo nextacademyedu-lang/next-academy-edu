@@ -1,6 +1,7 @@
 import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import type { Metadata } from 'next';
 import { getLocale } from 'next-intl/server';
 import { getPayload } from 'payload';
 import config from '@payload-config';
@@ -11,8 +12,25 @@ import { Button } from '@/components/ui/button';
 import { buildYouTubeThumbnailUrl } from '@/lib/youtube';
 import styles from './page.module.css';
 import { getInstructorNames } from '@/lib/instructor-helpers';
+import { buildPageMetadata } from '@/lib/seo/metadata';
 
 export const dynamic = 'force-dynamic';
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  return buildPageMetadata({
+    locale,
+    path: '/courses',
+    titleAr: 'الدورات',
+    titleEn: 'Courses',
+    descriptionAr: 'تصفح الدورات والورش والندوات المتاحة مع فلاتر حسب النوع والمستوى والتصنيف.',
+    descriptionEn: 'Browse available courses, workshops, and webinars with filters by type, level, and category.',
+  });
+}
 
 type PageSearchParams = {
   type?: string | string[];

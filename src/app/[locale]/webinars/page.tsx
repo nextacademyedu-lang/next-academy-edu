@@ -1,6 +1,7 @@
 import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import type { Metadata } from 'next';
 import { getLocale } from 'next-intl/server';
 import { getPayload } from 'payload';
 import config from '@payload-config';
@@ -12,8 +13,25 @@ import { Badge } from '@/components/ui/badge';
 import { buildYouTubeThumbnailUrl } from '@/lib/youtube';
 import styles from './page.module.css';
 import { getInstructorNames } from '@/lib/instructor-helpers';
+import { buildPageMetadata } from '@/lib/seo/metadata';
 
 export const dynamic = 'force-dynamic';
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  return buildPageMetadata({
+    locale,
+    path: '/webinars',
+    titleAr: 'الندوات',
+    titleEn: 'Webinars',
+    descriptionAr: 'استكشف الندوات المباشرة والأرشيف المسجل من خبراء السوق.',
+    descriptionEn: 'Explore live webinars and recorded archives from market experts.',
+  });
+}
 
 function getMediaUrl(media: Program['coverImage'] | Program['thumbnail']): string | null {
   if (!media || typeof media === 'number') return null;

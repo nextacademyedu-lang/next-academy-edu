@@ -1,10 +1,28 @@
 import React from 'react';
 import Link from 'next/link';
+import type { Metadata } from 'next';
 import { getLocale } from 'next-intl/server';
 import { Navbar } from '@/components/layout/navbar';
 import { Footer } from '@/components/layout/footer';
 import { Button } from '@/components/ui/button';
 import styles from './page.module.css';
+import { buildPageMetadata } from '@/lib/seo/metadata';
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  return buildPageMetadata({
+    locale,
+    path: '/faq',
+    titleAr: 'الأسئلة الشائعة',
+    titleEn: 'FAQ',
+    descriptionAr: 'إجابات سريعة على أكثر الأسئلة شيوعاً حول البرامج والتسجيل والدفع.',
+    descriptionEn: 'Quick answers to common questions about programs, enrollment, and payments.',
+  });
+}
 
 export default async function FaqPage() {
   const locale = await getLocale();
