@@ -17,6 +17,7 @@ import * as migration_20260409_010000_add_instructor_agreement_and_revenue_field
 import * as migration_20260411_020000_repair_schema_drift_for_auth_and_events from './20260411_020000_repair_schema_drift_for_auth_and_events';
 import * as migration_20260411_030000_require_onboarding_program_details from './20260411_030000_require_onboarding_program_details';
 import * as migration_20260411_050000_update_course_revenue_share_terms from './20260411_050000_update_course_revenue_share_terms';
+import * as migration_20260412_010000_add_rounds_count_to_program_submissions from './20260412_010000_add_rounds_count_to_program_submissions';
 
 export const migrations = [
   {
@@ -113,5 +114,10 @@ export const migrations = [
     up: migration_20260411_050000_update_course_revenue_share_terms.up,
     down: migration_20260411_050000_update_course_revenue_share_terms.down,
     name: '20260411_050000_update_course_revenue_share_terms',
+  },
+  {
+    up: migration_20260412_010000_add_rounds_count_to_program_submissions.up,
+    down: migration_20260412_010000_add_rounds_count_to_program_submissions.down,
+    name: '20260412_010000_add_rounds_count_to_program_submissions',
   },
 ];
