@@ -24,39 +24,43 @@ function relationToId(value: unknown): number | null {
   return null;
 }
 
-const AGREEMENT_VERSION = 'v1.0';
+const AGREEMENT_VERSION = 'v1.1';
 
 interface OnboardingPayload {
   // Step 1: Profile
   profile: {
     firstName: string;
     lastName: string;
-    jobTitle?: string;
-    tagline?: string;
-    linkedinUrl?: string;
+    jobTitle: string;
+    tagline: string;
+    linkedinUrl: string;
     twitterUrl?: string;
   };
   // Step 2: First program submission
   program: {
     type: string;
     titleAr: string;
-    titleEn?: string;
+    titleEn: string;
     shortDescriptionAr: string;
-    shortDescriptionEn?: string;
+    shortDescriptionEn: string;
     descriptionAr: string;
-    descriptionEn?: string;
-    categoryName?: string;
-    durationHours?: number;
+    descriptionEn: string;
+    categoryName: string;
+    durationHours: number;
     sessionsCount: number;
-    language?: string;
-    level?: string;
-    price?: number;
-    currency?: string;
-    objectivesText?: string;
-    requirementsText?: string;
-    targetAudienceText?: string;
-    extraNotes?: string;
-    roundsCount?: number;
+    language: string;
+    level: string;
+    price: number;
+    currency: string;
+    objectivesText: string;
+    requirementsText: string;
+    targetAudienceText: string;
+    extraNotes: string;
+    roundsCount: number;
+    previousTraineesCount: number;
+    isFirstTimeProgram: 'yes' | 'no';
+    teachingExperienceYears: number;
+    deliveryHistoryText: string;
   };
   // Step 3: Agreement
   clausesAccepted: string[];
@@ -93,14 +97,80 @@ export async function POST(req: NextRequest) {
     if (!profile?.firstName?.trim() || !profile?.lastName?.trim()) {
       return NextResponse.json({ error: 'First name and last name are required' }, { status: 400 });
     }
+    if (!profile?.jobTitle?.trim()) {
+      return NextResponse.json({ error: 'Job title is required' }, { status: 400 });
+    }
+    if (!profile?.tagline?.trim()) {
+      return NextResponse.json({ error: 'Tagline is required' }, { status: 400 });
+    }
+    if (!profile?.linkedinUrl?.trim()) {
+      return NextResponse.json({ error: 'LinkedIn URL is required' }, { status: 400 });
+    }
     if (!program?.titleAr?.trim()) {
       return NextResponse.json({ error: 'Arabic title is required' }, { status: 400 });
+    }
+    if (!program?.titleEn?.trim()) {
+      return NextResponse.json({ error: 'English title is required' }, { status: 400 });
     }
     if (!program?.shortDescriptionAr?.trim()) {
       return NextResponse.json({ error: 'Arabic short description is required' }, { status: 400 });
     }
+    if (!program?.shortDescriptionEn?.trim()) {
+      return NextResponse.json({ error: 'English short description is required' }, { status: 400 });
+    }
     if (!program?.descriptionAr?.trim()) {
       return NextResponse.json({ error: 'Arabic description is required' }, { status: 400 });
+    }
+    if (!program?.descriptionEn?.trim()) {
+      return NextResponse.json({ error: 'English description is required' }, { status: 400 });
+    }
+    if (!program?.categoryName?.trim()) {
+      return NextResponse.json({ error: 'Category is required' }, { status: 400 });
+    }
+    if (!Number.isFinite(program?.durationHours) || program.durationHours <= 0) {
+      return NextResponse.json({ error: 'Duration hours must be greater than 0' }, { status: 400 });
+    }
+    if (!Number.isFinite(program?.sessionsCount) || program.sessionsCount <= 0) {
+      return NextResponse.json({ error: 'Sessions count must be greater than 0' }, { status: 400 });
+    }
+    if (!Number.isFinite(program?.price) || program.price <= 0) {
+      return NextResponse.json({ error: 'Price must be greater than 0' }, { status: 400 });
+    }
+    if (!program?.currency?.trim()) {
+      return NextResponse.json({ error: 'Currency is required' }, { status: 400 });
+    }
+    if (!program?.language?.trim()) {
+      return NextResponse.json({ error: 'Language is required' }, { status: 400 });
+    }
+    if (!program?.level?.trim()) {
+      return NextResponse.json({ error: 'Level is required' }, { status: 400 });
+    }
+    if (!program?.objectivesText?.trim()) {
+      return NextResponse.json({ error: 'Objectives are required' }, { status: 400 });
+    }
+    if (!program?.requirementsText?.trim()) {
+      return NextResponse.json({ error: 'Requirements are required' }, { status: 400 });
+    }
+    if (!program?.targetAudienceText?.trim()) {
+      return NextResponse.json({ error: 'Target audience is required' }, { status: 400 });
+    }
+    if (!program?.extraNotes?.trim()) {
+      return NextResponse.json({ error: 'Extra notes are required' }, { status: 400 });
+    }
+    if (!Number.isFinite(program?.roundsCount) || program.roundsCount <= 0) {
+      return NextResponse.json({ error: 'Rounds count must be greater than 0' }, { status: 400 });
+    }
+    if (program?.previousTraineesCount == null || !Number.isFinite(program.previousTraineesCount) || program.previousTraineesCount < 0) {
+      return NextResponse.json({ error: 'Previous trainees count is required' }, { status: 400 });
+    }
+    if (program?.isFirstTimeProgram !== 'yes' && program?.isFirstTimeProgram !== 'no') {
+      return NextResponse.json({ error: 'First time delivery answer is required' }, { status: 400 });
+    }
+    if (program?.teachingExperienceYears == null || !Number.isFinite(program.teachingExperienceYears) || program.teachingExperienceYears < 0) {
+      return NextResponse.json({ error: 'Teaching experience years are required' }, { status: 400 });
+    }
+    if (!program?.deliveryHistoryText?.trim()) {
+      return NextResponse.json({ error: 'Previous delivery summary is required' }, { status: 400 });
     }
     if (!Array.isArray(clausesAccepted) || clausesAccepted.length < 10) {
       return NextResponse.json(
@@ -122,6 +192,7 @@ export async function POST(req: NextRequest) {
         tagline: profile.tagline?.trim() || undefined,
         linkedinUrl: profile.linkedinUrl?.trim() || undefined,
         twitterUrl: profile.twitterUrl?.trim() || undefined,
+        courseRevenueShare: 30,
         onboardingCompleted: true,
         agreementAccepted: true,
         agreementAcceptedAt: now,
@@ -141,25 +212,29 @@ export async function POST(req: NextRequest) {
         submittedBy: userId,
         status: 'pending',
         submittedAt: now,
-        type: program.type || 'course',
+        type: program.type,
         titleAr: program.titleAr.trim(),
-        titleEn: program.titleEn?.trim() || undefined,
+        titleEn: program.titleEn.trim(),
         shortDescriptionAr: program.shortDescriptionAr.trim(),
-        shortDescriptionEn: program.shortDescriptionEn?.trim() || undefined,
+        shortDescriptionEn: program.shortDescriptionEn.trim(),
         descriptionAr: program.descriptionAr.trim(),
-        descriptionEn: program.descriptionEn?.trim() || undefined,
-        categoryName: program.categoryName?.trim() || undefined,
-        durationHours: program.durationHours || undefined,
-        sessionsCount: program.sessionsCount || 1,
-        language: program.language || 'ar',
-        level: program.level || undefined,
-        price: program.price || undefined,
-        currency: program.currency || 'EGP',
-        objectivesText: program.objectivesText?.trim() || undefined,
-        requirementsText: program.requirementsText?.trim() || undefined,
-        targetAudienceText: program.targetAudienceText?.trim() || undefined,
-        extraNotes: program.extraNotes?.trim() || undefined,
-        roundsCount: program.roundsCount || undefined,
+        descriptionEn: program.descriptionEn.trim(),
+        categoryName: program.categoryName.trim(),
+        durationHours: program.durationHours,
+        sessionsCount: program.sessionsCount,
+        language: program.language,
+        level: program.level,
+        price: program.price,
+        currency: program.currency,
+        objectivesText: program.objectivesText.trim(),
+        requirementsText: program.requirementsText.trim(),
+        targetAudienceText: program.targetAudienceText.trim(),
+        extraNotes: program.extraNotes.trim(),
+        roundsCount: program.roundsCount,
+        previousTraineesCount: program.previousTraineesCount,
+        isFirstTimeProgram: program.isFirstTimeProgram,
+        teachingExperienceYears: program.teachingExperienceYears,
+        deliveryHistoryText: program.deliveryHistoryText.trim(),
       } as any,
       overrideAccess: true,
       req,

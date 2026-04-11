@@ -78,7 +78,7 @@ export default function InstructorEarningsPage() {
       if (res.success && res.data?.profile) {
         const p = res.data.profile as any;
         setRevenueShares({
-          course: p.courseRevenueShare ?? 33,
+          course: p.courseRevenueShare ?? 30,
           consultation: p.consultationRevenueShare ?? 50,
         });
       }

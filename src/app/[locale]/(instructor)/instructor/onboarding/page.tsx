@@ -15,9 +15,9 @@ const AGREEMENT_CLAUSES = [
     titleAr: 'بند الشراكة المالية',
     titleEn: 'Financial Partnership',
     textAr:
-      'أوافق على أن تكون حصتي كمحاضر وشريك نجاح هي ثلث قيمة مبيعات الكورس الفعلية، ويتم تسويتها حسب النظام المالي المعتمد في نكست أكاديمي.',
+      'أوافق على أن تكون حصتي كمحاضر وشريك نجاح هي 30% من صافي أرباح الكورسات أو الورش، ويتم تسويتها حسب النظام المالي المعتمد في نكست أكاديمي.',
     textEn:
-      'I agree that my share as an instructor and success partner is one-third (33%) of actual course sales, settled per Next Academy\'s approved financial system.',
+      'I agree that my share as an instructor and success partner is 30% of net course/workshop profits, settled per Next Academy\'s approved financial system.',
   },
   {
     id: 'co_marketing',
@@ -134,6 +134,10 @@ interface ProgramForm {
   targetAudienceText: string;
   extraNotes: string;
   roundsCount: string;
+  previousTraineesCount: string;
+  isFirstTimeProgram: 'yes' | 'no';
+  teachingExperienceYears: string;
+  deliveryHistoryText: string;
 }
 
 /* ─────────────────────────────────────────────────────
@@ -178,6 +182,10 @@ export default function InstructorOnboardingPage() {
     targetAudienceText: '',
     extraNotes: '',
     roundsCount: '1',
+    previousTraineesCount: '',
+    isFirstTimeProgram: 'yes',
+    teachingExperienceYears: '',
+    deliveryHistoryText: '',
   });
 
   // Step 3 agreement
@@ -199,15 +207,44 @@ export default function InstructorOnboardingPage() {
   const validateStep1 = () => {
     if (!profile.firstName.trim()) return 'الاسم الأول مطلوب / First name is required';
     if (!profile.lastName.trim()) return 'اسم العائلة مطلوب / Last name is required';
+    if (!profile.jobTitle.trim()) return 'المسمى الوظيفي مطلوب / Job title is required';
+    if (!profile.tagline.trim()) return 'الشعار مطلوب / Tagline is required';
+    if (!profile.linkedinUrl.trim()) return 'رابط LinkedIn مطلوب / LinkedIn URL is required';
     return null;
   };
 
   const validateStep2 = () => {
+    if (!program.type.trim()) return 'نوع البرنامج مطلوب / Program type is required';
     if (!program.titleAr.trim()) return 'عنوان الكورس بالعربي مطلوب / Arabic title is required';
+    if (!program.titleEn.trim()) return 'عنوان الكورس بالإنجليزي مطلوب / English title is required';
     if (!program.shortDescriptionAr.trim()) return 'الوصف المختصر بالعربي مطلوب / Arabic short description is required';
+    if (!program.shortDescriptionEn.trim()) return 'الوصف المختصر بالإنجليزي مطلوب / English short description is required';
     if (!program.descriptionAr.trim()) return 'الوصف الكامل بالعربي مطلوب / Arabic description is required';
+    if (!program.descriptionEn.trim()) return 'الوصف الكامل بالإنجليزي مطلوب / English description is required';
+    if (!program.categoryName.trim()) return 'التصنيف مطلوب / Category is required';
     const sc = Number(program.sessionsCount);
     if (!Number.isFinite(sc) || sc <= 0) return 'عدد الجلسات لازم يكون أكبر من 0 / Sessions count must be > 0';
+    const duration = Number(program.durationHours);
+    if (!Number.isFinite(duration) || duration <= 0) return 'مدة البرنامج بالساعات مطلوبة / Duration must be greater than 0';
+    const rounds = Number(program.roundsCount);
+    if (!Number.isFinite(rounds) || rounds <= 0) return 'عدد الراوندات مطلوب / Rounds count must be greater than 0';
+    const price = Number(program.price);
+    if (!Number.isFinite(price) || price <= 0) return 'السعر مطلوب / Price must be greater than 0';
+    if (!program.currency.trim()) return 'العملة مطلوبة / Currency is required';
+    if (!program.language.trim()) return 'اللغة مطلوبة / Language is required';
+    if (!program.level.trim()) return 'المستوى مطلوب / Level is required';
+    if (!program.objectivesText.trim()) return 'الأهداف مطلوبة / Objectives are required';
+    if (!program.requirementsText.trim()) return 'المتطلبات مطلوبة / Requirements are required';
+    if (!program.targetAudienceText.trim()) return 'الجمهور المستهدف مطلوب / Target audience is required';
+    if (!program.extraNotes.trim()) return 'الملاحظات الإضافية مطلوبة / Extra notes are required';
+    if (!program.previousTraineesCount.trim()) return 'عدد المتدربين السابق مطلوب / Previous trainees count is required';
+    const previousTrainees = Number(program.previousTraineesCount);
+    if (!Number.isFinite(previousTrainees) || previousTrainees < 0) return 'عدد المتدربين السابق مطلوب / Previous trainees count is required';
+    if (program.isFirstTimeProgram !== 'yes' && program.isFirstTimeProgram !== 'no') return 'حدد إذا كانت أول مرة أم لا / Choose yes or no for first-time delivery';
+    if (!program.teachingExperienceYears.trim()) return 'سنوات الخبرة مطلوبة / Teaching experience years are required';
+    const experienceYears = Number(program.teachingExperienceYears);
+    if (!Number.isFinite(experienceYears) || experienceYears < 0) return 'سنوات الخبرة مطلوبة / Teaching experience years are required';
+    if (!program.deliveryHistoryText.trim()) return 'ملخص خبرتك السابقة مطلوب / Previous delivery summary is required';
     return null;
   };
 
@@ -249,10 +286,12 @@ export default function InstructorOnboardingPage() {
           profile,
           program: {
             ...program,
-            durationHours: program.durationHours ? Number(program.durationHours) : undefined,
-            sessionsCount: Number(program.sessionsCount) || 1,
-            price: program.price ? Number(program.price) : undefined,
-            roundsCount: program.roundsCount ? Number(program.roundsCount) : undefined,
+            durationHours: Number(program.durationHours),
+            sessionsCount: Number(program.sessionsCount),
+            price: Number(program.price),
+            roundsCount: Number(program.roundsCount),
+            previousTraineesCount: Number(program.previousTraineesCount),
+            teachingExperienceYears: Number(program.teachingExperienceYears),
           },
           clausesAccepted: Array.from(acceptedClauses),
         }),
@@ -335,7 +374,7 @@ export default function InstructorOnboardingPage() {
               />
             </div>
             <div className={styles.fieldGroup}>
-              <label>المسمى الوظيفي / Job Title</label>
+              <label>المسمى الوظيفي / Job Title *</label>
               <input
                 value={profile.jobTitle}
                 onChange={(e) => setProfile((p) => ({ ...p, jobTitle: e.target.value }))}
@@ -343,7 +382,7 @@ export default function InstructorOnboardingPage() {
               />
             </div>
             <div className={styles.fieldGroup}>
-              <label>الشعار / Tagline</label>
+              <label>الشعار / Tagline *</label>
               <input
                 value={profile.tagline}
                 onChange={(e) => setProfile((p) => ({ ...p, tagline: e.target.value }))}
@@ -351,7 +390,7 @@ export default function InstructorOnboardingPage() {
               />
             </div>
             <div className={styles.fieldGroup}>
-              <label>LinkedIn</label>
+              <label>LinkedIn *</label>
               <input
                 type="url"
                 value={profile.linkedinUrl}
@@ -416,7 +455,7 @@ export default function InstructorOnboardingPage() {
               />
             </div>
             <div className={`${styles.fieldGroup} ${styles.fullWidth}`}>
-              <label>العنوان بالإنجلش / English Title</label>
+              <label>العنوان بالإنجلش / English Title *</label>
               <input
                 value={program.titleEn}
                 onChange={(e) => setProgram((p) => ({ ...p, titleEn: e.target.value }))}
@@ -432,7 +471,7 @@ export default function InstructorOnboardingPage() {
               />
             </div>
             <div className={`${styles.fieldGroup} ${styles.fullWidth}`}>
-              <label>وصف مختصر بالإنجلش / English Short Description</label>
+              <label>وصف مختصر بالإنجلش / English Short Description *</label>
               <textarea
                 rows={3}
                 value={program.shortDescriptionEn}
@@ -449,7 +488,7 @@ export default function InstructorOnboardingPage() {
               />
             </div>
             <div className={`${styles.fieldGroup} ${styles.fullWidth}`}>
-              <label>الوصف الكامل بالإنجلش / English Full Description</label>
+              <label>الوصف الكامل بالإنجلش / English Full Description *</label>
               <textarea
                 rows={5}
                 value={program.descriptionEn}
@@ -458,7 +497,7 @@ export default function InstructorOnboardingPage() {
             </div>
 
             <div className={styles.fieldGroup}>
-              <label>المدة بالساعات / Duration (hours)</label>
+              <label>المدة بالساعات / Duration (hours) *</label>
               <input
                 type="number"
                 min={0}
@@ -467,7 +506,7 @@ export default function InstructorOnboardingPage() {
               />
             </div>
             <div className={styles.fieldGroup}>
-              <label>عدد الراوندات / Rounds Count</label>
+              <label>عدد الراوندات / Rounds Count *</label>
               <input
                 type="number"
                 min={1}
@@ -476,7 +515,7 @@ export default function InstructorOnboardingPage() {
               />
             </div>
             <div className={styles.fieldGroup}>
-              <label>السعر / Price</label>
+              <label>السعر / Price *</label>
               <input
                 type="number"
                 min={0}
@@ -485,7 +524,7 @@ export default function InstructorOnboardingPage() {
               />
             </div>
             <div className={styles.fieldGroup}>
-              <label>العملة / Currency</label>
+              <label>العملة / Currency *</label>
               <select
                 value={program.currency}
                 onChange={(e) => setProgram((p) => ({ ...p, currency: e.target.value }))}
@@ -496,7 +535,7 @@ export default function InstructorOnboardingPage() {
               </select>
             </div>
             <div className={styles.fieldGroup}>
-              <label>اللغة / Language</label>
+              <label>اللغة / Language *</label>
               <select
                 value={program.language}
                 onChange={(e) => setProgram((p) => ({ ...p, language: e.target.value }))}
@@ -507,7 +546,7 @@ export default function InstructorOnboardingPage() {
               </select>
             </div>
             <div className={styles.fieldGroup}>
-              <label>المستوى / Level</label>
+              <label>المستوى / Level *</label>
               <select
                 value={program.level}
                 onChange={(e) => setProgram((p) => ({ ...p, level: e.target.value }))}
@@ -518,16 +557,61 @@ export default function InstructorOnboardingPage() {
               </select>
             </div>
             <div className={styles.fieldGroup}>
-              <label>التصنيف / Category</label>
+              <label>التصنيف / Category *</label>
               <input
                 value={program.categoryName}
                 onChange={(e) => setProgram((p) => ({ ...p, categoryName: e.target.value }))}
                 placeholder="Marketing, Leadership..."
               />
             </div>
+            <div className={styles.fieldGroup}>
+              <label>دربت كام متدرب قبل كده؟ / Previous Trainees Count *</label>
+              <input
+                type="number"
+                min={0}
+                value={program.previousTraineesCount}
+                onChange={(e) => setProgram((p) => ({ ...p, previousTraineesCount: e.target.value }))}
+                placeholder="0"
+              />
+            </div>
+            <div className={styles.fieldGroup}>
+              <label>دي أول مرة تقدّم البرنامج؟ / First Time Delivering This Program? *</label>
+              <select
+                value={program.isFirstTimeProgram}
+                onChange={(e) =>
+                  setProgram((p) => ({
+                    ...p,
+                    isFirstTimeProgram: e.target.value === 'no' ? 'no' : 'yes',
+                  }))
+                }
+              >
+                <option value="yes">Yes / نعم</option>
+                <option value="no">No / لا</option>
+              </select>
+            </div>
+            <div className={styles.fieldGroup}>
+              <label>سنوات الخبرة التدريبية / Teaching Experience (Years) *</label>
+              <input
+                type="number"
+                min={0}
+                value={program.teachingExperienceYears}
+                onChange={(e) => setProgram((p) => ({ ...p, teachingExperienceYears: e.target.value }))}
+                placeholder="0"
+              />
+            </div>
+            <div className={`${styles.fieldGroup} ${styles.fullWidth}`}>
+              <label>ملخص خبرتك السابقة / Previous Delivery Summary *</label>
+              <textarea
+                rows={3}
+                value={program.deliveryHistoryText}
+                onChange={(e) => setProgram((p) => ({ ...p, deliveryHistoryText: e.target.value }))}
+                placeholder="اذكر أمثلة سابقة: نوع البرنامج، القطاع، النتائج..."
+                dir="rtl"
+              />
+            </div>
 
             <div className={`${styles.fieldGroup} ${styles.fullWidth}`}>
-              <label>الأهداف / Objectives</label>
+              <label>الأهداف / Objectives *</label>
               <textarea
                 rows={3}
                 value={program.objectivesText}
@@ -537,7 +621,7 @@ export default function InstructorOnboardingPage() {
               />
             </div>
             <div className={`${styles.fieldGroup} ${styles.fullWidth}`}>
-              <label>المتطلبات / Requirements</label>
+              <label>المتطلبات / Requirements *</label>
               <textarea
                 rows={3}
                 value={program.requirementsText}
@@ -547,7 +631,7 @@ export default function InstructorOnboardingPage() {
               />
             </div>
             <div className={`${styles.fieldGroup} ${styles.fullWidth}`}>
-              <label>الجمهور المستهدف / Target Audience</label>
+              <label>الجمهور المستهدف / Target Audience *</label>
               <textarea
                 rows={3}
                 value={program.targetAudienceText}
@@ -557,7 +641,7 @@ export default function InstructorOnboardingPage() {
               />
             </div>
             <div className={`${styles.fieldGroup} ${styles.fullWidth}`}>
-              <label>ملاحظات إضافية / Extra Notes</label>
+              <label>ملاحظات إضافية / Extra Notes *</label>
               <textarea
                 rows={3}
                 value={program.extraNotes}

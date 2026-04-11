@@ -15,6 +15,7 @@ import * as migration_20260403_195416_add_b2b_allocation_mode_fields from './202
 import * as migration_20260408_230000_add_events_collection from './20260408_230000_add_events_collection';
 import * as migration_20260409_010000_add_instructor_agreement_and_revenue_fields from './20260409_010000_add_instructor_agreement_and_revenue_fields';
 import * as migration_20260411_020000_repair_schema_drift_for_auth_and_events from './20260411_020000_repair_schema_drift_for_auth_and_events';
+import * as migration_20260411_030000_require_onboarding_program_details from './20260411_030000_require_onboarding_program_details';
 
 export const migrations = [
   {
@@ -101,5 +102,10 @@ export const migrations = [
     up: migration_20260411_020000_repair_schema_drift_for_auth_and_events.up,
     down: migration_20260411_020000_repair_schema_drift_for_auth_and_events.down,
     name: '20260411_020000_repair_schema_drift_for_auth_and_events',
+  },
+  {
+    up: migration_20260411_030000_require_onboarding_program_details.up,
+    down: migration_20260411_030000_require_onboarding_program_details.down,
+    name: '20260411_030000_require_onboarding_program_details',
   },
 ];
