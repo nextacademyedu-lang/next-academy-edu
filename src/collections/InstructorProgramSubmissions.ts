@@ -130,7 +130,7 @@ export const InstructorProgramSubmissions: CollectionConfig = {
                   verificationStatus: 'approved',
                   onboardingCompleted: true,
                   isActive: true,
-                },
+                } as any,
                 overrideAccess: true,
                 req,
                 context: { skipInstructorAutoLink: true, allowInstructorStatusSync: true },
