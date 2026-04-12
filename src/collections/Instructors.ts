@@ -11,7 +11,10 @@ import {
 
 export const Instructors: CollectionConfig = {
   slug: 'instructors',
-  admin: { useAsTitle: 'firstName' },
+  admin: {
+    useAsTitle: 'firstName',
+    defaultColumns: ['firstName', 'lastName', 'email', 'verificationStatus', 'isActive', 'updatedAt'],
+  },
   access: {
     read: isPublic,
     create: isAdmin,
@@ -25,6 +28,9 @@ export const Instructors: CollectionConfig = {
         const isAdminActor = await isAdminRequest(req);
         const isSelfServiceActor = Boolean(
           (context as { selfServiceInstructorProfile?: boolean } | undefined)?.selfServiceInstructorProfile,
+        );
+        const allowStatusSync = Boolean(
+          (context as { allowInstructorStatusSync?: boolean } | undefined)?.allowInstructorStatusSync,
         );
         const actorRole =
           typeof (req as { user?: { role?: unknown } }).user?.role === 'string'
@@ -40,7 +46,7 @@ export const Instructors: CollectionConfig = {
             ? next.verificationStatus
             : previousStatus;
 
-        if (enforceSelfServiceRules) {
+        if (enforceSelfServiceRules && !allowStatusSync) {
           next.isActive = false;
           if (!next.verificationStatus) next.verificationStatus = operation === 'create' ? 'draft' : previousStatus;
           if (nextStatus === 'approved' || nextStatus === 'rejected') {

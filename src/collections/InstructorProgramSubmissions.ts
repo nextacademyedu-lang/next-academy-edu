@@ -96,6 +96,7 @@ export const InstructorProgramSubmissions: CollectionConfig = {
           | {
               firstName?: string | null;
               lastName?: string | null;
+              verificationStatus?: string | null;
             }
           | null;
 
@@ -113,6 +114,35 @@ export const InstructorProgramSubmissions: CollectionConfig = {
           (typeof doc.titleAr === 'string' && doc.titleAr.trim()) ||
           (typeof doc.titleEn === 'string' && doc.titleEn.trim()) ||
           'Program';
+
+        if (nextStatus === 'approved') {
+          const instructorStatus =
+            typeof instructor?.verificationStatus === 'string'
+              ? instructor.verificationStatus
+              : null;
+
+          if (instructorStatus !== 'approved') {
+            try {
+              await req.payload.update({
+                collection: 'instructors',
+                id: instructorId,
+                data: {
+                  verificationStatus: 'approved',
+                  onboardingCompleted: true,
+                  isActive: true,
+                },
+                overrideAccess: true,
+                req,
+                context: { skipInstructorAutoLink: true, allowInstructorStatusSync: true },
+              });
+            } catch (syncErr) {
+              console.error(
+                `[InstructorProgramSubmissions.afterChange] Failed to sync instructor approval for submission #${doc.id}.`,
+                syncErr,
+              );
+            }
+          }
+        }
 
         try {
           if (nextStatus === 'approved') {

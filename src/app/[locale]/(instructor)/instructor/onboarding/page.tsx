@@ -149,6 +149,8 @@ type CategoryOption = {
   slug: string;
 };
 
+type ReviewState = 'loading' | 'form' | 'pending' | 'approved' | 'rejected';
+
 /* ─────────────────────────────────────────────────────
    Component
    ───────────────────────────────────────────────────── */
@@ -160,6 +162,8 @@ export default function InstructorOnboardingPage() {
   const [step, setStep] = useState(1);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
+  const [reviewState, setReviewState] = useState<ReviewState>('loading');
+  const [reviewReason, setReviewReason] = useState('');
   const [categories, setCategories] = useState<CategoryOption[]>([]);
   const [categoriesLoading, setCategoriesLoading] = useState(true);
   const [uploadingField, setUploadingField] = useState<'picture' | 'coverImage' | null>(null);
@@ -204,6 +208,70 @@ export default function InstructorOnboardingPage() {
     teachingExperienceYears: '',
     deliveryHistoryText: '',
   });
+
+  useEffect(() => {
+    let active = true;
+
+    const loadOnboardingStatus = async () => {
+      try {
+        const res = await fetch('/api/instructor/profile', {
+          credentials: 'include',
+          cache: 'no-store',
+        });
+        const data = await res.json().catch(() => null);
+        if (!active) return;
+
+        if (!res.ok) {
+          setReviewState('form');
+          return;
+        }
+
+        const profile = data?.profile as
+          | {
+              onboardingCompleted?: boolean | null;
+              verificationStatus?: string | null;
+              rejectionReason?: string | null;
+            }
+          | undefined;
+
+        const onboardingCompleted = Boolean(profile?.onboardingCompleted);
+        const verificationStatus =
+          typeof profile?.verificationStatus === 'string'
+            ? profile.verificationStatus
+            : 'draft';
+
+        if (!onboardingCompleted) {
+          setReviewState('form');
+          return;
+        }
+
+        if (verificationStatus === 'approved') {
+          setReviewState('approved');
+          router.replace(`/${locale}/instructor`);
+          return;
+        }
+
+        if (verificationStatus === 'rejected') {
+          setReviewReason(
+            typeof profile?.rejectionReason === 'string' ? profile.rejectionReason : '',
+          );
+          setReviewState('rejected');
+          return;
+        }
+
+        setReviewState('pending');
+      } catch {
+        if (!active) return;
+        setReviewState('form');
+      }
+    };
+
+    void loadOnboardingStatus();
+
+    return () => {
+      active = false;
+    };
+  }, [locale, router]);
 
   useEffect(() => {
     let active = true;
@@ -421,9 +489,9 @@ export default function InstructorOnboardingPage() {
         setSaving(false);
         return;
       }
-
-      // Redirect to instructor dashboard
-      router.push(`/${locale}/instructor`);
+      setSaving(false);
+      setReviewState('pending');
+      router.replace(`/${locale}/instructor/onboarding`);
       router.refresh();
     } catch {
       setError('Network error. Please try again.');
@@ -433,6 +501,7 @@ export default function InstructorOnboardingPage() {
 
   /* ── Step Indicator ──────────────────────────────── */
   const stepLabels = ['Profile', 'Program', 'Agreement'];
+  const showForm = reviewState === 'form';
 
   return (
     <div className={styles.onboardingContainer}>
@@ -441,34 +510,80 @@ export default function InstructorOnboardingPage() {
         <p>Complete your setup to start teaching</p>
       </div>
 
-      {/* Steps indicator */}
-      <div className={styles.steps}>
-        {stepLabels.map((label, i) => {
-          const stepNum = i + 1;
-          const isActive = step === stepNum;
-          const isCompleted = step > stepNum;
-          return (
-            <React.Fragment key={label}>
-              {i > 0 && (
-                <div className={`${styles.stepConnector} ${isCompleted ? styles.active : ''}`} />
-              )}
-              <div
-                className={`${styles.stepItem} ${isActive ? styles.active : ''} ${isCompleted ? styles.completed : ''}`}
-              >
-                <div className={styles.stepCircle}>
-                  {isCompleted ? <Check size={16} /> : stepNum}
+      {reviewState === 'loading' && (
+        <div className={styles.statusCard}>
+          <h2 className={styles.statusTitle}>Loading…</h2>
+          <p className={styles.statusText}>Checking your onboarding status.</p>
+        </div>
+      )}
+
+      {reviewState === 'pending' && (
+        <div className={styles.statusCard}>
+          <h2 className={styles.statusTitle}>جاري المراجعة / Under Review</h2>
+          <p className={styles.statusText}>
+            تم استلام بياناتك بنجاح. فريقنا بيراجع الملف حالياً، وهنفعّل حسابك أول ما تتم الموافقة.
+          </p>
+        </div>
+      )}
+
+      {reviewState === 'approved' && (
+        <div className={styles.statusCard}>
+          <h2 className={styles.statusTitle}>Approved</h2>
+          <p className={styles.statusText}>Your profile is approved. Redirecting to instructor dashboard…</p>
+        </div>
+      )}
+
+      {reviewState === 'rejected' && (
+        <div className={styles.statusCard}>
+          <h2 className={styles.statusTitle}>Rejected</h2>
+          <p className={styles.statusText}>
+            Your previous submission was rejected. Please update your information and submit again.
+          </p>
+          {reviewReason && (
+            <p className={styles.statusReason}>
+              {isAr ? `سبب الرفض: ${reviewReason}` : `Rejection reason: ${reviewReason}`}
+            </p>
+          )}
+          <div className={styles.actions}>
+            <button className={styles.btnSecondary} onClick={() => router.replace(`/${locale}`)}>
+              {isAr ? 'العودة للموقع' : 'Back to Site'}
+            </button>
+            <button className={styles.btnPrimary} onClick={() => setReviewState('form')}>
+              {isAr ? 'تعديل وإعادة التقديم' : 'Edit & Resubmit'}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {showForm && (
+        <div className={styles.steps}>
+          {stepLabels.map((label, i) => {
+            const stepNum = i + 1;
+            const isActive = step === stepNum;
+            const isCompleted = step > stepNum;
+            return (
+              <React.Fragment key={label}>
+                {i > 0 && (
+                  <div className={`${styles.stepConnector} ${isCompleted ? styles.active : ''}`} />
+                )}
+                <div
+                  className={`${styles.stepItem} ${isActive ? styles.active : ''} ${isCompleted ? styles.completed : ''}`}
+                >
+                  <div className={styles.stepCircle}>
+                    {isCompleted ? <Check size={16} /> : stepNum}
+                  </div>
+                  <span>{label}</span>
                 </div>
-                <span>{label}</span>
-              </div>
-            </React.Fragment>
-          );
-        })}
-      </div>
+              </React.Fragment>
+            );
+          })}
+        </div>
+      )}
 
       {error && <p className={styles.errorMsg}>{error}</p>}
 
       {/* ── Step 1: Profile ────────────────────────── */}
-      {step === 1 && (
+      {showForm && step === 1 && (
         <div className={styles.formCard}>
           <h2 className={styles.stepTitle}>بياناتك الشخصية / Your Profile</h2>
           <p className={styles.stepSubtitle}>Basic information about you as an instructor</p>
@@ -578,7 +693,7 @@ export default function InstructorOnboardingPage() {
       )}
 
       {/* ── Step 2: Program ────────────────────────── */}
-      {step === 2 && (
+      {showForm && step === 2 && (
         <div className={styles.formCard}>
           <h2 className={styles.stepTitle}>تفاصيل أول كورس / First Program Details</h2>
           <p className={styles.stepSubtitle}>Tell us about the course or workshop you want to offer</p>
@@ -841,7 +956,7 @@ export default function InstructorOnboardingPage() {
       )}
 
       {/* ── Step 3: Agreement ──────────────────────── */}
-      {step === 3 && (
+      {showForm && step === 3 && (
         <div className={styles.formCard}>
           <h2 className={styles.stepTitle}>بنود الاتفاقية / Agreement Terms</h2>
           <p className={styles.stepSubtitle}>

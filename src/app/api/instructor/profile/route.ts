@@ -45,13 +45,54 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: scope.error }, { status: scope.status });
     }
 
-    const instructor = await scope.payload.findByID({
+    let instructor = (await scope.payload.findByID({
       collection: 'instructors',
       id: scope.instructorId,
       depth: 1,
       overrideAccess: true,
       req,
-    });
+    })) as {
+      id: number | string;
+      onboardingCompleted?: boolean | null;
+      verificationStatus?: string | null;
+      isActive?: boolean | null;
+    };
+
+    const isOnboardingCompleted = Boolean(instructor?.onboardingCompleted);
+    const verificationStatus =
+      typeof instructor?.verificationStatus === 'string'
+        ? instructor.verificationStatus
+        : null;
+
+    if (isOnboardingCompleted && verificationStatus !== 'approved') {
+      const approvedSubmission = await scope.payload.find({
+        collection: 'instructor-program-submissions',
+        where: {
+          and: [
+            { instructor: { equals: scope.instructorId } },
+            { status: { equals: 'approved' } },
+          ],
+        },
+        depth: 0,
+        limit: 1,
+        overrideAccess: true,
+        req,
+      });
+
+      if (approvedSubmission.docs.length > 0) {
+        instructor = (await scope.payload.update({
+          collection: 'instructors',
+          id: scope.instructorId,
+          data: {
+            verificationStatus: 'approved',
+            isActive: true,
+          },
+          overrideAccess: true,
+          req,
+          context: { allowInstructorStatusSync: true },
+        })) as typeof instructor;
+      }
+    }
 
     return NextResponse.json({ profile: instructor });
   } catch (error) {
