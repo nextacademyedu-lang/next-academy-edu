@@ -94,11 +94,25 @@ export function buildEmailLayout(content: EmailContent, options: LayoutOptions =
 
 // ─── Low-level send ──────────────────────────────────────────────────────────
 
-export async function send(to: string, subject: string, html: string): Promise<void> {
+export interface SendOptions {
+  replyTo?: string;
+}
+
+export async function send(
+  to: string,
+  subject: string,
+  html: string,
+  options: SendOptions = {},
+): Promise<void> {
   if (!process.env.RESEND_API_KEY) {
     console.log('[email] RESEND_API_KEY not set — skipping:', { to, subject });
     return;
   }
+
+  const replyTo =
+    typeof options.replyTo === 'string' && options.replyTo.trim()
+      ? options.replyTo.trim()
+      : undefined;
 
   const res = await fetch(RESEND_API, {
     method: 'POST',
@@ -106,7 +120,13 @@ export async function send(to: string, subject: string, html: string): Promise<v
       'Content-Type': 'application/json',
       Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
     },
-    body: JSON.stringify({ from: FROM, to, subject, html }),
+    body: JSON.stringify({
+      from: FROM,
+      to,
+      subject,
+      html,
+      ...(replyTo ? { reply_to: replyTo } : {}),
+    }),
   });
 
   const payload = await res.json().catch(() => null);

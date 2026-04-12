@@ -24,6 +24,7 @@ const staticLocaleRoutes = [
   '/privacy',
   '/terms',
   '/refund-policy',
+  '/unsubscribe',
 ];
 
 function withBase(path: string): string {

@@ -9,6 +9,15 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import styles from './page.module.css';
 
+type ContactScenario =
+  | 'general_support'
+  | 'sales_programs'
+  | 'corporate_training'
+  | 'partnerships'
+  | 'complaint';
+
+type PreferredChannel = 'email' | 'phone' | 'whatsapp';
+
 type ConsultationType = {
   id: string;
   title: string;
@@ -31,6 +40,49 @@ type ConsultationOptionsResponse = {
   availableSlots: ConsultationSlot[];
 };
 
+type ContactCopy = {
+  pageTitlePrimary: string;
+  pageTitleHighlight: string;
+  pageSubtitle: string;
+  fullNameLabel: string;
+  fullNamePlaceholder: string;
+  emailLabel: string;
+  emailPlaceholder: string;
+  phoneLabel: string;
+  phonePlaceholder: string;
+  scenarioLabel: string;
+  scenarioOptions: Array<{ value: ContactScenario; label: string }>;
+  companyLabel: string;
+  companyPlaceholder: string;
+  preferredChannelLabel: string;
+  preferredChannelOptions: Array<{ value: PreferredChannel; label: string }>;
+  preferredTimeLabel: string;
+  preferredTimePlaceholder: string;
+  subjectLabel: string;
+  subjectPlaceholder: string;
+  messageLabel: string;
+  messagePlaceholder: string;
+  submitText: string;
+  submittingText: string;
+  successText: string;
+  failureText: string;
+  invalidEmailText: string;
+  invalidPhoneText: string;
+  quickSupportTitle: string;
+  quickSupportBody: string;
+  headquartersTitle: string;
+  directContactTitle: string;
+};
+
+function isValidEmail(value: string): boolean {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+}
+
+function isValidPhone(value: string): boolean {
+  const digits = value.replace(/\D/g, '');
+  return digits.length >= 6 && digits.length <= 16;
+}
+
 export default function ContactPage() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -45,6 +97,11 @@ export default function ContactPage() {
 
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
+  const [scenario, setScenario] = useState<ContactScenario>('general_support');
+  const [company, setCompany] = useState('');
+  const [preferredChannel, setPreferredChannel] = useState<PreferredChannel>('email');
+  const [preferredTime, setPreferredTime] = useState('');
   const [subject, setSubject] = useState('');
   const [message, setMessage] = useState('');
   const [sending, setSending] = useState(false);
@@ -59,6 +116,100 @@ export default function ContactPage() {
   const [selectedSlotId, setSelectedSlotId] = useState('');
   const [paymentMethod, setPaymentMethod] = useState<'card' | 'wallet'>('card');
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+
+  const contactCopy: ContactCopy = useMemo(
+    () =>
+      locale === 'ar'
+        ? {
+            pageTitlePrimary: 'تواصل',
+            pageTitleHighlight: 'معنا',
+            pageSubtitle:
+              'حدد نوع طلبك وسنوجّه الرسالة للفريق المناسب، مع رد تلقائي على بريدك خلال دقائق.',
+            fullNameLabel: 'الاسم بالكامل',
+            fullNamePlaceholder: 'مثال: محمد أحمد',
+            emailLabel: 'البريد الإلكتروني',
+            emailPlaceholder: 'name@company.com',
+            phoneLabel: 'رقم الهاتف',
+            phonePlaceholder: '+20 10 0000 0000',
+            scenarioLabel: 'نوع الطلب',
+            scenarioOptions: [
+              { value: 'general_support', label: 'دعم عام' },
+              { value: 'sales_programs', label: 'البرامج والدورات' },
+              { value: 'corporate_training', label: 'تدريب مؤسسي للشركات' },
+              { value: 'partnerships', label: 'شراكات وتعاون' },
+              { value: 'complaint', label: 'شكوى' },
+            ],
+            companyLabel: 'الشركة (اختياري)',
+            companyPlaceholder: 'اسم الشركة',
+            preferredChannelLabel: 'قناة التواصل المفضلة',
+            preferredChannelOptions: [
+              { value: 'email', label: 'الإيميل' },
+              { value: 'phone', label: 'مكالمة هاتفية' },
+              { value: 'whatsapp', label: 'واتساب' },
+            ],
+            preferredTimeLabel: 'أفضل وقت للتواصل (اختياري)',
+            preferredTimePlaceholder: 'مثال: 10 ص - 2 م',
+            subjectLabel: 'الموضوع (اختياري)',
+            subjectPlaceholder: 'ملخص سريع للطلب',
+            messageLabel: 'تفاصيل الرسالة',
+            messagePlaceholder: 'اكتب كل التفاصيل التي تساعدنا نحل طلبك بسرعة...',
+            submitText: 'إرسال الطلب',
+            submittingText: 'جاري الإرسال...',
+            successText: 'تم إرسال طلبك بنجاح. سيصلك رد قريبًا على بريدك الإلكتروني.',
+            failureText: 'تعذر إرسال الطلب. حاول مرة أخرى.',
+            invalidEmailText: 'يرجى إدخال بريد إلكتروني صحيح.',
+            invalidPhoneText: 'يرجى إدخال رقم هاتف صحيح.',
+            quickSupportTitle: 'دعم سريع',
+            quickSupportBody: 'للحالات العاجلة يمكنك التواصل مباشرة عبر واتساب.',
+            headquartersTitle: 'المقر الرئيسي',
+            directContactTitle: 'تواصل مباشر',
+          }
+        : {
+            pageTitlePrimary: 'Contact',
+            pageTitleHighlight: 'Us',
+            pageSubtitle:
+              'Choose your request type and we will route it to the right team with a fast email confirmation.',
+            fullNameLabel: 'Full Name',
+            fullNamePlaceholder: 'e.g. John Doe',
+            emailLabel: 'Email Address',
+            emailPlaceholder: 'name@company.com',
+            phoneLabel: 'Phone Number',
+            phonePlaceholder: '+1 555 000 0000',
+            scenarioLabel: 'Request Type',
+            scenarioOptions: [
+              { value: 'general_support', label: 'General Support' },
+              { value: 'sales_programs', label: 'Programs & Courses' },
+              { value: 'corporate_training', label: 'Corporate Training' },
+              { value: 'partnerships', label: 'Partnerships' },
+              { value: 'complaint', label: 'Complaint' },
+            ],
+            companyLabel: 'Company (optional)',
+            companyPlaceholder: 'Company name',
+            preferredChannelLabel: 'Preferred Channel',
+            preferredChannelOptions: [
+              { value: 'email', label: 'Email' },
+              { value: 'phone', label: 'Phone Call' },
+              { value: 'whatsapp', label: 'WhatsApp' },
+            ],
+            preferredTimeLabel: 'Preferred Time (optional)',
+            preferredTimePlaceholder: 'e.g. 10:00 AM - 2:00 PM',
+            subjectLabel: 'Subject (optional)',
+            subjectPlaceholder: 'Short summary of your inquiry',
+            messageLabel: 'Message Details',
+            messagePlaceholder: 'Share all details so we can help faster...',
+            submitText: 'Send Request',
+            submittingText: 'Sending...',
+            successText: 'Your request has been sent successfully. We will reply soon.',
+            failureText: 'Failed to send your request. Please try again.',
+            invalidEmailText: 'Please enter a valid email address.',
+            invalidPhoneText: 'Please enter a valid phone number.',
+            quickSupportTitle: 'Quick Support',
+            quickSupportBody: 'For urgent matters, contact us directly on WhatsApp.',
+            headquartersTitle: 'Headquarters',
+            directContactTitle: 'Direct Contact',
+          },
+    [locale],
+  );
 
   useEffect(() => {
     if (intent === 'consultation' && !subject) {
@@ -144,6 +295,18 @@ export default function ContactPage() {
     event.preventDefault();
     setError('');
     setSuccess('');
+
+    const normalizedEmail = email.trim().toLowerCase();
+    if (!isValidEmail(normalizedEmail)) {
+      setError(contactCopy.invalidEmailText);
+      return;
+    }
+
+    if (!isValidPhone(phone)) {
+      setError(contactCopy.invalidPhoneText);
+      return;
+    }
+
     setSending(true);
 
     try {
@@ -151,25 +314,41 @@ export default function ContactPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
-        body: JSON.stringify({ name, email, subject, message }),
+        body: JSON.stringify({
+          locale,
+          name,
+          email: normalizedEmail,
+          phone,
+          scenario,
+          company,
+          preferredChannel,
+          preferredTime,
+          subject,
+          message,
+        }),
       });
       const data = (await response.json().catch(() => null)) as
         | { error?: string; sent?: boolean }
         | null;
 
       if (!response.ok) {
-        setError(data?.error || 'Failed to send message');
+        setError(data?.error || contactCopy.failureText);
         setSending(false);
         return;
       }
 
-      setSuccess('Message sent successfully. We will get back to you soon.');
+      setSuccess(contactCopy.successText);
       setName('');
       setEmail('');
+      setPhone('');
+      setScenario('general_support');
+      setCompany('');
+      setPreferredChannel('email');
+      setPreferredTime('');
       setSubject('');
       setMessage('');
     } catch {
-      setError('Network error. Please try again.');
+      setError(contactCopy.failureText);
     } finally {
       setSending(false);
     }
@@ -236,11 +415,22 @@ export default function ContactPage() {
       <main className={styles.main}>
         <div className={styles.container}>
           <div className={styles.header}>
-            <h1 className={styles.title}>Contact <span className={styles.highlight}>Us</span></h1>
+            <h1 className={styles.title}>
+              {isConsultationMode ? (
+                <>
+                  Contact <span className={styles.highlight}>Us</span>
+                </>
+              ) : (
+                <>
+                  {contactCopy.pageTitlePrimary}{' '}
+                  <span className={styles.highlight}>{contactCopy.pageTitleHighlight}</span>
+                </>
+              )}
+            </h1>
             <p className={styles.subtitle}>
               {isConsultationMode
                 ? 'Choose your consultation service, pick an available slot, and complete payment securely.'
-                : 'Have questions about our programs or team training? Reach out to our admissions team and we will get back to you shortly.'}
+                : contactCopy.pageSubtitle}
             </p>
           </div>
 
@@ -416,8 +606,8 @@ export default function ContactPage() {
                         <Input
                           id="name"
                           name="name"
-                          label="Full Name"
-                          placeholder="John Doe"
+                          label={contactCopy.fullNameLabel}
+                          placeholder={contactCopy.fullNamePlaceholder}
                           required
                           value={name}
                           onChange={(event) => setName(event.target.value)}
@@ -428,8 +618,8 @@ export default function ContactPage() {
                           id="email"
                           name="email"
                           type="email"
-                          label="Work Email"
-                          placeholder="john@company.com"
+                          label={contactCopy.emailLabel}
+                          placeholder={contactCopy.emailPlaceholder}
                           required
                           value={email}
                           onChange={(event) => setEmail(event.target.value)}
@@ -437,22 +627,98 @@ export default function ContactPage() {
                       </div>
                       <div className={styles.formGroup}>
                         <Input
+                          id="phone"
+                          name="phone"
+                          type="tel"
+                          label={contactCopy.phoneLabel}
+                          placeholder={contactCopy.phonePlaceholder}
+                          required
+                          value={phone}
+                          onChange={(event) => setPhone(event.target.value)}
+                        />
+                      </div>
+                      <div className={styles.formGroup}>
+                        <label className={styles.label} htmlFor="scenario">
+                          {contactCopy.scenarioLabel}
+                          <span className={styles.required}>*</span>
+                        </label>
+                        <select
+                          id="scenario"
+                          name="scenario"
+                          className={styles.select}
+                          required
+                          value={scenario}
+                          onChange={(event) => setScenario(event.target.value as ContactScenario)}
+                        >
+                          {contactCopy.scenarioOptions.map((option) => (
+                            <option key={option.value} value={option.value}>
+                              {option.label}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                      <div className={styles.formGroup}>
+                        <Input
+                          id="company"
+                          name="company"
+                          label={contactCopy.companyLabel}
+                          placeholder={contactCopy.companyPlaceholder}
+                          value={company}
+                          onChange={(event) => setCompany(event.target.value)}
+                        />
+                      </div>
+                      <div className={styles.formGroup}>
+                        <label className={styles.label} htmlFor="preferredChannel">
+                          {contactCopy.preferredChannelLabel}
+                          <span className={styles.required}>*</span>
+                        </label>
+                        <select
+                          id="preferredChannel"
+                          name="preferredChannel"
+                          className={styles.select}
+                          required
+                          value={preferredChannel}
+                          onChange={(event) =>
+                            setPreferredChannel(event.target.value as PreferredChannel)
+                          }
+                        >
+                          {contactCopy.preferredChannelOptions.map((option) => (
+                            <option key={option.value} value={option.value}>
+                              {option.label}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                      <div className={styles.formGroup}>
+                        <Input
+                          id="preferredTime"
+                          name="preferredTime"
+                          label={contactCopy.preferredTimeLabel}
+                          placeholder={contactCopy.preferredTimePlaceholder}
+                          value={preferredTime}
+                          onChange={(event) => setPreferredTime(event.target.value)}
+                        />
+                      </div>
+                      <div className={styles.formGroup}>
+                        <Input
                           id="subject"
                           name="subject"
-                          label="Subject"
-                          placeholder="How can we help?"
-                          required
+                          label={contactCopy.subjectLabel}
+                          placeholder={contactCopy.subjectPlaceholder}
                           value={subject}
                           onChange={(event) => setSubject(event.target.value)}
                         />
                       </div>
                       <div className={styles.formGroup}>
-                        <label className={styles.label} htmlFor="message">Message<span className={styles.required}>*</span></label>
-                        <textarea 
+                        <label className={styles.label} htmlFor="message">
+                          {contactCopy.messageLabel}
+                          <span className={styles.required}>*</span>
+                        </label>
+                        <textarea
                           name="message"
-                          id="message" 
-                          className={styles.textarea} 
-                          placeholder="Tell us more about your inquiry..."
+                          id="message"
+                          className={styles.textarea}
+                          placeholder={contactCopy.messagePlaceholder}
                           rows={5}
                           required
                           value={message}
@@ -462,7 +728,7 @@ export default function ContactPage() {
                       {error ? <p style={{ color: '#ff4d4f', margin: 0 }}>{error}</p> : null}
                       {success ? <p style={{ color: '#22c55e', margin: 0 }}>{success}</p> : null}
                       <Button type="submit" variant="primary" size="lg" fullWidth disabled={sending}>
-                        {sending ? 'Sending…' : 'Send Message'}
+                        {sending ? contactCopy.submittingText : contactCopy.submitText}
                       </Button>
                     </form>
                   )}
@@ -473,7 +739,7 @@ export default function ContactPage() {
             {/* Contact Info Sidebar */}
             <div className={styles.infoColumn}>
               <div className={styles.infoBlock}>
-                <h3 className={styles.infoTitle}>Headquarters</h3>
+                <h3 className={styles.infoTitle}>{contactCopy.headquartersTitle}</h3>
                 <p className={styles.infoText}>
                   Dubai Design District (D3)<br />
                   Building 4, Office 302<br />
@@ -482,21 +748,21 @@ export default function ContactPage() {
               </div>
 
               <div className={styles.infoBlock}>
-                <h3 className={styles.infoTitle}>Direct Contact</h3>
+                <h3 className={styles.infoTitle}>{contactCopy.directContactTitle}</h3>
                 <p className={styles.infoText}>
-                  <strong>Email:</strong> admissions@nextacademyedu.com<br />
+                  <strong>Email:</strong> support@nextacademyedu.com<br />
                   <strong>Phone:</strong> +971 4 123 4567
                 </p>
               </div>
 
               <div className={styles.infoBlock}>
-                <h3 className={styles.infoTitle}>Quick Support</h3>
-                <p className={styles.infoText}>
-                  Need a faster response? Chat with our admission specialists directly on WhatsApp.
-                </p>
+                <h3 className={styles.infoTitle}>{contactCopy.quickSupportTitle}</h3>
+                <p className={styles.infoText}>{contactCopy.quickSupportBody}</p>
                 <div style={{ marginTop: '16px' }}>
                   <a href={whatsappUrl} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none' }}>
-                    <Button variant="outline" size="md">Chat on WhatsApp</Button>
+                    <Button variant="outline" size="md">
+                      {locale === 'ar' ? 'التواصل عبر واتساب' : 'Chat on WhatsApp'}
+                    </Button>
                   </a>
                 </div>
               </div>

@@ -65,6 +65,9 @@ export async function Footer() {
               <Link href={`/${locale}/privacy`}       className={styles.link}>{t('privacy')}</Link>
               <Link href={`/${locale}/terms`}         className={styles.link}>{t('terms')}</Link>
               <Link href={`/${locale}/refund-policy`} className={styles.link}>{t('refund')}</Link>
+              <Link href={`/${locale}/unsubscribe`} className={styles.link}>
+                {locale === 'ar' ? 'إلغاء الاشتراك' : 'Unsubscribe'}
+              </Link>
             </div>
             <div className={styles.column}>
               <h4 className={styles.heading}>{t('register')}</h4>

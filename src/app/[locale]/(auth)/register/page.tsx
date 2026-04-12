@@ -33,10 +33,9 @@ export default function RegisterPage() {
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [signupIntent, setSignupIntent] = useState<'student' | 'instructor' | 'b2b_manager'>(() => {
+  const [signupIntent, setSignupIntent] = useState<'student' | 'instructor'>(() => {
     const intent = searchParams.get('intent');
     if (intent === 'instructor') return 'instructor';
-    if (intent === 'b2b_manager') return 'b2b_manager';
     return 'student';
   });
   const [error, setError] = useState('');
@@ -58,13 +57,7 @@ export default function RegisterPage() {
       setSignupIntent('instructor');
       return;
     }
-    if (intentParam === 'b2b_manager') {
-      setSignupIntent('b2b_manager');
-      return;
-    }
-    if (intentParam === 'student') {
-      setSignupIntent('student');
-    }
+    setSignupIntent('student');
   }, [searchParams]);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -216,23 +209,6 @@ export default function RegisterPage() {
               }}
             >
               Instructor
-            </button>
-            <button
-              type="button"
-              onClick={() => setSignupIntent('b2b_manager')}
-              disabled={isLoading}
-              style={{
-                padding: '10px 14px',
-                borderRadius: '10px',
-                border: signupIntent === 'b2b_manager' ? '1px solid #c9a96e' : '1px solid rgba(255,255,255,0.16)',
-                background: signupIntent === 'b2b_manager' ? 'rgba(201,169,110,0.12)' : 'rgba(255,255,255,0.03)',
-                color: 'var(--text-primary)',
-                cursor: 'pointer',
-                fontSize: '13px',
-                fontWeight: 500,
-              }}
-            >
-              B2B Manager
             </button>
           </div>
         </div>
