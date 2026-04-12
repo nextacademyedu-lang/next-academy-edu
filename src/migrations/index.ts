@@ -18,6 +18,7 @@ import * as migration_20260411_020000_repair_schema_drift_for_auth_and_events fr
 import * as migration_20260411_030000_require_onboarding_program_details from './20260411_030000_require_onboarding_program_details';
 import * as migration_20260411_050000_update_course_revenue_share_terms from './20260411_050000_update_course_revenue_share_terms';
 import * as migration_20260412_010000_add_rounds_count_to_program_submissions from './20260412_010000_add_rounds_count_to_program_submissions';
+import * as migration_20260412_140000_repair_onboarding_schema_drift from './20260412_140000_repair_onboarding_schema_drift';
 
 export const migrations = [
   {
@@ -119,5 +120,10 @@ export const migrations = [
     up: migration_20260412_010000_add_rounds_count_to_program_submissions.up,
     down: migration_20260412_010000_add_rounds_count_to_program_submissions.down,
     name: '20260412_010000_add_rounds_count_to_program_submissions',
+  },
+  {
+    up: migration_20260412_140000_repair_onboarding_schema_drift.up,
+    down: migration_20260412_140000_repair_onboarding_schema_drift.down,
+    name: '20260412_140000_repair_onboarding_schema_drift',
   },
 ];
