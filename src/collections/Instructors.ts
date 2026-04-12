@@ -4,6 +4,10 @@ import {
   linkUserToInstructor,
   normalizeEmail,
 } from '../lib/instructor-account-link.ts';
+import {
+  sendInstructorProfileApproved,
+  sendInstructorProfileRejected,
+} from '../lib/email/instructor-emails.ts';
 
 export const Instructors: CollectionConfig = {
   slug: 'instructors',
@@ -73,53 +77,111 @@ export const Instructors: CollectionConfig = {
         const skipInstructorAutoLink = Boolean(
           (context as { skipInstructorAutoLink?: boolean } | undefined)?.skipInstructorAutoLink,
         );
-        if (skipInstructorAutoLink) return;
-
         const normalizedEmail = normalizeEmail(doc.email);
-        if (!normalizedEmail) return;
-
         const previousEmail = normalizeEmail(previousDoc?.email);
         const emailChanged = normalizedEmail !== previousEmail;
-        if (operation !== 'create' && !emailChanged) return;
 
-        const users = await req.payload.find({
+        if (
+          !skipInstructorAutoLink &&
+          normalizedEmail &&
+          (operation === 'create' || emailChanged)
+        ) {
+          const users = await req.payload.find({
+            collection: 'users',
+            where: {
+              and: [
+                { email: { equals: normalizedEmail } },
+                { emailVerified: { equals: true } },
+              ],
+            },
+            depth: 0,
+            limit: 2,
+            overrideAccess: true,
+            req,
+          });
+
+          if (users.docs.length > 1) {
+            console.warn(
+              `[Instructors.afterChange] Multiple users share email "${normalizedEmail}". Auto-link skipped.`,
+            );
+          } else if (users.docs.length === 1) {
+            const user = users.docs[0] as {
+              id: number | string;
+              email?: string | null;
+              role?: string | null;
+              emailVerified?: boolean | null;
+              instructorId?: unknown;
+            };
+
+            await linkUserToInstructor({
+              payload: req.payload,
+              req,
+              user,
+              instructorId: doc.id,
+              source: 'Instructors.afterChange',
+            });
+          }
+        }
+
+        const previousStatus =
+          typeof previousDoc?.verificationStatus === 'string'
+            ? previousDoc.verificationStatus
+            : null;
+        const nextStatus =
+          typeof doc?.verificationStatus === 'string'
+            ? doc.verificationStatus
+            : null;
+        const statusChanged =
+          operation === 'update' &&
+          !!nextStatus &&
+          previousStatus !== nextStatus &&
+          (nextStatus === 'approved' || nextStatus === 'rejected');
+        if (!statusChanged) return;
+
+        const recipientEmail =
+          typeof doc.email === 'string' && doc.email.trim().length > 0
+            ? doc.email.trim()
+            : normalizedEmail;
+        if (!recipientEmail) return;
+
+        const linkedUsers = await req.payload.find({
           collection: 'users',
-          where: {
-            and: [
-              { email: { equals: normalizedEmail } },
-              { emailVerified: { equals: true } },
-            ],
-          },
+          where: { instructorId: { equals: doc.id } },
           depth: 0,
-          limit: 2,
+          limit: 1,
           overrideAccess: true,
           req,
         });
+        const linkedUser = linkedUsers.docs[0] as
+          | { preferredLanguage?: string | null }
+          | undefined;
+        const locale = linkedUser?.preferredLanguage === 'en' ? 'en' : 'ar';
+        const userName =
+          `${doc.firstName || ''} ${doc.lastName || ''}`.trim() || recipientEmail;
 
-        if (!users.docs.length) return;
-
-        if (users.docs.length > 1) {
-          console.warn(
-            `[Instructors.afterChange] Multiple users share email "${normalizedEmail}". Auto-link skipped.`,
+        try {
+          if (nextStatus === 'approved') {
+            await sendInstructorProfileApproved({
+              to: recipientEmail,
+              userName,
+              locale,
+            });
+          } else if (nextStatus === 'rejected') {
+            const reason =
+              typeof doc.rejectionReason === 'string' ? doc.rejectionReason : null;
+            await sendInstructorProfileRejected({
+              to: recipientEmail,
+              userName,
+              locale,
+              reason,
+            });
+          }
+        } catch (emailErr) {
+          console.error(
+            `[Instructors.afterChange] Failed to send review status email for instructor #${doc.id}.`,
+            emailErr,
           );
-          return;
         }
-
-        const user = users.docs[0] as {
-          id: number | string;
-          email?: string | null;
-          role?: string | null;
-          emailVerified?: boolean | null;
-          instructorId?: unknown;
-        };
-
-        await linkUserToInstructor({
-          payload: req.payload,
-          req,
-          user,
-          instructorId: doc.id,
-          source: 'Instructors.afterChange',
-        });
       },
     ],
     beforeDelete: [

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useLocale } from 'next-intl';
 import { Check } from 'lucide-react';
@@ -112,6 +112,8 @@ interface ProfileForm {
   tagline: string;
   linkedinUrl: string;
   twitterUrl: string;
+  pictureId: string;
+  coverImageId: string;
 }
 
 interface ProgramForm {
@@ -122,7 +124,7 @@ interface ProgramForm {
   shortDescriptionEn: string;
   descriptionAr: string;
   descriptionEn: string;
-  categoryName: string;
+  categoryIds: string[];
   durationHours: string;
   sessionsCount: string;
   language: string;
@@ -140,16 +142,29 @@ interface ProgramForm {
   deliveryHistoryText: string;
 }
 
+type CategoryOption = {
+  id: string;
+  nameAr: string;
+  nameEn: string;
+  slug: string;
+};
+
 /* ─────────────────────────────────────────────────────
    Component
    ───────────────────────────────────────────────────── */
 export default function InstructorOnboardingPage() {
   const router = useRouter();
   const locale = useLocale();
+  const isAr = locale === 'ar';
 
   const [step, setStep] = useState(1);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
+  const [categories, setCategories] = useState<CategoryOption[]>([]);
+  const [categoriesLoading, setCategoriesLoading] = useState(true);
+  const [uploadingField, setUploadingField] = useState<'picture' | 'coverImage' | null>(null);
+  const [picturePreviewUrl, setPicturePreviewUrl] = useState('');
+  const [coverPreviewUrl, setCoverPreviewUrl] = useState('');
 
   // Step 1 form
   const [profile, setProfile] = useState<ProfileForm>({
@@ -159,6 +174,8 @@ export default function InstructorOnboardingPage() {
     tagline: '',
     linkedinUrl: '',
     twitterUrl: '',
+    pictureId: '',
+    coverImageId: '',
   });
 
   // Step 2 form
@@ -170,7 +187,7 @@ export default function InstructorOnboardingPage() {
     shortDescriptionEn: '',
     descriptionAr: '',
     descriptionEn: '',
-    categoryName: '',
+    categoryIds: [],
     durationHours: '',
     sessionsCount: '1',
     language: 'ar',
@@ -188,6 +205,41 @@ export default function InstructorOnboardingPage() {
     deliveryHistoryText: '',
   });
 
+  useEffect(() => {
+    let active = true;
+
+    fetch('/api/instructor/onboarding/categories', { credentials: 'include' })
+      .then(async (res) => {
+        const data = await res.json().catch(() => null);
+        if (!active) return;
+
+        if (!res.ok || !Array.isArray(data?.categories)) {
+          setCategories([]);
+          setCategoriesLoading(false);
+          return;
+        }
+
+        setCategories(
+          data.categories.map((item: CategoryOption) => ({
+            id: String(item.id),
+            nameAr: item.nameAr || '',
+            nameEn: item.nameEn || '',
+            slug: item.slug || '',
+          })),
+        );
+        setCategoriesLoading(false);
+      })
+      .catch(() => {
+        if (!active) return;
+        setCategories([]);
+        setCategoriesLoading(false);
+      });
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
   // Step 3 agreement
   const [acceptedClauses, setAcceptedClauses] = useState<Set<string>>(new Set());
 
@@ -203,6 +255,49 @@ export default function InstructorOnboardingPage() {
 
   const allClausesAccepted = acceptedClauses.size === AGREEMENT_CLAUSES.length;
 
+  const getCategoryLabel = (category: CategoryOption) =>
+    isAr
+      ? category.nameAr || category.nameEn || category.slug
+      : category.nameEn || category.nameAr || category.slug;
+
+  const uploadOnboardingMedia = async (field: 'picture' | 'coverImage', file: File) => {
+    setUploadingField(field);
+    setError('');
+
+    try {
+      const formData = new FormData();
+      formData.append('field', field);
+      formData.append('file', file);
+
+      const res = await fetch('/api/instructor/onboarding/media', {
+        method: 'POST',
+        credentials: 'include',
+        body: formData,
+      });
+
+      const data = await res.json().catch(() => null);
+      if (!res.ok || !data?.media?.id) {
+        setError(data?.error || 'Failed to upload image');
+        return;
+      }
+
+      const mediaId = String(data.media.id);
+      const mediaUrl = typeof data.media.url === 'string' ? data.media.url : '';
+
+      if (field === 'picture') {
+        setProfile((prev) => ({ ...prev, pictureId: mediaId }));
+        setPicturePreviewUrl(mediaUrl);
+      } else {
+        setProfile((prev) => ({ ...prev, coverImageId: mediaId }));
+        setCoverPreviewUrl(mediaUrl);
+      }
+    } catch {
+      setError('Network error while uploading image');
+    } finally {
+      setUploadingField(null);
+    }
+  };
+
   /* ── Validation ──────────────────────────────────── */
   const validateStep1 = () => {
     if (!profile.firstName.trim()) return 'الاسم الأول مطلوب / First name is required';
@@ -210,6 +305,8 @@ export default function InstructorOnboardingPage() {
     if (!profile.jobTitle.trim()) return 'المسمى الوظيفي مطلوب / Job title is required';
     if (!profile.tagline.trim()) return 'الشعار مطلوب / Tagline is required';
     if (!profile.linkedinUrl.trim()) return 'رابط LinkedIn مطلوب / LinkedIn URL is required';
+    if (!profile.pictureId) return 'الصورة الشخصية مطلوبة / Profile picture is required';
+    if (!profile.coverImageId) return 'صورة الغلاف مطلوبة / Cover image is required';
     return null;
   };
 
@@ -221,7 +318,7 @@ export default function InstructorOnboardingPage() {
     if (!program.shortDescriptionEn.trim()) return 'الوصف المختصر بالإنجليزي مطلوب / English short description is required';
     if (!program.descriptionAr.trim()) return 'الوصف الكامل بالعربي مطلوب / Arabic description is required';
     if (!program.descriptionEn.trim()) return 'الوصف الكامل بالإنجليزي مطلوب / English description is required';
-    if (!program.categoryName.trim()) return 'التصنيف مطلوب / Category is required';
+    if (!program.categoryIds.length) return 'اختيار التصنيف مطلوب / At least one category is required';
     const sc = Number(program.sessionsCount);
     if (!Number.isFinite(sc) || sc <= 0) return 'عدد الجلسات لازم يكون أكبر من 0 / Sessions count must be > 0';
     const duration = Number(program.durationHours);
@@ -274,6 +371,25 @@ export default function InstructorOnboardingPage() {
       return;
     }
 
+    const selectedCategoryLabels = Array.from(
+      new Set(
+        program.categoryIds
+          .map((categoryId) => {
+            const category = categories.find((item) => item.id === categoryId);
+            if (!category) return categoryId;
+            const label = getCategoryLabel(category).trim();
+            return label || category.slug || categoryId;
+          })
+          .filter(Boolean),
+      ),
+    );
+    if (!selectedCategoryLabels.length) {
+      setError('اختيار التصنيف مطلوب / At least one category is required');
+      return;
+    }
+
+    const { categoryIds, ...programPayload } = program;
+
     setSaving(true);
     setError('');
 
@@ -285,7 +401,8 @@ export default function InstructorOnboardingPage() {
         body: JSON.stringify({
           profile,
           program: {
-            ...program,
+            ...programPayload,
+            categoryName: selectedCategoryLabels.join(', '),
             durationHours: Number(program.durationHours),
             sessionsCount: Number(program.sessionsCount),
             price: Number(program.price),
@@ -406,6 +523,48 @@ export default function InstructorOnboardingPage() {
                 onChange={(e) => setProfile((p) => ({ ...p, twitterUrl: e.target.value }))}
                 placeholder="https://x.com/yourhandle"
               />
+            </div>
+            <div className={`${styles.fieldGroup} ${styles.fullWidth}`}>
+              <label>الصورة الشخصية / Profile Picture *</label>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (!file) return;
+                  void uploadOnboardingMedia('picture', file);
+                }}
+              />
+              {uploadingField === 'picture' && (
+                <p className={styles.helperText}>Uploading profile picture...</p>
+              )}
+              {picturePreviewUrl && (
+                <div className={styles.imagePreviewWrap}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={picturePreviewUrl} alt="Profile preview" className={styles.imagePreview} />
+                </div>
+              )}
+            </div>
+            <div className={`${styles.fieldGroup} ${styles.fullWidth}`}>
+              <label>صورة الغلاف / Cover Image *</label>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (!file) return;
+                  void uploadOnboardingMedia('coverImage', file);
+                }}
+              />
+              {uploadingField === 'coverImage' && (
+                <p className={styles.helperText}>Uploading cover image...</p>
+              )}
+              {coverPreviewUrl && (
+                <div className={styles.imagePreviewWrap}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={coverPreviewUrl} alt="Cover preview" className={styles.imagePreview} />
+                </div>
+              )}
             </div>
           </div>
 
@@ -556,13 +715,34 @@ export default function InstructorOnboardingPage() {
                 <option value="advanced">متقدم / Advanced</option>
               </select>
             </div>
-            <div className={styles.fieldGroup}>
+            <div className={`${styles.fieldGroup} ${styles.fullWidth}`}>
               <label>التصنيف / Category *</label>
-              <input
-                value={program.categoryName}
-                onChange={(e) => setProgram((p) => ({ ...p, categoryName: e.target.value }))}
-                placeholder="Marketing, Leadership..."
-              />
+              <select
+                multiple
+                value={program.categoryIds}
+                onChange={(e) => {
+                  const values = Array.from(
+                    e.currentTarget.selectedOptions,
+                    (option: HTMLOptionElement) => option.value,
+                  );
+                  setProgram((p) => ({ ...p, categoryIds: values }));
+                }}
+                size={Math.min(Math.max(categories.length, 3), 8)}
+                disabled={categoriesLoading || categories.length === 0}
+              >
+                {categories.map((category) => (
+                  <option key={category.id} value={category.id}>
+                    {getCategoryLabel(category)}
+                  </option>
+                ))}
+              </select>
+              <p className={styles.helperText}>
+                {categoriesLoading
+                  ? 'Loading categories...'
+                  : categories.length
+                    ? 'يمكنك اختيار أكثر من تصنيف (Ctrl/Cmd + Click) / You can pick multiple categories'
+                    : 'لا توجد تصنيفات متاحة حالياً / No active categories available'}
+              </p>
             </div>
             <div className={styles.fieldGroup}>
               <label>دربت كام متدرب قبل كده؟ / Previous Trainees Count *</label>

@@ -1,5 +1,5 @@
 /**
- * Auth email templates — 7 functions.
+ * Auth email templates — 8 functions.
  *
  * Uses buildEmailLayout + send from email-core and i18n from email-dictionary.
  */
@@ -7,6 +7,40 @@
 import { buildEmailLayout, send, APP_URL, greeting } from './email-core';
 import { t } from './email-dictionary';
 import type { Locale } from './email-core';
+
+// ─── 0. OTP Verification Code ───────────────────────────────────────────────
+
+export async function sendOtpVerificationCode(data: {
+  to: string;
+  userName: string;
+  code: string;
+  locale?: Locale;
+}): Promise<void> {
+  const locale = data.locale ?? 'ar';
+  const subject = locale === 'ar'
+    ? 'رمز التحقق الخاص بك — نيكست أكاديمي'
+    : 'Your verification code — Next Academy';
+  const title = locale === 'ar'
+    ? 'تأكيد البريد الإلكتروني'
+    : 'Verify your email address';
+  const body = locale === 'ar'
+    ? `${greeting(data.userName, locale)}\n\nاستخدم الرمز التالي لإكمال تأكيد البريد الإلكتروني:`
+    : `${greeting(data.userName, locale)}\n\nUse this code to complete email verification:`;
+
+  const html = buildEmailLayout(
+    {
+      title,
+      body,
+      infoBox: [[locale === 'ar' ? 'رمز التحقق' : 'Verification code', data.code]],
+      alert: locale === 'ar'
+        ? 'هذا الرمز صالح لمدة 10 دقائق فقط.'
+        : 'This code is valid for 10 minutes only.',
+    },
+    { locale },
+  );
+
+  await send(data.to, subject, html);
+}
 
 // ─── 1. Welcome ──────────────────────────────────────────────────────────────
 

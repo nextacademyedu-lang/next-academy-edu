@@ -36,6 +36,11 @@ const optionalButRecommended = [
   'GOOGLE_CLIENT_SECRET',
   'TWENTY_CRM_URL',
   'TWENTY_CRM_API_KEY',
+  'S3_BUCKET',
+  'S3_REGION',
+  'S3_ACCESS_KEY',
+  'S3_SECRET_KEY',
+  'S3_ENDPOINT',
 ];
 
 const placeholderPattern =
@@ -103,6 +108,25 @@ if (cronSecret && cronSecret.length < 32) {
 const twentyAppSecret = getValue('TWENTY_APP_SECRET');
 if (twentyAppSecret && twentyAppSecret.length < 32) {
   errors.push('TWENTY_APP_SECRET must be at least 32 characters');
+}
+
+const s3Bucket = getValue('S3_BUCKET');
+const s3AccessKey = getValue('S3_ACCESS_KEY');
+const s3SecretKey = getValue('S3_SECRET_KEY');
+const s3Endpoint = getValue('S3_ENDPOINT');
+const hasAnyS3 = Boolean(s3Bucket || s3AccessKey || s3SecretKey || s3Endpoint);
+const hasFullS3 = Boolean(s3Bucket && s3AccessKey && s3SecretKey);
+
+if (hasAnyS3 && !hasFullS3) {
+  errors.push(
+    'S3 media storage is partially configured. Set S3_BUCKET + S3_ACCESS_KEY + S3_SECRET_KEY together or remove all S3_* values.',
+  );
+}
+
+if (!hasAnyS3) {
+  warnings.push(
+    'S3 media storage is not configured. Uploaded images may be lost on redeploy unless Coolify mounts a persistent volume to /app/media.',
+  );
 }
 
 if (errors.length === 0) {

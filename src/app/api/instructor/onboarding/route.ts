@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getPayload } from 'payload';
 import config from '@payload-config';
+import { sendInstructorOnboardingSubmitted } from '@/lib/email/instructor-emails';
 
 type AuthUser = {
   role?: string | null;
@@ -35,6 +36,8 @@ interface OnboardingPayload {
     tagline: string;
     linkedinUrl: string;
     twitterUrl?: string;
+    pictureId: number | string;
+    coverImageId: number | string;
   };
   // Step 2: First program submission
   program: {
@@ -65,6 +68,14 @@ interface OnboardingPayload {
   // Step 3: Agreement
   clausesAccepted: string[];
 }
+
+type AuthenticatedUser = {
+  id: number | string;
+  email?: string | null;
+  firstName?: string | null;
+  lastName?: string | null;
+  preferredLanguage?: string | null;
+};
 
 export async function POST(req: NextRequest) {
   try {
@@ -105,6 +116,14 @@ export async function POST(req: NextRequest) {
     }
     if (!profile?.linkedinUrl?.trim()) {
       return NextResponse.json({ error: 'LinkedIn URL is required' }, { status: 400 });
+    }
+    const pictureId = relationToId(profile?.pictureId);
+    if (!pictureId) {
+      return NextResponse.json({ error: 'Profile picture is required' }, { status: 400 });
+    }
+    const coverImageId = relationToId(profile?.coverImageId);
+    if (!coverImageId) {
+      return NextResponse.json({ error: 'Cover image is required' }, { status: 400 });
     }
     if (!program?.titleAr?.trim()) {
       return NextResponse.json({ error: 'Arabic title is required' }, { status: 400 });
@@ -192,8 +211,13 @@ export async function POST(req: NextRequest) {
         tagline: profile.tagline?.trim() || undefined,
         linkedinUrl: profile.linkedinUrl?.trim() || undefined,
         twitterUrl: profile.twitterUrl?.trim() || undefined,
+        picture: pictureId,
+        coverImage: coverImageId,
         courseRevenueShare: 33,
         onboardingCompleted: true,
+        verificationStatus: 'pending',
+        submittedAt: now,
+        isActive: false,
         agreementAccepted: true,
         agreementAcceptedAt: now,
         agreementVersion: AGREEMENT_VERSION,
@@ -252,6 +276,22 @@ export async function POST(req: NextRequest) {
       overrideAccess: true,
       req,
     });
+
+    const authenticatedUser = user as AuthenticatedUser;
+    if (authenticatedUser?.email) {
+      try {
+        await sendInstructorOnboardingSubmitted({
+          to: authenticatedUser.email,
+          userName:
+            `${authenticatedUser.firstName || ''} ${authenticatedUser.lastName || ''}`.trim() ||
+            authenticatedUser.email,
+          programTitle: program.titleAr.trim() || program.titleEn.trim(),
+          locale: authenticatedUser.preferredLanguage,
+        });
+      } catch (emailError) {
+        console.error('[api/instructor/onboarding][POST] onboarding email failed:', emailError);
+      }
+    }
 
     return NextResponse.json({ success: true, onboardingCompleted: true });
   } catch (error) {

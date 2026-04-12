@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getPayload } from 'payload';
 import config from '@payload-config';
-import { Resend } from 'resend';
 import crypto from 'node:crypto';
+import { sendOtpVerificationCode } from '@/lib/email';
 
 // Simple in-memory rate limiter (per-process)
 const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
@@ -122,39 +122,21 @@ export async function POST(request: NextRequest) {
       req: request as any,
     });
 
-    // Send OTP via Resend
     if (!process.env.RESEND_API_KEY) {
-      console.error('RESEND_API_KEY is not configured');
       return NextResponse.json(
         { error: 'Email service is not configured' },
         { status: 500 },
       );
     }
 
-    const resend = new Resend(process.env.RESEND_API_KEY);
-
     const firstName = user.firstName || '';
+    const preferredLanguage = user.preferredLanguage === 'en' ? 'en' : 'ar';
 
-    await resend.emails.send({
-      from: `${process.env.RESEND_FROM_NAME || 'Next Academy'} <${process.env.RESEND_FROM_EMAIL || 'noreply@nextacademyedu.com'}>`,
+    await sendOtpVerificationCode({
       to: normalizedEmail,
-      subject: 'Verify your email — Next Academy',
-      html: `
-        <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 480px; margin: 0 auto; padding: 40px 24px; background: #0a0a0f; color: #ffffff;">
-          <div style="text-align: center; margin-bottom: 32px;">
-            <h1 style="font-size: 24px; font-weight: 700; color: #C9A96E; margin: 0;">Next Academy</h1>
-          </div>
-          <div style="background: #1a1a2e; border-radius: 12px; padding: 32px 24px; border: 1px solid rgba(201, 169, 110, 0.2);">
-            <p style="color: #d4d4d8; font-size: 16px; margin: 0 0 8px;">Hi ${firstName},</p>
-            <p style="color: #a1a1aa; font-size: 14px; margin: 0 0 24px;">Enter this code to verify your email address:</p>
-            <div style="text-align: center; margin: 24px 0;">
-              <span style="display: inline-block; background: linear-gradient(135deg, #C9A96E, #B8945A); color: #0a0a0f; font-size: 32px; font-weight: 800; letter-spacing: 8px; padding: 16px 32px; border-radius: 8px;">${otp}</span>
-            </div>
-            <p style="color: #71717a; font-size: 13px; text-align: center; margin: 16px 0 0;">This code expires in <strong>10 minutes</strong>.</p>
-          </div>
-          <p style="color: #52525b; font-size: 12px; text-align: center; margin-top: 24px;">If you didn't create an account, you can safely ignore this email.</p>
-        </div>
-      `,
+      userName: firstName || normalizedEmail,
+      code: otp,
+      locale: preferredLanguage,
     });
 
     return NextResponse.json(

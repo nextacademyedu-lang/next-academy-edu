@@ -4,6 +4,34 @@ import { withPayload } from '@payloadcms/next/withPayload';
 
 const withNextIntl = createNextIntlPlugin();
 
+function toRemotePattern(rawUrl: string | undefined) {
+  if (!rawUrl) return null;
+  try {
+    const parsed = new URL(rawUrl);
+    const protocol =
+      parsed.protocol === 'https:'
+        ? 'https'
+        : parsed.protocol === 'http:'
+          ? 'http'
+          : null;
+    if (!protocol) return null;
+    return {
+      protocol,
+      hostname: parsed.hostname,
+      port: parsed.port || undefined,
+      pathname: '/**',
+    } as const;
+  } catch {
+    return null;
+  }
+}
+
+const extraMediaPatterns = [
+  toRemotePattern(process.env.S3_ENDPOINT),
+  toRemotePattern(process.env.S3_PUBLIC_BASE_URL),
+  toRemotePattern(process.env.NEXT_PUBLIC_MEDIA_BASE_URL),
+].filter((pattern): pattern is NonNullable<typeof pattern> => Boolean(pattern));
+
 const nextConfig: NextConfig = {
   output: 'standalone',
   images: {
@@ -14,6 +42,7 @@ const nextConfig: NextConfig = {
       { protocol: 'https', hostname: 'img.youtube.com' },
       { protocol: 'http', hostname: 'localhost', port: '3000', pathname: '/api/media/**' },
       { protocol: 'http', hostname: '127.0.0.1', port: '3000', pathname: '/api/media/**' },
+      ...extraMediaPatterns,
     ],
     formats: ['image/avif', 'image/webp'],
   },

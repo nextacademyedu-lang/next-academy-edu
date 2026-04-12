@@ -39,6 +39,8 @@ WORKDIR /app
 
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
+ENV PAYLOAD_UPLOAD_DIR=/app/media
+ENV PAYLOAD_MEDIA_BASE_URL=/media
 
 # Coolify overrides the Dockerfile HEALTHCHECK with its own curl-based probe
 RUN apk add --no-cache curl

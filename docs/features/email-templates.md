@@ -49,6 +49,16 @@
 | 30 | `new-program-announcement` | New program published | 🆕 برنامج جديد: {programName} |
 | 31 | `round-cancelled` | Admin cancels round | ❌ للأسف الجولة اتلغت — {programName} |
 
+### 1.3 Instructor Operational Emails (Transactional)
+
+| # | Template ID | Trigger | Subject (AR) |
+|---|---|---|---|
+| 32 | `instructor-onboarding-submitted` | Instructor completes onboarding submission | ✅ تم استلام طلب انضمامك كمحاضر |
+| 33 | `instructor-profile-approved` | Admin approves instructor profile | 🎉 تم قبول ملفك كمحاضر |
+| 34 | `instructor-profile-rejected` | Admin rejects instructor profile | ⚠️ نتيجة مراجعة ملفك كمحاضر |
+| 35 | `instructor-program-approved` | Admin approves proposed program | ✅ تمت الموافقة على البرنامج المقترح |
+| 36 | `instructor-program-rejected` | Admin requests revisions on proposed program | ❌ تم طلب تعديلات على البرنامج المقترح |
+
 ---
 
 ## 2. Email Template Structure

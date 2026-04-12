@@ -1,5 +1,9 @@
 import type { CollectionConfig } from 'payload';
 import { isAdmin, isAdminRequest } from '../lib/access-control.ts';
+import {
+  sendInstructorProgramApproved,
+  sendInstructorProgramRejected,
+} from '../lib/email/instructor-emails.ts';
 
 export const InstructorProgramSubmissions: CollectionConfig = {
   slug: 'instructor-program-submissions',
@@ -39,6 +43,101 @@ export const InstructorProgramSubmissions: CollectionConfig = {
         }
 
         return next;
+      },
+    ],
+    afterChange: [
+      async ({ req, doc, previousDoc, operation }) => {
+        const previousStatus =
+          typeof previousDoc?.status === 'string' ? previousDoc.status : null;
+        const nextStatus = typeof doc?.status === 'string' ? doc.status : null;
+        const hasStatusTransition =
+          operation === 'update' &&
+          !!nextStatus &&
+          previousStatus !== nextStatus &&
+          (nextStatus === 'approved' || nextStatus === 'rejected');
+
+        if (!hasStatusTransition) return;
+
+        const submittedById =
+          typeof doc.submittedBy === 'object' && doc.submittedBy && 'id' in doc.submittedBy
+            ? (doc.submittedBy as { id: string | number }).id
+            : (doc.submittedBy as string | number | null);
+        const instructorId =
+          typeof doc.instructor === 'object' && doc.instructor && 'id' in doc.instructor
+            ? (doc.instructor as { id: string | number }).id
+            : (doc.instructor as string | number | null);
+
+        if (!submittedById || !instructorId) return;
+
+        const [userDoc, instructorDoc] = await Promise.all([
+          req.payload.findByID({
+            collection: 'users',
+            id: submittedById,
+            depth: 0,
+            overrideAccess: true,
+            req,
+          }),
+          req.payload.findByID({
+            collection: 'instructors',
+            id: instructorId,
+            depth: 0,
+            overrideAccess: true,
+            req,
+          }),
+        ]);
+
+        const user = userDoc as {
+          email?: string | null;
+          firstName?: string | null;
+          lastName?: string | null;
+          preferredLanguage?: string | null;
+        } | null;
+        const instructor = instructorDoc as
+          | {
+              firstName?: string | null;
+              lastName?: string | null;
+            }
+          | null;
+
+        const recipientEmail =
+          typeof user?.email === 'string' && user.email.trim().length > 0
+            ? user.email.trim()
+            : null;
+        if (!recipientEmail) return;
+
+        const userName =
+          `${user?.firstName || instructor?.firstName || ''} ${user?.lastName || instructor?.lastName || ''}`.trim() ||
+          recipientEmail;
+        const locale = user?.preferredLanguage === 'en' ? 'en' : 'ar';
+        const programTitle =
+          (typeof doc.titleAr === 'string' && doc.titleAr.trim()) ||
+          (typeof doc.titleEn === 'string' && doc.titleEn.trim()) ||
+          'Program';
+
+        try {
+          if (nextStatus === 'approved') {
+            await sendInstructorProgramApproved({
+              to: recipientEmail,
+              userName,
+              locale,
+              programTitle,
+            });
+          } else if (nextStatus === 'rejected') {
+            await sendInstructorProgramRejected({
+              to: recipientEmail,
+              userName,
+              locale,
+              programTitle,
+              reason:
+                typeof doc.reviewNotes === 'string' ? doc.reviewNotes : null,
+            });
+          }
+        } catch (emailErr) {
+          console.error(
+            `[InstructorProgramSubmissions.afterChange] Failed sending ${nextStatus} email for submission #${doc.id}.`,
+            emailErr,
+          );
+        }
       },
     ],
   },

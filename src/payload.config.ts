@@ -2,12 +2,65 @@ import { buildConfig } from 'payload';
 import type { EmailAdapter, SendEmailOptions } from 'payload';
 import { postgresAdapter } from '@payloadcms/db-postgres';
 import { lexicalEditor } from '@payloadcms/richtext-lexical';
+import { s3Storage } from '@payloadcms/storage-s3';
 import { Resend } from 'resend';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+function getStoragePlugins() {
+  const bucket = process.env.S3_BUCKET?.trim();
+  const accessKeyId = process.env.S3_ACCESS_KEY?.trim();
+  const secretAccessKey = process.env.S3_SECRET_KEY?.trim();
+  const endpoint = process.env.S3_ENDPOINT?.trim();
+  const region = process.env.S3_REGION?.trim() || 'auto';
+  const prefix = process.env.S3_MEDIA_PREFIX?.trim() || 'nextacademy/media';
+  const forcePathStyle = process.env.S3_FORCE_PATH_STYLE === 'true';
+
+  const hasAnyS3Config = Boolean(
+    bucket || accessKeyId || secretAccessKey || endpoint || process.env.S3_REGION,
+  );
+  const hasCompleteS3Config = Boolean(bucket && accessKeyId && secretAccessKey);
+
+  if (hasAnyS3Config && !hasCompleteS3Config) {
+    console.warn(
+      '[storage] Incomplete S3 config detected. Falling back to local /media uploads.',
+    );
+    return [];
+  }
+
+  if (!hasCompleteS3Config) {
+    console.warn(
+      '[storage] S3 upload storage is disabled. Uploaded files will be stored locally and can be lost on stateless deploys unless a persistent volume is attached to /app/media.',
+    );
+    return [];
+  }
+
+  return [
+    s3Storage({
+      collections: {
+        media: {
+          prefix,
+        },
+      },
+      bucket: bucket!,
+      config: {
+        credentials: {
+          accessKeyId: accessKeyId!,
+          secretAccessKey: secretAccessKey!,
+        },
+        endpoint: endpoint || undefined,
+        region,
+        forcePathStyle,
+      },
+      disableLocalStorage: true,
+    }),
+  ];
+}
+
+const storagePlugins = getStoragePlugins();
 
 import { Users } from './collections/Users.ts';
 import { Media } from './collections/Media.ts';
@@ -242,6 +295,7 @@ export default buildConfig({
     CompanyPolicies,
   ],
   editor: lexicalEditor({}),
+  plugins: storagePlugins,
   db: postgresAdapter({
     pool: {
       connectionString: process.env.DATABASE_URI,

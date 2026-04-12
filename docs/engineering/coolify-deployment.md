@@ -28,6 +28,7 @@
 10. Port 3001 is the internal app port. Nginx proxies to it. Never expose 3001 publicly.
 11. Do NOT rely on `env_file` for Coolify deployments; map runtime env vars explicitly.
 12. Do NOT pass production secrets as Docker build args.
+13. Media uploads are not persisted on Dockerfile-only deploys unless you configure S3/R2 (recommended) or attach a persistent volume to `/app/media`.
 ```
 
 ---
@@ -121,6 +122,21 @@ Set these in **Coolify → Service → Environment Variables**:
 | `RESEND_API_KEY` | `re_...` key from Resend dashboard |
 | `RESEND_FROM_EMAIL` | Verified sender address |
 | `RESEND_FROM_NAME` | Display name (e.g. `Next Academy`) |
+
+### Media Storage (Recommended)
+
+| Variable | Notes |
+|---|---|
+| `S3_BUCKET` | Bucket/container name for media uploads |
+| `S3_REGION` | Region (`auto` for Cloudflare R2) |
+| `S3_ACCESS_KEY` | Access key ID |
+| `S3_SECRET_KEY` | Secret access key |
+| `S3_ENDPOINT` | S3-compatible endpoint URL |
+| `S3_MEDIA_PREFIX` | Optional folder prefix (default `nextacademy/media`) |
+| `S3_FORCE_PATH_STYLE` | Set `true` for MinIO/some providers |
+| `S3_PUBLIC_BASE_URL` | Optional CDN/custom domain used for rendering media URLs |
+
+> If S3 vars are missing, uploads fallback to local `/app/media`. In that case, attach a persistent volume in Coolify to avoid losing images on redeploy.
 
 ### Auth
 

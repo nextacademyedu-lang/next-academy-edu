@@ -38,6 +38,11 @@ export function buildEmailLayout(content: EmailContent, options: LayoutOptions =
   const locale = options.locale || 'ar';
   const dir = locale === 'ar' ? 'rtl' : 'ltr';
   const year = new Date().getFullYear();
+  const bodyHtml = content.body
+    .split('\n')
+    .map((line) => line.trim())
+    .filter((line) => line.length > 0)
+    .join('<br /><br />');
 
   const infoBoxHtml = content.infoBox
     ? `<div style="background:#1a1a1a;border-radius:8px;padding:16px;margin:20px 0">
@@ -73,7 +78,7 @@ export function buildEmailLayout(content: EmailContent, options: LayoutOptions =
   </div>
   <div style="max-width:600px;margin:0 auto;padding:32px;background:#111111;border-radius:8px">
     <h1 style="font-size:24px;margin:0 0 16px;color:#F1F6F1">${content.title}</h1>
-    <div style="font-size:16px;line-height:1.7;color:#C5C5C5">${content.body}</div>
+    <div style="font-size:16px;line-height:1.7;color:#C5C5C5">${bodyHtml}</div>
     ${infoBoxHtml}
     ${alertHtml}
     ${ctaHtml}
@@ -104,9 +109,14 @@ export async function send(to: string, subject: string, html: string): Promise<v
     body: JSON.stringify({ from: FROM, to, subject, html }),
   });
 
-  if (!res.ok) {
-    const err = await res.text();
-    console.error('[email] Failed to send:', err);
+  const payload = await res.json().catch(() => null);
+
+  if (!res.ok || payload?.error) {
+    const message =
+      (payload && typeof payload.error?.message === 'string' && payload.error.message) ||
+      (payload && typeof payload.message === 'string' && payload.message) ||
+      `HTTP ${res.status}`;
+    throw new Error(`[email] Failed to send "${subject}" to ${to}: ${message}`);
   }
 }
 

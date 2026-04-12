@@ -112,6 +112,11 @@ npm run check:env
 | `S3_ACCESS_KEY` | `AKIAIOSFODNN7EXAMPLE` | ⬜ | Access key |
 | `S3_SECRET_KEY` | `wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY` | ⬜ | Secret key |
 | `S3_ENDPOINT` | `https://abc.r2.cloudflarestorage.com` | ⬜ | S3-compatible endpoint |
+| `S3_MEDIA_PREFIX` | `nextacademy/media` | ⬜ | Folder prefix for uploaded assets |
+| `S3_FORCE_PATH_STYLE` | `false` | ⬜ | Set `true` for MinIO / some S3-compatible providers |
+| `S3_PUBLIC_BASE_URL` | `https://cdn.nextacademyedu.com` | ⬜ | Optional CDN/custom domain used to render media URLs |
+| `PAYLOAD_UPLOAD_DIR` | `/app/media` | ⬜ | Local upload directory used when S3 is disabled |
+| `PAYLOAD_MEDIA_BASE_URL` | `/media` | ⬜ | Public base URL for locally stored media |
 
 ### Rate Limiting
 

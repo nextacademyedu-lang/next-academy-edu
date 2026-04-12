@@ -1,7 +1,7 @@
 /**
  * Barrel re-export — preserves `@/lib/email` import path.
  *
- * 31 template functions + 2 legacy aliases (33 total).
+ * 37 template functions + 2 legacy aliases (39 total).
  */
 
 // ── Core utilities (not re-exported — internal only) ─────────────────────────
@@ -10,6 +10,7 @@
 // ── Template modules ─────────────────────────────────────────────────────────
 
 export {
+  sendOtpVerificationCode,
   sendWelcome,
   sendEmailVerification,
   sendPasswordReset,
@@ -51,6 +52,14 @@ export {
   sendInactiveUser,
   sendNewProgramAnnouncement,
 } from './engagement-emails';
+
+export {
+  sendInstructorOnboardingSubmitted,
+  sendInstructorProfileApproved,
+  sendInstructorProfileRejected,
+  sendInstructorProgramApproved,
+  sendInstructorProgramRejected,
+} from './instructor-emails';
 
 // ── Legacy aliases (backward compatibility) ──────────────────────────────────
 
