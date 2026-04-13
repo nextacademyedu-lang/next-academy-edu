@@ -1,7 +1,8 @@
 "use client";
 
 import React, { FormEvent, useEffect, useMemo, useState } from 'react';
-import { usePathname, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
+import { useLocale } from 'next-intl';
 import { Navbar } from '@/components/layout/navbar';
 import { Footer } from '@/components/layout/footer';
 import { Card, CardContent } from '@/components/ui/card';
@@ -84,9 +85,9 @@ function isValidPhone(value: string): boolean {
 }
 
 export default function ContactPage() {
-  const pathname = usePathname();
+  const localeValue = useLocale();
+  const locale = localeValue === 'en' ? 'en' : 'ar';
   const searchParams = useSearchParams();
-  const locale = pathname.split('/').filter(Boolean)[0] === 'en' ? 'en' : 'ar';
   const intent = searchParams.get('intent');
   const instructorSlug = (searchParams.get('instructor') || '').trim();
   const payment = searchParams.get('payment');
@@ -287,9 +288,9 @@ export default function ContactPage() {
   }, [consultationInfo, selectedTypeId]);
 
   const loginPath = useMemo(() => {
-    const current = `${pathname}${typeof window !== 'undefined' ? window.location.search : ''}`;
+    const current = `/${locale}/contact${typeof window !== 'undefined' ? window.location.search : ''}`;
     return `/${locale}/login?redirect=${encodeURIComponent(current)}`;
-  }, [locale, pathname]);
+  }, [locale]);
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();

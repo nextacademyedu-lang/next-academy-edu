@@ -1,7 +1,8 @@
 'use client';
 
 import React, { FormEvent, useMemo, useState } from 'react';
-import { usePathname, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
+import { useLocale } from 'next-intl';
 import { Navbar } from '@/components/layout/navbar';
 import { Footer } from '@/components/layout/footer';
 import { Card, CardContent } from '@/components/ui/card';
@@ -14,9 +15,9 @@ function isValidEmail(email: string): boolean {
 }
 
 export default function UnsubscribePage() {
-  const pathname = usePathname();
+  const localeValue = useLocale();
+  const locale = localeValue === 'en' ? 'en' : 'ar';
   const searchParams = useSearchParams();
-  const locale = pathname.split('/').filter(Boolean)[0] === 'en' ? 'en' : 'ar';
   const copy = useMemo(
     () =>
       locale === 'ar'
