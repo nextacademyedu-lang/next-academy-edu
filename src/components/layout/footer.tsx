@@ -1,11 +1,13 @@
+'use client';
+
 import React from 'react';
 import Link from 'next/link';
-import { getTranslations, getLocale } from 'next-intl/server';
+import { useLocale, useTranslations } from 'next-intl';
 import styles from './footer.module.css';
 
-export async function Footer() {
-  const t = await getTranslations('Footer');
-  const locale = await getLocale();
+export function Footer() {
+  const t = useTranslations('Footer');
+  const locale = useLocale();
   const socialLinks = [
     { label: 'LinkedIn', href: process.env.NEXT_PUBLIC_SOCIAL_LINKEDIN_URL || '' },
     { label: 'X / Twitter', href: process.env.NEXT_PUBLIC_SOCIAL_X_URL || '' },
