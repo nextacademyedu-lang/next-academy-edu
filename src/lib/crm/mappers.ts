@@ -154,6 +154,9 @@ export function mapUserToTwentyPerson(params: {
     jobTitle: (profile ? getString(profile.jobTitle) : undefined) || '',
     city: (profile ? getString(profile.city) : undefined) || '',
     createdAt: toIso(user.createdAt) || '',
+    gender: (user ? getString(user.gender) : undefined),
+    yearsOfExperience: (profile ? getString(profile.experience) : undefined),
+    specialization: (profile ? getString(profile.workField) : undefined),
   };
 }
 
@@ -256,6 +259,9 @@ export function mapBookingToTwentyOpportunity(params: {
 
   return {
     name: `${programTitle} | ${userName} | ${bookingCode} | ${status}`,
+    bookingType: 'Program',
+    promoCode: getString(booking.discountCode),
+    discount: getNumber(booking.discountAmount) ? String(getNumber(booking.discountAmount)) : undefined,
   };
 }
 
@@ -368,6 +374,9 @@ export function mapConsultationToTwentyOpportunity(params: {
 
   return {
     name: `${typeTitle} | ${userName} | ${bookingCode} | ${status}`,
+    bookingType: 'Consultation',
+    promoCode: getString(consultation.bookingCode), // Not the strictly right field perhaps but we map bookingCode or discountCode if we had one.
+    discount: getNumber(consultation.discountAmount) ? String(getNumber(consultation.discountAmount)) : undefined,
   };
 }
 
