@@ -6,6 +6,7 @@ import {
   mapConsultationToCrmDeal,
   mapConsultationToTwentyOpportunity,
   mapLeadToCrm,
+  mapLeadToTwentyPerson,
   mapPaymentToCrmDealPatch,
   mapPaymentToTwentyOpportunityPatch,
   mapUserToTwentyPerson,
@@ -310,8 +311,34 @@ export class CRMService {
     });
     if (!lead) return { skipped: true, reason: 'Lead not found' };
 
-    const leadPayload = mapLeadToCrm(lead);
-    const result = await this.client.upsert('leads', leadPayload.externalId, leadPayload);
+    const email = getString(lead.email);
+    const existingContactId = getString(lead.twentyCrmLeadId); // We repurpose this field to hold the contact ID.
+    const contactsResourcePath = this.client.getResourcePath('contacts');
+    let result: { id: string | null; raw: unknown };
+
+    if (contactsResourcePath === 'people') {
+      const personPayload = mapLeadToTwentyPerson(lead);
+      if (existingContactId) {
+        try {
+          result = await this.client.updateById('contacts', existingContactId, personPayload);
+        } catch {
+          result = await this.client.create('contacts', personPayload);
+        }
+      } else {
+        const discoveredContactId = email
+          ? await this.client.findPersonByPrimaryEmail(email)
+          : null;
+
+        if (discoveredContactId) {
+          result = await this.client.updateById('contacts', discoveredContactId, personPayload);
+        } else {
+          result = await this.client.create('contacts', personPayload);
+        }
+      }
+    } else {
+      const leadPayload = mapLeadToCrm(lead);
+      result = await this.client.upsert('contacts', leadPayload.externalId, leadPayload);
+    }
 
     if (result.id) {
       await this.updateLocalCrmId({

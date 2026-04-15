@@ -157,6 +157,8 @@ export function mapUserToTwentyPerson(params: {
     gender: (user ? getString(user.gender) : undefined),
     yearsOfExperience: (profile ? getString(profile.experience) : undefined),
     specialization: (profile ? getString(profile.workField) : undefined),
+    lifecycleStage: mapLifecycleStage(getString(user.lifecycleStage)),
+    contactSource: getString(user.contactSource) || 'website',
   };
 }
 
@@ -188,6 +190,40 @@ export function mapLeadToCrm(lead: Record<string, unknown>) {
       : undefined,
     sourceSystem: 'nextacademy',
     lastSyncedAt: new Date().toISOString(),
+  };
+}
+
+/**
+ * Maps Payload CMS Lead to Twenty's default `people` object schema.
+ */
+export function mapLeadToTwentyPerson(lead: Record<string, unknown>) {
+  const firstName = getString(lead.firstName) || '';
+  const lastName = getString(lead.lastName) || '';
+  const email = getString(lead.email) || '';
+  const phoneRaw = getString(lead.phone) || '';
+  const phoneNormalized = phoneRaw
+    .replace(/\s+/g, '')
+    .replace(/^(\+?20)/, '')
+    .replace(/^0/, '');
+
+  return {
+    name: {
+      firstName,
+      lastName,
+    },
+    emails: {
+      primaryEmail: email,
+      additionalEmails: [],
+    },
+    phones: {
+      primaryPhoneNumber: phoneNormalized,
+      primaryPhoneCountryCode: phoneNormalized ? 'EG' : '',
+      primaryPhoneCallingCode: phoneNormalized ? '+20' : '',
+      additionalPhones: [],
+    },
+    jobTitle: getString(lead.jobTitle) || '',
+    lifecycleStage: 'lead',
+    contactSource: getString(lead.source) || 'lead_form',
   };
 }
 
