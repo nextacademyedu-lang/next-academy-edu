@@ -19,6 +19,17 @@ interface Tag {
   name: string;
 }
 
+interface CompanyOption {
+  id: string;
+  name: string;
+}
+
+const REQUIRED_STEP_FIELDS: Record<number, string[]> = {
+  1: ['title', 'jobTitle', 'workField', 'yearsOfExperience', 'phone'],
+  2: ['company', 'companySize', 'companyType', 'country', 'city'],
+  3: ['howDidYouHear'],
+};
+
 function relationToId(value: unknown): number | undefined {
   if (typeof value === 'number') return value;
   if (typeof value === 'string') {
@@ -52,6 +63,7 @@ export default function OnboardingPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [availableTags, setAvailableTags] = useState<Tag[]>([]);
+  const [companyOptions, setCompanyOptions] = useState<CompanyOption[]>([]);
 
   // Step data
   const [step1, setStep1] = useState<Step1Data>({
@@ -59,9 +71,12 @@ export default function OnboardingPage() {
     jobTitle: '',
     workField: '',
     yearsOfExperience: '',
+    phone: '',
+    gender: '',
   });
 
   const [step2, setStep2] = useState<Step2Data>({
+    companyId: '',
     company: '',
     companySize: '',
     companyType: '',
@@ -75,24 +90,39 @@ export default function OnboardingPage() {
     howDidYouHear: '',
   });
 
-  // Fetch tags for Step 3
+  // Fetch metadata for onboarding form
   useEffect(() => {
-    async function fetchTags() {
+    async function fetchOnboardingMetadata() {
       try {
-        const res = await fetch('/api/tags?limit=50&depth=0');
-        if (res.ok) {
-          const data = await res.json();
-          const tags = (data.docs || []).map((tag: { id: string; name?: string; title?: string }) => ({
-            id: tag.id,
+        const [tagsRes, companiesRes] = await Promise.all([
+          fetch('/api/tags?limit=50&depth=0'),
+          fetch('/api/companies?limit=250&depth=0&sort=name'),
+        ]);
+
+        if (tagsRes.ok) {
+          const tagsData = await tagsRes.json();
+          const tags = (tagsData.docs || []).map((tag: { id: string; name?: string; title?: string }) => ({
+            id: String(tag.id),
             name: tag.name || tag.title || 'Unnamed',
           }));
           setAvailableTags(tags);
         }
+
+        if (companiesRes.ok) {
+          const companiesData = await companiesRes.json();
+          const companies = (companiesData.docs || [])
+            .map((company: { id: string | number; name?: string }) => ({
+              id: String(company.id),
+              name: (company.name || '').trim(),
+            }))
+            .filter((company: CompanyOption) => company.name.length > 0);
+          setCompanyOptions(companies);
+        }
       } catch {
-        // Non-critical: tags just won't appear
+        // Non-critical
       }
     }
-    fetchTags();
+    fetchOnboardingMetadata();
   }, []);
 
   // Redirect if not logged in
@@ -102,8 +132,31 @@ export default function OnboardingPage() {
     }
   }, [user, router, locale]);
 
+  const isStepValid = (step: number): boolean => {
+    const fields = REQUIRED_STEP_FIELDS[step];
+    if (!fields) return true;
+
+    const dataMap: Record<number, Record<string, unknown>> = {
+      1: step1 as unknown as Record<string, unknown>,
+      2: step2 as unknown as Record<string, unknown>,
+      3: step3 as unknown as Record<string, unknown>,
+    };
+    const data = dataMap[step];
+    if (!data) return true;
+
+    return fields.every((field) => {
+      const value = data[field];
+      if (Array.isArray(value)) return value.length > 0;
+      return typeof value === 'string' && value.trim().length > 0;
+    });
+  };
+
   const handleNext = () => {
     if (currentStep < TOTAL_STEPS) {
+      if (!isStepValid(currentStep)) {
+        setError(t('fillAllFields'));
+        return;
+      }
       setCurrentStep((prev) => prev + 1);
       setError('');
     }
@@ -117,6 +170,10 @@ export default function OnboardingPage() {
   };
 
   const handleComplete = async () => {
+    if (!isStepValid(currentStep)) {
+      setError(t('fillAllFields'));
+      return;
+    }
     setIsLoading(true);
     setError('');
 
@@ -173,6 +230,19 @@ export default function OnboardingPage() {
         return;
       }
 
+      // Save phone & gender to user record
+      if (step1.phone || step1.gender) {
+        await fetch(`/api/users/${user?.id}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({
+            phone: step1.phone || undefined,
+            gender: step1.gender || undefined,
+          }),
+        });
+      }
+
       const profilePayload = {
         user: user?.id,
         title: step1.title || undefined,
@@ -220,11 +290,7 @@ export default function OnboardingPage() {
     }
   };
 
-  const handleSkip = () => {
-    const role = user?.role || 'user';
-    const dashboardPath = getDashboardPath(role, locale);
-    router.push(dashboardPath);
-  };
+  // Skip removed — all onboarding fields are required
 
   return (
     <div className={styles.onboardingContainer}>
@@ -281,7 +347,7 @@ export default function OnboardingPage() {
             <OnboardingStep1 data={step1} onChange={setStep1} />
           )}
           {currentStep === 2 && (
-            <OnboardingStep2 data={step2} onChange={setStep2} />
+            <OnboardingStep2 data={step2} onChange={setStep2} companyOptions={companyOptions} />
           )}
           {currentStep === 3 && (
             <OnboardingStep3
@@ -332,11 +398,7 @@ export default function OnboardingPage() {
         )}
       </div>
 
-      <div className={styles.skipLink}>
-        <button type="button" onClick={handleSkip}>
-          {t('skipForNow')}
-        </button>
-      </div>
+
     </div>
   );
 }

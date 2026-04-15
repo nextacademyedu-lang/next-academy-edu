@@ -8,6 +8,8 @@ interface Step1Data {
   jobTitle: string;
   workField: string;
   yearsOfExperience: string;
+  phone: string;
+  gender: string;
 }
 
 interface Step1Props {
@@ -107,6 +109,38 @@ export function OnboardingStep1({ data, onChange }: Step1Props) {
             </option>
           ))}
         </select>
+      </div>
+
+      <div className={styles.row}>
+        <div className={styles.inputGroup}>
+          <label className={styles.label} htmlFor="ob-phone">
+            {t('phoneLabel')}
+          </label>
+          <input
+            id="ob-phone"
+            className={styles.input}
+            type="tel"
+            placeholder={t('phonePlaceholder')}
+            value={data.phone}
+            onChange={(e) => update('phone', e.target.value)}
+          />
+        </div>
+
+        <div className={styles.inputGroup}>
+          <label className={styles.label} htmlFor="ob-gender">
+            {t('genderLabel')}
+          </label>
+          <select
+            id="ob-gender"
+            className={styles.select}
+            value={data.gender}
+            onChange={(e) => update('gender', e.target.value)}
+          >
+            <option value="">{t('selectGender')}</option>
+            <option value="male">{t('genderMale')}</option>
+            <option value="female">{t('genderFemale')}</option>
+          </select>
+        </div>
       </div>
     </div>
   );

@@ -82,6 +82,39 @@ export interface ProfileUpdatePayload {
   firstName?: string;
   lastName?: string;
   phone?: string;
+  gender?: 'male' | 'female';
+}
+
+export interface ExtendedProfilePayload {
+  title?: string;
+  jobTitle?: string;
+  workField?: string;
+  yearsOfExperience?: string;
+  company?: number | string;
+  companySize?: string;
+  companyType?: string;
+  country?: string;
+  city?: string;
+  linkedinUrl?: string;
+  learningGoals?: string;
+}
+
+export interface ExtendedProfileData {
+  id: string;
+  title?: string;
+  jobTitle?: string;
+  workField?: string;
+  yearsOfExperience?: string;
+  company?: { id: string; name: string } | string | number | null;
+  companySize?: string;
+  companyType?: string;
+  country?: string;
+  city?: string;
+  linkedinUrl?: string;
+  learningGoals?: string;
+  howDidYouHear?: string;
+  interests?: Array<{ id: string; name?: string }> | string[];
+  onboardingCompleted?: boolean;
 }
 
 // ─────────────────────────────────────────────
@@ -147,6 +180,29 @@ export async function updateUserProfile(
   data: ProfileUpdatePayload,
 ): Promise<AuthResponse<{ doc: Record<string, unknown> }>> {
   const response = await fetch(`/api/users/${userId}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
+    body: JSON.stringify(data),
+  });
+  return handleResponse<{ doc: Record<string, unknown> }>(response);
+}
+
+export async function getUserExtendedProfile(
+  userId: string,
+): Promise<AuthResponse<PayloadListResponse<ExtendedProfileData>>> {
+  const response = await fetch(
+    `/api/user-profiles?where[user][equals]=${userId}&depth=1&limit=1`,
+    { credentials: 'include' },
+  );
+  return handleResponse<PayloadListResponse<ExtendedProfileData>>(response);
+}
+
+export async function updateUserExtendedProfile(
+  profileId: string,
+  data: ExtendedProfilePayload,
+): Promise<AuthResponse<{ doc: Record<string, unknown> }>> {
+  const response = await fetch(`/api/user-profiles/${profileId}`, {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },
     credentials: 'include',

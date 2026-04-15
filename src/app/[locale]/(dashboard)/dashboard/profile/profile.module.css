@@ -136,6 +136,24 @@
   color: var(--text-muted);
 }
 
+.selectField {
+  width: 100%;
+  padding: 10px 14px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-default);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: 14px;
+  font-family: inherit;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.selectField:focus {
+  outline: none;
+  border-color: var(--accent-primary);
+}
+
 .actionsRow {
   margin-top: 4px;
 }
