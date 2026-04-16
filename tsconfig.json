@@ -46,6 +46,8 @@
     "ramadan-event",
     "e2e-prod-test",
     "cardo",
-    "mekk"
+    "mekk",
+    "vitest.config.ts",
+    "src/__tests__"
   ]
 }
