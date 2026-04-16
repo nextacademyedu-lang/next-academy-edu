@@ -5,7 +5,10 @@ import { enqueueCrmSyncEvent } from '../lib/crm/queue.ts';
 
 export const Payments: CollectionConfig = {
   slug: 'payments',
-  admin: { useAsTitle: 'paymentCode' },
+  admin: {
+    useAsTitle: 'paymentCode',
+    defaultColumns: ['paymentCode', 'amount', 'status', 'paymentMethod', 'currency', 'reconciliationStatus', 'dueDate', 'paidDate'],
+  },
   access: {
     read: isAdminOrOwnerByField('booking.user'),
     create: isAdmin,

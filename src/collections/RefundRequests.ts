@@ -6,6 +6,7 @@ export const RefundRequests: CollectionConfig = {
   admin: {
     useAsTitle: 'id',
     group: 'Finance',
+    defaultColumns: ['id', 'amount', 'status', 'reason', 'processedAt', 'createdAt'],
   },
   access: {
     read: isAdminOrOwnerByField('requestedBy'),

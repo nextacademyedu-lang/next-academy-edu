@@ -36,7 +36,10 @@ function resolveBookingAction(params: {
 
 export const Bookings: CollectionConfig = {
   slug: 'bookings',
-  admin: { useAsTitle: 'bookingCode' },
+  admin: {
+    useAsTitle: 'bookingCode',
+    defaultColumns: ['bookingCode', 'status', 'totalAmount', 'finalAmount', 'bookingSource', 'bookingType', 'createdAt'],
+  },
   access: {
     read: isAdminOrOwner,
     create: isAuthenticated,
