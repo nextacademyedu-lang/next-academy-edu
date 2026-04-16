@@ -3,7 +3,8 @@
 import { useTranslations } from 'next-intl';
 import styles from './onboarding.module.css';
 
-interface Step2Data {
+export interface Step2Data {
+  companyId: string;
   company: string;
   companySize: string;
   companyType: string;
@@ -14,11 +15,12 @@ interface Step2Data {
 interface Step2Props {
   data: Step2Data;
   onChange: (data: Step2Data) => void;
+  companyOptions: Array<{ id: string; name: string }>;
 }
 
 const COMPANY_SIZE_OPTIONS = ['', '1-10', '11-50', '51-200', '201-500', '500+'];
 
-export function OnboardingStep2({ data, onChange }: Step2Props) {
+export function OnboardingStep2({ data, onChange, companyOptions }: Step2Props) {
   const t = useTranslations('Auth');
 
   const update = (field: keyof Step2Data, value: string) => {
@@ -44,10 +46,26 @@ export function OnboardingStep2({ data, onChange }: Step2Props) {
           id="ob-company"
           className={styles.input}
           type="text"
+          list="company-options-list"
           placeholder={t('companyPlaceholder')}
           value={data.company}
-          onChange={(e) => update('company', e.target.value)}
+          onChange={(e) => {
+            const value = e.target.value;
+            const match = companyOptions.find(
+              (company) => company.name.trim().toLowerCase() === value.trim().toLowerCase(),
+            );
+            onChange({
+              ...data,
+              company: value,
+              companyId: match ? String(match.id) : '',
+            });
+          }}
         />
+        <datalist id="company-options-list">
+          {companyOptions.map((company) => (
+            <option key={company.id} value={company.name} />
+          ))}
+        </datalist>
       </div>
 
       <div className={styles.row}>
@@ -121,4 +139,3 @@ export function OnboardingStep2({ data, onChange }: Step2Props) {
   );
 }
 
-export type { Step2Data };
