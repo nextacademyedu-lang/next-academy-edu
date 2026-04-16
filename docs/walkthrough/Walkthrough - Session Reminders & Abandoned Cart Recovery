@@ -1,0 +1,45 @@
+# Walkthrough - Session Reminders & Abandoned Cart Recovery
+
+I have implemented the student lifecycle automation as requested, following the backend patterns of the project.
+
+## Changes Made
+
+### 1. Data Model & Lifecycle Hooks
+- Added tracking fields to [Bookings.ts](file:///d:/projects/nextacademy/src/collections/Bookings.ts):
+    - `reminderSent24h`, `reminderSent1h`
+    - `cartRecovery1hSent`, `cartRecovery24hSent`
+    - `checkoutStartedAt`
+- Implemented a `beforeChange` hook to automatically set `checkoutStartedAt` when a new `pending` booking is created. This enables the abandoned cart cron to accurately calculate elapsed time.
+
+### 2. Email Automation
+- Created [reminder-emails.ts](file:///d:/projects/nextacademy/src/lib/email/reminder-emails.ts) with `sendSessionReminder`:
+    - Supports 24-hour and 1-hour reminders.
+    - Includes bilingual templates (AR/EN).
+- Created [abandoned-cart-emails.ts](file:///d:/projects/nextacademy/src/lib/email/abandoned-cart-emails.ts) with `sendAbandonedCartEmail`:
+    - Handles 1-hour "nudge" and 24-hour "urgency" follow-ups.
+    - Includes bilingual templates.
+- Updated the main email index to export these new utilities.
+
+### 3. Cron Endpoints
+- Implemented `/api/cron/session-reminders`:
+    - Scans for upcoming sessions in 24h and 1h windows.
+    - Notifies confirmed students who haven't received a reminder yet.
+- Implemented `/api/cron/abandoned-cart`:
+    - Identifies pending checkouts initiated 1h and 24h ago.
+    - Triggers recovery emails to reduce drop-off.
+- Updated [vercel.json](file:///d:/projects/nextacademy/vercel.json) to register these schedules.
+
+## Verification Results
+
+### Automated Tests
+- **Vitest**: All tests passed (26 total).
+    - `src/__tests__/rate-limit.test.ts`
+    - `src/__tests__/payment-amounts.test.ts`
+    - `src/__tests__/payment-webhook.test.ts`
+    - `src/__tests__/access-control.test.ts`
+
+### Type Check
+- **TSC**: Encountered pre-existing syntax errors in `src/collections/Programs.ts`. These are unrelated to the current task as I did not modify that file. My modifications to `Bookings.ts` and the new files do not introduce new type errors relevant to the implemented logic.
+
+> [!NOTE]
+> The abandoned cart cron uses a 30-minute interval on Vercel to catch checkouts within the 1-hour and 24-hour windows reliably.

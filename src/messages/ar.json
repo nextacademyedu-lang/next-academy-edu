@@ -284,7 +284,15 @@
     "updatePassword": "تحديث كلمة المرور",
     "updatingPassword": "جاري التحديث...",
     "linkedinLabel": "رابط LinkedIn",
-    "linkedinPlaceholder": "https://linkedin.com/in/your-profile"
+    "linkedinPlaceholder": "https://linkedin.com/in/your-profile",
+    "dangerZone": "منطقة الخطر",
+    "deleteAccountDesc": "بمجرد حذف حسابك، لن تتمكن من التراجع. يرجى التأكد من قرارك.",
+    "deleteAccountBtn": "حذف حسابي",
+    "deleteAccountTitle": "حذف حسابك",
+    "deleteConfirmText": "يرجى كتابة DELETE لتأكيد الحذف",
+    "deleteWarning": "هذا الإجراء نهائي وسيؤدي إلى إزالة جميع بياناتك، بما في ذلك الشهادات والتقدم.",
+    "cancel": "إلغاء",
+    "deleting": "جاري الحذف..."
   },
   "ProgramDetail": {
     "ledBy": "بقيادة",

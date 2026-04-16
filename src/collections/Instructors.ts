@@ -1,5 +1,7 @@
 import type { CollectionConfig } from 'payload';
 import { isAdmin, isAdminRequest, isPublic } from '../lib/access-control.ts';
+import { cacheInvalidate } from '../lib/cache.ts';
+
 import {
   linkUserToInstructor,
   normalizeEmail,
@@ -188,6 +190,9 @@ export const Instructors: CollectionConfig = {
             emailErr,
           );
         }
+
+        // Invalidate instructor cache
+        await cacheInvalidate('instructors:*');
       },
     ],
     beforeDelete: [

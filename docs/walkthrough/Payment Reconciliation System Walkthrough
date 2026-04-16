@@ -1,0 +1,45 @@
+# Payment Reconciliation System Walkthrough
+
+Implemented a secure, automated daily reconciliation system to ensure financial integrity between the internal Payload CMS database and the Paymob payment gateway.
+
+## Implementation Details
+
+### 1. Database Schema Enhancements
+Updated the [Payments](file:///d:/projects/nextacademy/src/collections/Payments.ts) collection to include specialized reconciliation tracking fields:
+- `reconciliationStatus`: Tracks the outcome (`PENDING`, `MATCHED`, `MISMATCH`, `MANUAL_FIXED`).
+- `lastReconciledAt`: Audit timestamp for the last verification run.
+- `reconciliationNotes`: Detailed logs of any detected discrepancies.
+
+### 2. Core Reconciliation Engine
+Created [payment-reconciliation.ts](file:///d:/projects/nextacademy/src/lib/payment-reconciliation.ts) which implements the `reconcilePaymentsWindow` logic:
+- **Time Window**: Scans payments from the last 48 hours to account for webhook processing delays.
+- **Paymob Integration**: Directly queries the Paymob API for authentic transaction status.
+- **Comparison Logic**: Verifies both the transaction `status` and the exact `amount` match.
+- **Auto-Update**: Marks records as `Matched` or `Mismatch` automatically.
+
+### 3. Administrative Alert System
+Implemented [admin-alerts.ts](file:///d:/projects/nextacademy/src/lib/email/admin-alerts.ts) to notify the finance team immediately when a discrepancy is found:
+- **Detailed Reports**: Sends a table containing the Internal ID, External ID, Status, and Reason for every mismatch.
+- **Actionable Info**: Includes links to the admin panel for quick investigation.
+
+### 4. Scheduled Cron Job
+- **Secure Endpoint**: [route.ts](file:///d:/projects/nextacademy/src/app/api/cron/reconcile-payments/route.ts) implements an HMAC-style `CRON_SECRET` check.
+- **Daily Window**: Configured in [vercel.json](file:///d:/projects/nextacademy/vercel.json) to run every day at 06:00 UTC.
+
+## Verification Results
+
+### Automated Tests
+- Ran `pnpm tsc --noEmit` to verify type safety.
+- **Result**: Zero new errors in modified files.
+- **Bonus**: Fixed pre-existing syntax errors in `src/collections/Programs.ts` that were blocking the build.
+
+### Manual Verification Path
+To manually trigger a reconciliation run:
+```bash
+curl -X POST \
+  -H "Authorization: Bearer <CRON_SECRET>" \
+  https://your-domain.com/api/cron/reconcile-payments
+```
+
+> [!IMPORTANT]
+> Ensure the `CRON_SECRET`, `PAYMOB_API_KEY`, and `FINANCE_ADMIN_EMAIL` environment variables are correctly configured in your deployment environment.

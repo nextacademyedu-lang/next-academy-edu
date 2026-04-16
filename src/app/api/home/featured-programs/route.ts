@@ -157,9 +157,10 @@ function pickCardImage(program: Program, round: Round | null): string | null {
   return null;
 }
 
+import { cacheGetOrSet, CACHE_TTL } from '@/lib/cache';
+
 export async function GET(req: NextRequest) {
   try {
-    const payload = await getPayload({ config });
     const localeParam = (req.nextUrl.searchParams.get('locale') || 'en').toLowerCase();
     const locale: 'ar' | 'en' = localeParam === 'ar' ? 'ar' : 'en';
 
@@ -168,173 +169,175 @@ export async function GET(req: NextRequest) {
       ? Math.max(1, Math.min(20, Math.floor(limitParam)))
       : 8;
 
-    const featured = await payload.find({
-      collection: 'programs',
-      where: {
-        and: [
-          { isActive: { equals: true } },
-          { isFeatured: { equals: true } },
-        ],
-      },
-      depth: 2,
-      sort: 'featuredPriority',
-      limit,
-    });
+    const cacheKey = `programs:featured:${locale}:${limit}`;
 
-    let programs = featured.docs as Program[];
-
-    if (programs.length < limit) {
-      const filler = await payload.find({
-        collection: 'programs',
-        where: {
-          and: [
-            { isActive: { equals: true } },
-            programs.length > 0
-              ? { id: { not_in: programs.map((p) => p.id) } }
-              : { id: { exists: true } },
-          ],
-        },
-        depth: 2,
-        sort: '-createdAt',
-        limit: limit - programs.length,
-      });
-      programs = [...programs, ...(filler.docs as Program[])];
-    }
-
-    if (programs.length === 0) {
-      return NextResponse.json(
-        { upcomingPrograms: [], recordedPrograms: [] },
-        { headers: PUBLIC_CACHE_HEADERS },
-      );
-    }
-
-    const programIds = programs.map((program) => program.id);
-
-    const [roundsSettled, reviewsSettled] = await Promise.allSettled([
-      payload.find({
-        collection: 'rounds',
-        where: { program: { in: programIds } },
-        depth: 0,
-        sort: 'startDate',
-        limit: 1000,
-      }),
-      payload.find({
-        collection: 'reviews',
-        where: {
-          and: [
-            { program: { in: programIds } },
-            { status: { equals: 'approved' } },
-          ],
-        },
-        depth: 0,
-        limit: 2000,
-      }),
-    ]);
-
-    const roundsResult = roundsSettled.status === 'fulfilled'
-      ? roundsSettled.value
-      : { docs: [] as Round[] };
-    const reviewsResult = reviewsSettled.status === 'fulfilled'
-      ? reviewsSettled.value
-      : { docs: [] as Review[] };
-
-    const roundsByProgram = new Map<number, Round[]>();
-    for (const roundDoc of roundsResult.docs as Round[]) {
-      const programId = typeof roundDoc.program === 'number'
-        ? roundDoc.program
-        : roundDoc.program?.id;
-      if (!programId) continue;
-      const current = roundsByProgram.get(programId) || [];
-      current.push(roundDoc);
-      roundsByProgram.set(programId, current);
-    }
-
-    const reviewStats = new Map<number, { total: number; count: number }>();
-    for (const review of reviewsResult.docs as Review[]) {
-      const programId = typeof review.program === 'number'
-        ? review.program
-        : review.program?.id;
-      if (!programId) continue;
-      const current = reviewStats.get(programId) || { total: 0, count: 0 };
-      current.total += review.rating || 0;
-      current.count += 1;
-      reviewStats.set(programId, current);
-    }
-
-    const upcomingPrograms: FeaturedCard[] = [];
-    const recordedPrograms: FeaturedCard[] = [];
-
-    programs.forEach((rawProgram) => {
-      const program = rawProgram as ProgramWithDerived;
-      const rounds = roundsByProgram.get(program.id) || [];
-      const upcomingRound = pickUpcomingRound(rounds);
-      const recordedRound = pickRecordedRound(rounds);
-      const selectedRound = upcomingRound || pickBestRound(rounds);
-      const enrollmentsFromRounds = rounds.reduce(
-        (sum, round) => sum + (round.currentEnrollments || 0),
-        0,
-      );
-
-      const review = reviewStats.get(program.id);
-      const ratingCount = review?.count ?? (program.reviewCount || 0);
-      const ratingRaw = review?.count
-        ? review.total / review.count
-        : (program.averageRating || 0);
-      const rating = Number(ratingRaw.toFixed(1));
-
-      const title = locale === 'ar'
-        ? (program.titleAr || program.titleEn || 'برنامج')
-        : (program.titleEn || program.titleAr || 'Program');
-
-      const baseCard = {
-        id: String(program.id),
-        title,
-        kind: typeLabel(program.type, locale),
-        category: categoryLabel(program.category, locale),
-        audienceCount: enrollmentsFromRounds || program.learnersCount || 0,
-        rating,
-        ratingCount,
-        instructor: instructorLabel(program.instructor, locale),
-        date: roundLabel(selectedRound, locale),
-        price: priceLabel(selectedRound, locale),
-        image: pickCardImage(program, selectedRound),
-      };
-
-      if (upcomingRound) {
-        upcomingPrograms.push({
-          ...baseCard,
-          date: roundLabel(upcomingRound, locale),
-          price: priceLabel(upcomingRound, locale),
-          image: pickCardImage(program, upcomingRound),
-          href: `/${locale}/programs/${program.slug || program.id}`,
+    const data = await cacheGetOrSet(
+      cacheKey,
+      async () => {
+        const payload = await getPayload({ config });
+        const featured = await payload.find({
+          collection: 'programs',
+          where: {
+            and: [
+              { isActive: { equals: true } },
+              { isFeatured: { equals: true } },
+            ],
+          },
+          depth: 2,
+          sort: 'featuredPriority',
+          limit,
         });
-      }
 
-      if (!upcomingRound && recordedRound) {
-        const viewsCount = Math.max(program.viewCount || 0, enrollmentsFromRounds || 0);
-        recordedPrograms.push({
-          ...baseCard,
-          audienceCount: viewsCount,
-          date: roundLabel(recordedRound, locale),
-          price: priceLabel(recordedRound, locale),
-          image: pickCardImage(program, recordedRound),
-          href: `/${locale}/programs/${program.slug || program.id}#recording-${recordedRound.id}`,
+        let programs = featured.docs as Program[];
+
+        if (programs.length < limit) {
+          const filler = await payload.find({
+            collection: 'programs',
+            where: {
+              and: [
+                { isActive: { equals: true } },
+                programs.length > 0
+                  ? { id: { not_in: programs.map((p) => p.id) } }
+                  : { id: { exists: true } },
+              ],
+            },
+            depth: 2,
+            sort: '-createdAt',
+            limit: limit - programs.length,
+          });
+          programs = [...programs, ...(filler.docs as Program[])];
+        }
+
+        if (programs.length === 0) {
+          return { upcomingPrograms: [], recordedPrograms: [] };
+        }
+
+        const programIds = programs.map((program) => program.id);
+
+        const [roundsSettled, reviewsSettled] = await Promise.allSettled([
+          payload.find({
+            collection: 'rounds',
+            where: { program: { in: programIds } },
+            depth: 0,
+            sort: 'startDate',
+            limit: 1000,
+          }),
+          payload.find({
+            collection: 'reviews',
+            where: {
+              and: [
+                { program: { in: programIds } },
+                { status: { equals: 'approved' } },
+              ],
+            },
+            depth: 0,
+            limit: 2000,
+          }),
+        ]);
+
+        const roundsResult =
+          roundsSettled.status === 'fulfilled' ? roundsSettled.value : { docs: [] as Round[] };
+        const reviewsResult =
+          reviewsSettled.status === 'fulfilled' ? reviewsSettled.value : { docs: [] as Review[] };
+
+        const roundsByProgram = new Map<number, Round[]>();
+        for (const roundDoc of roundsResult.docs as Round[]) {
+          const programId =
+            typeof roundDoc.program === 'number' ? roundDoc.program : roundDoc.program?.id;
+          if (!programId) continue;
+          const current = roundsByProgram.get(programId) || [];
+          current.push(roundDoc);
+          roundsByProgram.set(programId, current);
+        }
+
+        const reviewStats = new Map<number, { total: number; count: number }>();
+        for (const review of reviewsResult.docs as Review[]) {
+          const programId =
+            typeof review.program === 'number' ? review.program : review.program?.id;
+          if (!programId) continue;
+          const current = reviewStats.get(programId) || { total: 0, count: 0 };
+          current.total += review.rating || 0;
+          current.count += 1;
+          reviewStats.set(programId, current);
+        }
+
+        const upcomingPrograms: FeaturedCard[] = [];
+        const recordedPrograms: FeaturedCard[] = [];
+
+        programs.forEach((rawProgram) => {
+          const program = rawProgram as ProgramWithDerived;
+          const rounds = roundsByProgram.get(program.id) || [];
+          const upcomingRound = pickUpcomingRound(rounds);
+          const recordedRound = pickRecordedRound(rounds);
+          const selectedRound = upcomingRound || pickBestRound(rounds);
+          const enrollmentsFromRounds = rounds.reduce(
+            (sum, round) => sum + (round.currentEnrollments || 0),
+            0
+          );
+
+          const review = reviewStats.get(program.id);
+          const ratingCount = review?.count ?? (program.reviewCount || 0);
+          const ratingRaw = review?.count
+            ? review.total / review.count
+            : program.averageRating || 0;
+          const rating = Number(ratingRaw.toFixed(1));
+
+          const title =
+            locale === 'ar'
+              ? program.titleAr || program.titleEn || 'برنامج'
+              : program.titleEn || program.titleAr || 'Program';
+
+          const baseCard = {
+            id: String(program.id),
+            title,
+            kind: typeLabel(program.type, locale),
+            category: categoryLabel(program.category, locale),
+            audienceCount: enrollmentsFromRounds || program.learnersCount || 0,
+            rating,
+            ratingCount,
+            instructor: instructorLabel(program.instructor, locale),
+            date: roundLabel(selectedRound, locale),
+            price: priceLabel(selectedRound, locale),
+            image: pickCardImage(program, selectedRound),
+          };
+
+          if (upcomingRound) {
+            upcomingPrograms.push({
+              ...baseCard,
+              date: roundLabel(upcomingRound, locale),
+              price: priceLabel(upcomingRound, locale),
+              image: pickCardImage(program, upcomingRound),
+              href: `/${locale}/programs/${program.slug || program.id}`,
+            });
+          }
+
+          if (!upcomingRound && recordedRound) {
+            const viewsCount = Math.max(program.viewCount || 0, enrollmentsFromRounds || 0);
+            recordedPrograms.push({
+              ...baseCard,
+              audienceCount: viewsCount,
+              date: roundLabel(recordedRound, locale),
+              price: priceLabel(recordedRound, locale),
+              image: pickCardImage(program, recordedRound),
+              href: `/${locale}/programs/${program.slug || program.id}#recording-${recordedRound.id}`,
+            });
+          }
         });
-      }
-    });
 
-    return NextResponse.json(
-      {
-        upcomingPrograms: upcomingPrograms.slice(0, limit),
-        recordedPrograms: recordedPrograms.slice(0, limit),
+        return {
+          upcomingPrograms: upcomingPrograms.slice(0, limit),
+          recordedPrograms: recordedPrograms.slice(0, limit),
+        };
       },
-      { headers: PUBLIC_CACHE_HEADERS },
+      { ttl: CACHE_TTL.PROGRAMS_LIST }
     );
+
+    return NextResponse.json(data, { headers: PUBLIC_CACHE_HEADERS });
   } catch (error) {
     console.error('[api/home/featured-programs] Failed to fetch cards:', error);
     return NextResponse.json(
       { error: 'Failed to fetch featured programs' },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }

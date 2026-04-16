@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getPayload } from 'payload';
 import config from '@payload-config';
 import { rateLimit } from '@/lib/rate-limit';
+import { asPayloadRequest } from '@/lib/payload-request';
 import {
   findInstructorIdByEmail,
   linkUserToInstructor,
@@ -99,7 +100,7 @@ async function ensureInstructorAccountForIntent(params: {
       userId: user.id,
     });
 
-    const created = await (payload as any).create({
+    const created = await payload.create({
       collection: 'instructors',
       data: {
         firstName,
@@ -110,9 +111,9 @@ async function ensureInstructorAccountForIntent(params: {
         verificationStatus: 'draft',
       },
       overrideAccess: true,
-      req,
+      req: asPayloadRequest(req),
       context: { skipInstructorAutoLink: true, selfServiceInstructorProfile: true },
-    } as any);
+    });
 
     instructorId = created.id as number | string;
   }
@@ -144,7 +145,7 @@ async function ensureB2BManagerAccountForIntent(params: {
     id: user.id,
     data: { role: 'b2b_manager' },
     overrideAccess: true,
-    req: req as any,
+    req: asPayloadRequest(req),
     context: { allowPrivilegedRoleWrite: true },
   });
 
@@ -218,7 +219,7 @@ export async function POST(request: NextRequest) {
       limit: 1,
       sort: '-createdAt',
       overrideAccess: true,
-      req: request as any,
+      req: asPayloadRequest(request),
     });
 
     if (verificationCodes.docs.length === 0) {
@@ -236,7 +237,7 @@ export async function POST(request: NextRequest) {
       id: verificationCode.id,
       data: { used: true },
       overrideAccess: true,
-      req: request as any,
+      req: asPayloadRequest(request),
     });
 
     // Find and update user's emailVerified status
@@ -245,7 +246,7 @@ export async function POST(request: NextRequest) {
       where: { email: { equals: normalizedEmail } },
       limit: 1,
       overrideAccess: true,
-      req: request as any,
+      req: asPayloadRequest(request),
     });
 
     if (users.docs.length === 0) {
@@ -260,7 +261,7 @@ export async function POST(request: NextRequest) {
       id: users.docs[0].id,
       data: { emailVerified: true },
       overrideAccess: true,
-      req: request as any,
+      req: asPayloadRequest(request),
     });
 
     // ── Intent-based role assignment (non-blocking) ──────────────────

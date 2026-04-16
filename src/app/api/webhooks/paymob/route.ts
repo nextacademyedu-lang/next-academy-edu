@@ -3,6 +3,7 @@ import { verifyPaymobHmac } from '@/lib/payment-api';
 import { processSuccessfulPayment } from '@/lib/payment-helper';
 import { getPayload } from 'payload';
 import config from '@payload-config';
+import { asPayloadRequest } from '@/lib/payload-request';
 
 export async function POST(req: NextRequest) {
   try {
@@ -40,7 +41,7 @@ export async function POST(req: NextRequest) {
             paymentGatewayResponse: obj,
           },
           overrideAccess: true,
-          req: req as any,
+          req: asPayloadRequest(req),
         });
       }
       return NextResponse.json({ received: true });
@@ -55,7 +56,7 @@ export async function POST(req: NextRequest) {
         where: { transactionId: { equals: transactionId } },
         limit: 1,
         overrideAccess: true,
-        req: req as any,
+        req: asPayloadRequest(req),
       });
       resolvedPaymentId = existing.docs[0]?.id != null ? String(existing.docs[0].id) : undefined;
     }
@@ -72,7 +73,7 @@ export async function POST(req: NextRequest) {
       receivedAmountCents: amountCents,
       transactionId,
       gatewayResponse: obj,
-      req: req as any,
+      req: asPayloadRequest(req),
     });
 
     return NextResponse.json({ received: true });

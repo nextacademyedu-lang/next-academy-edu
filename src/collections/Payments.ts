@@ -1,5 +1,5 @@
 import type { CollectionConfig } from 'payload';
-import { isAdmin, isAdminOrOwnerByField, isAuthenticated } from '../lib/access-control.ts';
+import { isAdmin, isAdminOrOwnerByField } from '../lib/access-control.ts';
 import { createCrmDedupeKey } from '../lib/crm/dedupe.ts';
 import { enqueueCrmSyncEvent } from '../lib/crm/queue.ts';
 
@@ -13,6 +13,15 @@ export const Payments: CollectionConfig = {
     delete: isAdmin,
   },
   hooks: {
+    beforeChange: [
+      async ({ data }) => {
+        // netAmount calculation: netAmount = amount - gatewayFee
+        const amount = typeof data.amount === 'number' ? data.amount : 0;
+        const gatewayFee = typeof data.gatewayFee === 'number' ? data.gatewayFee : 0;
+        data.netAmount = amount - gatewayFee;
+        return data;
+      },
+    ],
     afterChange: [
       async ({ req, doc, previousDoc, operation }) => {
         try {
@@ -99,6 +108,42 @@ export const Payments: CollectionConfig = {
     { name: 'paymentGatewayResponse', type: 'json' },
     { name: 'receiptUrl', type: 'text' },
     { name: 'receiptNumber', type: 'text' },
+    {
+      name: 'netAmount',
+      type: 'number',
+      admin: {
+        description: 'Amount after gateway fees (= amount - gatewayFee)',
+        readOnly: true,
+      },
+    },
+    {
+      name: 'gatewayFee',
+      type: 'number',
+      admin: {
+        description: 'Fee charged by payment gateway (Paymob/EasyKash)',
+      },
+    },
+    {
+      name: 'currency',
+      type: 'select',
+      defaultValue: 'EGP',
+      options: ['EGP', 'USD', 'SAR'],
+    },
+    {
+      name: 'reconciliationStatus',
+      type: 'select',
+      defaultValue: 'pending',
+      options: [
+        { label: 'Pending', value: 'pending' },
+        { label: 'Matched', value: 'matched' },
+        { label: 'Mismatch', value: 'mismatch' },
+        { label: 'Manual Fixed', value: 'manual_fixed' },
+      ],
+      admin: {
+        description: 'Result of daily reconciliation check against payment gateway',
+        position: 'sidebar',
+      },
+    },
     { name: 'notes', type: 'textarea' },
     { name: 'reminderSentCount', type: 'number', defaultValue: 0 },
     { name: 'lastReminderSent', type: 'date' },

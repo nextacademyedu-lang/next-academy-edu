@@ -1,0 +1,56 @@
+# Walkthrough — CRM Sync Alerts & Manual Re-Sync
+
+I have implemented the failure alerting system and the manual re-sync API for the CRM pipeline.
+
+## Changes Made
+
+---
+
+### [Component] Email System
+
+#### `src/lib/email/admin-alerts.ts` [NEW]
+Added a new module for administrative operational alerts following the `instructor-emails.ts` pattern.
+- **`sendCrmSyncFailureAlert`**: Sends an email to the admin/ops team when a user's CRM sync fails 3 consecutive times.
+- Includes details: User ID, Email, Failure Count, Last Error, and Timestamp.
+
+---
+
+### [Component] CRM Pipeline
+
+#### `src/lib/crm/processor.ts` [MODIFY]
+Enhanced the sync processor to track failures.
+- **Failure Tracking**: Uses Redis (via `ioredis`) with a memory fallback to count consecutive failures for users.
+- **Automatic Alerting**: Automatically triggers the admin alert email upon reaching the 3rd consecutive failure.
+- **Self-Healing**: Automatically resets the failure counter upon a successful sync.
+
+---
+
+### [Component] Admin API
+
+#### `src/app/api/admin/crm-resync/route.ts` [NEW]
+Created a new secure endpoint for manual operations.
+- **URL**: `POST /api/admin/crm-resync`
+- **Method**: `POST`
+- **Payload**: `{ "userId": "..." }`
+- **Security**: 
+    - Enforces Admin-only access via `isAdminRequest`.
+    - Uses `asPayloadRequest` for safe type casting as requested.
+- **Action**: Correctly generates a dedupe key and queues a fresh CRM sync event.
+
+---
+
+## Verification Results
+
+### Automated Tests
+- **Type Check**: Ran `pnpm tsc --noEmit`. 
+    - **Result**: All modified files (`processor.ts`, `admin-alerts.ts`, `route.ts`) are **clean and error-free**.
+    - *Note: Some unrelated errors persist in experimental directories (`mekk/`) which are outside the scope of this task.*
+
+### Manual Verification Path
+- Admins can trigger a re-sync via:
+  ```bash
+  curl -X POST http://localhost:3000/api/admin/crm-resync \
+    -H "Content-Type: application/json" \
+    -d '{"userId": "USER_ID_HERE"}'
+  ```
+- Alerts will be sent to the email defined in `ADMIN_ALERT_EMAIL` or `ops@nextacademyedu.com`.

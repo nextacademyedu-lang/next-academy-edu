@@ -1,0 +1,127 @@
+.banner {
+  position: fixed;
+  bottom: var(--space-md);
+  left: var(--space-md);
+  right: var(--space-md);
+  z-index: var(--z-fixed);
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-md) var(--space-lg);
+  box-shadow: 0 10px 40px var(--glass-shadow);
+  animation: slideUp 0.5s var(--ease-bounce);
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.container {
+  max-width: 1000px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-lg);
+}
+
+.content {
+  flex: 1;
+}
+
+.text {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: var(--text-small);
+  line-height: 1.5;
+}
+
+.link {
+  color: var(--accent-primary);
+  text-decoration: underline;
+  margin-inline-start: var(--space-2xs);
+  transition: color var(--duration-fast) var(--ease-default);
+}
+
+.link:hover {
+  color: var(--accent-hover);
+}
+
+.actions {
+  display: flex;
+  gap: var(--space-md);
+  flex-shrink: 0;
+}
+
+.button {
+  padding: 10px 20px;
+  border-radius: var(--radius-md);
+  font-size: var(--text-small);
+  font-weight: var(--font-medium);
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--ease-default);
+  white-space: nowrap;
+}
+
+.accept {
+  background: var(--accent-primary);
+  color: #ffffff;
+  border: 1px solid var(--accent-primary);
+}
+
+.accept:hover {
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
+  transform: translateY(-1px);
+}
+
+.decline {
+  background: transparent;
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+}
+
+.decline:hover {
+  background: var(--hover-overlay);
+  color: var(--text-primary);
+  border-color: var(--border-strong);
+}
+
+/* RTL Specific */
+[dir="rtl"] .banner {
+  direction: rtl;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .banner {
+    bottom: 0;
+    left: 0;
+    right: 0;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    padding: var(--space-lg);
+  }
+
+  .container {
+    flex-direction: column;
+    text-align: center;
+    gap: var(--space-md);
+  }
+
+  .actions {
+    width: 100%;
+    flex-direction: column-reverse;
+  }
+
+  .button {
+    width: 100%;
+  }
+}

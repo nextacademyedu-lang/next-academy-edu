@@ -7,6 +7,54 @@ import {
   markCrmEventProcessing,
 } from './queue.ts';
 import { processCrmEventOrThrow } from './service.ts';
+import { safeErrorMessage } from './utils.ts';
+import { sendCrmSyncFailureAlert } from '../email/admin-alerts.ts';
+
+// ─── Failure Tracking (Redis + Memory Fallback) ─────────────────────────────
+
+let redisClient: any = null;
+const memoryFailures = new Map<string, number>();
+
+async function getRedis() {
+  if (!redisClient && process.env.REDIS_URL) {
+    try {
+      const { default: Redis } = await import('ioredis');
+      redisClient = new Redis(process.env.REDIS_URL, {
+        maxRetriesPerRequest: 1,
+        enableOfflineQueue: false,
+        lazyConnect: true,
+      });
+      redisClient.on('error', () => {
+        redisClient = null;
+      });
+    } catch {
+      redisClient = null;
+    }
+  }
+  return redisClient;
+}
+
+async function incrementFailureCount(userId: string): Promise<number> {
+  const redis = await getRedis();
+  if (redis) {
+    const key = `crm_fail:${userId}`;
+    const val = await (redis as any).incr(key);
+    await (redis as any).expire(key, 86400 * 7); // 7 days
+    return val;
+  }
+  const count = (memoryFailures.get(userId) || 0) + 1;
+  memoryFailures.set(userId, count);
+  return count;
+}
+
+async function resetFailureCount(userId: string): Promise<void> {
+  const redis = await getRedis();
+  if (redis) {
+    await (redis as any).del(`crm_fail:${userId}`);
+    return;
+  }
+  memoryFailures.delete(userId);
+}
 
 type PayloadLike = {
   find: (args: any) => Promise<{ docs: unknown[] }>;
@@ -68,6 +116,10 @@ export async function processCrmSyncQueue(
         summary.succeeded++;
       }
 
+      if (event.entityType === 'user') {
+        await resetFailureCount(String(event.entityId));
+      }
+
       await markCrmEventDone(payload, event.id, {
         skipped: result.skipped,
         reason: result.reason,
@@ -88,6 +140,34 @@ export async function processCrmSyncQueue(
         summary.deadLettered++;
       }
       summary.errors.push(failure.message);
+
+      // Trigger Alert after 3 consecutive failures for a user
+      if (event.entityType === 'user') {
+        const userId = String(event.entityId);
+        const failureCount = await incrementFailureCount(userId);
+
+        if (failureCount === 3) {
+          try {
+            const user = await payload.findByID({
+              collection: 'users',
+              id: userId,
+              depth: 0,
+              overrideAccess: true,
+            });
+            if (user && user.email) {
+              await sendCrmSyncFailureAlert({
+                userId,
+                userEmail: user.email,
+                failureCount,
+                lastError: failure.message,
+                timestamp: new Date().toISOString(),
+              });
+            }
+          } catch (alertError) {
+            console.error('[crm][alert] failed to send failure alert:', alertError);
+          }
+        }
+      }
     }
   }
 

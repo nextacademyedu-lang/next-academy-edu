@@ -1,0 +1,71 @@
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 9999;
+  backdrop-filter: blur(4px);
+}
+
+.modal {
+  background: var(--card-bg);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-xl);
+  max-width: 500px;
+  width: 100%;
+  padding: 32px;
+  position: relative;
+  box-shadow: var(--shadow-2xl);
+}
+
+.title {
+  color: var(--text-error);
+  font-size: 24px;
+  font-weight: var(--font-bold);
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+.warning {
+  color: var(--text-base);
+  font-size: 16px;
+  line-height: 1.6;
+  margin-bottom: 24px;
+  text-align: center;
+}
+
+.instruction {
+  font-size: 14px;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+  display: block;
+  text-align: center;
+}
+
+.input {
+  margin-bottom: 24px;
+  width: 100%;
+}
+
+.actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.deleteBtn {
+  background-color: var(--text-error) !important;
+  color: white !important;
+}
+
+.deleteBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  filter: grayscale(1);
+}

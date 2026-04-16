@@ -2,6 +2,7 @@ import { getPayload } from 'payload';
 import config from '@payload-config';
 import { sendBookingConfirmation } from '@/lib/email';
 import { atomicIncrement } from '@/lib/atomic-db';
+import { asPayloadRequest } from '@/lib/payload-request';
 
 /**
  * Shared post-payment logic used by all webhook handlers (Paymob, EasyKash, etc).
@@ -31,7 +32,7 @@ export async function processSuccessfulPayment(opts: {
     req,
   } = opts;
   const payload = await getPayload({ config });
-  const reqForHooks = req as any;
+  const reqForHooks = req ? asPayloadRequest(req as Request) : undefined;
 
   // ── 1. Fetch payment record ──────────────────────────────────────
   const payment = await payload.findByID({
@@ -179,8 +180,8 @@ export async function processSuccessfulPayment(opts: {
         location: round?.locationType
           ? {
               type: round.locationType as string,
-              name: (round as any).locationName || undefined,
-              address: (round as any).locationAddress || undefined,
+              name: (round as { locationName?: string }).locationName || undefined,
+              address: (round as { locationAddress?: string }).locationAddress || undefined,
             }
           : null,
       });

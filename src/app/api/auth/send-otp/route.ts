@@ -1,8 +1,9 @@
-import { NextRequest, NextResponse } from 'next/server';
+﻿import { NextRequest, NextResponse } from 'next/server';
 import { getPayload } from 'payload';
 import config from '@payload-config';
 import crypto from 'node:crypto';
 import { sendOtpVerificationCode } from '@/lib/email';
+import { asPayloadRequest } from '@/lib/payload-request';
 
 // Simple in-memory rate limiter (per-process)
 const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
@@ -60,7 +61,7 @@ export async function POST(request: NextRequest) {
       where: { email: { equals: normalizedEmail } },
       limit: 1,
       overrideAccess: true,
-      req: request as any,
+      req: asPayloadRequest(request),
     });
 
     if (users.docs.length === 0) {
@@ -92,7 +93,7 @@ export async function POST(request: NextRequest) {
         ],
       },
       overrideAccess: true,
-      req: request as any,
+      req: asPayloadRequest(request),
     });
 
     for (const code of existingCodes.docs) {
@@ -101,7 +102,7 @@ export async function POST(request: NextRequest) {
         id: code.id,
         data: { used: true },
         overrideAccess: true,
-        req: request as any,
+        req: asPayloadRequest(request),
       });
     }
 
@@ -119,7 +120,7 @@ export async function POST(request: NextRequest) {
         type: 'email_verification',
       },
       overrideAccess: true,
-      req: request as any,
+      req: asPayloadRequest(request),
     });
 
     if (!process.env.RESEND_API_KEY) {

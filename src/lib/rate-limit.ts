@@ -9,32 +9,16 @@ export interface RateLimitResult {
   resetInMs: number;
 }
 
-// ─── Redis (production) ──────────────────────────────────────────────────────
-
-let redisClient: import('ioredis').Redis | null = null;
-
-async function getRedis() {
-  if (!redisClient && process.env.REDIS_URL) {
-    const { default: Redis } = await import('ioredis');
-    redisClient = new Redis(process.env.REDIS_URL, {
-      maxRetriesPerRequest: 1,
-      enableOfflineQueue: false,
-      lazyConnect: true,
-    });
-    redisClient!.on('error', () => {
-      // Silently fall back to in-memory on Redis error
-      redisClient = null;
-    });
-  }
-  return redisClient;
-}
+import { getRedis } from './redis';
 
 async function redisLimit(
   key: string,
   limit: number,
   windowMs: number,
 ): Promise<RateLimitResult> {
-  const redis = (await getRedis())!;
+  const redis = await getRedis();
+  if (!redis) throw new Error('Redis unavailable');
+  
   const now = Date.now();
   const windowStart = now - windowMs;
   const redisKey = `rl:${key}`;

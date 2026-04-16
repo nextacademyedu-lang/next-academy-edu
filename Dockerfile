@@ -31,6 +31,7 @@ ENV DATABASE_URI=$DATABASE_URI
 ENV NODE_OPTIONS=--max-old-space-size=4096
 ENV NEXT_TELEMETRY_DISABLED=1
 
+RUN pnpm type-check
 RUN sh -c '(while sleep 20; do echo "[build] next.js build is still running..."; done) & HEARTBEAT_PID=$!; pnpm build; BUILD_EXIT=$?; kill $HEARTBEAT_PID; exit $BUILD_EXIT'
 
 # ── Stage 3: Runner ───────────────────────────────────────────────────────────

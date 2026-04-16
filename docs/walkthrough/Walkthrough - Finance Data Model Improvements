@@ -1,0 +1,35 @@
+# Walkthrough - Finance Data Model Improvements
+
+I have improved the finance data model to support better reconciliation, net revenue tracking, and refund auditing.
+
+## Changes Made
+
+### 1. Payments Collection Enhancement
+- **New Fields:** Added `netAmount`, `gatewayFee`, `currency`, and `reconciliationStatus`.
+- **Automation:** Implemented a `beforeChange` hook that automatically calculates `netAmount`.
+  - Formula: `netAmount = amount - gatewayFee`
+  - If `gatewayFee` is missing, `netAmount` equals `amount`.
+
+### 2. RefundRequests Collection (NEW)
+Created a standalone collection for tracking refund requests with the following features:
+- **Audit Trail:** Tracks `booking`, `payment`, `requestedBy`, `amount`, `reason`, `status`, `approvedBy`, and `gatewayRefundId`.
+- **Access Control:**
+  - **Users:** Can create their own requests and read them.
+  - **Admins:** Can manage (update/approve/process) all requests.
+- **Organization:** Categorized under the "Finance" group in the admin panel.
+
+### 3. Bookings Collection Enhancement
+- **New Field:** Added `bookingType` (B2C vs B2B) to distinguish between individual and corporate enrollments.
+
+### 4. Configuration
+- Registered `RefundRequests` in `src/payload.config.ts`.
+
+## Verification Results
+
+### Automated Checks
+- **Import Map:** Updated via `pnpm payload generate:importmap`.
+- **Type Safety:** Ran `pnpm tsc --noEmit`. While the project has some existing errors in other modules, **no new errors were found in `src/collections/`**.
+
+### Integrity
+- No existing fields were removed or renamed.
+- `RefundRequests` acts as a standalone audit trail as requested (no automatic status sync to Payments yet).

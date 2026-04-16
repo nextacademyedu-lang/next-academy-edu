@@ -7,6 +7,8 @@ import { routing } from '@/i18n/routing';
 import { AuthProvider } from '@/context/auth-context';
 import { ThemeProvider } from '@/context/theme-context';
 import { PopupManager } from '@/components/marketing/popup-manager';
+import { CookieConsent } from '@/components/cookie-consent';
+import { SourceTracker } from '@/components/source-tracker';
 import '../globals.css';
 
 const montserrat = Montserrat({
@@ -72,6 +74,8 @@ export default async function LocaleLayout({
             <ThemeProvider>
               {children}
               <PopupManager />
+              <CookieConsent />
+              <SourceTracker />
             </ThemeProvider>
           </AuthProvider>
         </NextIntlClientProvider>

@@ -1,0 +1,41 @@
+# Walkthrough - Platform Performance Optimization
+
+We have successfully implemented Redis caching for public API endpoints and optimized the Neon PostgreSQL connection pool configuration.
+
+## Changes Made
+
+### 1. Redis Infrastructure
+- Created [redis.ts](file:///d:/projects/nextacademy/src/lib/redis.ts): A centralized shared utility for Redis connection management.
+- Created [cache.ts](file:///d:/projects/nextacademy/src/lib/cache.ts): A robust, typed caching library supporting:
+  - Cache-aside pattern via `cacheGetOrSet`.
+  - Pattern-based invalidation via `cacheInvalidate`.
+  - Graceful degradation (falls back to direct DB queries if Redis is down).
+  - Configurable TTL (Time-To-Live).
+
+### 2. High-Read Caching
+Implemented caching on the following public endpoints:
+- **Featured Programs**: Cached for 5 minutes (`/api/home/featured-programs`).
+- **Instructors Listing**: Cached for 10 minutes (`/api/home/instructors`).
+- **Upcoming Events**: Cached for 5 minutes (`/api/upcoming-events`).
+
+### 3. Cache Invalidation
+Added `afterChange` hooks to automatically invalidate relevant caches when content is updated:
+- [Programs.ts](file:///d:/projects/nextacademy/src/collections/Programs.ts): Invalidates `programs:*` pattern.
+- [Instructors.ts](file:///d:/projects/nextacademy/src/collections/Instructors.ts): Invalidates `instructors:*` pattern.
+
+### 4. Database Optimization
+Updated [payload.config.ts](file:///d:/projects/nextacademy/src/payload.config.ts):
+- **Neon Pooler**: Configured connection pool limits (`max: 10`, `idleTimeoutMillis: 30000`) to respect Neon's serverless limits.
+- **Production Safety**: Set `push: process.env.NODE_ENV !== 'production'` to prevent dangerous automated schema shifts in production.
+
+### 5. Documentation
+- Updated [.env.production.template](file:///d:/projects/nextacademy/.env.production.template) with instructions for using the Neon pooler URL.
+- Created [MIGRATIONS.md](file:///d:/projects/nextacademy/docs/MIGRATIONS.md) outlining the safe production deployment workflow.
+
+## Verification Results
+
+### Type Check
+- Ran `tsc --noEmit`. Note that existing errors in `payment-reconciliation.ts` were detected but are unrelated to these changes. All performance-related files pass type checking.
+
+> [!IMPORTANT]
+> Ensure that the `DATABASE_URI` in production uses the Neon pooler URL (ending in `-pooler.neon.tech`) to take full advantage of the optimized connection pooling.

@@ -1,0 +1,49 @@
+# Walkthrough - Cookie Consent Banner Implementation
+
+I have implemented a comprehensive cookie consent system for Next Academy, ensuring legal compliance while maintaining premium aesthetics.
+
+## Changes Made
+
+### UI Components
+
+#### [cookie-consent.tsx](file:///d:/projects/nextacademy/src/components/cookie-consent.tsx)
+- Created a client-side component for the cookie banner.
+- Detects user preference from `localStorage`.
+- Supports Arabic and English with automated locale detection.
+- Dispatches a custom event `cookie-consent-accepted` for retroactive tracking.
+
+#### [cookie-consent.module.css](file:///d:/projects/nextacademy/src/components/cookie-consent.module.css)
+- Implemented a floating glassmorphism banner.
+- Uses `backdrop-filter: blur(12px)` for a premium feel.
+- Fully RTL compatible with directional spacing.
+- Dark theme styling with red accents matching the platform's brand.
+
+#### [source-tracker.tsx](file:///d:/projects/nextacademy/src/components/source-tracker.tsx)
+- A utility component that initializes UTM tracking on page changes, respecting the user's consent.
+
+### Core Logic
+
+#### [source-tracking.ts](file:///d:/projects/nextacademy/src/lib/source-tracking.ts)
+- Added `initializeSourceTracking()` to persist UTM sources only when consent is granted.
+- Implemented retroactive tracking (listens for the consent event to save sources detected earlier in the session).
+- Added `getPersistedContactSource()` to safely retrieve stored source data.
+
+### Integration
+
+#### [layout.tsx](file:///d:/projects/nextacademy/src/app/[locale]/layout.tsx)
+- Mounted the `CookieConsent` and `SourceTracker` components at the root level.
+
+## Verification
+
+### Manual Check
+- **Banner Appearance**: Verified that the banner appears for new visitors.
+- **Persistence**: Verified that clicking "Accept All" or "Decline" stores the preference in `localStorage`.
+- **RTL Support**: Verified that the layout correctly flips for Arabic users.
+- **Design**: Confirmed the use of glassmorphism and the correct color/accent tokens.
+
+### Technical Check
+- **Type Safety**: The code adheres to strict TypeScript standards.
+- **Performance**: Banner is client-side only and uses lightweight CSS Modules.
+
+> [!IMPORTANT]
+> The source tracking now strictly requires user consent. UTM parameters will not be persisted if the user declines or has not yet interacted with the banner.

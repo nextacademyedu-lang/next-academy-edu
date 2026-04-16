@@ -3,6 +3,7 @@ import { getPayload } from 'payload';
 import config from '@payload-config';
 import { verifyEasyKashHmac } from '@/lib/payment-api';
 import { processSuccessfulPayment } from '@/lib/payment-helper';
+import { asPayloadRequest } from '@/lib/payload-request';
 
 export async function POST(req: NextRequest) {
   try {
@@ -34,7 +35,7 @@ export async function POST(req: NextRequest) {
         depth: 1,
         limit: 1,
         overrideAccess: true,
-        req: req as any,
+        req: asPayloadRequest(req),
       });
       payment = result.docs[0];
     }
@@ -50,7 +51,7 @@ export async function POST(req: NextRequest) {
         depth: 1,
         limit: 1,
         overrideAccess: true,
-        req: req as any,
+        req: asPayloadRequest(req),
       });
       payment = byCustRef.docs[0] ?? null;
     }
@@ -69,7 +70,7 @@ export async function POST(req: NextRequest) {
             id: idPrefix,
             depth: 1,
             overrideAccess: true,
-            req: req as any,
+            req: asPayloadRequest(req),
           });
         } catch {
           payment = null;
@@ -94,7 +95,7 @@ export async function POST(req: NextRequest) {
           sort: '-createdAt',
           limit: 1,
           overrideAccess: true,
-          req: req as any,
+          req: asPayloadRequest(req),
         });
         payment = byBooking.docs[0];
       }
@@ -123,7 +124,7 @@ export async function POST(req: NextRequest) {
       receivedAmountCents: receivedCents,
       transactionId: easykashRef || String(payment.transactionId || `easykash-${payment.id}`),
       gatewayResponse: body as unknown as Record<string, unknown>,
-      req: req as any,
+      req: asPayloadRequest(req),
     });
 
     return NextResponse.json({ received: true });

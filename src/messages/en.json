@@ -284,7 +284,15 @@
     "updatePassword": "Update Password",
     "updatingPassword": "Updating...",
     "linkedinLabel": "LinkedIn URL",
-    "linkedinPlaceholder": "https://linkedin.com/in/your-profile"
+    "linkedinPlaceholder": "https://linkedin.com/in/your-profile",
+    "dangerZone": "Danger Zone",
+    "deleteAccountDesc": "Once you delete your account, there is no going back. Please be certain.",
+    "deleteAccountBtn": "Delete My Account",
+    "deleteAccountTitle": "Delete Your Account",
+    "deleteConfirmText": "Please type DELETE to confirm deletion",
+    "deleteWarning": "This action is permanent and will remove all your data, including certificates and progress.",
+    "cancel": "Cancel",
+    "deleting": "Deleting..."
   },
   "ProgramDetail": {
     "ledBy": "Led by",

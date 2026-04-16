@@ -1,5 +1,6 @@
 import crypto from 'node:crypto';
 import type { NextRequest } from 'next/server';
+import type { Payload } from 'payload';
 
 type AuthCandidateHeaders = Record<string, string>;
 
@@ -101,7 +102,7 @@ function verifyHs256PayloadToken(token: string, secret: string): Record<string, 
   }
 }
 
-async function resolveUserFromVerifiedToken(payload: any, token: string): Promise<any | null> {
+async function resolveUserFromVerifiedToken(payload: Payload, token: string): Promise<any | null> {
   const secret = process.env.PAYLOAD_SECRET;
   if (!secret) return null;
 
@@ -111,8 +112,9 @@ async function resolveUserFromVerifiedToken(payload: any, token: string): Promis
   const collection = String(jwtPayload.collection || '');
   if (collection !== 'users') return null;
 
-  const id = jwtPayload.id;
-  if (!id) return null;
+  const rawId = jwtPayload.id;
+  if (!rawId || typeof rawId === 'object') return null;
+  const id = rawId as string | number;
 
   try {
     const user = await payload.findByID({
@@ -132,7 +134,7 @@ async function resolveUserFromVerifiedToken(payload: any, token: string): Promis
  * In production, cookies can appear in multiple scopes (host + domain cookie),
  * so we try all token candidates and include a cryptographic fallback verifier.
  */
-export async function authenticateRequestUser(payload: any, req: NextRequest): Promise<any | null> {
+export async function authenticateRequestUser(payload: Payload, req: NextRequest): Promise<any | null> {
   // Fast path: let Payload parse the original request headers first.
   try {
     const { user } = await payload.auth({ headers: req.headers });

@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getPayload } from 'payload';
+import { getPayload, type Payload } from 'payload';
 import config from '@payload-config';
 import { rateLimit } from '@/lib/rate-limit';
+import { asPayloadRequest } from '@/lib/payload-request';
 
 // 5 requests per minute per IP.
 const LIMIT = 5;
@@ -32,7 +33,7 @@ function resolveCookieDomain(hostname: string): string | undefined {
   return undefined;
 }
 
-async function syncConfiguredAdminBeforeLogin(payload: any, email: string): Promise<void> {
+async function syncConfiguredAdminBeforeLogin(payload: Payload, email: string): Promise<void> {
   const normalizedEmail = email.trim().toLowerCase();
   if (!isConfiguredAdminEmail(normalizedEmail)) {
     return;
@@ -64,7 +65,7 @@ async function syncConfiguredAdminBeforeLogin(payload: any, email: string): Prom
 }
 
 async function ensureConfiguredAdminAfterLogin(params: {
-  payload: any;
+  payload: Payload;
   result: any;
   email: string;
   password: string;
@@ -176,7 +177,7 @@ export async function POST(req: NextRequest) {
     let result = await payload.login({
       collection: 'users',
       data: { email: normalizedEmail as string, password: password as string },
-      req: req as any,
+      req: asPayloadRequest(req),
     });
     result = await ensureConfiguredAdminAfterLogin({
       payload,

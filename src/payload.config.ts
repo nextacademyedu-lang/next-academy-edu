@@ -96,6 +96,7 @@ import { Popups } from './collections/Popups.ts';
 import { AnnouncementBars } from './collections/AnnouncementBars.ts';
 import { UpcomingEventsConfig } from './collections/UpcomingEventsConfig.ts';
 import { CrmSyncEvents } from './collections/CrmSyncEvents.ts';
+import { RefundRequests } from './collections/RefundRequests.ts';
 import { Partners } from './collections/Partners.ts';
 import { InstructorProgramSubmissions } from './collections/InstructorProgramSubmissions.ts';
 import { InstructorAgreements } from './collections/InstructorAgreements.ts';
@@ -286,6 +287,7 @@ export default buildConfig({
     AnnouncementBars,
     UpcomingEventsConfig,
     CrmSyncEvents,
+    RefundRequests,
     Partners,
     InstructorProgramSubmissions,
     InstructorAgreements,
@@ -299,11 +301,14 @@ export default buildConfig({
   db: postgresAdapter({
     pool: {
       connectionString: process.env.DATABASE_URI,
+      max: 10, // max concurrent connections to Neon
+      idleTimeoutMillis: 30000,
+      connectionTimeoutMillis: 5000,
     },
     // In production, postgresAdapter does not run schema push.
     // Wire generated migrations so schema evolves automatically on boot.
     prodMigrations: migrations,
-    push: true,
+    push: process.env.NODE_ENV !== 'production', // DISABLE push in production
   }),
   typescript: {
     outputFile: path.resolve(__dirname, 'payload-types.ts'),

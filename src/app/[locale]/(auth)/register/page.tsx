@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Check, X, Loader2 } from 'lucide-react';
 import { useAuth } from '@/context/auth-context';
+import { deriveContactSourceFromSearchParams } from '@/lib/source-tracking';
 import styles from '../login/login.module.css';
 
 // Password requirement checkers
@@ -75,7 +76,15 @@ export default function RegisterPage() {
     setError('');
 
     try {
-      const result = await register({ firstName, lastName, email, password, signupIntent });
+      const contactSource = deriveContactSourceFromSearchParams(searchParams);
+      const result = await register({
+        firstName,
+        lastName,
+        email,
+        password,
+        signupIntent,
+        contactSource,
+      });
 
       if (result.success) {
         // Registration successful — redirect to verify email

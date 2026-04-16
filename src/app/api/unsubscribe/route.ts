@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getPayload } from 'payload';
 import config from '@payload-config';
 import { assertTrustedWriteRequest } from '@/lib/csrf';
+import { asPayloadRequest } from '@/lib/payload-request';
 
 type UnsubscribeBody = {
   email?: unknown;
@@ -39,7 +40,7 @@ export async function POST(req: NextRequest) {
       depth: 0,
       limit: 10,
       overrideAccess: true,
-      req: req as any,
+      req: asPayloadRequest(req),
     });
 
     for (const user of users.docs) {
@@ -51,7 +52,7 @@ export async function POST(req: NextRequest) {
           whatsappOptIn: false,
         },
         overrideAccess: true,
-        req: req as any,
+        req: asPayloadRequest(req),
       });
     }
 

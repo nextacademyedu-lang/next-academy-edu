@@ -95,53 +95,38 @@ export const Programs: CollectionConfig = {
   hooks: {
     beforeDelete: [
       async ({ req, id }) => {
-        const existingRounds = await req.payload.find({
+        const rounds = await req.payload.find({
           collection: 'rounds',
           where: { program: { equals: id } },
           depth: 0,
-          limit: 500,
+          limit: 1000,
           overrideAccess: true,
           req,
         });
-        for (const round of existingRounds.docs) {
-          await req.payload.delete({
-            collection: 'rounds',
-            id: (round as { id: number | string }).id,
-            overrideAccess: true,
-            req,
-          });
+        for (const r of rounds.docs) {
+          await req.payload.delete({ collection: 'rounds', id: (r as { id: string | number }).id, overrideAccess: true, req });
         }
         const reviews = await req.payload.find({
           collection: 'reviews',
           where: { program: { equals: id } },
           depth: 0,
-          limit: 500,
+          limit: 1000,
           overrideAccess: true,
           req,
         });
-        for (const review of reviews.docs) {
-          await req.payload.delete({
-            collection: 'reviews',
-            id: (review as { id: number | string }).id,
-            overrideAccess: true,
-            req,
-          });
+        for (const r of reviews.docs) {
+          await req.payload.delete({ collection: 'reviews', id: (r as { id: string | number }).id, overrideAccess: true, req });
         }
-        const certificates = await req.payload.find({
+        const certs = await req.payload.find({
           collection: 'certificates',
           where: { program: { equals: id } },
           depth: 0,
-          limit: 500,
+          limit: 1000,
           overrideAccess: true,
           req,
         });
-        for (const cert of certificates.docs) {
-          await req.payload.delete({
-            collection: 'certificates',
-            id: (cert as { id: number | string }).id,
-            overrideAccess: true,
-            req,
-          });
+        for (const c of certs.docs) {
+          await req.payload.delete({ collection: 'certificates', id: (c as { id: string | number }).id, overrideAccess: true, req });
         }
       },
     ],
@@ -150,73 +135,109 @@ export const Programs: CollectionConfig = {
         await ensureProgramRounds({
           payload: req.payload,
           req,
-          program: doc as ProgramLike,
+          program: doc as any,
         });
       },
     ],
   },
+
   fields: [
     {
-      name: 'type',
-      type: 'select',
-      options: [
-        { label: 'Workshop', value: 'workshop' },
-        { label: 'Course', value: 'course' },
-        { label: 'Webinar', value: 'webinar' },
-        { label: 'Camp', value: 'camp' },
+      type: 'tabs',
+      tabs: [
+        /* ── Tab 1: General ─────────────────────────────────────── */
+        {
+          label: 'General',
+          fields: [
+            {
+              name: 'type',
+              type: 'select',
+              options: [
+                { label: 'Workshop', value: 'workshop' },
+                { label: 'Course', value: 'course' },
+                { label: 'Webinar', value: 'webinar' },
+                { label: 'Camp', value: 'camp' },
+              ],
+              required: true,
+            },
+            { name: 'titleAr', type: 'text', required: true },
+            { name: 'titleEn', type: 'text' },
+            { name: 'slug', type: 'text', required: true, unique: true },
+            { name: 'isFeatured', type: 'checkbox', defaultValue: false },
+            { name: 'isActive', type: 'checkbox', defaultValue: true, admin: { description: 'Controls whether this program is visible on the website' } },
+          ],
+        },
+
+        /* ── Tab 2: Content ─────────────────────────────────────── */
+        {
+          label: 'Content',
+          fields: [
+            { name: 'shortDescriptionAr', type: 'textarea' },
+            { name: 'shortDescriptionEn', type: 'textarea' },
+            { name: 'descriptionAr', type: 'richText' },
+            { name: 'descriptionEn', type: 'richText' },
+            { name: 'thumbnail', type: 'upload', relationTo: 'media', admin: { description: 'Small preview image used in cards and listings' } },
+            { name: 'coverImage', type: 'upload', relationTo: 'media', admin: { description: 'Large banner image displayed on the program detail page' } },
+            { name: 'category', type: 'relationship', relationTo: 'categories' },
+          ],
+        },
+
+        /* ── Tab 3: Educational ─────────────────────────────────── */
+        {
+          label: 'Educational',
+          fields: [
+            { name: 'objectives', type: 'array', fields: [{ name: 'item', type: 'text' }] },
+            { name: 'requirements', type: 'array', fields: [{ name: 'item', type: 'text' }], admin: { description: 'Prerequisites learners should meet before enrolling' } },
+            {
+              name: 'roundsCount',
+              type: 'number',
+              defaultValue: 0,
+              admin: { description: 'Total rounds planned. Missing rounds are auto-created as drafts.' },
+            },
+            { name: 'sessionsCount', type: 'number', admin: { description: 'Number of sessions per round' } },
+            { name: 'level', type: 'select', options: ['beginner', 'intermediate', 'advanced'], admin: { description: 'Target skill level for the learner' } },
+            { name: 'durationHours', type: 'number', admin: { description: 'Total duration in hours across all sessions' } },
+            {
+              name: 'language',
+              type: 'select',
+              options: ['ar', 'en', 'both'],
+              defaultValue: 'ar',
+              admin: { description: 'Language the program is delivered in' },
+            },
+            { name: 'targetAudience', type: 'array', fields: [{ name: 'item', type: 'text' }], admin: { description: 'Who this program is designed for' } },
+          ],
+        },
+
+        /* ── Tab 4: SEO ─────────────────────────────────────────── */
+        {
+          label: 'SEO',
+          fields: [
+            { name: 'seoTitle', type: 'text' },
+            { name: 'seoDescription', type: 'textarea' },
+            { name: 'seoKeywords', type: 'array', fields: [{ name: 'keyword', type: 'text' }] },
+          ],
+        },
+
+        /* ── Tab 5: Settings ────────────────────────────────────── */
+        {
+          label: 'Settings',
+          fields: [
+            { name: 'instructor', type: 'relationship', relationTo: 'instructors' },
+            { name: 'tags', type: 'relationship', relationTo: 'tags', hasMany: true },
+            {
+              name: 'featuredPriority',
+              type: 'number',
+              defaultValue: 0,
+              admin: { description: 'Controls ordering in featured cards (lower appears first)' },
+            },
+            /* ── Stats (read-only) ───────────────────────────────── */
+            { name: 'learnersCount', type: 'number', defaultValue: 0, admin: { readOnly: true, description: 'Auto-calculated from enrollments' } },
+            { name: 'viewCount', type: 'number', defaultValue: 0, admin: { readOnly: true, description: 'Auto-tracked page views' } },
+            { name: 'averageRating', type: 'number', defaultValue: 0, admin: { readOnly: true } },
+            { name: 'reviewCount', type: 'number', defaultValue: 0, admin: { readOnly: true } },
+          ],
+        },
       ],
-      required: true,
     },
-    { name: 'titleAr', type: 'text', required: true },
-    { name: 'titleEn', type: 'text' },
-    { name: 'slug', type: 'text', required: true, unique: true },
-    { name: 'descriptionAr', type: 'richText' },
-    { name: 'descriptionEn', type: 'richText' },
-    { name: 'shortDescriptionAr', type: 'textarea' },
-    { name: 'shortDescriptionEn', type: 'textarea' },
-    { name: 'category', type: 'relationship', relationTo: 'categories' },
-    { name: 'instructor', type: 'relationship', relationTo: 'instructors' },
-    { name: 'thumbnail', type: 'upload', relationTo: 'media' },
-    { name: 'coverImage', type: 'upload', relationTo: 'media' },
-    { name: 'durationHours', type: 'number' },
-    {
-      name: 'language',
-      type: 'select',
-      options: ['ar', 'en', 'both'],
-      defaultValue: 'ar',
-    },
-    { name: 'targetAudience', type: 'array', fields: [{ name: 'item', type: 'text' }] },
-    { name: 'tags', type: 'relationship', relationTo: 'tags', hasMany: true },
-    { name: 'isFeatured', type: 'checkbox', defaultValue: false },
-    {
-      name: 'featuredPriority',
-      type: 'number',
-      defaultValue: 0,
-      admin: { description: 'Controls ordering in featured cards (lower appears first)' },
-    },
-    { name: 'isActive', type: 'checkbox', defaultValue: true },
-
-    /* ── Educational fields ──────────────────────────────────── */
-    {
-      name: 'roundsCount',
-      type: 'number',
-      defaultValue: 0,
-      admin: { description: 'Total rounds planned. Missing rounds are auto-created as drafts.' },
-    },
-    { name: 'sessionsCount', type: 'number' },
-    { name: 'level', type: 'select', options: ['beginner', 'intermediate', 'advanced'] },
-    { name: 'objectives', type: 'array', fields: [{ name: 'item', type: 'text' }] },
-    { name: 'requirements', type: 'array', fields: [{ name: 'item', type: 'text' }] },
-
-    /* ── Stats (read-only) ───────────────────────────────────── */
-    { name: 'learnersCount', type: 'number', defaultValue: 0, admin: { readOnly: true } },
-    { name: 'viewCount', type: 'number', defaultValue: 0, admin: { readOnly: true } },
-    { name: 'averageRating', type: 'number', defaultValue: 0, admin: { readOnly: true } },
-    { name: 'reviewCount', type: 'number', defaultValue: 0, admin: { readOnly: true } },
-
-    /* ── SEO ──────────────────────────────────────────────────── */
-    { name: 'seoTitle', type: 'text' },
-    { name: 'seoDescription', type: 'textarea' },
-    { name: 'seoKeywords', type: 'array', fields: [{ name: 'keyword', type: 'text' }] },
   ],
 };

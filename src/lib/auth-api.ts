@@ -38,6 +38,7 @@ interface RegisterPayload {
   phone?: string;
   preferredLanguage?: 'ar' | 'en';
   signupIntent?: 'student' | 'instructor' | 'b2b_manager';
+  contactSource?: 'website' | 'whatsapp' | 'social' | 'referral';
 }
 
 async function handleResponse<T>(response: Response): Promise<AuthResponse<T>> {

@@ -156,6 +156,16 @@ export const Bookings: CollectionConfig = {
           return data;
         }
       },
+      // Initialize checkoutStartedAt for abandoned cart recovery
+      async ({ data, operation }) => {
+        if (operation === 'create' && data.status === 'pending' && !data.checkoutStartedAt) {
+          return {
+            ...data,
+            checkoutStartedAt: new Date().toISOString(),
+          };
+        }
+        return data;
+      },
     ],
     afterChange: [
       async ({ req, doc, previousDoc, operation }) => {
@@ -368,8 +378,25 @@ export const Bookings: CollectionConfig = {
     { name: 'twentyCrmDealId', type: 'text', admin: { readOnly: true } },
     { name: 'confirmationEmailSent', type: 'checkbox', defaultValue: false },
     { name: 'reminderEmailSent', type: 'checkbox', defaultValue: false },
+    { name: 'reminderSent24h', type: 'checkbox', defaultValue: false, admin: { readOnly: true, position: 'sidebar' } },
+    { name: 'reminderSent1h', type: 'checkbox', defaultValue: false, admin: { readOnly: true, position: 'sidebar' } },
+    { name: 'cartRecovery1hSent', type: 'checkbox', defaultValue: false, admin: { readOnly: true, position: 'sidebar' } },
+    { name: 'cartRecovery24hSent', type: 'checkbox', defaultValue: false, admin: { readOnly: true, position: 'sidebar' } },
+    { name: 'checkoutStartedAt', type: 'date', admin: { readOnly: true, position: 'sidebar' } },
     { name: 'cancelledAt', type: 'date' },
     { name: 'cancellationReason', type: 'textarea' },
+    {
+      name: 'bookingType',
+      type: 'select',
+      defaultValue: 'b2c',
+      options: [
+        { label: 'B2C (Individual)', value: 'b2c' },
+        { label: 'B2B (Corporate)', value: 'b2b' },
+      ],
+      admin: {
+        description: 'Whether this booking is an individual or corporate enrollment',
+      },
+    },
     { name: 'refundAmount', type: 'number' },
     { name: 'refundDate', type: 'date' },
   ],

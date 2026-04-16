@@ -32,6 +32,9 @@ export {
   sendRoundReminder1d,
 } from './booking-emails';
 
+export { sendSessionReminder } from './reminder-emails';
+export { sendAbandonedCartEmail } from './abandoned-cart-emails';
+
 export {
   sendPaymentReceipt,
   sendInstallmentRequestReceived,
@@ -60,6 +63,11 @@ export {
   sendInstructorProgramApproved,
   sendInstructorProgramRejected,
 } from './instructor-emails';
+
+export {
+  sendReconciliationAlert,
+} from './admin-alerts';
+
 
 // ── Legacy aliases (backward compatibility) ──────────────────────────────────
 

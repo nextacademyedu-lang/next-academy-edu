@@ -1,0 +1,45 @@
+
+***
+
+### المجموعة 1 — Software House Team (8 Agents)
+| الـ Agent | الدور |
+|---|---|
+| Lead Architect | مراجعة البنية التقنية، Next.js، Payload CMS، DB Schema |
+| Frontend Engineer | UI/UX، أداء الصفحات، Accessibility، RTL |
+| Backend Engineer | API Contracts، Webhooks، Logic، Error Handling |
+| Security Engineer | Auth، IDOR، Rate Limiting، CSRF، Payment Security |
+| DevOps Engineer | Deployment، CI/CD، Monitoring، Backups |
+| QA Engineer | Testing Coverage، Edge Cases، Bugs |
+| Database Engineer | Schema، Indexes، Queries Performance، Data Integrity |
+| Mobile/PWA Engineer | PWA Features، Offline، Push Notifications |
+
+### المجموعة 2 — Marketing & Business Team (6 Agents)
+| الـ Agent | الدور |
+|---|---|
+| CMO | استراتيجية تسويقية، Brand Positioning |
+| SEO Specialist | Technical SEO، Content، Meta، Performance |
+| Conversion Analyst | Funnels، CTAs، Checkout Flow، Drop-off Points |
+| Competitor Analyst | مقارنة مع المنافسين (Coursera، Udemy، محلي) |
+| Content Strategist | جودة المحتوى، Blog، Email Templates |
+| Growth Hacker | Referral System، Retention، Upsell Opportunities |
+
+### المجموعة 3 — Users Team (5 Agents)
+| الـ Agent | الدور |
+|---|---|
+| Individual Learner | تجربة التسجيل، Onboarding، Booking، Dashboard |
+| Instructor | Instructor Portal، Availability، Consultations |
+| New Visitor | First Impression، Homepage، UX، Trust Signals |
+| Returning Customer | Loyalty، Notifications، Re-engagement |
+
+### المجموعة 4 — Next Academy Internal Team (6 Agents)
+| الـ Agent | الدور |
+|---|---|
+| Founder/CEO | Vision Alignment، Business Goals من PRD |
+| Admin | Admin Panel، CMS، Payload Collections |
+| Sales Rep | CRM، Referral Codes، Lead Attribution |
+| Customer Support | Error Pages، FAQs، Contact Flow |
+| Finance Manager | Installments، Paymob، EasyKash، Refunds |
+| Data Analyst | Analytics، Reports، KPIs، Cohort Analysis |
+## إجمالي الـ Agents: **24 Agent**
+
+

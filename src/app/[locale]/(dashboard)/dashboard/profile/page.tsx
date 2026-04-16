@@ -16,6 +16,7 @@ import {
   type ExtendedProfileData,
 } from '@/lib/dashboard-api';
 import styles from './profile.module.css';
+import { DeleteAccountModal } from '@/components/dashboard/delete-account-modal';
 
 type Toast = { type: 'success' | 'error'; message: string } | null;
 type Tab = 'general' | 'professional' | 'company' | 'security';
@@ -69,6 +70,7 @@ export default function ProfilePage() {
   const [newPassword,     setNewPassword]     = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [changingPwd,     setChangingPwd]     = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   const [profileId, setProfileId] = useState<string | null>(null);
   const [toast, setToast] = useState<Toast>(null);
@@ -488,47 +490,74 @@ export default function ProfilePage() {
 
           {/* Security Tab */}
           {tab === 'security' && (
-            <Card className={styles.panelCard}>
-              <CardHeader>
-                <CardTitle>{t('securityPassword')}</CardTitle>
-                <CardDescription>{t('changePasswordDesc')}</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <form onSubmit={handleChangePassword} className={styles.formStack}>
-                  <div className={styles.fieldBlock}>
-                    <Label htmlFor="newPassword">{t('newPassword')}</Label>
-                    <Input
-                      id="newPassword"
-                      type="password"
-                      value={newPassword}
-                      onChange={e => setNewPassword(e.target.value)}
-                      placeholder={t('passwordMinLength')}
-                      required
-                    />
-                  </div>
-                  <div className={styles.fieldBlock}>
-                    <Label htmlFor="confirmPassword">{t('confirmNewPassword')}</Label>
-                    <Input
-                      id="confirmPassword"
-                      type="password"
-                      value={confirmPassword}
-                      onChange={e => setConfirmPassword(e.target.value)}
-                      placeholder={t('passwordMinLength')}
-                      required
-                    />
-                  </div>
+            <>
+              <Card className={styles.panelCard}>
+                <CardHeader>
+                  <CardTitle>{t('securityPassword')}</CardTitle>
+                  <CardDescription>{t('changePasswordDesc')}</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <form onSubmit={handleChangePassword} className={styles.formStack}>
+                    <div className={styles.fieldBlock}>
+                      <Label htmlFor="newPassword">{t('newPassword')}</Label>
+                      <Input
+                        id="newPassword"
+                        type="password"
+                        value={newPassword}
+                        onChange={e => setNewPassword(e.target.value)}
+                        placeholder={t('passwordMinLength')}
+                        required
+                      />
+                    </div>
+                    <div className={styles.fieldBlock}>
+                      <Label htmlFor="confirmPassword">{t('confirmNewPassword')}</Label>
+                      <Input
+                        id="confirmPassword"
+                        type="password"
+                        value={confirmPassword}
+                        onChange={e => setConfirmPassword(e.target.value)}
+                        placeholder={t('passwordMinLength')}
+                        required
+                      />
+                    </div>
+                    <div className={styles.actionsRow}>
+                      <Button type="submit" variant="primary" disabled={changingPwd}>
+                        {changingPwd ? <><Loader2 size={16} className={styles.spinningIcon} />{t('updatingPassword')}</> : t('updatePassword')}
+                      </Button>
+                    </div>
+                  </form>
+                </CardContent>
+              </Card>
+
+              <Card className={`${styles.panelCard} ${styles.dangerCard}`}>
+                <CardHeader>
+                  <CardTitle className={styles.dangerTitle}>{t('dangerZone')}</CardTitle>
+                  <CardDescription>{t('deleteAccountDesc')}</CardDescription>
+                </CardHeader>
+                <CardContent>
                   <div className={styles.actionsRow}>
-                    <Button type="submit" variant="primary" disabled={changingPwd}>
-                      {changingPwd ? <><Loader2 size={16} className={styles.spinningIcon} />{t('updatingPassword')}</> : t('updatePassword')}
+                    <Button 
+                      type="button" 
+                      variant="secondary" 
+                      onClick={() => setShowDeleteModal(true)}
+                    >
+                      {t('deleteAccountBtn')}
                     </Button>
                   </div>
-                </form>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            </>
           )}
 
         </div>
       </div>
+
+      {showDeleteModal && (
+        <DeleteAccountModal 
+          isOpen={showDeleteModal} 
+          onClose={() => setShowDeleteModal(false)} 
+        />
+      )}
     </div>
   );
 }
