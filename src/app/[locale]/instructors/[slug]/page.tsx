@@ -19,6 +19,7 @@ import { Navbar } from '@/components/layout/navbar';
 import { Footer } from '@/components/layout/footer';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { BookingSidebar } from '@/components/instructor/booking-sidebar';
 import styles from './page.module.css';
 import { buildPageMetadata } from '@/lib/seo/metadata';
 
@@ -417,98 +418,20 @@ export default async function InstructorProfilePage({
             </div>
 
             <aside className={styles.sidebar}>
-              <div className={styles.sidebarCard}>
-                <h3>{locale === 'ar' ? 'جلسات الحجز المتاحة' : 'Available Booking Types'}</h3>
-                <p className={styles.sidebarLead}>
-                  {locale === 'ar'
-                    ? `${totalAvailableSlots} مواعيد متاحة حالياً و ${totalCompletedRounds} دفعات مكتملة`
-                    : `${totalAvailableSlots} open slots and ${totalCompletedRounds} completed batches`}
-                </p>
-
-                <div className={styles.bookingTypes}>
-                  {consultationTypes.length === 0 && (
-                    <p className={styles.emptyText}>
-                      {locale === 'ar' ? 'لا توجد أنواع حجز متاحة الآن.' : 'No active booking types right now.'}
-                    </p>
-                  )}
-
-                  {consultationTypes.map((type) => {
-                    const typeTitle = type.titleEn || type.titleAr || 'Consultation';
-                    const slotsForType = slotCountByType.get(type.id) || 0;
-                    const price = type.price || 0;
-
-                    return (
-                      <div key={type.id} className={styles.bookingTypeCard}>
-                        <div>
-                          <strong>{typeTitle}</strong>
-                          <p>
-                            {type.durationMinutes || 0} {locale === 'ar' ? 'دقيقة' : 'minutes'} • {slotsForType} {locale === 'ar' ? 'مواعيد' : 'slots'}
-                          </p>
-                        </div>
-                        <span>{price.toLocaleString()} {type.currency || 'EGP'}</span>
-                      </div>
-                    );
-                  })}
-                </div>
-
-                {availableSlots.length > 0 && (
-                  <div className={styles.availableSlots}>
-                    <h4>{locale === 'ar' ? 'المواعيد المتاحة القادمة' : 'Next Available Slots'}</h4>
-                    <div className={styles.availableSlotsList}>
-                      {availableSlots.slice(0, 6).map((slot) => {
-                        const slotTypeId =
-                          typeof slot.consultationType === 'number'
-                            ? slot.consultationType
-                            : slot.consultationType?.id;
-                        const slotTypeTitle = slotTypeId
-                          ? consultationTypeTitleById.get(slotTypeId) || 'Consultation'
-                          : 'Consultation';
-
-                        return (
-                          <div key={slot.id} className={styles.availableSlotItem}>
-                            <strong>{slotTypeTitle}</strong>
-                            <span>
-                              {new Date(slot.date).toLocaleDateString(locale === 'ar' ? 'ar-EG' : 'en-US', {
-                                month: 'short',
-                                day: 'numeric',
-                                year: 'numeric',
-                              })}{' '}
-                              • {slot.startTime} - {slot.endTime}
-                            </span>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                )}
-
-                {weeklyAvailability.length > 0 && (
-                  <div className={styles.availableSlots}>
-                    <h4>{locale === 'ar' ? 'المواعيد الأسبوعية' : 'Weekly Availability'}</h4>
-                    <div className={styles.availableSlotsList}>
-                      {weeklyAvailability.map((item) => (
-                        <div key={item.id} className={styles.availableSlotItem}>
-                          <strong>{dayLabel(item.dayOfWeek || '', locale)}</strong>
-                          <span>
-                            {item.startTime} - {item.endTime}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                <Link
-                  href={`/${locale}/contact?intent=consultation&instructor=${encodeURIComponent(
-                    instructor.slug || String(instructor.id),
-                  )}`}
-                  className={styles.sidebarAction}
-                >
-                  <Button variant="secondary" fullWidth>
-                    {locale === 'ar' ? 'اطلب جلسة' : 'Request A Session'}
-                  </Button>
-                </Link>
-              </div>
+              <BookingSidebar
+                instructor={{
+                  id: String(instructor.id),
+                  slug: instructor.slug || String(instructor.id),
+                  name: fullName,
+                }}
+                consultationTypes={consultationTypes.map((t) => ({
+                  id: String(t.id),
+                  title: t.titleEn || t.titleAr || t.title || 'Consultation',
+                  durationMinutes: t.durationMinutes || 0,
+                  price: t.price || 0,
+                  currency: t.currency || 'EGP',
+                }))}
+              />
             </aside>
           </div>
         </section>

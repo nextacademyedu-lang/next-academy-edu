@@ -2,13 +2,24 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getPayload } from 'payload';
 import config from '@payload-config';
 import { verifyPaymobHmac } from '@/lib/payment-api';
+import { createSessionEvent } from '@/lib/google-calendar';
 
 type ConsultationBookingDoc = {
   id: number | string;
   amount?: number | null;
-  slot?: number | string | { id?: number | string } | null;
+  slot?: number | string | { id?: number | string; date?: string; startTime?: string; endTime?: string } | null;
   status?: 'pending' | 'confirmed' | 'completed' | 'cancelled' | 'no_show' | null;
   paymentStatus?: 'pending' | 'paid' | 'refunded' | null;
+  user?: { id?: string | number; email?: string } | string | number | null;
+  instructor?: {
+    id?: string | number;
+    email?: string;
+    googleRefreshToken?: string | null;
+  } | string | number | null;
+  bookingDate?: string | null;
+  startTime?: string | null;
+  endTime?: string | null;
+  timezone?: string | null;
 };
 
 function relationToId(value: unknown): number | null {
@@ -58,7 +69,7 @@ export async function POST(req: NextRequest) {
     const booking = (await payload.findByID({
       collection: 'consultation-bookings',
       id: consultationBookingId,
-      depth: 0,
+      depth: 2,
       overrideAccess: true,
       req: req as any,
     })) as ConsultationBookingDoc | null;
@@ -135,6 +146,41 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ received: true });
     }
 
+    // Create Google Calendar event
+    let meetingUrl = '';
+    const bookingDateRaw = typeof booking.slot === 'object' && booking.slot !== null && 'date' in booking.slot ? booking.slot.date : booking.bookingDate;
+    const startTimeRaw = typeof booking.slot === 'object' && booking.slot !== null && 'startTime' in booking.slot ? booking.slot.startTime : booking.startTime;
+    const endTimeRaw = typeof booking.slot === 'object' && booking.slot !== null && 'endTime' in booking.slot ? booking.slot.endTime : booking.endTime;
+
+    // Check if dynamic or static slots properties are fully present to create an event
+    if (bookingDateRaw && startTimeRaw && endTimeRaw) {
+      try {
+        const studentEmail = typeof booking.user === 'object' && booking.user !== null ? booking.user.email : undefined;
+        const refreshToken = typeof booking.instructor === 'object' && booking.instructor !== null ? booking.instructor.googleRefreshToken : null;
+
+        if (refreshToken && studentEmail) {
+          const eventResult = await createSessionEvent({
+            title: `Consultation with Next Academy`,
+            description: `A 1-on-1 consultation booking. Reference ID: ${booking.id}`,
+            date: bookingDateRaw,
+            startTime: startTimeRaw,
+            endTime: endTimeRaw,
+            timezone: booking.timezone || 'Africa/Cairo',
+            attendeeEmails: [studentEmail],
+            refreshToken,
+          });
+
+          if (eventResult?.meetingUrl) {
+            meetingUrl = eventResult.meetingUrl;
+          }
+        } else {
+          console.warn('[webhook/paymob/consultation] Instructor has no calendar connected or student has no email.');
+        }
+      } catch (err) {
+        console.error('[webhook/paymob/consultation] Error creating calendar event:', err);
+      }
+    }
+
     await payload.update({
       collection: 'consultation-bookings',
       id: consultationBookingId,
@@ -142,6 +188,7 @@ export async function POST(req: NextRequest) {
         status: 'confirmed',
         paymentStatus: 'paid',
         transactionId,
+        ...(meetingUrl ? { meetingUrl } : {}),
       },
       overrideAccess: true,
       req: req as any,

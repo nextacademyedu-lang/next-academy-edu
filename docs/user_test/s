@@ -1,0 +1,27 @@
+افتح متصفح خفي (Incognito) وادخل على الموقع nextacademyedu.com. ✅
+شريط الكوكيز (Cookie Banner): تأكد من ظهور شريط الخصوصية أسفل الشاشة، اضغط على "موافق/Accept". ✅
+ثبات الموافقة: اعمل Refresh للصفحة وتأكد إن الشريط مش هيظهر تاني (حفظ الاختيار). ✅
+التسجيل: اعمل إنشاء حساب جديد للزائر ده (بأي إيميل تجريبي). (layout-7499c9cae1a9bf1f.js:1 
+ POST https://nextacademyedu.com/api/auth/verify-otp 500 (Internal Server Error)) رمز التحقق بيقولي غلط لكن لما رجعت للصفحة الرئيسية للموقع لقيت الحساب اتفتح عادي ومدخلنش عالـ onboarding فاهمني
+تزامن الـ CRM: افتح crm.nextacademyedu.com في تاب تانية، وادخل على Customers (People). تأكد إن النظام سجّل العميل الجديد فوراً.  الحساب (الحساب متسجلش فالـ crm) ❌
+
+
+
+🛒 رحلة 2: السلة المتروكة (Abandoned Cart)
+الهدف: اختبار عملية إيقاف الشراء وعمل الـ Cron Job. 
+بحسابك الجديد، ادخل على أي Program أو Event واعمل "حجز/شراء".
+لما توصل لحركة الدفع (Checkout) وتقف عند اختيار وسيلة الدفع.. اقفل الصفحة وماتدفعش. (حصلت مشكلة  -  page-ec7d2342dcef5a27.js:1 
+ POST https://nextacademyedu.com/api/bookings/create 500 (Internal Server Error)
+لوحة التحكم (Admin): ادخل على nextacademyedu.com/admin بحساب الأدمن.  (صفحات كتيرة اوي جوة payload بفتحها بلاقيها فاضية )
+ادخل على Bookings وتأكد إن الحجز اتسجل وحالته Pending أو مقترن بعملية دفع Pending. احنا اصلا الدفع مخليينه ع easykash مش paymob رجع easykash
+(اختبار خلفية): كده العميل مسجل في قائمة الـ Abandoned Cart، والنظام هيبعتله إيميل تذكير بعد 24 ساعة ليكمل الشراء.
+
+
+Failed to delete account. Please try again.
+
+page-044c06626e956eb6.js:1 
+ DELETE https://nextacademyedu.com/api/users/delete-account 500 (Internal Server Error)
+
+page-044c06626e956eb6.js:1 
+ DELETE https://nextacademyedu.com/api/users/delete-account 500 (Internal Server Error)
+﻿

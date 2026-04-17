@@ -1,4 +1,4 @@
-import type { CollectionConfig } from 'payload';
+import { APIError, type CollectionConfig } from 'payload';
 import {
   isAdmin,
   isAdminOrOwnerOrOwnInstructor,
@@ -7,6 +7,8 @@ import {
 } from '../lib/access-control.ts';
 import { createCrmDedupeKey } from '../lib/crm/dedupe.ts';
 import { enqueueCrmSyncEvent } from '../lib/crm/queue.ts';
+import { sendConsultationCancelled } from '../lib/email/engagement-emails.ts';
+import { sendInstructorConsultationCancelled } from '../lib/email/instructor-emails.ts';
 
 export const ConsultationBookings: CollectionConfig = {
   slug: 'consultation-bookings',
@@ -18,6 +20,45 @@ export const ConsultationBookings: CollectionConfig = {
     delete: isAdmin,
   },
   hooks: {
+    beforeChange: [
+      async ({ data, req, originalDoc, operation }) => {
+        // Enforce minCancelNoticeHours
+        if (operation === 'update' && data.status === 'cancelled' && originalDoc?.status !== 'cancelled') {
+          const isAdmin = req.user?.roles?.includes('admin');
+          if (!isAdmin && originalDoc?.consultationType) {
+            try {
+              const consultationTypeId = typeof originalDoc.consultationType === 'object' 
+                ? originalDoc.consultationType.id 
+                : originalDoc.consultationType;
+                
+              const consultationType = await req.payload.findByID({
+                collection: 'consultation-types',
+                id: consultationTypeId as string | number,
+                depth: 0,
+              });
+
+              if (consultationType?.minCancelNoticeHours) {
+                if (originalDoc.bookingDate && originalDoc.startTime) {
+                  const bookingDateOnly = String(originalDoc.bookingDate).split('T')[0];
+                  const bookingDateTimeStr = `${bookingDateOnly}T${originalDoc.startTime}:00`;
+                  const bookingTime = new Date(bookingDateTimeStr).getTime();
+                  const now = Date.now();
+
+                  const hoursDiff = (bookingTime - now) / (1000 * 60 * 60);
+                  if (hoursDiff < Number(consultationType.minCancelNoticeHours)) {
+                    throw new APIError(`Cancellations require at least ${consultationType.minCancelNoticeHours} hours notice.`);
+                  }
+                }
+              }
+            } catch (err) {
+              if (err instanceof APIError) throw err;
+              console.error('[ConsultationBookings] Error checking minCancelNoticeHours:', err);
+            }
+          }
+        }
+        return data;
+      }
+    ],
     afterChange: [
       async ({ req, doc, previousDoc, operation }) => {
         try {
@@ -32,6 +73,57 @@ export const ConsultationBookings: CollectionConfig = {
               else action = 'consultation_payment_status_updated';
             } else if (previousDoc?.status !== doc.status) {
               action = 'consultation_status_updated';
+              
+              // Trigger Cancellation Emails
+              if (doc.status === 'cancelled') {
+                try {
+                  const fullDoc = await req.payload.findByID({
+                    collection: 'consultation-bookings',
+                    id: doc.id,
+                    depth: 2,
+                  });
+
+                  if (
+                    fullDoc && 
+                    typeof fullDoc.user === 'object' && fullDoc.user !== null && 
+                    typeof fullDoc.instructor === 'object' && fullDoc.instructor !== null
+                  ) {
+                    const studentUser = fullDoc.user as any;
+                    const instructorDoc = fullDoc.instructor as any;
+                    
+                    const instructorUserQuery = await req.payload.find({
+                      collection: 'users',
+                      where: { instructorId: { equals: instructorDoc.id } },
+                      limit: 1,
+                    });
+                    
+                    const instructorUser = instructorUserQuery.docs[0] as any;
+                    const dateStr = fullDoc.bookingDate && typeof fullDoc.bookingDate === 'string' ? fullDoc.bookingDate.split('T')[0] : String(fullDoc.bookingDate);
+                    
+                    if (studentUser.email) {
+                      await sendConsultationCancelled({
+                        to: studentUser.email,
+                        userName: studentUser.firstName || 'Student',
+                        instructor: instructorDoc.fullNameAr || instructorDoc.fullNameEn || 'Instructor',
+                        date: dateStr,
+                        reason: 'Cancelled by system / user request',
+                      });
+                    }
+                    
+                    if (instructorUser && instructorUser.email) {
+                      await sendInstructorConsultationCancelled({
+                        to: instructorUser.email,
+                        userName: instructorUser.firstName || 'Instructor',
+                        clientName: studentUser.firstName || studentUser.email || 'Client',
+                        date: dateStr,
+                        reason: 'Cancelled by system / user request',
+                      });
+                    }
+                  }
+                } catch (emailErr) {
+                  console.error('[ConsultationBookings] Failed to send cancellation emails:', emailErr);
+                }
+              }
             }
           }
 
@@ -61,7 +153,10 @@ export const ConsultationBookings: CollectionConfig = {
               user: doc.user,
               instructor: doc.instructor,
               consultationType: doc.consultationType,
-              slot: doc.slot,
+              bookingDate: doc.bookingDate,
+              startTime: doc.startTime,
+              endTime: doc.endTime,
+              timezone: doc.timezone,
               status: doc.status,
               paymentStatus: doc.paymentStatus,
               amount: doc.amount,
@@ -72,45 +167,21 @@ export const ConsultationBookings: CollectionConfig = {
           console.error('[ConsultationBookings] afterChange CRM sync failed (non-blocking):', err);
         }
 
-        try {
-          const slotId =
-            typeof doc.slot === 'object' && doc.slot
-              ? Number((doc.slot as { id?: unknown }).id)
-              : Number(doc.slot);
-          if (!Number.isFinite(slotId)) return;
-
-          if (doc.paymentStatus === 'paid') {
-            await req.payload.update({
-              collection: 'consultation-slots',
-              id: slotId,
-              data: { status: 'booked' },
-              overrideAccess: true,
-              req,
-            });
-            return;
-          }
-
-          if (doc.status === 'cancelled' || doc.paymentStatus === 'refunded') {
-            await req.payload.update({
-              collection: 'consultation-slots',
-              id: slotId,
-              data: { status: 'available' },
-              overrideAccess: true,
-              req,
-            });
-          }
-        } catch (slotErr) {
-          console.error('[ConsultationBookings] slot status sync failed (non-blocking):', slotErr);
-        }
+        // Slot sync for explicit consultation-slots is removed as part of dynamic booking engine.
       },
     ],
   },
   fields: [
     { name: 'bookingCode', type: 'text', unique: true, admin: { readOnly: true } },
     { name: 'user', type: 'relationship', relationTo: 'users', required: true },
-    { name: 'slot', type: 'relationship', relationTo: 'consultation-slots', required: true },
     { name: 'consultationType', type: 'relationship', relationTo: 'consultation-types', required: true },
     { name: 'instructor', type: 'relationship', relationTo: 'instructors', required: true },
+    { name: 'bookingDate', type: 'date', required: true, admin: { description: 'The scheduled date in UTC.' } },
+    { name: 'startTime', type: 'text', required: true, admin: { description: 'e.g., 14:30' } },
+    { name: 'endTime', type: 'text', required: true, admin: { description: 'e.g., 15:00' } },
+    { name: 'timezone', type: 'text', defaultValue: 'Africa/Cairo', required: true },
+    { name: 'clientName', type: 'text' },
+    { name: 'clientEmail', type: 'text' },
     {
       name: 'status',
       type: 'select',

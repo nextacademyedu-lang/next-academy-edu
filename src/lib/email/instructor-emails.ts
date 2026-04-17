@@ -219,3 +219,53 @@ export async function sendInstructorProgramRejected(data: {
 
   await send(data.to, subject, html);
 }
+
+export async function sendInstructorConsultationCancelled(data: {
+  to: string;
+  userName: string;
+  clientName: string;
+  date: string;
+  reason: string;
+  locale?: string | null;
+}): Promise<void> {
+  const locale = asLocale(data.locale);
+  const subject = pick(locale, {
+    ar: `❌ تم إلغاء استشارة - ${data.clientName}`,
+    en: `❌ Consultation Cancelled - ${data.clientName}`,
+  });
+  const title = pick(locale, {
+    ar: 'تم إلغاء الاستشارة',
+    en: 'Consultation Cancelled',
+  });
+  const body = pick(locale, {
+    ar: `تم إلغاء استشارتك المقررة يوم ${data.date} مع ${data.clientName}.`,
+    en: `Your consultation scheduled on ${data.date} with ${data.clientName} has been cancelled.`,
+  });
+
+  const html = buildEmailLayout(
+    {
+      title,
+      body: `${greeting(data.userName, locale)}\n\n${body}`,
+      infoBox: [
+        [
+          pick(locale, { ar: 'العميل', en: 'Client' }),
+          data.clientName,
+        ],
+        [
+          pick(locale, { ar: 'السبب', en: 'Reason' }),
+          data.reason,
+        ],
+      ],
+      cta: {
+        text: pick(locale, {
+          ar: 'جدول المواعيد',
+          en: 'View Schedule',
+        }),
+        url: `${APP_URL()}/instructor/consultations`,
+      },
+    },
+    { locale },
+  );
+
+  await send(data.to, subject, html);
+}

@@ -122,6 +122,8 @@ export async function POST(req: NextRequest) {
 
     const body = (await req.json().catch(() => null)) as {
       slotId?: unknown;
+      typeId?: unknown;
+      slot?: string;
       method?: 'card' | 'wallet';
       locale?: 'ar' | 'en';
       instructorSlug?: string;
@@ -129,6 +131,8 @@ export async function POST(req: NextRequest) {
     } | null;
 
     const slotId = normalizeId(body?.slotId);
+    const typeId = normalizeId(body?.typeId);
+    const slotStr = body?.slot;
     const method = body?.method === 'wallet' ? 'wallet' : 'card';
     const locale = body?.locale === 'ar' ? 'ar' : 'en';
     const instructorSlug =
@@ -140,8 +144,8 @@ export async function POST(req: NextRequest) {
         ? body.userNotes.trim()
         : undefined;
 
-    if (!slotId) {
-      return NextResponse.json({ error: 'slotId is required' }, { status: 400 });
+    if (!slotId && (!typeId || !slotStr)) {
+      return NextResponse.json({ error: 'slotId or typeId+slot is required' }, { status: 400 });
     }
 
     const payload = await getPayload({ config });
@@ -152,97 +156,129 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const slot = (await payload.findByID({
-      collection: 'consultation-slots',
-      id: slotId,
-      depth: 1,
-      overrideAccess: true,
-      req,
-    })) as ConsultationSlotDoc | null;
+    let consultationTypeId: number | null = null;
+    let instructorId: number | null = null;
+    let bookingDate: string | undefined;
+    let startTime: string | undefined;
+    let endTime: string | undefined;
+    let consultationType: ConsultationTypeDoc | null = null;
+    let legacySlot: ConsultationSlotDoc | null = null;
 
-    const pendingForSlot = await payload.find({
-      collection: 'consultation-bookings',
-      where: {
-        and: [
-          { slot: { equals: slotId } },
-          { status: { equals: 'pending' } },
-          { paymentStatus: { equals: 'pending' } },
-        ],
-      },
-      depth: 0,
-      limit: 50,
-      sort: '-createdAt',
-      overrideAccess: true,
-      req,
-    });
-
-    const pendingDocs = pendingForSlot.docs as ConsultationBookingDoc[];
-    const hasRecentPending = pendingDocs.some(isPendingAndRecent);
-    if (hasRecentPending) {
-      return NextResponse.json(
-        { error: 'This slot is currently reserved by another checkout attempt. Please choose another time.' },
-        { status: 409 },
-      );
-    }
-
-    const stalePending = pendingDocs.filter((doc) => !isPendingAndRecent(doc));
-    if (stalePending.length > 0) {
-      await Promise.all(
-        stalePending.map((doc) =>
-          payload.update({
-            collection: 'consultation-bookings',
-            id: doc.id,
-            data: {
-              status: 'cancelled',
-              cancellationReason: 'Reservation timed out before payment completion',
-            },
-            overrideAccess: true,
-            req,
-          }),
-        ),
-      );
-    }
-
-    if (!slot) {
-      return NextResponse.json({ error: 'Slot not found' }, { status: 404 });
-    }
-
-    if (slot.status === 'blocked' && !hasRecentPending) {
-      await payload.update({
+    if (slotId) {
+      legacySlot = (await payload.findByID({
         collection: 'consultation-slots',
         id: slotId,
-        data: { status: 'available' },
+        depth: 1,
+        overrideAccess: true,
+        req,
+      })) as ConsultationSlotDoc | null;
+
+      if (!legacySlot) {
+        return NextResponse.json({ error: 'Slot not found' }, { status: 404 });
+      }
+
+      if (legacySlot.status !== 'available') {
+        const checkPending = await payload.find({
+          collection: 'consultation-bookings',
+          where: {
+            and: [
+              { slot: { equals: slotId } },
+              { status: { equals: 'pending' } },
+              { paymentStatus: { equals: 'pending' } },
+            ],
+          },
+          depth: 0,
+          limit: 1,
+          sort: '-createdAt',
+          overrideAccess: true,
+          req,
+        });
+
+        if (checkPending.docs.length > 0 && isPendingAndRecent(checkPending.docs[0] as ConsultationBookingDoc)) {
+          return NextResponse.json({ error: 'This slot is currently reserved by another checkout attempt.' }, { status: 409 });
+        }
+      }
+
+      const slotStart = parseSlotStartDate(legacySlot.date, legacySlot.startTime);
+      if (!slotStart || slotStart <= new Date()) {
+        return NextResponse.json({ error: 'This slot is no longer valid' }, { status: 409 });
+      }
+
+      consultationTypeId = relationToId(legacySlot.consultationType);
+      instructorId = relationToId(legacySlot.instructor);
+      
+      if (consultationTypeId) {
+        consultationType = (await payload.findByID({
+          collection: 'consultation-types',
+          id: consultationTypeId,
+          depth: 0,
+          overrideAccess: true,
+          req,
+        })) as ConsultationTypeDoc | null;
+      }
+    } else {
+      consultationTypeId = typeId;
+      if (consultationTypeId) {
+        consultationType = (await payload.findByID({
+          collection: 'consultation-types',
+          id: consultationTypeId,
+          depth: 0,
+          overrideAccess: true,
+          req,
+        })) as ConsultationTypeDoc | null;
+      }
+      
+      if (!consultationType) {
+        return NextResponse.json({ error: 'Consultation type not found' }, { status: 404 });
+      }
+
+      instructorId = relationToId(consultationType.instructor);
+      if (slotStr) {
+        const d = new Date(slotStr);
+        if (Number.isNaN(d.getTime())) {
+          return NextResponse.json({ error: 'Invalid slot time format' }, { status: 400 });
+        }
+        bookingDate = d.toISOString();
+        
+        const pad = (n: number) => n.toString().padStart(2, '0');
+        startTime = `${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())}`;
+        
+        // Calculate end time using duration
+        const duration = (consultationType as any).durationMinutes || 60;
+        const e = new Date(d.getTime() + duration * 60000);
+        endTime = `${pad(e.getUTCHours())}:${pad(e.getUTCMinutes())}`;
+      }
+
+      // Check for clashing recent pending active bookings at exactly the same time,
+      // handled effectively enough by the BookingEngine in real time, but a safety net:
+      const existingAtTime = await payload.find({
+        collection: 'consultation-bookings',
+        where: {
+          and: [
+            { instructor: { equals: instructorId } },
+            { bookingDate: { equals: bookingDate } },
+          ],
+        },
+        depth: 0,
         overrideAccess: true,
         req,
       });
-      slot.status = 'available';
+
+      const hasRecentPendingOrConfirmed = existingAtTime.docs.some((doc: any) => {
+        if (doc.status === 'cancelled' || doc.paymentStatus === 'refunded') return false;
+        if (doc.status === 'pending' && doc.paymentStatus === 'pending') {
+          return doc.createdAt && doc.createdAt > minutesAgo(20);
+        }
+        return true;
+      });
+
+      if (hasRecentPendingOrConfirmed) {
+        return NextResponse.json({ error: 'This time slot was just booked or reserved by someone else.' }, { status: 409 });
+      }
     }
 
-    if (slot.status !== 'available') {
-      return NextResponse.json({ error: 'This slot is no longer available' }, { status: 409 });
-    }
-
-    const slotStart = parseSlotStartDate(slot.date, slot.startTime);
-    if (!slotStart || slotStart <= new Date()) {
-      return NextResponse.json({ error: 'This slot is no longer valid' }, { status: 409 });
-    }
-
-    const consultationTypeId = relationToId(slot.consultationType);
-    const instructorId = relationToId(slot.instructor);
-    if (!consultationTypeId || !instructorId) {
-      return NextResponse.json({ error: 'Invalid slot configuration' }, { status: 500 });
-    }
-
-    const consultationType = (await payload.findByID({
-      collection: 'consultation-types',
-      id: consultationTypeId,
-      depth: 0,
-      overrideAccess: true,
-      req,
-    })) as ConsultationTypeDoc | null;
-
-    if (!consultationType) {
-      return NextResponse.json({ error: 'Consultation type not found' }, { status: 404 });
+    if (!consultationTypeId || !instructorId || !consultationType) {
+      return NextResponse.json({ error: 'Invalid slot or type configuration' }, { status: 500 });
     }
 
     const amount = Number(consultationType.price) || 0;
@@ -251,9 +287,12 @@ export async function POST(req: NextRequest) {
       data: {
         bookingCode: generateCode('CB'),
         user: user.id,
-        slot: slotId,
+        slot: slotId || null,
         consultationType: consultationTypeId,
         instructor: instructorId,
+        bookingDate: bookingDate,
+        startTime: startTime,
+        endTime: endTime,
         status: 'pending',
         amount,
         paymentStatus: amount <= 0 ? 'paid' : 'pending',
@@ -277,14 +316,15 @@ export async function POST(req: NextRequest) {
           overrideAccess: true,
           req,
         }),
-        payload.update({
+      if (slotId) {
+        await payload.update({
           collection: 'consultation-slots',
           id: slotId,
           data: { status: 'booked' },
           overrideAccess: true,
           req,
-        }),
-      ]);
+        });
+      }
 
       return NextResponse.json({
         free: true,
@@ -295,14 +335,16 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    await payload.update({
-      collection: 'consultation-slots',
-      id: slotId,
-      data: { status: 'blocked' },
-      overrideAccess: true,
-      req,
-    });
-    rollbackSlotId = slotId;
+    if (slotId) {
+      await payload.update({
+        collection: 'consultation-slots',
+        id: slotId,
+        data: { status: 'blocked' },
+        overrideAccess: true,
+        req,
+      });
+      rollbackSlotId = slotId;
+    }
 
     const appBaseUrl = resolveAppBaseUrl(req);
     const redirectParams = new URLSearchParams({
@@ -347,9 +389,9 @@ export async function POST(req: NextRequest) {
       redirectUrl: getPaymobCheckoutUrl(intention.client_secret),
     });
   } catch (error) {
-    if (rollbackPayload && rollbackReq && rollbackBookingId && rollbackSlotId) {
+    if (rollbackPayload && rollbackReq && rollbackBookingId) {
       try {
-        await Promise.all([
+        const promises: Promise<any>[] = [
           rollbackPayload.update({
             collection: 'consultation-bookings',
             id: rollbackBookingId,
@@ -360,14 +402,21 @@ export async function POST(req: NextRequest) {
             overrideAccess: true,
             req: rollbackReq,
           }),
-          rollbackPayload.update({
-            collection: 'consultation-slots',
-            id: rollbackSlotId,
-            data: { status: 'available' },
-            overrideAccess: true,
-            req: rollbackReq,
-          }),
-        ]);
+        ];
+        
+        if (rollbackSlotId) {
+          promises.push(
+            rollbackPayload.update({
+              collection: 'consultation-slots',
+              id: rollbackSlotId,
+              data: { status: 'available' },
+              overrideAccess: true,
+              req: rollbackReq,
+            })
+          );
+        }
+
+        await Promise.all(promises);
       } catch (rollbackError) {
         console.error('[api/consultation/checkout][POST] rollback failed', rollbackError);
       }

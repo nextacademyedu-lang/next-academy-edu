@@ -1,0 +1,282 @@
+cardo/src/app/page.tsx(1,21): error TS2307: Cannot find module '@/components/Frame23' or its corresponding type declarations.
+cardo/src/components/Frame23.tsx(1,21): error TS2307: Cannot find module '@/components/Frame29' or its corresponding type declarations.
+mekk/src/app/about/page.tsx(1,20): error TS2307: Cannot find module '@/components/Navbar' or its corresponding type declarations.
+mekk/src/app/about/page.tsx(2,30): error TS2307: Cannot find module '@/components/about/AboutHeroSection' or its corresponding type declarations.
+mekk/src/app/about/page.tsx(3,35): error TS2307: Cannot find module '@/components/about/AboutManifestoSection' or its corresponding type declarations.
+mekk/src/app/about/page.tsx(4,31): error TS2307: Cannot find module '@/components/about/AboutStorySection' or its corresponding type declarations.
+mekk/src/app/about/page.tsx(5,36): error TS2307: Cannot find module '@/components/about/AboutPhilosophySection' or its corresponding type declarations.
+mekk/src/app/about/page.tsx(6,34): error TS2307: Cannot find module '@/components/about/AboutTimelineSection' or its corresponding type declarations.
+mekk/src/app/about/page.tsx(7,34): error TS2307: Cannot find module '@/components/about/AboutCorneredSection' or its corresponding type declarations.
+mekk/src/app/about/page.tsx(8,34): error TS2307: Cannot find module '@/components/about/AboutKeywordsSection' or its corresponding type declarations.
+mekk/src/app/about/page.tsx(9,36): error TS2307: Cannot find module '@/components/about/AboutOnePercentSection' or its corresponding type declarations.
+mekk/src/app/about/page.tsx(10,33): error TS2307: Cannot find module '@/components/about/AboutContactSection' or its corresponding type declarations.
+mekk/src/app/about/page.tsx(11,37): error TS2307: Cannot find module '@/components/ui/ImpactTransitionSection' or its corresponding type declarations.
+mekk/src/app/about/page.tsx(12,27): error TS2307: Cannot find module '@/components/FooterSection' or its corresponding type declarations.
+mekk/src/app/admin/actions.ts(3,30): error TS2307: Cannot find module '@/utils/supabase/server' or its corresponding type declarations.
+mekk/src/app/admin/availability/actions.ts(3,30): error TS2307: Cannot find module '@/utils/supabase/server' or its corresponding type declarations.
+mekk/src/app/admin/availability/page.tsx(1,30): error TS2307: Cannot find module '@/utils/supabase/server' or its corresponding type declarations.
+mekk/src/app/admin/availability/page.tsx(28,102): error TS7006: Parameter 'o' implicitly has an 'any' type.
+mekk/src/app/admin/blogs/[id]/page.tsx(1,30): error TS2307: Cannot find module '@/utils/supabase/server' or its corresponding type declarations.
+mekk/src/app/admin/blogs/[id]/page.tsx(2,40): error TS2307: Cannot find module '@/components/admin/AdminForm' or its corresponding type declarations.
+mekk/src/app/admin/blogs/new/page.tsx(1,40): error TS2307: Cannot find module '@/components/admin/AdminForm' or its corresponding type declarations.
+mekk/src/app/admin/blogs/page.tsx(1,30): error TS2307: Cannot find module '@/utils/supabase/server' or its corresponding type declarations.
+mekk/src/app/admin/blogs/page.tsx(2,24): error TS2307: Cannot find module '@/components/admin/AdminTable' or its corresponding type declarations.
+mekk/src/app/admin/booking-profile/actions.ts(3,30): error TS2307: Cannot find module '@/utils/supabase/server' or its corresponding type declarations.
+mekk/src/app/admin/bookings/page.tsx(1,30): error TS2307: Cannot find module '@/utils/supabase/server' or its corresponding type declarations.
+mekk/src/app/admin/case-studies/[id]/page.tsx(1,30): error TS2307: Cannot find module '@/utils/supabase/server' or its corresponding type declarations.
+mekk/src/app/admin/case-studies/[id]/page.tsx(2,40): error TS2307: Cannot find module '@/components/admin/AdminForm' or its corresponding type declarations.
+mekk/src/app/admin/case-studies/new/page.tsx(1,40): error TS2307: Cannot find module '@/components/admin/AdminForm' or its corresponding type declarations.
+mekk/src/app/admin/case-studies/page.tsx(1,30): error TS2307: Cannot find module '@/utils/supabase/server' or its corresponding type declarations.
+mekk/src/app/admin/case-studies/page.tsx(2,24): error TS2307: Cannot find module '@/components/admin/AdminTable' or its corresponding type declarations.
+mekk/src/app/admin/email-settings/actions.ts(3,30): error TS2307: Cannot find module '@/utils/supabase/server' or its corresponding type declarations.
+mekk/src/app/admin/email-settings/page.tsx(1,30): error TS2307: Cannot find module '@/utils/supabase/server' or its corresponding type declarations.
+mekk/src/app/admin/email-settings/page.tsx(19,39): error TS7006: Parameter 'setting' implicitly has an 'any' type.
+mekk/src/app/admin/event-types/actions.ts(3,30): error TS2307: Cannot find module '@/utils/supabase/server' or its corresponding type declarations.
+mekk/src/app/admin/event-types/page.tsx(1,30): error TS2307: Cannot find module '@/utils/supabase/server' or its corresponding type declarations.
+mekk/src/app/admin/integrations/page.tsx(1,59): error TS2307: Cannot find module '@/utils/google' or its corresponding type declarations.
+mekk/src/app/admin/layout.tsx(3,24): error TS2307: Cannot find module '@/app/api/auth/actions' or its corresponding type declarations.
+mekk/src/app/admin/page.tsx(1,30): error TS2307: Cannot find module '@/utils/supabase/server' or its corresponding type declarations.
+mekk/src/app/admin/page.tsx(36,44): error TS7006: Parameter 'contact' implicitly has an 'any' type.
+mekk/src/app/admin/page.tsx(64,49): error TS7006: Parameter 'sub' implicitly has an 'any' type.
+mekk/src/app/admin/projects/[id]/page.tsx(1,30): error TS2307: Cannot find module '@/utils/supabase/server' or its corresponding type declarations.
+mekk/src/app/admin/projects/[id]/page.tsx(2,40): error TS2307: Cannot find module '@/components/admin/AdminForm' or its corresponding type declarations.
+mekk/src/app/admin/projects/new/page.tsx(1,40): error TS2307: Cannot find module '@/components/admin/AdminForm' or its corresponding type declarations.
+mekk/src/app/admin/projects/page.tsx(1,30): error TS2307: Cannot find module '@/utils/supabase/server' or its corresponding type declarations.
+mekk/src/app/admin/projects/page.tsx(2,24): error TS2307: Cannot find module '@/components/admin/AdminTable' or its corresponding type declarations.
+mekk/src/app/admin/seed/actions.ts(3,30): error TS2307: Cannot find module '@/utils/supabase/server' or its corresponding type declarations.
+mekk/src/app/admin/seed/actions.ts(4,47): error TS2307: Cannot find module '@/lib/constants' or its corresponding type declarations.
+mekk/src/app/api/auth/actions.ts(5,30): error TS2307: Cannot find module '@/utils/supabase/server' or its corresponding type declarations.
+mekk/src/app/api/auth/google/callback/route.ts(2,35): error TS2307: Cannot find module '@/utils/google' or its corresponding type declarations.
+mekk/src/app/api/auth/google/route.ts(2,28): error TS2307: Cannot find module '@/utils/google' or its corresponding type declarations.
+mekk/src/app/api/bookings/actions.ts(3,30): error TS2307: Cannot find module '@/utils/supabase/server' or its corresponding type declarations.
+mekk/src/app/api/bookings/actions.ts(5,37): error TS2307: Cannot find module '@/emails/BookingConfirmation' or its corresponding type declarations.
+mekk/src/app/api/bookings/actions.ts(44,39): error TS7006: Parameter 'a' implicitly has an 'any' type.
+mekk/src/app/api/bookings/actions.ts(72,57): error TS2307: Cannot find module '@/utils/google' or its corresponding type declarations.
+mekk/src/app/api/bookings/actions.ts(163,60): error TS2307: Cannot find module '@/utils/google' or its corresponding type declarations.
+mekk/src/app/api/bookings/actions.ts(197,41): error TS2307: Cannot find module '@react-email/render' or its corresponding type declarations.
+mekk/src/app/api/bookings/test-services/route.ts(8,59): error TS2307: Cannot find module '@/utils/google' or its corresponding type declarations.
+mekk/src/app/api/bookings/test-submit.ts(1,31): error TS2307: Cannot find module '../actions' or its corresponding type declarations.
+mekk/src/app/api/contact/actions.ts(3,30): error TS2307: Cannot find module '@/utils/supabase/server' or its corresponding type declarations.
+mekk/src/app/api/contact/actions.ts(5,30): error TS2307: Cannot find module '@/emails/ContactReply' or its corresponding type declarations.
+mekk/src/app/api/contact/actions.ts(6,35): error TS2307: Cannot find module '@/emails/NewsletterWelcome' or its corresponding type declarations.
+mekk/src/app/api/contact/actions.ts(7,35): error TS2307: Cannot find module '@/emails/TestimonialsReply' or its corresponding type declarations.
+mekk/src/app/api/contact/actions.ts(8,32): error TS2307: Cannot find module '@/emails/CaseStudyReply' or its corresponding type declarations.
+mekk/src/app/blog/[slug]/BlogClient.tsx(7,20): error TS2307: Cannot find module '@/components/Navbar' or its corresponding type declarations.
+mekk/src/app/blog/[slug]/BlogClient.tsx(8,27): error TS2307: Cannot find module '@/components/FooterSection' or its corresponding type declarations.
+mekk/src/app/blog/[slug]/BlogClient.tsx(9,28): error TS2307: Cannot find module '@/components/blog/BlogNewsletter' or its corresponding type declarations.
+mekk/src/app/blog/[slug]/page.tsx(1,30): error TS2307: Cannot find module '@/utils/supabase/server' or its corresponding type declarations.
+mekk/src/app/blog/[slug]/page.tsx(3,20): error TS2307: Cannot find module '@/components/Navbar' or its corresponding type declarations.
+mekk/src/app/blog/[slug]/page.tsx(4,27): error TS2307: Cannot find module '@/components/FooterSection' or its corresponding type declarations.
+mekk/src/app/blog/page.tsx(1,20): error TS2307: Cannot find module '@/components/Navbar' or its corresponding type declarations.
+mekk/src/app/blog/page.tsx(2,27): error TS2307: Cannot find module '@/components/FooterSection' or its corresponding type declarations.
+mekk/src/app/blog/page.tsx(3,22): error TS2307: Cannot find module '@/components/blog/BlogHero' or its corresponding type declarations.
+mekk/src/app/blog/page.tsx(4,22): error TS2307: Cannot find module '@/components/blog/BlogGrid' or its corresponding type declarations.
+mekk/src/app/blog/page.tsx(5,28): error TS2307: Cannot find module '@/components/blog/BlogNewsletter' or its corresponding type declarations.
+mekk/src/app/blog/page.tsx(6,30): error TS2307: Cannot find module '@/utils/supabase/server' or its corresponding type declarations.
+mekk/src/app/book/[slug]/BookingFlow.tsx(5,50): error TS2307: Cannot find module '@/app/api/bookings/actions' or its corresponding type declarations.
+mekk/src/app/book/[slug]/BookingFlow.tsx(85,67): error TS7006: Parameter 'result' implicitly has an 'any' type.
+mekk/src/app/book/[slug]/page.tsx(1,30): error TS2307: Cannot find module '@/utils/supabase/server' or its corresponding type declarations.
+mekk/src/app/book/[slug]/page.tsx(3,35): error TS2307: Cannot find module '@/app/admin/booking-profile/actions' or its corresponding type declarations.
+mekk/src/app/book/page.tsx(1,30): error TS2307: Cannot find module '@/utils/supabase/server' or its corresponding type declarations.
+mekk/src/app/book/page.tsx(26,36): error TS7006: Parameter 'ev' implicitly has an 'any' type.
+mekk/src/app/case-studies/[slug]/CaseStudyClient.tsx(7,22): error TS2307: Cannot find module '@/lib/constants' or its corresponding type declarations.
+mekk/src/app/case-studies/[slug]/CaseStudyClient.tsx(8,20): error TS2307: Cannot find module '@/components/Navbar' or its corresponding type declarations.
+mekk/src/app/case-studies/[slug]/CaseStudyClient.tsx(9,27): error TS2307: Cannot find module '@/components/FooterSection' or its corresponding type declarations.
+mekk/src/app/case-studies/[slug]/CaseStudyClient.tsx(25,15): error TS2304: Cannot find name 'MetricDefinition'.
+mekk/src/app/case-studies/[slug]/CaseStudyClient.tsx(108,30): error TS2304: Cannot find name 'MetricsCharts'.
+mekk/src/app/case-studies/[slug]/page.tsx(2,20): error TS2307: Cannot find module '@/components/Navbar' or its corresponding type declarations.
+mekk/src/app/case-studies/[slug]/page.tsx(3,27): error TS2307: Cannot find module '@/components/FooterSection' or its corresponding type declarations.
+mekk/src/app/case-studies/[slug]/page.tsx(4,30): error TS2307: Cannot find module '@/lib/constants' or its corresponding type declarations.
+mekk/src/app/case-studies/[slug]/page.tsx(30,36): error TS7006: Parameter 'study' implicitly has an 'any' type.
+mekk/src/app/case-studies/page.tsx(1,20): error TS2307: Cannot find module '@/components/Navbar' or its corresponding type declarations.
+mekk/src/app/case-studies/page.tsx(2,27): error TS2307: Cannot find module '@/components/FooterSection' or its corresponding type declarations.
+mekk/src/app/case-studies/page.tsx(3,29): error TS2307: Cannot find module '@/components/case-studies/CaseStudiesHero' or its corresponding type declarations.
+mekk/src/app/case-studies/page.tsx(4,29): error TS2307: Cannot find module '@/components/case-studies/CaseStudiesList' or its corresponding type declarations.
+mekk/src/app/case-studies/page.tsx(5,35): error TS2307: Cannot find module '@/components/case-studies/CaseStudiesNewsletter' or its corresponding type declarations.
+mekk/src/app/case-studies/page.tsx(6,30): error TS2307: Cannot find module '@/lib/constants' or its corresponding type declarations.
+mekk/src/app/contact/page.tsx(7,36): error TS2307: Cannot find module '@/lib/constants' or its corresponding type declarations.
+mekk/src/app/contact/page.tsx(96,55): error TS7006: Parameter 'link' implicitly has an 'any' type.
+mekk/src/app/layout.tsx(5,27): error TS2307: Cannot find module '@/lib/constants' or its corresponding type declarations.
+mekk/src/app/layout.tsx(6,27): error TS2307: Cannot find module '@/components/LenisProvider' or its corresponding type declarations.
+mekk/src/app/layout.tsx(7,26): error TS2307: Cannot find module '@/components/NoiseOverlay' or its corresponding type declarations.
+mekk/src/app/layout.tsx(8,25): error TS2307: Cannot find module '@/components/FloatingCTA' or its corresponding type declarations.
+mekk/src/app/layout.tsx(9,27): error TS2307: Cannot find module '@vercel/analytics/react' or its corresponding type declarations.
+mekk/src/app/lectures/[slug]/page.tsx(8,32): error TS2307: Cannot find module '@/lib/constants' or its corresponding type declarations.
+mekk/src/app/lectures/[slug]/page.tsx(9,20): error TS2307: Cannot find module '@/components/Navbar' or its corresponding type declarations.
+mekk/src/app/lectures/[slug]/page.tsx(10,27): error TS2307: Cannot find module '@/components/FooterSection' or its corresponding type declarations.
+mekk/src/app/lectures/[slug]/page.tsx(53,36): error TS7006: Parameter 'l' implicitly has an 'any' type.
+mekk/src/app/lectures/[slug]/page.tsx(54,44): error TS7006: Parameter 'l' implicitly has an 'any' type.
+mekk/src/app/lectures/[slug]/page.tsx(141,54): error TS7006: Parameter 'topic' implicitly has an 'any' type.
+mekk/src/app/lectures/[slug]/page.tsx(141,61): error TS7006: Parameter 'i' implicitly has an 'any' type.
+mekk/src/app/lectures/[slug]/page.tsx(206,53): error TS7006: Parameter 'l' implicitly has an 'any' type.
+mekk/src/app/lectures/page.tsx(1,20): error TS2307: Cannot find module '@/components/Navbar' or its corresponding type declarations.
+mekk/src/app/lectures/page.tsx(2,27): error TS2307: Cannot find module '@/components/FooterSection' or its corresponding type declarations.
+mekk/src/app/lectures/page.tsx(3,26): error TS2307: Cannot find module '@/components/lectures/LecturesHero' or its corresponding type declarations.
+mekk/src/app/lectures/page.tsx(4,26): error TS2307: Cannot find module '@/components/lectures/LecturesList' or its corresponding type declarations.
+mekk/src/app/lectures/page.tsx(5,28): error TS2307: Cannot find module '@/components/lectures/LecturesImpact' or its corresponding type declarations.
+mekk/src/app/lectures/page.tsx(6,25): error TS2307: Cannot find module '@/components/lectures/LecturesCTA' or its corresponding type declarations.
+mekk/src/app/login/page.tsx(4,23): error TS2307: Cannot find module '@/app/api/auth/actions' or its corresponding type declarations.
+mekk/src/app/page.tsx(1,23): error TS2307: Cannot find module '@/components/Preloader' or its corresponding type declarations.
+mekk/src/app/page.tsx(2,20): error TS2307: Cannot find module '@/components/Navbar' or its corresponding type declarations.
+mekk/src/app/page.tsx(3,25): error TS2307: Cannot find module '@/components/HeroSection' or its corresponding type declarations.
+mekk/src/app/page.tsx(4,26): error TS2307: Cannot find module '@/components/AboutSection' or its corresponding type declarations.
+mekk/src/app/page.tsx(5,29): error TS2307: Cannot find module '@/components/ServicesSection' or its corresponding type declarations.
+mekk/src/app/page.tsx(6,26): error TS2307: Cannot find module '@/components/StatsSection' or its corresponding type declarations.
+mekk/src/app/page.tsx(7,33): error TS2307: Cannot find module '@/components/TestimonialsSection' or its corresponding type declarations.
+mekk/src/app/page.tsx(8,31): error TS2307: Cannot find module '@/components/MotivationSection' or its corresponding type declarations.
+mekk/src/app/page.tsx(9,30): error TS2307: Cannot find module '@/components/BlueprintSection' or its corresponding type declarations.
+mekk/src/app/page.tsx(10,29): error TS2307: Cannot find module '@/components/CaseStudyTeaser' or its corresponding type declarations.
+mekk/src/app/page.tsx(11,27): error TS2307: Cannot find module '@/components/FooterSection' or its corresponding type declarations.
+mekk/src/app/page.tsx(12,23): error TS2307: Cannot find module '@/components/StickyCTA' or its corresponding type declarations.
+mekk/src/app/page.tsx(13,37): error TS2307: Cannot find module '@/components/ui/ImpactTransitionSection' or its corresponding type declarations.
+mekk/src/app/page.tsx(14,30): error TS2307: Cannot find module '@/utils/supabase/server' or its corresponding type declarations.
+mekk/src/app/portfolio/[slug]/page.tsx(2,20): error TS2307: Cannot find module '@/components/Navbar' or its corresponding type declarations.
+mekk/src/app/portfolio/[slug]/page.tsx(3,27): error TS2307: Cannot find module '@/components/FooterSection' or its corresponding type declarations.
+mekk/src/app/portfolio/[slug]/page.tsx(4,26): error TS2307: Cannot find module '@/lib/constants' or its corresponding type declarations.
+mekk/src/app/portfolio/[slug]/page.tsx(30,32): error TS7006: Parameter 'project' implicitly has an 'any' type.
+mekk/src/app/portfolio/[slug]/ProjectClient.tsx(7,22): error TS2307: Cannot find module '@/lib/constants' or its corresponding type declarations.
+mekk/src/app/portfolio/[slug]/ProjectClient.tsx(8,20): error TS2307: Cannot find module '@/components/Navbar' or its corresponding type declarations.
+mekk/src/app/portfolio/[slug]/ProjectClient.tsx(9,27): error TS2307: Cannot find module '@/components/FooterSection' or its corresponding type declarations.
+mekk/src/app/portfolio/[slug]/ProjectClient.tsx(10,27): error TS2307: Cannot find module '@/components/portfolio/MockupSection' or its corresponding type declarations.
+mekk/src/app/portfolio/page.tsx(1,20): error TS2307: Cannot find module '@/components/Navbar' or its corresponding type declarations.
+mekk/src/app/portfolio/page.tsx(2,27): error TS2307: Cannot find module '@/components/FooterSection' or its corresponding type declarations.
+mekk/src/app/portfolio/page.tsx(3,27): error TS2307: Cannot find module '@/components/portfolio/PortfolioHero' or its corresponding type declarations.
+mekk/src/app/portfolio/page.tsx(4,30): error TS2307: Cannot find module '@/components/portfolio/ProjectsShowcase' or its corresponding type declarations.
+mekk/src/app/portfolio/page.tsx(5,34): error TS2307: Cannot find module '@/components/portfolio/PortfolioCaseStudies' or its corresponding type declarations.
+mekk/src/app/portfolio/page.tsx(6,32): error TS2307: Cannot find module '@/components/portfolio/PortfolioStatement' or its corresponding type declarations.
+mekk/src/app/portfolio/page.tsx(7,30): error TS2307: Cannot find module '@/components/portfolio/PortfolioProcess' or its corresponding type declarations.
+mekk/src/app/portfolio/page.tsx(8,25): error TS2307: Cannot find module '@/components/lectures/LecturesCTA' or its corresponding type declarations.
+mekk/src/app/portfolio/page.tsx(9,40): error TS2307: Cannot find module '@/lib/constants' or its corresponding type declarations.
+mekk/src/app/portfolio/PortfolioClient.tsx(4,27): error TS2307: Cannot find module '@/components/portfolio/PortfolioHero' or its corresponding type declarations.
+mekk/src/app/portfolio/PortfolioClient.tsx(5,30): error TS2307: Cannot find module '@/components/portfolio/ProjectsShowcase' or its corresponding type declarations.
+mekk/src/app/portfolio/PortfolioClient.tsx(6,32): error TS2307: Cannot find module '@/components/portfolio/PortfolioStatement' or its corresponding type declarations.
+mekk/src/app/portfolio/PortfolioClient.tsx(7,34): error TS2307: Cannot find module '@/components/portfolio/PortfolioCaseStudies' or its corresponding type declarations.
+mekk/src/app/portfolio/PortfolioClient.tsx(8,26): error TS2307: Cannot find module '@/components/StatsSection' or its corresponding type declarations.
+mekk/src/app/portfolio/PortfolioClient.tsx(9,40): error TS2307: Cannot find module '@/lib/constants' or its corresponding type declarations.
+mekk/src/app/robots.ts(2,22): error TS2307: Cannot find module '@/lib/constants' or its corresponding type declarations.
+mekk/src/app/sitemap.ts(2,22): error TS2307: Cannot find module '@/lib/constants' or its corresponding type declarations.
+mekk/src/app/testimonials/page.tsx(1,20): error TS2307: Cannot find module '@/components/Navbar' or its corresponding type declarations.
+mekk/src/app/testimonials/page.tsx(2,27): error TS2307: Cannot find module '@/components/FooterSection' or its corresponding type declarations.
+mekk/src/app/testimonials/page.tsx(3,30): error TS2307: Cannot find module '@/components/testimonials/TestimonialsHero' or its corresponding type declarations.
+mekk/src/app/testimonials/page.tsx(4,33): error TS2307: Cannot find module '@/components/testimonials/TestimonialsMarquee' or its corresponding type declarations.
+mekk/src/app/testimonials/page.tsx(5,35): error TS2307: Cannot find module '@/components/testimonials/TestimonialsStatement' or its corresponding type declarations.
+mekk/src/app/testimonials/page.tsx(6,31): error TS2307: Cannot find module '@/components/testimonials/TestimonialsStats' or its corresponding type declarations.
+mekk/src/app/testimonials/page.tsx(7,31): error TS2307: Cannot find module '@/components/testimonials/TestimonialsLogos' or its corresponding type declarations.
+mekk/src/components/about/AboutContactSection.tsx(6,30): error TS2307: Cannot find module '@/hooks/useSplitText' or its corresponding type declarations.
+mekk/src/components/about/AboutCorneredSection.tsx(6,30): error TS2307: Cannot find module '@/hooks/useSplitText' or its corresponding type declarations.
+mekk/src/components/about/AboutManifestoSection.tsx(6,30): error TS2307: Cannot find module '@/hooks/useSplitText' or its corresponding type declarations.
+mekk/src/components/about/AboutOnePercentSection.tsx(6,30): error TS2307: Cannot find module '@/hooks/useSplitText' or its corresponding type declarations.
+mekk/src/components/about/AboutPhilosophySection.tsx(7,30): error TS2307: Cannot find module '@/hooks/useSplitText' or its corresponding type declarations.
+mekk/src/components/about/AboutStorySection.tsx(6,23): error TS2307: Cannot find module '@/components/magicui/Globe' or its corresponding type declarations.
+mekk/src/components/about/AboutTimelineSection.tsx(6,30): error TS2307: Cannot find module '@/hooks/useSplitText' or its corresponding type declarations.
+mekk/src/components/AboutSection.tsx(6,23): error TS2307: Cannot find module 'split-type' or its corresponding type declarations.
+mekk/src/components/AboutSection.tsx(7,23): error TS2307: Cannot find module '@/lib/constants' or its corresponding type declarations.
+mekk/src/components/AboutSection.tsx(91,34): error TS2322: Type '{ children: string; type: string; show: boolean; color: string; }' is not assignable to type 'IntrinsicAttributes & HighlighterProps'.
+  Property 'type' does not exist on type 'IntrinsicAttributes & HighlighterProps'.
+mekk/src/components/AboutSection.tsx(95,34): error TS2322: Type '{ children: string; type: string; show: boolean; color: string; }' is not assignable to type 'IntrinsicAttributes & HighlighterProps'.
+  Property 'type' does not exist on type 'IntrinsicAttributes & HighlighterProps'.
+mekk/src/components/AboutSection.tsx(104,38): error TS2322: Type '{ children: string; type: string; show: boolean; color: string; }' is not assignable to type 'IntrinsicAttributes & HighlighterProps'.
+  Property 'type' does not exist on type 'IntrinsicAttributes & HighlighterProps'.
+mekk/src/components/AboutSection.tsx(108,38): error TS2322: Type '{ children: string; type: string; show: boolean; color: string; }' is not assignable to type 'IntrinsicAttributes & HighlighterProps'.
+  Property 'type' does not exist on type 'IntrinsicAttributes & HighlighterProps'.
+mekk/src/components/AboutSection.tsx(115,38): error TS2322: Type '{ children: string; type: string; show: boolean; color: string; }' is not assignable to type 'IntrinsicAttributes & HighlighterProps'.
+  Property 'type' does not exist on type 'IntrinsicAttributes & HighlighterProps'.
+mekk/src/components/AboutSection.tsx(122,38): error TS2322: Type '{ children: string; type: string; show: boolean; color: string; padding: number[]; }' is not assignable to type 'IntrinsicAttributes & HighlighterProps'.
+  Property 'type' does not exist on type 'IntrinsicAttributes & HighlighterProps'.
+mekk/src/components/AboutSection.tsx(126,38): error TS2322: Type '{ children: string; type: string; show: boolean; color: string; padding: number[]; }' is not assignable to type 'IntrinsicAttributes & HighlighterProps'.
+  Property 'type' does not exist on type 'IntrinsicAttributes & HighlighterProps'.
+mekk/src/components/AboutSection.tsx(130,38): error TS2322: Type '{ children: string; type: string; show: boolean; color: string; padding: number[]; }' is not assignable to type 'IntrinsicAttributes & HighlighterProps'.
+  Property 'type' does not exist on type 'IntrinsicAttributes & HighlighterProps'.
+mekk/src/components/AboutSection.tsx(137,38): error TS2322: Type '{ children: string; type: string; show: boolean; color: string; }' is not assignable to type 'IntrinsicAttributes & HighlighterProps'.
+  Property 'type' does not exist on type 'IntrinsicAttributes & HighlighterProps'.
+mekk/src/components/blog/BlogGrid.tsx(7,20): error TS2307: Cannot find module '@/components/ui/Reveal' or its corresponding type declarations.
+mekk/src/components/blog/BlogHero.tsx(6,29): error TS2307: Cannot find module '@/components/ui/ScrollHighlight' or its corresponding type declarations.
+mekk/src/components/blog/BlogNewsletter.tsx(6,34): error TS2307: Cannot find module '@/app/api/contact/actions' or its corresponding type declarations.
+mekk/src/components/case-studies/CaseStudiesNewsletter.tsx(6,34): error TS2307: Cannot find module '@/app/api/contact/actions' or its corresponding type declarations.
+mekk/src/components/FooterSection.tsx(6,36): error TS2307: Cannot find module '@/lib/constants' or its corresponding type declarations.
+mekk/src/components/FooterSection.tsx(7,34): error TS2307: Cannot find module '@/app/api/contact/actions' or its corresponding type declarations.
+mekk/src/components/FooterSection.tsx(164,39): error TS7006: Parameter 'link' implicitly has an 'any' type.
+mekk/src/components/lectures/LecturesCTA.tsx(10,22): error TS2307: Cannot find module '@/lib/constants' or its corresponding type declarations.
+mekk/src/components/lectures/LecturesImpact.tsx(6,29): error TS2307: Cannot find module '@/components/ui/ScrollHighlight' or its corresponding type declarations.
+mekk/src/components/lectures/LecturesList.tsx(7,26): error TS2307: Cannot find module '@/lib/constants' or its corresponding type declarations.
+mekk/src/components/lectures/LecturesList.tsx(55,32): error TS7006: Parameter 'lecture' implicitly has an 'any' type.
+mekk/src/components/lectures/LecturesList.tsx(55,41): error TS7006: Parameter 'i' implicitly has an 'any' type.
+mekk/src/components/LecturesSection.tsx(7,26): error TS2307: Cannot find module '@/lib/constants' or its corresponding type declarations.
+mekk/src/components/LecturesSection.tsx(50,36): error TS7006: Parameter 'lecture' implicitly has an 'any' type.
+mekk/src/components/LecturesSection.tsx(50,45): error TS7006: Parameter 'i' implicitly has an 'any' type.
+mekk/src/components/LenisProvider.tsx(4,26): error TS2307: Cannot find module '@/hooks/useLenis' or its corresponding type declarations.
+mekk/src/components/magicui/animated-beam.tsx(5,20): error TS2307: Cannot find module '@/lib/utils' or its corresponding type declarations.
+mekk/src/components/magicui/animated-beam.tsx(6,30): error TS2307: Cannot find module '@/registry/magicui/animated-beam' or its corresponding type declarations.
+mekk/src/components/magicui/Globe.tsx(4,42): error TS2307: Cannot find module 'cobe' or its corresponding type declarations.
+mekk/src/components/magicui/Globe.tsx(5,43): error TS2307: Cannot find module 'motion/react' or its corresponding type declarations.
+mekk/src/components/magicui/Globe.tsx(88,24): error TS7006: Parameter 'state' implicitly has an 'any' type.
+mekk/src/components/magicui/Highlighter.tsx(4,51): error TS2307: Cannot find module 'react-rough-notation' or its corresponding type declarations.
+mekk/src/components/magicui/Highlighter.tsx(12,5): error TS2339: Property 'type' does not exist on type 'HighlighterProps'.
+mekk/src/components/magicui/Highlighter.tsx(13,5): error TS2339: Property 'color' does not exist on type 'HighlighterProps'.
+mekk/src/components/magicui/Highlighter.tsx(14,5): error TS2339: Property 'strokeWidth' does not exist on type 'HighlighterProps'.
+mekk/src/components/magicui/Highlighter.tsx(15,5): error TS2339: Property 'animationDuration' does not exist on type 'HighlighterProps'.
+mekk/src/components/magicui/Highlighter.tsx(16,5): error TS2339: Property 'iterations' does not exist on type 'HighlighterProps'.
+mekk/src/components/magicui/Highlighter.tsx(17,5): error TS2339: Property 'padding' does not exist on type 'HighlighterProps'.
+mekk/src/components/magicui/Highlighter.tsx(18,5): error TS2339: Property 'multiline' does not exist on type 'HighlighterProps'.
+mekk/src/components/magicui/Highlighter.tsx(19,5): error TS2339: Property 'show' does not exist on type 'HighlighterProps'.
+mekk/src/components/Navbar.tsx(5,27): error TS2307: Cannot find module '@/lib/constants' or its corresponding type declarations.
+mekk/src/components/Navbar.tsx(176,47): error TS7006: Parameter 'link' implicitly has an 'any' type.
+mekk/src/components/Navbar.tsx(176,124): error TS7006: Parameter 'item' implicitly has an 'any' type.
+mekk/src/components/Navbar.tsx(176,130): error TS7006: Parameter 'index' implicitly has an 'any' type.
+mekk/src/components/Navbar.tsx(193,47): error TS7006: Parameter 'link' implicitly has an 'any' type.
+mekk/src/components/Navbar.tsx(193,123): error TS7006: Parameter 'item' implicitly has an 'any' type.
+mekk/src/components/portfolio/MetricsChart.tsx(7,8): error TS2307: Cannot find module 'recharts' or its corresponding type declarations.
+mekk/src/components/portfolio/PortfolioCaseStudies.tsx(6,20): error TS2307: Cannot find module '@/components/ui/Reveal' or its corresponding type declarations.
+mekk/src/components/portfolio/PortfolioHero.tsx(5,23): error TS2307: Cannot find module 'split-type' or its corresponding type declarations.
+mekk/src/components/portfolio/PortfolioStatement.tsx(6,23): error TS2307: Cannot find module 'split-type' or its corresponding type declarations.
+mekk/src/components/portfolio/PortfolioStatement.tsx(7,29): error TS2307: Cannot find module '@/components/ui/ScrollHighlight' or its corresponding type declarations.
+mekk/src/components/ServicesSection.tsx(6,23): error TS2307: Cannot find module 'split-type' or its corresponding type declarations.
+mekk/src/components/ServicesSection.tsx(7,26): error TS2307: Cannot find module '@/lib/constants' or its corresponding type declarations.
+mekk/src/components/ServicesSection.tsx(65,42): error TS7006: Parameter 'service' implicitly has an 'any' type.
+mekk/src/components/ServicesSection.tsx(65,51): error TS7006: Parameter 'i' implicitly has an 'any' type.
+mekk/src/components/StatsSection.tsx(6,23): error TS2307: Cannot find module '@/lib/constants' or its corresponding type declarations.
+mekk/src/components/StatsSection.tsx(119,33): error TS7006: Parameter 'stat' implicitly has an 'any' type.
+mekk/src/components/StatsSection.tsx(119,39): error TS7006: Parameter 'i' implicitly has an 'any' type.
+mekk/src/components/testimonials/TestimonialsGrid.tsx(6,30): error TS2307: Cannot find module '@/lib/constants' or its corresponding type declarations.
+mekk/src/components/testimonials/TestimonialsGrid.tsx(44,36): error TS7006: Parameter 't' implicitly has an 'any' type.
+mekk/src/components/testimonials/TestimonialsGrid.tsx(44,39): error TS7006: Parameter 'i' implicitly has an 'any' type.
+mekk/src/components/testimonials/TestimonialsMarquee.tsx(4,30): error TS2307: Cannot find module '@/lib/constants' or its corresponding type declarations.
+mekk/src/components/testimonials/TestimonialsStatement.tsx(6,22): error TS2307: Cannot find module '@/lib/constants' or its corresponding type declarations.
+mekk/src/components/testimonials/TestimonialsStatement.tsx(7,42): error TS2307: Cannot find module '@/app/api/contact/actions' or its corresponding type declarations.
+mekk/src/components/TestimonialsSection.tsx(6,23): error TS2307: Cannot find module 'split-type' or its corresponding type declarations.
+mekk/src/components/TestimonialsSection.tsx(7,30): error TS2307: Cannot find module '@/lib/constants' or its corresponding type declarations.
+mekk/src/components/ui/3d-marquee.tsx(3,24): error TS2307: Cannot find module 'motion/react' or its corresponding type declarations.
+mekk/src/components/ui/3d-marquee.tsx(4,20): error TS2307: Cannot find module '@/lib/utils' or its corresponding type declarations.
+mekk/src/components/ui/animated-beam.tsx(4,24): error TS2307: Cannot find module 'motion/react' or its corresponding type declarations.
+mekk/src/components/ui/bento-grid.tsx(2,32): error TS2307: Cannot find module '@radix-ui/react-icons' or its corresponding type declarations.
+mekk/src/components/ui/bento-grid.tsx(4,20): error TS2307: Cannot find module '@/lib/utils' or its corresponding type declarations.
+mekk/src/components/ui/bento-grid.tsx(74,11): error TS2322: Type '"link"' is not assignable to type '"primary" | "outline" | "secondary" | "ghost" | undefined'.
+mekk/src/components/ui/bento-grid.tsx(93,9): error TS2322: Type '"link"' is not assignable to type '"primary" | "outline" | "secondary" | "ghost" | undefined'.
+mekk/src/components/ui/button.tsx(2,22): error TS2307: Cannot find module '@radix-ui/react-slot' or its corresponding type declarations.
+mekk/src/components/ui/button.tsx(3,40): error TS2307: Cannot find module 'class-variance-authority' or its corresponding type declarations.
+mekk/src/components/ui/button.tsx(5,20): error TS2307: Cannot find module '@/lib/utils' or its corresponding type declarations.
+mekk/src/components/ui/button.tsx(44,17): error TS2339: Property 'variant' does not exist on type 'ButtonProps'.
+mekk/src/components/ui/button.tsx(44,26): error TS2339: Property 'size' does not exist on type 'ButtonProps'.
+mekk/src/components/ui/interactive-grid-pattern.tsx(5,20): error TS2307: Cannot find module '@/lib/utils' or its corresponding type declarations.
+mekk/src/components/ui/number-ticker.tsx(4,54): error TS2307: Cannot find module 'motion/react' or its corresponding type declarations.
+mekk/src/components/ui/number-ticker.tsx(6,20): error TS2307: Cannot find module '@/lib/utils' or its corresponding type declarations.
+mekk/src/components/ui/number-ticker.tsx(44,33): error TS7006: Parameter 'latest' implicitly has an 'any' type.
+mekk/src/hooks/useLenis.ts(4,19): error TS2307: Cannot find module 'lenis' or its corresponding type declarations.
+mekk/src/hooks/useSplitText.ts(4,23): error TS2307: Cannot find module 'split-type' or its corresponding type declarations.
+mekk/src/lib/utils.ts(2,25): error TS2307: Cannot find module 'tailwind-merge' or its corresponding type declarations.
+mekk/src/middleware.ts(2,31): error TS2307: Cannot find module '@/utils/supabase/middleware' or its corresponding type declarations.
+mekk/src/utils/google.ts(2,30): error TS2307: Cannot find module '@/utils/supabase/server' or its corresponding type declarations.
+mekk/src/utils/supabase/client.ts(1,37): error TS2307: Cannot find module '@supabase/ssr' or its corresponding type declarations.
+mekk/src/utils/supabase/middleware.ts(1,36): error TS2307: Cannot find module '@supabase/ssr' or its corresponding type declarations.
+mekk/src/utils/supabase/middleware.ts(17,24): error TS7006: Parameter 'cookiesToSet' implicitly has an 'any' type.
+mekk/src/utils/supabase/middleware.ts(18,45): error TS7031: Binding element 'name' implicitly has an 'any' type.
+mekk/src/utils/supabase/middleware.ts(18,51): error TS7031: Binding element 'value' implicitly has an 'any' type.
+mekk/src/utils/supabase/middleware.ts(18,58): error TS7031: Binding element 'options' implicitly has an 'any' type.
+mekk/src/utils/supabase/middleware.ts(22,45): error TS7031: Binding element 'name' implicitly has an 'any' type.
+mekk/src/utils/supabase/middleware.ts(22,51): error TS7031: Binding element 'value' implicitly has an 'any' type.
+mekk/src/utils/supabase/middleware.ts(22,58): error TS7031: Binding element 'options' implicitly has an 'any' type.
+mekk/src/utils/supabase/server.ts(1,36): error TS2307: Cannot find module '@supabase/ssr' or its corresponding type declarations.
+mekk/src/utils/supabase/server.ts(15,24): error TS7006: Parameter 'cookiesToSet' implicitly has an 'any' type.
+mekk/src/utils/supabase/server.ts(17,49): error TS7031: Binding element 'name' implicitly has an 'any' type.
+mekk/src/utils/supabase/server.ts(17,55): error TS7031: Binding element 'value' implicitly has an 'any' type.
+mekk/src/utils/supabase/server.ts(17,62): error TS7031: Binding element 'options' implicitly has an 'any' type.

@@ -113,8 +113,12 @@ export default function ContactPage() {
   const [consultationSubmitting, setConsultationSubmitting] = useState(false);
   const [consultationError, setConsultationError] = useState('');
   const [consultationInfo, setConsultationInfo] = useState<ConsultationOptionsResponse | null>(null);
-  const [selectedTypeId, setSelectedTypeId] = useState('');
+  const typeIdParam = searchParams.get('typeId');
+  const slotParam = searchParams.get('slot');
+
+  const [selectedTypeId, setSelectedTypeId] = useState(typeIdParam || '');
   const [selectedSlotId, setSelectedSlotId] = useState('');
+  const [selectedSlotStr, setSelectedSlotStr] = useState(slotParam || '');
   const [paymentMethod, setPaymentMethod] = useState<'card' | 'wallet'>('card');
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
 
@@ -247,7 +251,7 @@ export default function ContactPage() {
 
         const options = data as ConsultationOptionsResponse;
         setConsultationInfo(options);
-        if (options.consultationTypes.length > 0) {
+        if (options.consultationTypes.length > 0 && !typeIdParam) {
           setSelectedTypeId(options.consultationTypes[0].id);
         }
       })
@@ -356,7 +360,7 @@ export default function ContactPage() {
   };
 
   const handleConsultationCheckout = async () => {
-    if (!selectedSlotId || !selectedType) {
+    if ((!selectedSlotId && !selectedSlotStr) || !selectedType) {
       setConsultationError('Please select a service and an available slot');
       return;
     }
@@ -374,7 +378,9 @@ export default function ContactPage() {
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
         body: JSON.stringify({
-          slotId: selectedSlotId,
+          slotId: selectedSlotId || undefined,
+          typeId: selectedTypeId || undefined,
+          slot: selectedSlotStr || undefined,
           method: paymentMethod,
           locale,
           instructorSlug,
@@ -500,7 +506,30 @@ export default function ContactPage() {
 
                           <div className={styles.formGroup}>
                             <label className={styles.label}>Available Slots</label>
-                            {consultationSlots.length === 0 ? (
+                            {selectedSlotStr ? (
+                                <div style={{
+                                  border: '1px solid var(--accent-primary)',
+                                  background: 'rgba(231, 76, 60, 0.12)',
+                                  color: 'var(--text-primary)',
+                                  borderRadius: '10px',
+                                  padding: '10px 12px',
+                                }}>
+                                  <strong>
+                                    {new Date(selectedSlotStr).toLocaleDateString(locale === 'ar' ? 'ar-EG' : 'en-US', {
+                                      weekday: 'long',
+                                      month: 'long',
+                                      day: 'numeric',
+                                      year: 'numeric',
+                                    })}
+                                  </strong>
+                                  <div style={{ color: 'var(--text-secondary)', fontSize: '14px', marginTop: '4px' }}>
+                                    {new Date(selectedSlotStr).toLocaleTimeString(locale === 'ar' ? 'ar-EG' : 'en-US', {
+                                      hour: 'numeric',
+                                      minute: '2-digit',
+                                    })}
+                                  </div>
+                                </div>
+                            ) : consultationSlots.length === 0 ? (
                               <p style={{ margin: 0, color: 'var(--text-secondary)', fontSize: '14px' }}>
                                 No available slots for this service right now.
                               </p>
@@ -590,7 +619,7 @@ export default function ContactPage() {
                           consultationSubmitting ||
                           consultationLoading ||
                           !selectedType ||
-                          !selectedSlotId
+                          (!selectedSlotId && !selectedSlotStr)
                         }
                         onClick={handleConsultationCheckout}
                       >

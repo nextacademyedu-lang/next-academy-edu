@@ -111,5 +111,49 @@ export const ConsultationTypes: CollectionConfig = {
     { name: 'meetingPlatform', type: 'text' },
     { name: 'maxParticipants', type: 'number', defaultValue: 1 },
     { name: 'isActive', type: 'checkbox', defaultValue: true },
+    
+    /* ── Advanced Scheduling Boundaries ────────────────────────── */
+    { 
+      name: 'bufferBefore', 
+      type: 'number', 
+      defaultValue: 0, 
+      admin: { description: 'Minutes of breathing room before a session.' } 
+    },
+    { 
+      name: 'bufferAfter', 
+      type: 'number', 
+      defaultValue: 0, 
+      admin: { description: 'Minutes of breathing room after a session.' } 
+    },
+    { 
+      name: 'maxPerDay', 
+      type: 'number', 
+      admin: { description: 'Maximum allowed bookings of this specific consultation type per day.' } 
+    },
+    { 
+      name: 'availableDays', 
+      type: 'select', 
+      hasMany: true,
+      options: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
+      admin: { description: 'Select specific days this service is allowed to be booked.' } 
+    },
+    { 
+      name: 'startTimeIncrement', 
+      type: 'number', 
+      defaultValue: 30, 
+      admin: { description: 'Slot start time interval (e.g., every 30 minutes).' } 
+    },
+    { 
+      name: 'minNoticeHours', 
+      type: 'number', 
+      defaultValue: 24, 
+      admin: { description: 'Minimum hours notice required before a booking can be made.' } 
+    },
+    { 
+      name: 'minCancelNoticeHours', 
+      type: 'number', 
+      defaultValue: 72, 
+      admin: { description: 'Minimum hours notice required to allow a cancellation (prevents last minute cancellations).' } 
+    },
   ],
 };

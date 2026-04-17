@@ -321,3 +321,169 @@
     right: 20px;
   }
 }
+
+/* Booking Sidebar Additions */
+.sidebarCard {
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  background: var(--card-bg);
+  padding: 18px;
+}
+.sidebarCard h3 {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 22px;
+}
+.sidebarLead {
+  margin: 10px 0 0;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  font-size: 14px;
+}
+.emptyText {
+  margin: 10px 0 0;
+  color: var(--text-muted);
+}
+.bookingTypes {
+  margin-top: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.bookingTypeCardBtn {
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--bg-surface) 88%, transparent);
+  padding: 12px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.bookingTypeCardBtn:hover {
+  background: var(--hover-overlay);
+  border-color: var(--accent-primary-40);
+}
+.bookingTypeCardBtn strong {
+  color: var(--text-primary);
+  display: block;
+  font-size: 15px;
+}
+.bookingTypeCardBtn p {
+  margin: 4px 0 0;
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+.priceTag {
+  color: var(--accent-gold);
+  font-weight: var(--font-bold);
+  white-space: nowrap;
+}
+.backButton {
+  background: none;
+  border: none;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+}
+.backButton:hover {
+  color: var(--text-primary);
+}
+.spinningIcon {
+  animation: spin 1s linear infinite;
+}
+@keyframes spin {
+  100% { transform: rotate(360deg); }
+}
+.calendarFlow {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.daysScroll {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+  scrollbar-width: none;
+}
+.daysScroll::-webkit-scrollbar {
+  display: none;
+}
+.dayButton {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 60px;
+  padding: 10px 8px;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  background: var(--bg-surface);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.dayButton:not(.dayDisabled):hover {
+  border-color: var(--accent-primary-40);
+  background: var(--hover-overlay);
+}
+.daySelected {
+  border-color: var(--accent-primary);
+  background: color-mix(in srgb, var(--accent-primary) 15%, transparent);
+}
+.dayDisabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  background: transparent;
+}
+.dayName {
+  font-size: 12px;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+}
+.dayNumber {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 2px 0;
+}
+.dayMonth {
+  font-size: 11px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+.slotsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+.slotButton {
+  padding: 10px 0;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  background: var(--bg-surface);
+  color: var(--text-primary);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+}
+.slotButton:hover {
+  border-color: var(--accent-primary-40);
+  background: var(--hover-overlay);
+}
+.slotSelected {
+  border-color: var(--accent-primary);
+  background: var(--accent-primary);
+  color: white;
+}

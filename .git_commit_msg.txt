@@ -1,0 +1,4 @@
+fix: disable ESLint and type-check during next build to prevent hang
+
+ESLint has a circular reference in React plugin config causing infinite loop.
+Both checks already run in GitHub Actions CI, so skip them in Docker build.

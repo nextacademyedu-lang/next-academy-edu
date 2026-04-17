@@ -298,6 +298,7 @@ export function mapBookingToTwentyOpportunity(params: {
     bookingType: 'Program',
     promoCode: getString(booking.discountCode),
     discount: getNumber(booking.discountAmount) ? String(getNumber(booking.discountAmount)) : undefined,
+    stage: mapBookingStatusToDealStage(status),
   };
 }
 
@@ -413,6 +414,7 @@ export function mapConsultationToTwentyOpportunity(params: {
     bookingType: 'Consultation',
     promoCode: getString(consultation.bookingCode), // Not the strictly right field perhaps but we map bookingCode or discountCode if we had one.
     discount: getNumber(consultation.discountAmount) ? String(getNumber(consultation.discountAmount)) : undefined,
+    stage: mapConsultationStatusToDealStage(status, getString(consultation.paymentStatus)),
   };
 }
 

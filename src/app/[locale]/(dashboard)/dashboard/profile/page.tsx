@@ -20,7 +20,7 @@ import styles from './profile.module.css';
 import { DeleteAccountModal } from '@/components/dashboard/delete-account-modal';
 
 type Toast = { type: 'success' | 'error'; message: string } | null;
-type Tab = 'general' | 'professional' | 'company' | 'interests' | 'security';
+type Tab = 'general' | 'professional' | 'company' | 'interests' | 'security' | 'integrations';
 
 const WORK_FIELDS = [
   'Marketing', 'Sales', 'Tech', 'Finance', 'Operations', 'HR', 'Legal',
@@ -266,6 +266,11 @@ export default function ProfilePage() {
           <button onClick={() => setTab('security')} className={`${styles.navBtn} ${tab === 'security' ? styles.active : ''}`}>
             <Lock size={18} /> {t('securityPassword')}
           </button>
+          {user?.role === 'instructor' && (
+            <button onClick={() => setTab('integrations')} className={`${styles.navBtn} ${tab === 'integrations' ? styles.active : ''}`}>
+              <Calendar size={18} /> Integrations
+            </button>
+          )}
         </div>
 
         {/* Content */}
@@ -542,6 +547,41 @@ export default function ProfilePage() {
                 </CardContent>
               </Card>
             </>
+          )}
+
+          {/* Integrations Tab (Instructors Only) */}
+          {tab === 'integrations' && user?.role === 'instructor' && (
+            <Card className={styles.panelCard}>
+              <CardHeader>
+                <CardTitle>Calendar Integration</CardTitle>
+                <CardDescription>Connect your Google Calendar to automatically sync your availability and generate Meet links for bookings.</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                  <div style={{ 
+                    padding: '16px', 
+                    borderRadius: '8px', 
+                    backgroundColor: 'var(--bg-surface)', 
+                    border: '1px solid var(--border-subtle)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between'
+                  }}>
+                    <div>
+                      <h4 style={{ fontSize: '15px', fontWeight: 600 }}>Google Calendar</h4>
+                      <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginTop: '4px' }}>
+                        Required for accepting online consultations.
+                      </p>
+                    </div>
+                    <div>
+                      <a href={`/api/auth/google/user-connect`} style={{ textDecoration: 'none' }}>
+                        <Button variant="primary">Connect Google Calendar</Button>
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           )}
 
         </div>

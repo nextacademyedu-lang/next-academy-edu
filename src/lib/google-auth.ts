@@ -1,14 +1,12 @@
 /**
  * Google OAuth2 Authentication
  *
- * Used to authorize the admin's Gmail account for Google Calendar API access.
- * The admin connects once, and the refresh token is stored for server-side use.
+ * Modified to support dynamic per-user refresh tokens for Native Booking Engine.
  *
  * Required env vars:
  *   GOOGLE_CLIENT_ID
  *   GOOGLE_CLIENT_SECRET
- *   GOOGLE_REDIRECT_URI   – e.g. http://localhost:3000/api/google/callback
- *   GOOGLE_REFRESH_TOKEN  – populated after first OAuth flow
+ *   GOOGLE_REDIRECT_URI
  */
 
 import { google } from 'googleapis';
@@ -38,13 +36,14 @@ export function createOAuth2Client() {
   return new google.auth.OAuth2(clientId, clientSecret, redirectUri);
 }
 
-/** Get the Google consent URL for the admin to authorize */
-export function getAuthUrl(): string {
+/** Get the Google consent URL for a user to authorize */
+export function getAuthUrl(state?: string): string {
   const oauth2Client = createOAuth2Client();
   return oauth2Client.generateAuthUrl({
     access_type: 'offline',
     prompt: 'consent',
     scope: SCOPES,
+    state, // Pass user intent or user ID
   });
 }
 
@@ -56,11 +55,9 @@ export async function exchangeCodeForTokens(code: string) {
 }
 
 /**
- * Get an authenticated Google OAuth2 client using the stored refresh token.
- * Returns null if no refresh token is configured.
+ * Get an authenticated Google OAuth2 client using a specific refresh token.
  */
-export function getAuthClient() {
-  const refreshToken = process.env.GOOGLE_REFRESH_TOKEN;
+export function getUserAuthClient(refreshToken: string | null | undefined) {
   if (!refreshToken) return null;
 
   const oauth2Client = createOAuth2Client();
@@ -68,11 +65,15 @@ export function getAuthClient() {
   return oauth2Client;
 }
 
-/** Check if Google Calendar integration is configured and ready */
+/** Get an authenticated Google OAuth2 client using the global admin refresh token. */
+export function getAdminAuthClient() {
+  return getUserAuthClient(process.env.GOOGLE_REFRESH_TOKEN);
+}
+
+/** Check if Google Calendar integration is structurally configured globally */
 export function isGoogleCalendarEnabled(): boolean {
   return !!(
     process.env.GOOGLE_CLIENT_ID &&
-    process.env.GOOGLE_CLIENT_SECRET &&
-    process.env.GOOGLE_REFRESH_TOKEN
+    process.env.GOOGLE_CLIENT_SECRET
   );
 }

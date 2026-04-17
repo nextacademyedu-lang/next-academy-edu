@@ -1,15 +1,15 @@
 /**
  * Google Calendar Service
  *
- * Creates Calendar events with Google Meet links, manages attendees.
- * Used by Payload hooks to auto-invite/revoke students.
+ * Used for both Admin system Calendar events (sessions) and
+ * Native Instructor Booking engine (fetching Free/Busy, creating bookings).
  */
 
 import { google, type calendar_v3 } from 'googleapis';
-import { getAuthClient, isGoogleCalendarEnabled } from './google-auth.ts';
+import { getAdminAuthClient, getUserAuthClient } from './google-auth';
 
-function getCalendarClient(): calendar_v3.Calendar | null {
-  const auth = getAuthClient();
+function getCalendarClient(refreshToken?: string | null): calendar_v3.Calendar | null {
+  const auth = refreshToken ? getUserAuthClient(refreshToken) : getAdminAuthClient();
   if (!auth) return null;
   return google.calendar({ version: 'v3', auth });
 }
@@ -26,6 +26,7 @@ export interface CreateEventParams {
   endTime: string;       // "12:00"
   timezone?: string;     // "Africa/Cairo"
   attendeeEmails?: string[];
+  refreshToken?: string | null; // Pass to use specific user's calendar, otherwise uses Admin
 }
 
 export interface EventResult {
@@ -38,11 +39,36 @@ export interface EventResult {
 // ─────────────────────────────────────────────
 
 /**
+ * Check Free/Busy for a specific time range.
+ * Returns an array of busy periods, or an empty array if completely free.
+ */
+export async function getFreeBusy(
+  timeMin: string, // ISO datetime
+  timeMax: string, // ISO datetime
+  refreshToken: string, // REQUIRED: Instructor's refresh token
+  calendarId: string = 'primary',
+): Promise<{ start: string; end: string }[]> {
+  const calendar = getCalendarClient(refreshToken);
+  if (!calendar) throw new Error('Missing Google Calendar authorization client.');
+
+  const res = await calendar.freebusy.query({
+    requestBody: {
+      timeMin,
+      timeMax,
+      items: [{ id: calendarId }],
+    },
+  });
+
+  const calendars = res.data.calendars || {};
+  return calendars[calendarId]?.busy || [];
+}
+
+/**
  * Create a Calendar event with an auto-generated Google Meet link.
  * Returns the event ID and meeting URL.
  */
 export async function createSessionEvent(params: CreateEventParams): Promise<EventResult | null> {
-  const calendar = getCalendarClient();
+  const calendar = getCalendarClient(params.refreshToken);
   if (!calendar) return null;
 
   const tz = params.timezone || 'Africa/Cairo';
@@ -66,7 +92,7 @@ export async function createSessionEvent(params: CreateEventParams): Promise<Eve
       attendees,
       conferenceData: {
         createRequest: {
-          requestId: `session-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+          requestId: `booking-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
           conferenceSolutionKey: { type: 'hangoutsMeet' },
         },
       },
@@ -93,8 +119,8 @@ export async function createSessionEvent(params: CreateEventParams): Promise<Eve
 /**
  * Add an attendee to an existing Calendar event.
  */
-export async function addAttendee(eventId: string, email: string): Promise<void> {
-  const calendar = getCalendarClient();
+export async function addAttendee(eventId: string, email: string, refreshToken?: string | null): Promise<void> {
+  const calendar = getCalendarClient(refreshToken);
   if (!calendar) return;
 
   const existing = await calendar.events.get({
@@ -122,8 +148,8 @@ export async function addAttendee(eventId: string, email: string): Promise<void>
 /**
  * Remove an attendee from an existing Calendar event.
  */
-export async function removeAttendee(eventId: string, email: string): Promise<void> {
-  const calendar = getCalendarClient();
+export async function removeAttendee(eventId: string, email: string, refreshToken?: string | null): Promise<void> {
+  const calendar = getCalendarClient(refreshToken);
   if (!calendar) return;
 
   const existing = await calendar.events.get({
@@ -156,12 +182,12 @@ export async function removeAttendee(eventId: string, email: string): Promise<vo
 export async function removeAttendeeFromAllEvents(
   eventIds: string[],
   email: string,
+  refreshToken?: string | null,
 ): Promise<void> {
   for (const eventId of eventIds) {
     try {
-      await removeAttendee(eventId, email);
+      await removeAttendee(eventId, email, refreshToken);
     } catch (err) {
-      // Log but don't fail the whole operation for one event
       console.error(`[Google Calendar] Failed to remove ${email} from event ${eventId}:`, err);
     }
   }
@@ -174,10 +200,11 @@ export async function removeAttendeeFromAllEvents(
 export async function addAttendeeToAllEvents(
   eventIds: string[],
   email: string,
+  refreshToken?: string | null,
 ): Promise<void> {
   for (const eventId of eventIds) {
     try {
-      await addAttendee(eventId, email);
+      await addAttendee(eventId, email, refreshToken);
     } catch (err) {
       console.error(`[Google Calendar] Failed to add ${email} to event ${eventId}:`, err);
     }
@@ -187,8 +214,8 @@ export async function addAttendeeToAllEvents(
 /**
  * Delete a Calendar event. Used when a session is deleted.
  */
-export async function deleteEvent(eventId: string): Promise<void> {
-  const calendar = getCalendarClient();
+export async function deleteEvent(eventId: string, refreshToken?: string | null): Promise<void> {
+  const calendar = getCalendarClient(refreshToken);
   if (!calendar) return;
 
   try {

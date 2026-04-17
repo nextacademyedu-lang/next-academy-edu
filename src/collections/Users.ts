@@ -342,5 +342,34 @@ export const Users: CollectionConfig = {
     { name: 'googleId', type: 'text', admin: { readOnly: true, description: 'Google OAuth sub ID' } },
     { name: 'emailVerified', type: 'checkbox', defaultValue: false },
     { name: 'lastLogin', type: 'date', admin: { readOnly: true } },
+    
+    /* ── Native Google Calendar Sync ────────────────────────────── */
+    { 
+      name: 'googleRefreshToken', 
+      type: 'text', 
+      admin: { readOnly: true, description: 'User-specific Google Calendar integration refresh token' },
+      access: { read: isAdmin, update: isAdmin },
+    },
+    { 
+      name: 'googleAccessToken', 
+      type: 'text', 
+      admin: { readOnly: true },
+      access: { read: isAdmin, update: isAdmin },
+    },
+    { 
+      name: 'googleCalendarConnectedAt', 
+      type: 'date', 
+      admin: { readOnly: true },
+    },
+    { 
+      name: 'googleCalendarEmail', 
+      type: 'text', 
+      admin: { readOnly: true },
+    },
+    { 
+      name: 'googleCalendarId', 
+      type: 'text', 
+      admin: { readOnly: true, description: 'Default calendar ID used for booking creation' },
+    },
   ],
 };
