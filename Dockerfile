@@ -68,8 +68,8 @@ EXPOSE 3001
 ENV PORT=3001
 ENV HOSTNAME=0.0.0.0
 
-# Increased start-period to 60s to allow Payload schema push on first boot
-HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+# Fast healthcheck since Payload schema push is disabled in production
+HEALTHCHECK --interval=15s --timeout=10s --start-period=10s --retries=5 \
   CMD node -e "const http = require('http'); const req = http.get('http://localhost:3001/api/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1); }); req.on('error', () => process.exit(1)); req.setTimeout(5000, () => { req.destroy(); process.exit(1); });"
 
 CMD ["node", "server.js"]
