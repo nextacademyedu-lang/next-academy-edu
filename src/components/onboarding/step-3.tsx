@@ -1,12 +1,15 @@
 'use client';
 
+import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import styles from './onboarding.module.css';
 
 interface Step3Data {
   interests: string[];
+  customInterests: string;
   learningGoals: string;
   howDidYouHear: string;
+  howDidYouHearOther: string;
 }
 
 interface Step3Props {
@@ -17,6 +20,7 @@ interface Step3Props {
 
 export function OnboardingStep3({ data, onChange, availableTags }: Step3Props) {
   const t = useTranslations('Auth');
+  const [customTagInput, setCustomTagInput] = useState('');
 
   const toggleInterest = (tagId: string) => {
     const current = data.interests;
@@ -26,6 +30,32 @@ export function OnboardingStep3({ data, onChange, availableTags }: Step3Props) {
     onChange({ ...data, interests: updated });
   };
 
+  const addCustomInterest = () => {
+    const trimmed = customTagInput.trim();
+    if (!trimmed) return;
+    // Store custom interests as a comma-separated string
+    const existing = data.customInterests
+      ? data.customInterests.split(',').map((s) => s.trim()).filter(Boolean)
+      : [];
+    if (!existing.includes(trimmed)) {
+      existing.push(trimmed);
+    }
+    onChange({ ...data, customInterests: existing.join(', ') });
+    setCustomTagInput('');
+  };
+
+  const removeCustomInterest = (interest: string) => {
+    const existing = data.customInterests
+      ? data.customInterests.split(',').map((s) => s.trim()).filter(Boolean)
+      : [];
+    const updated = existing.filter((i) => i !== interest);
+    onChange({ ...data, customInterests: updated.join(', ') });
+  };
+
+  const customInterestList = data.customInterests
+    ? data.customInterests.split(',').map((s) => s.trim()).filter(Boolean)
+    : [];
+
   const HOW_OPTIONS: { value: string; label: string }[] = [
     { value: '', label: t('selectOption') },
     { value: 'website', label: t('howWebsite') },
@@ -33,11 +63,14 @@ export function OnboardingStep3({ data, onChange, availableTags }: Step3Props) {
     { value: 'social', label: t('howSocial') },
     { value: 'friend', label: t('howFriend') },
     { value: 'google', label: t('howGoogle') },
+    { value: 'linkedin', label: t('howLinkedIn') },
+    { value: 'youtube', label: t('howYouTube') },
     { value: 'other', label: t('howOther') },
   ];
 
   return (
     <div className={styles.form}>
+      {/* Interests from DB Tags */}
       <div className={styles.inputGroup}>
         <label className={styles.label}>{t('interests')}</label>
         <div className={styles.tagsContainer}>
@@ -58,6 +91,47 @@ export function OnboardingStep3({ data, onChange, availableTags }: Step3Props) {
             </span>
           )}
         </div>
+      </div>
+
+      {/* Custom interests the user can type */}
+      <div className={styles.inputGroup}>
+        <label className={styles.label}>{t('customInterestsLabel')}</label>
+        <div className={styles.customTagRow}>
+          <input
+            className={styles.input}
+            type="text"
+            placeholder={t('customInterestsPlaceholder')}
+            value={customTagInput}
+            onChange={(e) => setCustomTagInput(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                e.preventDefault();
+                addCustomInterest();
+              }
+            }}
+          />
+          <button
+            type="button"
+            className={styles.addTagBtn}
+            onClick={addCustomInterest}
+          >
+            {t('add')}
+          </button>
+        </div>
+        {customInterestList.length > 0 && (
+          <div className={styles.tagsContainer} style={{ marginTop: '8px' }}>
+            {customInterestList.map((interest) => (
+              <button
+                key={interest}
+                type="button"
+                className={`${styles.tagChip} ${styles.selected}`}
+                onClick={() => removeCustomInterest(interest)}
+              >
+                {interest} ✕
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
       <div className={styles.inputGroup}>
@@ -81,7 +155,13 @@ export function OnboardingStep3({ data, onChange, availableTags }: Step3Props) {
           id="ob-how"
           className={styles.select}
           value={data.howDidYouHear}
-          onChange={(e) => onChange({ ...data, howDidYouHear: e.target.value })}
+          onChange={(e) => {
+            onChange({
+              ...data,
+              howDidYouHear: e.target.value,
+              howDidYouHearOther: e.target.value !== 'other' ? '' : data.howDidYouHearOther,
+            });
+          }}
         >
           {HOW_OPTIONS.map((opt) => (
             <option key={opt.value} value={opt.value}>
@@ -89,6 +169,16 @@ export function OnboardingStep3({ data, onChange, availableTags }: Step3Props) {
             </option>
           ))}
         </select>
+        {data.howDidYouHear === 'other' && (
+          <input
+            id="ob-how-other"
+            className={`${styles.input} ${styles.otherInput}`}
+            type="text"
+            placeholder={t('howDidYouHearOtherPlaceholder')}
+            value={data.howDidYouHearOther}
+            onChange={(e) => onChange({ ...data, howDidYouHearOther: e.target.value })}
+          />
+        )}
       </div>
     </div>
   );

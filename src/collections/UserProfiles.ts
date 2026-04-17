@@ -129,8 +129,7 @@ export const UserProfiles: CollectionConfig = {
     { name: 'jobTitle', type: 'text' },
     {
       name: 'workField',
-      type: 'select',
-      options: ['Marketing', 'Sales', 'Tech', 'Finance', 'Operations', 'HR', 'Legal', 'Other'],
+      type: 'text',
     },
     {
       name: 'yearsOfExperience',
@@ -161,8 +160,7 @@ export const UserProfiles: CollectionConfig = {
     { name: 'interests', type: 'relationship', relationTo: 'tags', hasMany: true },
     {
       name: 'howDidYouHear',
-      type: 'select',
-      options: ['website', 'whatsapp', 'social', 'friend', 'google', 'other'],
+      type: 'text',
     },
     { name: 'onboardingCompleted', type: 'checkbox', defaultValue: false },
     { name: 'onboardingStep', type: 'number', defaultValue: 1 },

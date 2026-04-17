@@ -354,3 +354,60 @@
     font-size: 11px;
   }
 }
+
+/* ── Tags / Interests chips ─────────────────────── */
+.tagsContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.tagChip {
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 1px solid var(--border, #2a2d45);
+  background: transparent;
+  color: var(--text-secondary, #94a3b8);
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.tagChip:hover {
+  border-color: var(--primary, #c9a96e);
+  color: var(--primary, #c9a96e);
+}
+
+.tagChip.selected {
+  border-color: var(--primary, #c9a96e);
+  background: rgba(201, 169, 110, 0.15);
+  color: var(--primary, #c9a96e);
+}
+
+/* ── Custom interest row ──────────────────────── */
+.customTagRow {
+  display: flex;
+  gap: 8px;
+}
+
+.addTagBtn {
+  padding: 0 16px;
+  border-radius: 8px;
+  border: 1px solid var(--primary, #c9a96e);
+  background: transparent;
+  color: var(--primary, #c9a96e);
+  font-size: 14px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.2s;
+}
+
+.addTagBtn:hover {
+  background: rgba(201, 169, 110, 0.12);
+}
+
+/* ── Other / custom input ──────────────────────── */
+.otherInput {
+  margin-top: 8px;
+}

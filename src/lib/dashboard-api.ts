@@ -97,6 +97,8 @@ export interface ExtendedProfilePayload {
   city?: string;
   linkedinUrl?: string;
   learningGoals?: string;
+  howDidYouHear?: string;
+  interests?: string[];
 }
 
 export interface ExtendedProfileData {
@@ -113,7 +115,7 @@ export interface ExtendedProfileData {
   linkedinUrl?: string;
   learningGoals?: string;
   howDidYouHear?: string;
-  interests?: Array<{ id: string; name?: string }> | string[];
+  interests?: Array<{ id: string; name?: string; title?: string }> | string[];
   onboardingCompleted?: boolean;
 }
 
@@ -207,6 +209,19 @@ export async function updateUserExtendedProfile(
     headers: { 'Content-Type': 'application/json' },
     credentials: 'include',
     body: JSON.stringify(data),
+  });
+  return handleResponse<{ doc: Record<string, unknown> }>(response);
+}
+
+export async function createUserExtendedProfile(
+  userId: string,
+  data: ExtendedProfilePayload,
+): Promise<AuthResponse<{ doc: Record<string, unknown> }>> {
+  const response = await fetch('/api/user-profiles', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
+    body: JSON.stringify({ user: userId, ...data }),
   });
   return handleResponse<{ doc: Record<string, unknown> }>(response);
 }

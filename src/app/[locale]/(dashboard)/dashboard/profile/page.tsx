@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { User, Lock, Mail, Phone, Loader2, CheckCircle2, AlertCircle, Briefcase, Building2 } from 'lucide-react';
+import { User, Lock, Mail, Phone, Loader2, CheckCircle2, AlertCircle, Briefcase, Building2, Heart } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -13,20 +13,23 @@ import {
   changeUserPassword,
   getUserExtendedProfile,
   updateUserExtendedProfile,
+  createUserExtendedProfile,
   type ExtendedProfileData,
 } from '@/lib/dashboard-api';
 import styles from './profile.module.css';
 import { DeleteAccountModal } from '@/components/dashboard/delete-account-modal';
 
 type Toast = { type: 'success' | 'error'; message: string } | null;
-type Tab = 'general' | 'professional' | 'company' | 'security';
+type Tab = 'general' | 'professional' | 'company' | 'interests' | 'security';
 
 const WORK_FIELDS = [
-  'Marketing', 'Sales', 'Tech', 'Finance', 'Operations', 'HR', 'Legal', 'Other',
+  'Marketing', 'Sales', 'Tech', 'Finance', 'Operations', 'HR', 'Legal',
+  'Education', 'Healthcare', 'Engineering', 'Design', 'Entrepreneurship',
+  'Consulting', 'Media', 'Other',
 ] as const;
 
 const EXPERIENCE_RANGES = [
-  '0-1', '2-5', '6-10', '11-15', '16+',
+  '0-2', '3-5', '6-10', '10+',
 ] as const;
 
 const COMPANY_SIZES = [
@@ -37,7 +40,18 @@ const COMPANY_TYPES = [
   'startup', 'sme', 'enterprise', 'government', 'freelancer',
 ] as const;
 
-const TITLE_OPTIONS = ['Mr', 'Ms', 'Mrs', 'Dr', 'Eng'] as const;
+const HOW_OPTIONS = [
+  { value: 'website', label: 'Website' },
+  { value: 'whatsapp', label: 'WhatsApp' },
+  { value: 'social', label: 'Social Media' },
+  { value: 'friend', label: 'Friend / Colleague' },
+  { value: 'google', label: 'Google Search' },
+  { value: 'linkedin', label: 'LinkedIn' },
+  { value: 'youtube', label: 'YouTube' },
+  { value: 'other', label: 'Other' },
+] as const;
+
+const TITLE_OPTIONS = ['Mr', 'Ms', 'Mrs', 'Dr', 'Eng', 'Prof'] as const;
 
 export default function ProfilePage() {
   const { user, refreshUser } = useAuth();
@@ -65,6 +79,11 @@ export default function ProfilePage() {
   const [country, setCountry]           = useState('');
   const [city, setCity]                 = useState('');
   const [savingComp, setSavingComp]     = useState(false);
+
+  // Interests / Learning form state
+  const [learningGoals, setLearningGoals]     = useState('');
+  const [howDidYouHear, setHowDidYouHear]     = useState('');
+  const [savingInterests, setSavingInterests] = useState(false);
 
   // Security form state
   const [newPassword,     setNewPassword]     = useState('');
@@ -96,15 +115,20 @@ export default function ProfilePage() {
       setJobTitle(p.jobTitle ?? '');
       setWorkField(p.workField ?? '');
       setExperience(p.yearsOfExperience ?? '');
+
+      // Company: handle relation or string
       if (p.company && typeof p.company === 'object' && 'name' in p.company) {
-        setCompany(p.company.name);
+        setCompany((p.company as { name: string }).name);
       } else if (typeof p.company === 'string') {
         setCompany(p.company);
       }
+
       setCompanySize(p.companySize ?? '');
       setCompanyType(p.companyType ?? '');
       setCountry(p.country ?? '');
       setCity(p.city ?? '');
+      setLearningGoals(p.learningGoals ?? '');
+      setHowDidYouHear(p.howDidYouHear ?? '');
     }
   }, [user]);
 
@@ -117,11 +141,40 @@ export default function ProfilePage() {
     setTimeout(() => setToast(null), 4000);
   };
 
+  // Helper: save extended profile — creates one if none exists yet
+  const saveExtended = async (
+    data: Record<string, unknown>,
+    setLoading: (b: boolean) => void,
+  ) => {
+    if (!user) return;
+    setLoading(true);
+
+    let res;
+    if (profileId) {
+      res = await updateUserExtendedProfile(profileId, data);
+    } else {
+      res = await createUserExtendedProfile(user.id, data);
+      if (res.success && res.data) {
+        const newId = (res.data as { doc?: { id?: string } }).doc?.id;
+        if (newId) setProfileId(newId);
+      }
+    }
+
+    setLoading(false);
+    if (res.success) {
+      showToast('success', t('profileUpdated'));
+    } else {
+      showToast('error', res.error ?? t('profileUpdateFailed'));
+    }
+  };
+
   const handleSaveGeneral = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) return;
     setSaving(true);
-    const res = await updateUserProfile(user.id, { firstName, lastName, phone, gender: gender as 'male' | 'female' });
+    const res = await updateUserProfile(user.id, {
+      firstName, lastName, phone, gender: gender as 'male' | 'female',
+    });
     setSaving(false);
     if (res.success) {
       await refreshUser();
@@ -133,51 +186,34 @@ export default function ProfilePage() {
 
   const handleSaveProfessional = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!profileId) {
-      showToast('error', t('profileUpdateFailed'));
-      return;
-    }
-    setSavingPro(true);
-    const res = await updateUserExtendedProfile(profileId, {
-      title, jobTitle, workField, yearsOfExperience: experience,
-    });
-    setSavingPro(false);
-    if (res.success) {
-      showToast('success', t('profileUpdated'));
-    } else {
-      showToast('error', res.error ?? t('profileUpdateFailed'));
-    }
+    await saveExtended(
+      { title, jobTitle, workField, yearsOfExperience: experience },
+      setSavingPro,
+    );
   };
 
   const handleSaveCompany = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!profileId) {
-      showToast('error', t('profileUpdateFailed'));
-      return;
-    }
-    setSavingComp(true);
-    const res = await updateUserExtendedProfile(profileId, {
-      companySize, companyType, country, city,
-    });
-    setSavingComp(false);
-    if (res.success) {
-      showToast('success', t('profileUpdated'));
-    } else {
-      showToast('error', res.error ?? t('profileUpdateFailed'));
-    }
+    // Note: company name is read-only from onboarding — only size/type/country/city can change
+    await saveExtended(
+      { companySize, companyType, country, city },
+      setSavingComp,
+    );
+  };
+
+  const handleSaveInterests = async (e: React.FormEvent) => {
+    e.preventDefault();
+    await saveExtended(
+      { learningGoals, howDidYouHear: howDidYouHear || undefined },
+      setSavingInterests,
+    );
   };
 
   const handleChangePassword = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) return;
-    if (newPassword.length < 8) {
-      showToast('error', t('passwordMin'));
-      return;
-    }
-    if (newPassword !== confirmPassword) {
-      showToast('error', t('passwordsNoMatch'));
-      return;
-    }
+    if (newPassword.length < 8) { showToast('error', t('passwordMin')); return; }
+    if (newPassword !== confirmPassword) { showToast('error', t('passwordsNoMatch')); return; }
     setChangingPwd(true);
     const res = await changeUserPassword(user.id, newPassword);
     setChangingPwd(false);
@@ -198,7 +234,9 @@ export default function ProfilePage() {
       {/* Toast */}
       {toast && (
         <div className={`${styles.toast} ${toast.type === 'success' ? styles.toastSuccess : styles.toastError}`}>
-          {toast.type === 'success' ? <CheckCircle2 size={16} className={styles.toastIcon} /> : <AlertCircle size={16} className={styles.toastIcon} />}
+          {toast.type === 'success'
+            ? <CheckCircle2 size={16} className={styles.toastIcon} />
+            : <AlertCircle  size={16} className={styles.toastIcon} />}
           {toast.message}
         </div>
       )}
@@ -222,6 +260,9 @@ export default function ProfilePage() {
           <button onClick={() => setTab('company')} className={`${styles.navBtn} ${tab === 'company' ? styles.active : ''}`}>
             <Building2 size={18} /> {t('companyLocation')}
           </button>
+          <button onClick={() => setTab('interests')} className={`${styles.navBtn} ${tab === 'interests' ? styles.active : ''}`}>
+            <Heart size={18} /> {t('interestsLearning')}
+          </button>
           <button onClick={() => setTab('security')} className={`${styles.navBtn} ${tab === 'security' ? styles.active : ''}`}>
             <Lock size={18} /> {t('securityPassword')}
           </button>
@@ -239,40 +280,22 @@ export default function ProfilePage() {
               </CardHeader>
               <CardContent>
                 <form onSubmit={handleSaveGeneral} className={styles.formStack}>
-
-                  {/* Avatar */}
                   <div className={styles.avatarRow}>
-                    <div className={styles.avatar}>
-                      {avatarInitial}
-                    </div>
+                    <div className={styles.avatar}>{avatarInitial}</div>
                     <div>
-                      <p className={styles.identityName}>
-                        {user?.firstName} {user?.lastName}
-                      </p>
-                      <p className={styles.identityEmail}>
-                        {user?.email}
-                      </p>
+                      <p className={styles.identityName}>{user?.firstName} {user?.lastName}</p>
+                      <p className={styles.identityEmail}>{user?.email}</p>
                     </div>
                   </div>
 
                   <div className={styles.formGridRow}>
                     <div className={styles.fieldBlock}>
                       <Label htmlFor="firstName">{t('firstName')}</Label>
-                      <Input
-                        id="firstName"
-                        value={firstName}
-                        onChange={e => setFirstName(e.target.value)}
-                        required
-                      />
+                      <Input id="firstName" value={firstName} onChange={e => setFirstName(e.target.value)} required />
                     </div>
                     <div className={styles.fieldBlock}>
                       <Label htmlFor="lastName">{t('lastName')}</Label>
-                      <Input
-                        id="lastName"
-                        value={lastName}
-                        onChange={e => setLastName(e.target.value)}
-                        required
-                      />
+                      <Input id="lastName" value={lastName} onChange={e => setLastName(e.target.value)} required />
                     </div>
                   </div>
 
@@ -280,12 +303,7 @@ export default function ProfilePage() {
                     <Label htmlFor="email">{t('email')}</Label>
                     <div className={styles.fieldWithIcon}>
                       <Mail size={16} color="var(--text-muted)" className={styles.inputIcon} />
-                      <Input
-                        id="email"
-                        value={user?.email ?? ''}
-                        className={styles.withIconInput}
-                        disabled
-                      />
+                      <Input id="email" value={user?.email ?? ''} className={styles.withIconInput} disabled />
                     </div>
                     <p className={styles.fieldHint}>{t('emailCannotChange')}</p>
                   </div>
@@ -295,23 +313,12 @@ export default function ProfilePage() {
                       <Label htmlFor="phone">{t('phoneLabel')}</Label>
                       <div className={styles.fieldWithIcon}>
                         <Phone size={16} color="var(--text-muted)" className={styles.inputIcon} />
-                        <Input
-                          id="phone"
-                          value={phone}
-                          onChange={e => setPhone(e.target.value)}
-                          className={styles.withIconInput}
-                          placeholder={t('phonePlaceholder')}
-                        />
+                        <Input id="phone" value={phone} onChange={e => setPhone(e.target.value)} className={styles.withIconInput} placeholder={t('phonePlaceholder')} />
                       </div>
                     </div>
                     <div className={styles.fieldBlock}>
                       <Label htmlFor="gender">{t('genderLabel')}</Label>
-                      <select
-                        id="gender"
-                        className={styles.selectField}
-                        value={gender}
-                        onChange={e => setGender(e.target.value)}
-                      >
+                      <select id="gender" className={styles.selectField} value={gender} onChange={e => setGender(e.target.value)}>
                         <option value="">{t('selectGender')}</option>
                         <option value="male">{t('genderMale')}</option>
                         <option value="female">{t('genderFemale')}</option>
@@ -341,56 +348,46 @@ export default function ProfilePage() {
                   <div className={styles.formGridRow}>
                     <div className={styles.fieldBlock}>
                       <Label htmlFor="title">{t('titleLabel')}</Label>
-                      <select
-                        id="title"
-                        className={styles.selectField}
-                        value={title}
-                        onChange={e => setTitle(e.target.value)}
-                      >
+                      <select id="title" className={styles.selectField} value={title} onChange={e => setTitle(e.target.value)}>
                         <option value="">{t('selectTitle')}</option>
-                        {TITLE_OPTIONS.map(opt => (
-                          <option key={opt} value={opt}>{opt}</option>
-                        ))}
+                        {TITLE_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
                       </select>
                     </div>
                     <div className={styles.fieldBlock}>
                       <Label htmlFor="jobTitle">{t('jobTitleLabel')}</Label>
-                      <Input
-                        id="jobTitle"
-                        value={jobTitle}
-                        onChange={e => setJobTitle(e.target.value)}
-                        placeholder={t('jobTitlePlaceholder')}
-                      />
+                      <Input id="jobTitle" value={jobTitle} onChange={e => setJobTitle(e.target.value)} placeholder={t('jobTitlePlaceholder')} />
                     </div>
                   </div>
 
                   <div className={styles.formGridRow}>
                     <div className={styles.fieldBlock}>
                       <Label htmlFor="workField">{t('workFieldLabel')}</Label>
-                      <select
-                        id="workField"
-                        className={styles.selectField}
-                        value={workField}
-                        onChange={e => setWorkField(e.target.value)}
-                      >
+                      <select id="workField" className={styles.selectField} value={WORK_FIELDS.includes(workField as any) ? workField : workField ? 'Other' : ''} onChange={e => {
+                        if (e.target.value !== 'Other') {
+                          setWorkField(e.target.value);
+                        } else {
+                          setWorkField(''); // clear for custom input
+                        }
+                      }}>
                         <option value="">{t('selectField')}</option>
-                        {WORK_FIELDS.map(f => (
-                          <option key={f} value={f.toLowerCase()}>{f}</option>
-                        ))}
+                        {WORK_FIELDS.map(f => <option key={f} value={f}>{f}</option>)}
+                        <option value="Other">{t('fieldOther')}</option>
                       </select>
+                      {(!WORK_FIELDS.includes(workField as any) && workField !== '') || workField === 'Other' ? (
+                        <div style={{ marginTop: '8px' }}>
+                          <Input
+                            placeholder={t('workFieldOtherPlaceholder')}
+                            value={workField}
+                            onChange={(e) => setWorkField(e.target.value)}
+                          />
+                        </div>
+                      ) : null}
                     </div>
                     <div className={styles.fieldBlock}>
                       <Label htmlFor="experience">{t('experienceLabel')}</Label>
-                      <select
-                        id="experience"
-                        className={styles.selectField}
-                        value={experience}
-                        onChange={e => setExperience(e.target.value)}
-                      >
+                      <select id="experience" className={styles.selectField} value={experience} onChange={e => setExperience(e.target.value)}>
                         <option value="">{t('selectExperience')}</option>
-                        {EXPERIENCE_RANGES.map(r => (
-                          <option key={r} value={r}>{r} years</option>
-                        ))}
+                        {EXPERIENCE_RANGES.map(r => <option key={r} value={r}>{r} years</option>)}
                       </select>
                     </div>
                   </div>
@@ -414,45 +411,25 @@ export default function ProfilePage() {
               </CardHeader>
               <CardContent>
                 <form onSubmit={handleSaveCompany} className={styles.formStack}>
-
                   <div className={styles.fieldBlock}>
                     <Label htmlFor="company">{t('companyName')}</Label>
-                    <Input
-                      id="company"
-                      value={company}
-                      disabled
-                      placeholder={t('companyPlaceholder')}
-                    />
-                    <p className={styles.fieldHint}>Company is set during onboarding.</p>
+                    <Input id="company" value={company} disabled placeholder={t('companyPlaceholder')} />
+                    <p className={styles.fieldHint}>{t('companySetDuringOnboarding')}</p>
                   </div>
 
                   <div className={styles.formGridRow}>
                     <div className={styles.fieldBlock}>
                       <Label htmlFor="companySize">{t('companySize')}</Label>
-                      <select
-                        id="companySize"
-                        className={styles.selectField}
-                        value={companySize}
-                        onChange={e => setCompanySize(e.target.value)}
-                      >
+                      <select id="companySize" className={styles.selectField} value={companySize} onChange={e => setCompanySize(e.target.value)}>
                         <option value="">{t('selectSize')}</option>
-                        {COMPANY_SIZES.map(s => (
-                          <option key={s} value={s}>{s} employees</option>
-                        ))}
+                        {COMPANY_SIZES.map(s => <option key={s} value={s}>{s} employees</option>)}
                       </select>
                     </div>
                     <div className={styles.fieldBlock}>
                       <Label htmlFor="companyType">{t('companyType')}</Label>
-                      <select
-                        id="companyType"
-                        className={styles.selectField}
-                        value={companyType}
-                        onChange={e => setCompanyType(e.target.value)}
-                      >
+                      <select id="companyType" className={styles.selectField} value={companyType} onChange={e => setCompanyType(e.target.value)}>
                         <option value="">{t('selectType')}</option>
-                        {COMPANY_TYPES.map(ct => (
-                          <option key={ct} value={ct}>{ct}</option>
-                        ))}
+                        {COMPANY_TYPES.map(ct => <option key={ct} value={ct}>{ct}</option>)}
                       </select>
                     </div>
                   </div>
@@ -460,27 +437,63 @@ export default function ProfilePage() {
                   <div className={styles.formGridRow}>
                     <div className={styles.fieldBlock}>
                       <Label htmlFor="country">{t('country')}</Label>
-                      <Input
-                        id="country"
-                        value={country}
-                        onChange={e => setCountry(e.target.value)}
-                        placeholder={t('countryPlaceholder')}
-                      />
+                      <Input id="country" value={country} onChange={e => setCountry(e.target.value)} placeholder={t('countryPlaceholder')} />
                     </div>
                     <div className={styles.fieldBlock}>
                       <Label htmlFor="city">{t('city')}</Label>
-                      <Input
-                        id="city"
-                        value={city}
-                        onChange={e => setCity(e.target.value)}
-                        placeholder={t('cityPlaceholder')}
-                      />
+                      <Input id="city" value={city} onChange={e => setCity(e.target.value)} placeholder={t('cityPlaceholder')} />
                     </div>
                   </div>
 
                   <div className={styles.actionsRow}>
                     <Button type="submit" variant="primary" disabled={savingComp}>
                       {savingComp ? <><Loader2 size={16} className={styles.spinningIcon} />{t('savingChanges')}</> : t('saveChanges')}
+                    </Button>
+                  </div>
+                </form>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Interests & Learning Tab */}
+          {tab === 'interests' && (
+            <Card className={styles.panelCard}>
+              <CardHeader>
+                <CardTitle>{t('interestsLearning')}</CardTitle>
+                <CardDescription>{t('updateInterests')}</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <form onSubmit={handleSaveInterests} className={styles.formStack}>
+                  <div className={styles.fieldBlock}>
+                    <Label htmlFor="howDidYouHear">{t('howDidYouHear')}</Label>
+                    <select
+                      id="howDidYouHear"
+                      className={styles.selectField}
+                      value={howDidYouHear}
+                      onChange={e => setHowDidYouHear(e.target.value)}
+                    >
+                      <option value="">{t('selectOption')}</option>
+                      {HOW_OPTIONS.map(opt => (
+                        <option key={opt.value} value={opt.value}>{opt.label}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className={styles.fieldBlock}>
+                    <Label htmlFor="learningGoals">{t('learningGoalsLabel')}</Label>
+                    <textarea
+                      id="learningGoals"
+                      className={styles.selectField}
+                      style={{ minHeight: 120, resize: 'vertical', padding: '8px 12px', fontFamily: 'inherit', fontSize: '0.875rem' }}
+                      placeholder={t('learningGoalsPlaceholder')}
+                      value={learningGoals}
+                      onChange={e => setLearningGoals(e.target.value)}
+                    />
+                  </div>
+
+                  <div className={styles.actionsRow}>
+                    <Button type="submit" variant="primary" disabled={savingInterests}>
+                      {savingInterests ? <><Loader2 size={16} className={styles.spinningIcon} />{t('savingChanges')}</> : t('saveChanges')}
                     </Button>
                   </div>
                 </form>
@@ -500,25 +513,11 @@ export default function ProfilePage() {
                   <form onSubmit={handleChangePassword} className={styles.formStack}>
                     <div className={styles.fieldBlock}>
                       <Label htmlFor="newPassword">{t('newPassword')}</Label>
-                      <Input
-                        id="newPassword"
-                        type="password"
-                        value={newPassword}
-                        onChange={e => setNewPassword(e.target.value)}
-                        placeholder={t('passwordMinLength')}
-                        required
-                      />
+                      <Input id="newPassword" type="password" value={newPassword} onChange={e => setNewPassword(e.target.value)} placeholder={t('passwordMinLength')} required />
                     </div>
                     <div className={styles.fieldBlock}>
                       <Label htmlFor="confirmPassword">{t('confirmNewPassword')}</Label>
-                      <Input
-                        id="confirmPassword"
-                        type="password"
-                        value={confirmPassword}
-                        onChange={e => setConfirmPassword(e.target.value)}
-                        placeholder={t('passwordMinLength')}
-                        required
-                      />
+                      <Input id="confirmPassword" type="password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} placeholder={t('passwordMinLength')} required />
                     </div>
                     <div className={styles.actionsRow}>
                       <Button type="submit" variant="primary" disabled={changingPwd}>
@@ -536,11 +535,7 @@ export default function ProfilePage() {
                 </CardHeader>
                 <CardContent>
                   <div className={styles.actionsRow}>
-                    <Button 
-                      type="button" 
-                      variant="secondary" 
-                      onClick={() => setShowDeleteModal(true)}
-                    >
+                    <Button type="button" variant="secondary" onClick={() => setShowDeleteModal(true)}>
                       {t('deleteAccountBtn')}
                     </Button>
                   </div>
@@ -553,9 +548,9 @@ export default function ProfilePage() {
       </div>
 
       {showDeleteModal && (
-        <DeleteAccountModal 
-          isOpen={showDeleteModal} 
-          onClose={() => setShowDeleteModal(false)} 
+        <DeleteAccountModal
+          isOpen={showDeleteModal}
+          onClose={() => setShowDeleteModal(false)}
         />
       )}
     </div>

@@ -70,6 +70,7 @@ export default function OnboardingPage() {
     title: '',
     jobTitle: '',
     workField: '',
+    workFieldOther: '',
     yearsOfExperience: '',
     phone: '',
     gender: '',
@@ -86,8 +87,10 @@ export default function OnboardingPage() {
 
   const [step3, setStep3] = useState<Step3Data>({
     interests: [],
+    customInterests: '',
     learningGoals: '',
     howDidYouHear: '',
+    howDidYouHearOther: '',
   });
 
   // Fetch metadata for onboarding form
@@ -95,16 +98,18 @@ export default function OnboardingPage() {
     async function fetchOnboardingMetadata() {
       try {
         const [tagsRes, companiesRes] = await Promise.all([
-          fetch('/api/tags?limit=50&depth=0'),
+          fetch('/api/tags?limit=100&depth=0'),
           fetch('/api/companies?limit=250&depth=0&sort=name'),
         ]);
 
         if (tagsRes.ok) {
           const tagsData = await tagsRes.json();
-          const tags = (tagsData.docs || []).map((tag: { id: string; name?: string; title?: string }) => ({
-            id: String(tag.id),
-            name: tag.name || tag.title || 'Unnamed',
-          }));
+          const tags = (tagsData.docs || [])
+            .map((tag: { id: string; name?: string; title?: string }) => ({
+              id: String(tag.id),
+              name: tag.name || tag.title || '',
+            }))
+            .filter((tag: Tag) => tag.name.length > 0); // skip unnamed tags
           setAvailableTags(tags);
         }
 
@@ -243,11 +248,27 @@ export default function OnboardingPage() {
         });
       }
 
+      // Resolve workField: if "Other" use the custom text
+      const resolvedWorkField = step1.workField === 'Other' && step1.workFieldOther.trim()
+        ? step1.workFieldOther.trim()
+        : step1.workField || undefined;
+
+      // Resolve howDidYouHear: if "other" append the custom text
+      const resolvedHowDidYouHear = step3.howDidYouHear === 'other' && step3.howDidYouHearOther.trim()
+        ? `other:${step3.howDidYouHearOther.trim()}`
+        : step3.howDidYouHear || undefined;
+
+      // Merge standard tag interests + custom text interests into learningGoals notes
+      const combinedLearningGoals = [
+        step3.learningGoals,
+        step3.customInterests ? `Custom interests: ${step3.customInterests}` : '',
+      ].filter(Boolean).join('\n');
+
       const profilePayload = {
         user: user?.id,
         title: step1.title || undefined,
         jobTitle: step1.jobTitle || undefined,
-        workField: step1.workField || undefined,
+        workField: resolvedWorkField,
         yearsOfExperience: step1.yearsOfExperience || undefined,
         company: companyId || undefined,
         companySize: step2.companySize || undefined,
@@ -255,8 +276,8 @@ export default function OnboardingPage() {
         country: step2.country || undefined,
         city: step2.city || undefined,
         interests: step3.interests.length > 0 ? step3.interests : undefined,
-        learningGoals: step3.learningGoals || undefined,
-        howDidYouHear: step3.howDidYouHear || undefined,
+        learningGoals: combinedLearningGoals || undefined,
+        howDidYouHear: resolvedHowDidYouHear,
         onboardingCompleted: true,
         onboardingStep: TOTAL_STEPS,
       };
@@ -266,31 +287,37 @@ export default function OnboardingPage() {
         Object.entries(profilePayload).filter(([, v]) => v !== undefined),
       );
 
+      let saveRes;
       if (existingProfile) {
-        await fetch(`/api/user-profiles/${existingProfile.id}`, {
+        saveRes = await fetch(`/api/user-profiles/${existingProfile.id}`, {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
           body: JSON.stringify(cleanPayload),
         });
       } else {
-        await fetch('/api/user-profiles', {
+        saveRes = await fetch('/api/user-profiles', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
           body: JSON.stringify(cleanPayload),
         });
+      }
+
+      if (!saveRes.ok) {
+        const errData = await saveRes.json().catch(() => ({}));
+        throw new Error(errData?.errors?.[0]?.message || errData?.message || 'Save failed');
       }
 
       const role = user?.role || 'user';
       const dashboardPath = getDashboardPath(role, locale);
       router.push(dashboardPath);
-    } catch {
-      setError(t('somethingWentWrong'));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : t('somethingWentWrong'));
     } finally {
       setIsLoading(false);
     }
   };
-
-  // Skip removed — all onboarding fields are required
 
   return (
     <div className={styles.onboardingContainer}>
@@ -397,8 +424,6 @@ export default function OnboardingPage() {
           </button>
         )}
       </div>
-
-
     </div>
   );
 }

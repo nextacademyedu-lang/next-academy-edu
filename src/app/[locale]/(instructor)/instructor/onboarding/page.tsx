@@ -309,19 +309,18 @@ export default function InstructorOnboardingPage() {
   }, []);
 
   // Step 3 agreement
-  const [acceptedClauses, setAcceptedClauses] = useState<Set<string>>(new Set());
+  const [hasScrolledToBottom, setHasScrolledToBottom] = useState(false);
+  const [agreeAll, setAgreeAll] = useState(false);
+  const [agreeTerms, setAgreeTerms] = useState(false);
+  const [agreePrivacy, setAgreePrivacy] = useState(false);
 
-  const toggleClause = (id: string) => {
-    setAcceptedClauses((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
-    setError('');
+  const handleAgreementScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    const el = e.currentTarget;
+    const bottom = el.scrollHeight - el.scrollTop - el.clientHeight < 30;
+    if (bottom) setHasScrolledToBottom(true);
   };
 
-  const allClausesAccepted = acceptedClauses.size === AGREEMENT_CLAUSES.length;
+  const allAgreementsChecked = agreeAll && agreeTerms && agreePrivacy;
 
   const getCategoryLabel = (category: CategoryOption) =>
     isAr
@@ -434,8 +433,12 @@ export default function InstructorOnboardingPage() {
 
   /* ── Submit ──────────────────────────────────────── */
   const handleSubmit = async () => {
-    if (!allClausesAccepted) {
-      setError('يجب الموافقة على جميع البنود / All clauses must be accepted');
+    if (!allAgreementsChecked) {
+      setError('يجب الموافقة على جميع البنود / All agreements must be accepted');
+      return;
+    }
+    if (!hasScrolledToBottom) {
+      setError('يرجى قراءة جميع البنود حتى النهاية / Please scroll through all clauses');
       return;
     }
 
@@ -478,7 +481,7 @@ export default function InstructorOnboardingPage() {
             previousTraineesCount: Number(program.previousTraineesCount),
             teachingExperienceYears: Number(program.teachingExperienceYears),
           },
-          clausesAccepted: Array.from(acceptedClauses),
+          clausesAccepted: AGREEMENT_CLAUSES.map(c => c.id),
         }),
       });
 
@@ -830,34 +833,33 @@ export default function InstructorOnboardingPage() {
                 <option value="advanced">متقدم / Advanced</option>
               </select>
             </div>
+            {/* Categories as checkboxes */}
             <div className={`${styles.fieldGroup} ${styles.fullWidth}`}>
               <label>التصنيف / Category *</label>
-              <select
-                multiple
-                value={program.categoryIds}
-                onChange={(e) => {
-                  const values = Array.from(
-                    e.currentTarget.selectedOptions,
-                    (option: HTMLOptionElement) => option.value,
-                  );
-                  setProgram((p) => ({ ...p, categoryIds: values }));
-                }}
-                size={Math.min(Math.max(categories.length, 3), 8)}
-                disabled={categoriesLoading || categories.length === 0}
-              >
-                {categories.map((category) => (
-                  <option key={category.id} value={category.id}>
-                    {getCategoryLabel(category)}
-                  </option>
-                ))}
-              </select>
-              <p className={styles.helperText}>
-                {categoriesLoading
-                  ? 'Loading categories...'
-                  : categories.length
-                    ? 'يمكنك اختيار أكثر من تصنيف (Ctrl/Cmd + Click) / You can pick multiple categories'
-                    : 'لا توجد تصنيفات متاحة حالياً / No active categories available'}
-              </p>
+              {categoriesLoading ? (
+                <p className={styles.helperText}>Loading categories...</p>
+              ) : categories.length === 0 ? (
+                <p className={styles.helperText}>لا توجد تصنيفات متاحة / No active categories available</p>
+              ) : (
+                <div className={styles.checkboxGrid}>
+                  {categories.map((category) => (
+                    <label key={category.id} className={styles.checkboxItem}>
+                      <input
+                        type="checkbox"
+                        checked={program.categoryIds.includes(category.id)}
+                        onChange={() => {
+                          const current = program.categoryIds;
+                          const updated = current.includes(category.id)
+                            ? current.filter(id => id !== category.id)
+                            : [...current, category.id];
+                          setProgram(p => ({ ...p, categoryIds: updated }));
+                        }}
+                      />
+                      <span>{getCategoryLabel(category)}</span>
+                    </label>
+                  ))}
+                </div>
+              )}
             </div>
             <div className={styles.fieldGroup}>
               <label>دربت كام متدرب قبل كده؟ / Previous Trainees Count *</label>
@@ -955,20 +957,21 @@ export default function InstructorOnboardingPage() {
         </div>
       )}
 
-      {/* ── Step 3: Agreement ──────────────────────── */}
       {showForm && step === 3 && (
         <div className={styles.formCard}>
           <h2 className={styles.stepTitle}>بنود الاتفاقية / Agreement Terms</h2>
           <p className={styles.stepSubtitle}>
-            يرجى قراءة كل بند والموافقة عليه / Please read and accept each clause
+            يرجى قراءة جميع البنود حتى النهاية ثم الموافقة / Please read all clauses to the end then agree
           </p>
 
-          <div className={styles.agreementSection}>
+          {/* Scrollable clauses */}
+          <div
+            className={styles.agreementSection}
+            style={{ maxHeight: 400, overflowY: 'auto', border: '1px solid var(--border)', borderRadius: 8, padding: 16, marginBottom: 16 }}
+            onScroll={handleAgreementScroll}
+          >
             {AGREEMENT_CLAUSES.map((clause, i) => (
-              <div
-                key={clause.id}
-                className={`${styles.clauseCard} ${acceptedClauses.has(clause.id) ? styles.accepted : ''}`}
-              >
+              <div key={clause.id} className={styles.clauseCard}>
                 <div className={styles.clauseHeader}>
                   <div className={styles.clauseNumber}>{i + 1}</div>
                   <h3 className={styles.clauseTitle}>{clause.titleAr} / {clause.titleEn}</h3>
@@ -977,16 +980,54 @@ export default function InstructorOnboardingPage() {
                   <p className={styles.clauseAr}>{clause.textAr}</p>
                   <p className={styles.clauseEn}>{clause.textEn}</p>
                 </div>
-                <label className={styles.clauseCheckbox}>
-                  <input
-                    type="checkbox"
-                    checked={acceptedClauses.has(clause.id)}
-                    onChange={() => toggleClause(clause.id)}
-                  />
-                  أوافق على هذا البند / I agree to this clause
-                </label>
               </div>
             ))}
+            {!hasScrolledToBottom && (
+              <p style={{ textAlign: 'center', color: 'var(--text-muted)', fontSize: 13, marginTop: 8 }}>
+                ↓ اسحب للأسفل لقراءة جميع البنود / Scroll down to read all clauses
+              </p>
+            )}
+          </div>
+
+          {/* Agreement Checkboxes */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 20 }}>
+            <label className={styles.clauseCheckbox} style={{ opacity: hasScrolledToBottom ? 1 : 0.4, pointerEvents: hasScrolledToBottom ? 'auto' : 'none' }}>
+              <input
+                type="checkbox"
+                checked={agreeAll}
+                disabled={!hasScrolledToBottom}
+                onChange={e => setAgreeAll(e.target.checked)}
+              />
+              <span>أوافق على جميع بنود الاتفاقية / I agree to all clauses of this agreement</span>
+            </label>
+            <label className={styles.clauseCheckbox} style={{ opacity: hasScrolledToBottom ? 1 : 0.4, pointerEvents: hasScrolledToBottom ? 'auto' : 'none' }}>
+              <input
+                type="checkbox"
+                checked={agreeTerms}
+                disabled={!hasScrolledToBottom}
+                onChange={e => setAgreeTerms(e.target.checked)}
+              />
+              <span>
+                أوافق على{' '}
+                <a href="/ar/terms" target="_blank" rel="noreferrer" style={{ color: 'var(--primary)' }}>شروط الخدمة</a>
+                {' / I agree to the '}  
+                <a href="/en/terms" target="_blank" rel="noreferrer" style={{ color: 'var(--primary)' }}>Terms of Service</a>
+              </span>
+            </label>
+            <label className={styles.clauseCheckbox} style={{ opacity: hasScrolledToBottom ? 1 : 0.4, pointerEvents: hasScrolledToBottom ? 'auto' : 'none' }}>
+              <input
+                type="checkbox"
+                checked={agreePrivacy}
+                disabled={!hasScrolledToBottom}
+                onChange={e => setAgreePrivacy(e.target.checked)}
+              />
+              <span>
+                أوافق على{' '}
+                <a href="/ar/privacy" target="_blank" rel="noreferrer" style={{ color: 'var(--primary)' }}>سياسة الخصوصية</a>
+                {' / I agree to the '}
+                <a href="/en/privacy" target="_blank" rel="noreferrer" style={{ color: 'var(--primary)' }}>Privacy Policy</a>
+              </span>
+            </label>
           </div>
 
           <div className={styles.actions}>
@@ -994,7 +1035,7 @@ export default function InstructorOnboardingPage() {
             <button
               className={styles.btnPrimary}
               onClick={handleSubmit}
-              disabled={!allClausesAccepted || saving}
+              disabled={!allAgreementsChecked || !hasScrolledToBottom || saving}
             >
               {saving ? 'جاري الحفظ... / Saving...' : 'إتمام التسجيل / Complete Registration ✓'}
             </button>

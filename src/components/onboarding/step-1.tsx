@@ -7,6 +7,7 @@ interface Step1Data {
   title: string;
   jobTitle: string;
   workField: string;
+  workFieldOther: string;
   yearsOfExperience: string;
   phone: string;
   gender: string;
@@ -36,6 +37,13 @@ export function OnboardingStep1({ data, onChange }: Step1Props) {
     { value: 'Operations', label: t('fieldOperations') },
     { value: 'HR', label: t('fieldHR') },
     { value: 'Legal', label: t('fieldLegal') },
+    { value: 'Education', label: t('fieldEducation') },
+    { value: 'Healthcare', label: t('fieldHealthcare') },
+    { value: 'Engineering', label: t('fieldEngineering') },
+    { value: 'Design', label: t('fieldDesign') },
+    { value: 'Entrepreneurship', label: t('fieldEntrepreneurship') },
+    { value: 'Consulting', label: t('fieldConsulting') },
+    { value: 'Media', label: t('fieldMedia') },
     { value: 'Other', label: t('fieldOther') },
   ];
 
@@ -101,7 +109,12 @@ export function OnboardingStep1({ data, onChange }: Step1Props) {
           id="ob-workField"
           className={styles.select}
           value={data.workField}
-          onChange={(e) => update('workField', e.target.value)}
+          onChange={(e) => {
+            update('workField', e.target.value);
+            if (e.target.value !== 'Other') {
+              update('workFieldOther', '');
+            }
+          }}
         >
           {WORK_FIELD_OPTIONS.map((opt) => (
             <option key={opt.value} value={opt.value}>
@@ -109,6 +122,16 @@ export function OnboardingStep1({ data, onChange }: Step1Props) {
             </option>
           ))}
         </select>
+        {data.workField === 'Other' && (
+          <input
+            id="ob-workFieldOther"
+            className={`${styles.input} ${styles.otherInput}`}
+            type="text"
+            placeholder={t('workFieldOtherPlaceholder')}
+            value={data.workFieldOther}
+            onChange={(e) => update('workFieldOther', e.target.value)}
+          />
+        )}
       </div>
 
       <div className={styles.row}>
