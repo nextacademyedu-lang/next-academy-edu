@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getAuthUrl } from '../../../../lib/google-auth';
+import { getAuthUrl } from '../../../../../lib/google-auth';
 import { getPayload } from 'payload';
 import config from '@payload-config';
 

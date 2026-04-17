@@ -304,27 +304,17 @@ export async function POST(req: NextRequest) {
     rollbackBookingId = normalizeId(booking.id);
 
     if (amount <= 0) {
-      await Promise.all([
-        payload.update({
-          collection: 'consultation-bookings',
-          id: booking.id,
-          data: {
-            status: 'confirmed',
-            paymentStatus: 'paid',
-            transactionId: `FREE-${booking.id}-${Date.now()}`,
-          },
-          overrideAccess: true,
-          req,
-        }),
-      if (slotId) {
-        await payload.update({
-          collection: 'consultation-slots',
-          id: slotId,
-          data: { status: 'booked' },
-          overrideAccess: true,
-          req,
-        });
-      }
+      await payload.update({
+        collection: 'consultation-bookings',
+        id: booking.id,
+        data: {
+          status: 'confirmed',
+          paymentStatus: 'paid',
+          transactionId: `FREE-${booking.id}-${Date.now()}`,
+        },
+        overrideAccess: true,
+        req,
+      });
 
       return NextResponse.json({
         free: true,
@@ -333,17 +323,6 @@ export async function POST(req: NextRequest) {
           String(booking.id),
         )}${instructorSlug ? `&instructor=${encodeURIComponent(instructorSlug)}` : ''}`,
       });
-    }
-
-    if (slotId) {
-      await payload.update({
-        collection: 'consultation-slots',
-        id: slotId,
-        data: { status: 'blocked' },
-        overrideAccess: true,
-        req,
-      });
-      rollbackSlotId = slotId;
     }
 
     const appBaseUrl = resolveAppBaseUrl(req);

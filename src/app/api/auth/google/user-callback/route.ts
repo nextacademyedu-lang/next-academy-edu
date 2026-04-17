@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { exchangeCodeForTokens, getUserAuthClient } from '../../../../lib/google-auth';
+import { exchangeCodeForTokens, getUserAuthClient } from '../../../../../lib/google-auth';
 import { getPayload } from 'payload';
 import config from '@payload-config';
 import { google } from 'googleapis';
