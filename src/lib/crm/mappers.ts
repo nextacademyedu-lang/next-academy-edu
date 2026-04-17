@@ -348,9 +348,8 @@ export function mapConsultationToCrmDeal(params: {
   user?: Record<string, unknown> | null;
   instructor?: Record<string, unknown> | null;
   consultationType?: Record<string, unknown> | null;
-  slot?: Record<string, unknown> | null;
 }) {
-  const { consultation, user, instructor, consultationType, slot } = params;
+  const { consultation, user, instructor, consultationType } = params;
   const id = normalizeId(consultation.id);
   if (!id) throw new Error('Consultation booking id is required');
 
@@ -372,9 +371,9 @@ export function mapConsultationToCrmDeal(params: {
     meetingUrl: getString(consultation.meetingUrl),
     cancelledBy: getString(consultation.cancelledBy),
     cancellationReason: getString(consultation.cancellationReason),
-    slotDate: toIso(slot?.date),
-    slotStartTime: getString(slot?.startTime),
-    slotEndTime: getString(slot?.endTime),
+    slotDate: toIso(consultation.bookingDate),
+    slotStartTime: getString(consultation.startTime),
+    slotEndTime: getString(consultation.endTime),
     consultationTypeTitle:
       getString(consultationType?.titleAr) ||
       getString(consultationType?.titleEn) ||

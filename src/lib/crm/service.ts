@@ -493,7 +493,6 @@ export class CRMService {
       }));
     const instructor = asRecord(consultation.instructor);
     const consultationType = asRecord(consultation.consultationType);
-    const slot = asRecord(consultation.slot);
     const dealsResourcePath = this.client.getResourcePath('deals');
     const existingDealId = getString(consultation.twentyCrmDealId);
     let result: { id: string | null; raw: unknown };
@@ -513,7 +512,6 @@ export class CRMService {
         user,
         instructor,
         consultationType,
-        slot,
       });
       result = await this.client.upsert('deals', dealPayload.externalId, dealPayload);
     }
