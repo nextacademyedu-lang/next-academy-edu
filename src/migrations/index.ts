@@ -20,6 +20,7 @@ import * as migration_20260411_050000_update_course_revenue_share_terms from './
 import * as migration_20260412_010000_add_rounds_count_to_program_submissions from './20260412_010000_add_rounds_count_to_program_submissions';
 import * as migration_20260412_140000_repair_onboarding_schema_drift from './20260412_140000_repair_onboarding_schema_drift';
 import * as migration_20260412_150000_add_instructor_program_submissions_rels from './20260412_150000_add_instructor_program_submissions_rels';
+import * as migration_20260417_010000_add_financial_lifecycle_fields from './20260417_010000_add_financial_lifecycle_fields';
 
 export const migrations = [
   {
@@ -131,5 +132,10 @@ export const migrations = [
     up: migration_20260412_150000_add_instructor_program_submissions_rels.up,
     down: migration_20260412_150000_add_instructor_program_submissions_rels.down,
     name: '20260412_150000_add_instructor_program_submissions_rels',
+  },
+  {
+    up: migration_20260417_010000_add_financial_lifecycle_fields.up,
+    down: migration_20260417_010000_add_financial_lifecycle_fields.down,
+    name: '20260417_010000_add_financial_lifecycle_fields',
   },
 ];
