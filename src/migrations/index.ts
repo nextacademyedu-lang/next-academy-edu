@@ -22,6 +22,7 @@ import * as migration_20260412_140000_repair_onboarding_schema_drift from './202
 import * as migration_20260412_150000_add_instructor_program_submissions_rels from './20260412_150000_add_instructor_program_submissions_rels';
 import * as migration_20260417_010000_add_financial_lifecycle_fields from './20260417_010000_add_financial_lifecycle_fields';
 import * as migration_20260418_010000_schema_sync from './20260418_010000_schema_sync';
+import * as migration_20260418_070000_fix_consultation_schema_drift from './20260418_070000_fix_consultation_schema_drift';
 
 export const migrations = [
   {
@@ -143,5 +144,10 @@ export const migrations = [
     up: migration_20260418_010000_schema_sync.up,
     down: migration_20260418_010000_schema_sync.down,
     name: '20260418_010000_schema_sync',
+  },
+  {
+    up: migration_20260418_070000_fix_consultation_schema_drift.up,
+    down: migration_20260418_070000_fix_consultation_schema_drift.down,
+    name: '20260418_070000_fix_consultation_schema_drift',
   },
 ];
