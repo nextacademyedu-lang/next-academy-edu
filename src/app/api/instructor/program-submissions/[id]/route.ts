@@ -113,12 +113,11 @@ async function resolveScope(req: NextRequest) {
 
 async function getOwnedSubmission(params: {
   payload: Awaited<ReturnType<typeof getPayload>>;
-  req: NextRequest;
   id: number;
   userId: number;
   instructorId: number;
 }) {
-  const { payload, req, id, userId, instructorId } = params;
+  const { payload, id, userId, instructorId } = params;
   const result = await payload.find({
     collection: 'instructor-program-submissions',
     where: {
@@ -131,7 +130,6 @@ async function getOwnedSubmission(params: {
     depth: 0,
     limit: 1,
     overrideAccess: true,
-    req,
   });
 
   return result.docs[0] || null;
@@ -151,7 +149,6 @@ export async function PATCH(
 
     const owned = await getOwnedSubmission({
       payload: scope.payload,
-      req,
       id,
       userId: scope.userId,
       instructorId: scope.instructorId,
@@ -171,7 +168,6 @@ export async function PATCH(
       id,
       data,
       overrideAccess: true,
-      req,
     } as any);
 
     return NextResponse.json({ doc: updated });
@@ -195,7 +191,6 @@ export async function DELETE(
 
     const owned = await getOwnedSubmission({
       payload: scope.payload,
-      req,
       id,
       userId: scope.userId,
       instructorId: scope.instructorId,
@@ -206,7 +201,6 @@ export async function DELETE(
       collection: 'instructor-program-submissions',
       id,
       overrideAccess: true,
-      req,
     });
 
     return NextResponse.json({ deleted: true });

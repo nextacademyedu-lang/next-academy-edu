@@ -348,13 +348,13 @@ export const Users: CollectionConfig = {
       name: 'googleRefreshToken', 
       type: 'text', 
       admin: { readOnly: true, description: 'User-specific Google Calendar integration refresh token' },
-      access: { read: isAdmin, update: isAdmin },
+      access: { read: isAdmin as any, update: isAdmin as any },
     },
     { 
       name: 'googleAccessToken', 
       type: 'text', 
       admin: { readOnly: true },
-      access: { read: isAdmin, update: isAdmin },
+      access: { read: isAdmin as any, update: isAdmin as any },
     },
     { 
       name: 'googleCalendarConnectedAt', 

@@ -50,8 +50,7 @@ export async function GET(req: NextRequest) {
       id: scope.instructorId,
       depth: 1,
       overrideAccess: true,
-      req,
-    })) as {
+          })) as {
       id: number | string;
       onboardingCompleted?: boolean | null;
       verificationStatus?: string | null;
@@ -76,8 +75,7 @@ export async function GET(req: NextRequest) {
         depth: 0,
         limit: 1,
         overrideAccess: true,
-        req,
-      });
+              });
 
       if (approvedSubmission.docs.length > 0) {
         instructor = (await scope.payload.update({
@@ -88,7 +86,6 @@ export async function GET(req: NextRequest) {
             isActive: true,
           },
           overrideAccess: true,
-          req,
           context: { allowInstructorStatusSync: true },
         })) as typeof instructor;
       }
@@ -131,8 +128,7 @@ export async function PATCH(req: NextRequest) {
       id: scope.instructorId,
       depth: 0,
       overrideAccess: true,
-      req,
-    })) as { verificationStatus?: string | null } | null;
+          })) as { verificationStatus?: string | null } | null;
 
     if (current?.verificationStatus === 'rejected') {
       data.verificationStatus = 'draft';
@@ -145,7 +141,6 @@ export async function PATCH(req: NextRequest) {
       id: scope.instructorId,
       data,
       overrideAccess: true,
-      req,
       context: { selfServiceInstructorProfile: true },
     });
 

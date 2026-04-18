@@ -269,8 +269,7 @@ export async function PUT(req: NextRequest) {
       await syncInstructorConsultationSlots({
         payload: payload as any,
         instructorId,
-        req,
-      });
+              });
     } catch (syncError) {
       console.error('[api/instructor/availability][PUT] slot sync failed', syncError);
     }

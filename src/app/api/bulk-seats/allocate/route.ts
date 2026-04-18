@@ -28,17 +28,15 @@ function relationToId(value: unknown): number | null {
 async function getCompanyIdFromUserProfile(params: {
   payload: Awaited<ReturnType<typeof getPayload>>;
   userId: number;
-  req: NextRequest;
 }) {
-  const { payload, userId, req } = params;
+  const { payload, userId } = params;
   const profileResult = await payload.find({
     collection: 'user-profiles',
     where: { user: { equals: userId } },
     depth: 0,
     limit: 1,
     overrideAccess: true,
-    req,
-  });
+      });
 
   const profile = profileResult.docs[0] as { company?: unknown } | undefined;
   return relationToId(profile?.company);
@@ -105,8 +103,7 @@ export async function POST(req: NextRequest) {
       id: bulkSeatId,
       depth: 1,
       overrideAccess: true,
-      req,
-    }).catch(() => null);
+          }).catch(() => null);
 
     if (!seatDoc) {
       return NextResponse.json(
@@ -133,8 +130,7 @@ export async function POST(req: NextRequest) {
     const targetUserCompanyId = await getCompanyIdFromUserProfile({
       payload,
       userId,
-      req,
-    });
+          });
 
     if (!targetUserCompanyId || targetUserCompanyId !== seatCompanyId) {
       return NextResponse.json(
@@ -147,8 +143,7 @@ export async function POST(req: NextRequest) {
       const actorCompanyId = await getCompanyIdFromUserProfile({
         payload,
         userId: actorId,
-        req,
-      });
+              });
 
       if (!actorCompanyId || actorCompanyId !== seatCompanyId) {
         return NextResponse.json(
@@ -196,8 +191,7 @@ export async function POST(req: NextRequest) {
       id: bulkSeatId,
       data: { allocations: newAllocations },
       overrideAccess: true,
-      req,
-    });
+          });
 
     const roundId = relationToId((seatDoc as { round?: unknown }).round);
     if (!roundId) {
@@ -219,8 +213,7 @@ export async function POST(req: NextRequest) {
       depth: 0,
       limit: 1,
       overrideAccess: true,
-      req,
-    });
+          });
 
     if (existingBooking.docs.length === 0) {
       await payload.create({
@@ -237,8 +230,7 @@ export async function POST(req: NextRequest) {
           notes: `Auto-created from bulk seat allocation ${bulkSeatId}`,
         },
         overrideAccess: true,
-        req,
-      });
+              });
     }
 
     return NextResponse.json({

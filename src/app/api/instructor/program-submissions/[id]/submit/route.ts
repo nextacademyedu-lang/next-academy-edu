@@ -65,7 +65,6 @@ export async function POST(
       depth: 0,
       limit: 1,
       overrideAccess: true,
-      req,
     });
 
     const doc = result.docs[0];
@@ -89,7 +88,6 @@ export async function POST(
         submittedAt: new Date().toISOString(),
       },
       overrideAccess: true,
-      req,
     } as any);
 
     return NextResponse.json({ submitted: true, doc: updated });

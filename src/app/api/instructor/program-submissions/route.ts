@@ -126,8 +126,7 @@ export async function GET(req: NextRequest) {
       sort: '-updatedAt',
       limit: 100,
       overrideAccess: true,
-      req,
-    });
+          });
 
     return NextResponse.json({
       docs: result.docs,
@@ -177,7 +176,6 @@ export async function POST(req: NextRequest) {
         status: 'draft',
       },
       overrideAccess: true,
-      req,
     } as any);
 
     return NextResponse.json({ doc });

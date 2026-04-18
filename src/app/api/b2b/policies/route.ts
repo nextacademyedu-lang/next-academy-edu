@@ -107,8 +107,7 @@ export async function PATCH(req: NextRequest) {
         id: existingPolicy.id,
         data: data as any,
         overrideAccess: true,
-        req,
-      })) as unknown as Record<string, unknown>;
+              })) as unknown as Record<string, unknown>;
     } else {
       saved = (await payload.create({
         collection: 'company-policies',
@@ -117,8 +116,7 @@ export async function PATCH(req: NextRequest) {
           ...data,
         } as any,
         overrideAccess: true,
-        req,
-      })) as unknown as Record<string, unknown>;
+              })) as unknown as Record<string, unknown>;
     }
 
     return NextResponse.json({

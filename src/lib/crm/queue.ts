@@ -35,7 +35,6 @@ export async function enqueueCrmSyncEvent({
       },
       limit: 1,
       overrideAccess: true,
-      req,
     });
 
     if (existing.docs.length > 0) {
@@ -61,7 +60,6 @@ export async function enqueueCrmSyncEvent({
         ...(req?.context || {}),
         skipCrmSync: true,
       },
-      req,
     });
 
     return { created: true, id: (created as { id?: string | number }).id };

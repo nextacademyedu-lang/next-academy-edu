@@ -66,8 +66,7 @@ export async function GET(req: NextRequest) {
       limit,
       sort,
       overrideAccess: true,
-      req,
-    });
+          });
 
     return NextResponse.json({
       docs: result.docs,

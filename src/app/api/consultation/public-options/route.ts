@@ -106,8 +106,7 @@ export async function GET(req: NextRequest) {
       depth: 0,
       limit: 1,
       overrideAccess: true,
-      req,
-    });
+          });
 
     const instructor = instructorResult.docs[0] as InstructorLike | undefined;
     if (!instructor) {
@@ -133,8 +132,7 @@ export async function GET(req: NextRequest) {
         sort: '-updatedAt',
         limit: typeLimit,
         overrideAccess: true,
-        req,
-      }),
+              }),
       payload.find({
         collection: 'consultation-slots',
         where: {
@@ -148,8 +146,7 @@ export async function GET(req: NextRequest) {
         sort: 'date',
         limit: slotLimit,
         overrideAccess: true,
-        req,
-      }),
+              }),
     ]);
 
     const types = (typesResult.docs as ConsultationTypeLike[]).map((doc) => ({

@@ -60,7 +60,9 @@ export async function getFreeBusy(
   });
 
   const calendars = res.data.calendars || {};
-  return calendars[calendarId]?.busy || [];
+  const busyPeriods = calendars[calendarId]?.busy || [];
+  return busyPeriods
+    .filter((b): b is { start: string; end: string } => typeof b.start === 'string' && typeof b.end === 'string');
 }
 
 /**

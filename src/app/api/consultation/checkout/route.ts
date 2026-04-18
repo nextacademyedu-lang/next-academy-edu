@@ -221,8 +221,7 @@ export async function POST(req: NextRequest) {
           id: consultationTypeId,
           depth: 0,
           overrideAccess: true,
-          req,
-        })) as ConsultationTypeDoc | null;
+                  })) as ConsultationTypeDoc | null;
       }
       
       if (!consultationType) {
@@ -278,7 +277,7 @@ export async function POST(req: NextRequest) {
     }
 
     const amount = Number(consultationType.price) || 0;
-    const booking = (await payload.create({
+    const booking = (await (payload as any).create({
       collection: 'consultation-bookings',
       data: {
         bookingCode: generateCode('CB'),

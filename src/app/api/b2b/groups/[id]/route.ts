@@ -57,7 +57,6 @@ export async function PATCH(req: NextRequest, context: RouteContext) {
       id: groupId,
       data: data as any,
       overrideAccess: true,
-      req,
     });
 
     return NextResponse.json({
@@ -122,7 +121,6 @@ export async function DELETE(req: NextRequest, context: RouteContext) {
         collection: 'company-group-members',
         id: (member as { id: number | string }).id,
         overrideAccess: true,
-        req,
       });
     }
 
@@ -131,7 +129,6 @@ export async function DELETE(req: NextRequest, context: RouteContext) {
       collection: 'company-groups' as 'users',
       id: groupId,
       overrideAccess: true,
-      req,
     });
 
     return NextResponse.json({ deleted: true, groupId: String(groupId) });

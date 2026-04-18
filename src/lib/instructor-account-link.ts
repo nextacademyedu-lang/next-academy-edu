@@ -57,7 +57,6 @@ export async function findInstructorIdByEmail(params: {
     depth: 0,
     limit: 2,
     overrideAccess: true,
-    req,
   });
 
   if (!instructors.docs.length) return { status: 'none' };
@@ -99,7 +98,6 @@ export async function linkUserToInstructor(params: {
     depth: 0,
     limit: 10,
     overrideAccess: true,
-    req,
   });
 
   const userIdStr = String(user.id);
@@ -122,7 +120,6 @@ export async function linkUserToInstructor(params: {
       instructorId,
     },
     overrideAccess: true,
-    req,
     context: {
       allowPrivilegedRoleWrite: true,
       skipInstructorAutoLink: true,

@@ -43,8 +43,7 @@ async function buildUniqueInstructorSlug(params: {
       depth: 0,
       limit: 1,
       overrideAccess: true,
-      req,
-    });
+          });
 
     if (existing.docs.length === 0) return candidate;
   }

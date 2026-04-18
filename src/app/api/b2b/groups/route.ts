@@ -107,8 +107,7 @@ export async function POST(req: NextRequest) {
       collection: 'company-groups',
       data: data as any,
       overrideAccess: true,
-      req,
-    });
+          });
 
     return NextResponse.json({
       group: {

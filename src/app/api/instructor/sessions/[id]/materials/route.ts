@@ -91,12 +91,11 @@ async function resolveInstructorScope(req: NextRequest): Promise<InstructorScope
 
 async function getOwnedSession(params: {
   payload: Awaited<ReturnType<typeof getPayload>>;
-  req: NextRequest;
   sessionId: number;
   instructorId: number;
   depth?: number;
 }) {
-  const { payload, req, sessionId, instructorId, depth = 1 } = params;
+  const { payload, sessionId, instructorId, depth = 1 } = params;
   const result = await payload.find({
     collection: 'sessions',
     where: {
@@ -105,7 +104,6 @@ async function getOwnedSession(params: {
     depth,
     limit: 1,
     overrideAccess: true,
-    req,
   });
 
   return (result.docs[0] as SessionDoc | undefined) || null;
@@ -134,7 +132,6 @@ export async function GET(
 
     const session = await getOwnedSession({
       payload: scope.payload,
-      req,
       sessionId,
       instructorId: scope.instructorId,
       depth: 1,
@@ -172,7 +169,6 @@ export async function PATCH(
 
     const ownedSession = await getOwnedSession({
       payload: scope.payload,
-      req,
       sessionId,
       instructorId: scope.instructorId,
       depth: 0,
@@ -197,12 +193,10 @@ export async function PATCH(
       id: sessionId,
       data: { materials: normalizedIds },
       overrideAccess: true,
-      req,
     });
 
     const updated = await getOwnedSession({
       payload: scope.payload,
-      req,
       sessionId,
       instructorId: scope.instructorId,
       depth: 1,
@@ -236,7 +230,6 @@ export async function POST(
 
     const ownedSession = await getOwnedSession({
       payload: scope.payload,
-      req,
       sessionId,
       instructorId: scope.instructorId,
       depth: 0,
@@ -271,7 +264,6 @@ export async function POST(
           size: buffer.length,
         },
         overrideAccess: true,
-        req,
       });
 
       const mediaId = relationToId(created.id);
@@ -294,12 +286,10 @@ export async function POST(
       id: sessionId,
       data: { materials: nextIds },
       overrideAccess: true,
-      req,
     });
 
     const updated = await getOwnedSession({
       payload: scope.payload,
-      req,
       sessionId,
       instructorId: scope.instructorId,
       depth: 1,

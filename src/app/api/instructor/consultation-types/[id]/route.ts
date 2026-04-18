@@ -64,7 +64,7 @@ async function resolveScope(req: NextRequest) {
   return { payload, instructorId };
 }
 
-async function verifyOwnership(payload: Awaited<ReturnType<typeof getPayload>>, req: NextRequest, id: number, instructorId: number) {
+async function verifyOwnership(payload: Awaited<ReturnType<typeof getPayload>>, id: number, instructorId: number) {
   const result = await payload.find({
     collection: 'consultation-types',
     where: {
@@ -73,7 +73,6 @@ async function verifyOwnership(payload: Awaited<ReturnType<typeof getPayload>>, 
     depth: 0,
     limit: 1,
     overrideAccess: true,
-    req,
   });
 
   return result.docs[0] || null;
@@ -95,7 +94,7 @@ export async function PATCH(
       return NextResponse.json({ error: 'Invalid id' }, { status: 400 });
     }
 
-    const owned = await verifyOwnership(scope.payload, req, id, scope.instructorId);
+    const owned = await verifyOwnership(scope.payload, id, scope.instructorId);
     if (!owned) {
       return NextResponse.json({ error: 'Not found' }, { status: 404 });
     }
@@ -160,14 +159,12 @@ export async function PATCH(
       id,
       data,
       overrideAccess: true,
-      req,
     } as any);
 
     try {
       await syncInstructorConsultationSlots({
         payload: scope.payload as any,
         instructorId: scope.instructorId,
-        req,
       });
     } catch (syncError) {
       console.error('[api/instructor/consultation-types/:id][PATCH] slot sync failed', syncError);
@@ -196,7 +193,7 @@ export async function DELETE(
       return NextResponse.json({ error: 'Invalid id' }, { status: 400 });
     }
 
-    const owned = await verifyOwnership(scope.payload, req, id, scope.instructorId);
+    const owned = await verifyOwnership(scope.payload, id, scope.instructorId);
     if (!owned) {
       return NextResponse.json({ error: 'Not found' }, { status: 404 });
     }
@@ -205,14 +202,12 @@ export async function DELETE(
       collection: 'consultation-types',
       id,
       overrideAccess: true,
-      req,
     });
 
     try {
       await syncInstructorConsultationSlots({
         payload: scope.payload as any,
         instructorId: scope.instructorId,
-        req,
       });
     } catch (syncError) {
       console.error('[api/instructor/consultation-types/:id][DELETE] slot sync failed', syncError);

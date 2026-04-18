@@ -223,7 +223,6 @@ export async function POST(req: NextRequest) {
         agreementVersion: AGREEMENT_VERSION,
       } as any,
       overrideAccess: true,
-      req,
       context: { selfServiceInstructorProfile: true },
     });
 
@@ -261,8 +260,7 @@ export async function POST(req: NextRequest) {
         deliveryHistoryText: program.deliveryHistoryText.trim(),
       } as any,
       overrideAccess: true,
-      req,
-    });
+          });
 
     // 3. Create agreement audit record
     await payload.create({
@@ -274,8 +272,7 @@ export async function POST(req: NextRequest) {
         clausesAccepted: clausesAccepted,
       } as any,
       overrideAccess: true,
-      req,
-    });
+          });
 
     const authenticatedUser = user as AuthenticatedUser;
     if (authenticatedUser?.email) {

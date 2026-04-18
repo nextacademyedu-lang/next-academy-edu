@@ -112,8 +112,7 @@ export async function PATCH(req: NextRequest) {
           id: doc.id,
           data: { isRead: true, readAt: new Date().toISOString() },
           overrideAccess: true,
-          req,
-        });
+                  });
       }
 
       return NextResponse.json({ markedRead: unread.docs.length });
@@ -127,8 +126,7 @@ export async function PATCH(req: NextRequest) {
         id: notifId as number,
         data: { isRead: true, readAt: new Date().toISOString() },
         overrideAccess: true,
-        req,
-      });
+              });
       return NextResponse.json({ markedRead: 1 });
     }
 

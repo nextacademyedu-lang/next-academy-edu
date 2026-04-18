@@ -176,7 +176,6 @@ export async function POST(req: NextRequest, context: RouteContext) {
         addedBy: user.id,
       } as any,
       overrideAccess: true,
-      req,
     });
 
     return NextResponse.json({
@@ -243,7 +242,6 @@ export async function DELETE(req: NextRequest, context: RouteContext) {
       collection: 'company-group-members',
       id: memberDoc.id,
       overrideAccess: true,
-      req,
     });
 
     return NextResponse.json({

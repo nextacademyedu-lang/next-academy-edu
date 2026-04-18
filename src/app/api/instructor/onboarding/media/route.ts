@@ -74,8 +74,7 @@ export async function POST(req: NextRequest) {
         size: buffer.length,
       },
       overrideAccess: true,
-      req,
-    });
+          });
 
     const createdRecord = created as unknown as {
       id: unknown;
@@ -92,7 +91,6 @@ export async function POST(req: NextRequest) {
       id: instructorId,
       data: { [field]: mediaId } as Record<string, unknown>,
       overrideAccess: true,
-      req,
       context: { selfServiceInstructorProfile: true },
     });
 

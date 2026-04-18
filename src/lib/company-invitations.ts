@@ -110,7 +110,6 @@ export async function markInvitationExpiredIfNeeded(params: {
       id: invitation.id,
       data: { status: 'expired' },
       overrideAccess: true,
-      req,
     })
     .catch(() => null);
 }
@@ -129,7 +128,6 @@ export async function findInvitationByToken(params: {
     depth,
     limit: 1,
     overrideAccess: true,
-    req,
   });
 
   return (result.docs[0] as CompanyInvitationDoc | undefined) || null;
@@ -147,7 +145,6 @@ async function getUserProfile(params: {
     depth: 0,
     limit: 1,
     overrideAccess: true,
-    req,
   });
 
   return (result.docs[0] as UserProfileDoc | undefined) || null;
@@ -184,7 +181,6 @@ async function upsertUserProfileCompany(params: {
         id: profile.id,
         data: updateData,
         overrideAccess: true,
-        req,
       });
 
       return { ok: true, profileId: String(updated.id) };
@@ -202,7 +198,6 @@ async function upsertUserProfileCompany(params: {
       ...(invitationTitle ? { title: invitationTitle } : {}),
     },
     overrideAccess: true,
-    req,
   });
 
   return { ok: true, profileId: String(created.id) };
@@ -226,7 +221,6 @@ async function acceptInvitationRecord(params: {
       acceptedBy: userId,
     },
     overrideAccess: true,
-    req,
   });
 }
 
@@ -372,7 +366,6 @@ export async function autoAcceptInvitationByEmail(params: {
     depth: 1,
     limit: 20,
     overrideAccess: true,
-    req,
   });
 
   const docs = pendingInvites.docs as CompanyInvitationDoc[];

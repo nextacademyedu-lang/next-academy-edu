@@ -89,8 +89,7 @@ export async function GET(req: NextRequest) {
       limit: 100,
       sort: '-updatedAt',
       overrideAccess: true,
-      req,
-    });
+          });
 
     return NextResponse.json({
       docs: (result.docs as ConsultationType[]).map(mapDoc),
@@ -169,8 +168,7 @@ export async function POST(req: NextRequest) {
       await syncInstructorConsultationSlots({
         payload: scope.payload as any,
         instructorId: scope.instructorId,
-        req,
-      });
+              });
     } catch (syncError) {
       console.error('[api/instructor/consultation-types][POST] slot sync failed', syncError);
     }

@@ -114,8 +114,7 @@ async function createUniqueToken(payload: any, req: NextRequest): Promise<string
       depth: 0,
       limit: 1,
       overrideAccess: true,
-      req,
-    });
+          });
 
     if (existing.docs.length === 0) return token;
   }
@@ -154,8 +153,7 @@ export async function GET(req: NextRequest) {
       limit: 200,
       sort: '-createdAt',
       overrideAccess: true,
-      req,
-    });
+          });
 
     const docs = result.docs as CompanyInvitationDoc[];
 
@@ -169,8 +167,7 @@ export async function GET(req: NextRequest) {
               id: doc.id,
               data: { status: 'expired' },
               overrideAccess: true,
-              req,
-            })
+                          })
             .catch(() => null),
         ),
     );
@@ -226,8 +223,7 @@ export async function POST(req: NextRequest) {
       depth: 0,
       limit: 1,
       overrideAccess: true,
-      req,
-    });
+          });
 
     if (existingUserResult.docs.length > 0) {
       const existingUser = existingUserResult.docs[0] as { id?: unknown; role?: string | null };
@@ -246,8 +242,7 @@ export async function POST(req: NextRequest) {
           depth: 0,
           limit: 1,
           overrideAccess: true,
-          req,
-        });
+                  });
 
         const profile = existingProfileResult.docs[0] as { id: number | string; company?: unknown } | undefined;
         const companyId = relationToId(profile?.company);
@@ -282,8 +277,7 @@ export async function POST(req: NextRequest) {
       depth: 1,
       limit: 1,
       overrideAccess: true,
-      req,
-    });
+          });
 
     let invitationDoc: CompanyInvitationDoc | null = null;
     let created = false;
@@ -303,8 +297,7 @@ export async function POST(req: NextRequest) {
             ...(title ? { title } : {}),
           },
           overrideAccess: true,
-          req,
-        })) as CompanyInvitationDoc;
+                  })) as CompanyInvitationDoc;
       } else {
         invitationDoc = existing;
       }
@@ -327,8 +320,7 @@ export async function POST(req: NextRequest) {
           ...(title ? { title } : {}),
         },
         overrideAccess: true,
-        req,
-      })) as CompanyInvitationDoc;
+              })) as CompanyInvitationDoc;
       created = true;
     }
 
@@ -394,8 +386,7 @@ export async function DELETE(req: NextRequest) {
       depth: 0,
       limit: 1,
       overrideAccess: true,
-      req,
-    });
+          });
 
     const invitation = found.docs[0] as CompanyInvitationDoc | undefined;
     if (!invitation) {
@@ -417,8 +408,7 @@ export async function DELETE(req: NextRequest) {
         revokedAt: new Date().toISOString(),
       },
       overrideAccess: true,
-      req,
-    });
+          });
 
     return NextResponse.json({ revoked: true, invitationId: String(invitationId) });
   } catch (error) {

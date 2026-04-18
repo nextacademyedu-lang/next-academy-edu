@@ -91,8 +91,7 @@ export async function POST(req: NextRequest) {
       id: scope.instructorId,
       depth: 0,
       overrideAccess: true,
-      req,
-    })) as InstructorDocLike;
+          })) as InstructorDocLike;
 
     if (instructor.verificationStatus === 'approved') {
       return NextResponse.json({
@@ -121,7 +120,6 @@ export async function POST(req: NextRequest) {
         submittedAt: new Date().toISOString(),
       },
       overrideAccess: true,
-      req,
       context: { selfServiceInstructorProfile: true },
     } as any)) as { verificationStatus?: string | null };
 

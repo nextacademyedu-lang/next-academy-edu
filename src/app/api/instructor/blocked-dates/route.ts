@@ -107,8 +107,7 @@ export async function GET(req: NextRequest) {
       page,
       limit,
       overrideAccess: true,
-      req,
-    });
+          });
 
     return NextResponse.json({
       docs: result.docs.map((doc) =>
@@ -155,15 +154,13 @@ export async function POST(req: NextRequest) {
         reason,
       },
       overrideAccess: true,
-      req,
-    });
+          });
 
     try {
       await syncInstructorConsultationSlots({
         payload: scope.payload as any,
         instructorId: scope.instructorId,
-        req,
-      });
+              });
     } catch (syncError) {
       console.error('[api/instructor/blocked-dates][POST] slot sync failed', syncError);
     }

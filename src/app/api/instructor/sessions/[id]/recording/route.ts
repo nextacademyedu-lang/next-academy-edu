@@ -69,7 +69,6 @@ async function getOwnedSession(
     depth: 0,
     limit: 1,
     overrideAccess: true,
-    req,
   });
 
   return result.docs[0] as { id: number | string; recordingUrl?: string | null } | undefined;
@@ -112,7 +111,6 @@ export async function PATCH(
       id: sessionId,
       data: { recordingUrl: normalized },
       overrideAccess: true,
-      req,
     });
 
     return NextResponse.json({

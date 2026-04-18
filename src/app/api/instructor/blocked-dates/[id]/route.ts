@@ -69,7 +69,6 @@ export async function DELETE(
       depth: 0,
       limit: 1,
       overrideAccess: true,
-      req,
     });
 
     if (!existing.docs.length) {
@@ -80,14 +79,12 @@ export async function DELETE(
       collection: 'instructor-blocked-dates',
       id: blockedDateId,
       overrideAccess: true,
-      req,
     });
 
     try {
       await syncInstructorConsultationSlots({
         payload: scope.payload as any,
         instructorId: scope.instructorId,
-        req,
       });
     } catch (syncError) {
       console.error('[api/instructor/blocked-dates/:id][DELETE] slot sync failed', syncError);

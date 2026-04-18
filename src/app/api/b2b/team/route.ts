@@ -188,8 +188,7 @@ export async function POST(req: NextRequest) {
         id: requestedUserId,
         depth: 0,
         overrideAccess: true,
-        req,
-      }).catch(() => null);
+              }).catch(() => null);
 
       if (!found) {
         return NextResponse.json({ error: 'User not found' }, { status: 404 });
@@ -202,8 +201,7 @@ export async function POST(req: NextRequest) {
         depth: 0,
         limit: 1,
         overrideAccess: true,
-        req,
-      });
+              });
 
       if (existing.docs.length > 0) {
         userDoc = existing.docs[0] as User;
@@ -229,7 +227,6 @@ export async function POST(req: NextRequest) {
             signupIntent: 'student',
           },
           overrideAccess: true,
-          req,
           context: { allowPrivilegedRoleWrite: true },
         });
         userDoc = created as User;
@@ -258,8 +255,7 @@ export async function POST(req: NextRequest) {
       depth: 1,
       limit: 1,
       overrideAccess: true,
-      req,
-    });
+          });
 
     const existingProfile = (existingProfileResult.docs[0] as UserProfile | undefined) || null;
     const existingCompanyId = relationToId(existingProfile?.company);
@@ -283,8 +279,7 @@ export async function POST(req: NextRequest) {
         id: existingProfile.id,
         data: profileData,
         overrideAccess: true,
-        req,
-      });
+              });
       savedProfile = updated as UserProfile;
     } else {
       const created = await payload.create({
@@ -294,8 +289,7 @@ export async function POST(req: NextRequest) {
           ...profileData,
         },
         overrideAccess: true,
-        req,
-      });
+              });
       savedProfile = created as UserProfile;
     }
 
@@ -351,8 +345,7 @@ export async function DELETE(req: NextRequest) {
       depth: 0,
       limit: 1,
       overrideAccess: true,
-      req,
-    });
+          });
 
     const profile = profileResult.docs[0] as UserProfile | undefined;
     if (!profile) {
@@ -367,8 +360,7 @@ export async function DELETE(req: NextRequest) {
       id: profile.id,
       data: { company: null },
       overrideAccess: true,
-      req,
-    });
+          });
 
     return NextResponse.json({ removed: true, userId: String(userId) });
   } catch (error) {

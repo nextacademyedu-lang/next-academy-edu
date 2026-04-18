@@ -34,8 +34,7 @@ export async function GET(req: NextRequest) {
       limit: 200,
       sort: 'order',
       overrideAccess: true,
-      req,
-    });
+          });
 
     const categories = (categoriesResult.docs as CategoryDoc[]).map((category) => ({
       id: String(category.id),
