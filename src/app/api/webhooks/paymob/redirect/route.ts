@@ -45,17 +45,6 @@ export async function GET(req: NextRequest) {
     if (bookingIdNumeric) {
       try {
         const payload = await getPayload({ config });
-        const booking = await payload.findByID({
-          collection: 'consultation-bookings',
-          id: bookingIdNumeric,
-          depth: 0,
-          overrideAccess: true,
-        });
-
-        const slot =
-          typeof booking?.slot === 'object' && booking?.slot
-            ? Number((booking.slot as { id?: unknown }).id)
-            : Number(booking?.slot);
 
         await payload.update({
           collection: 'consultation-bookings',
@@ -66,15 +55,6 @@ export async function GET(req: NextRequest) {
           },
           overrideAccess: true,
         });
-
-        if (Number.isFinite(slot)) {
-          await payload.update({
-            collection: 'consultation-slots',
-            id: slot,
-            data: { status: 'available' },
-            overrideAccess: true,
-          });
-        }
       } catch (error) {
         console.error('[webhook/paymob/redirect] consultation failure rollback failed', error);
       }

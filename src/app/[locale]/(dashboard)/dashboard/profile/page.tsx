@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { User, Lock, Mail, Phone, Loader2, CheckCircle2, AlertCircle, Briefcase, Building2, Heart } from 'lucide-react';
+import { User, Lock, Mail, Phone, Loader2, CheckCircle2, AlertCircle, Briefcase, Building2, Heart, Calendar } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';

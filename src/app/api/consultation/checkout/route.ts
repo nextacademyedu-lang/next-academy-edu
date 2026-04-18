@@ -170,7 +170,6 @@ export async function POST(req: NextRequest) {
         id: slotId,
         depth: 1,
         overrideAccess: true,
-        req,
       })) as ConsultationSlotDoc | null;
 
       if (!legacySlot) {
@@ -191,7 +190,6 @@ export async function POST(req: NextRequest) {
           limit: 1,
           sort: '-createdAt',
           overrideAccess: true,
-          req,
         });
 
         if (checkPending.docs.length > 0 && isPendingAndRecent(checkPending.docs[0] as ConsultationBookingDoc)) {
@@ -213,7 +211,6 @@ export async function POST(req: NextRequest) {
           id: consultationTypeId,
           depth: 0,
           overrideAccess: true,
-          req,
         })) as ConsultationTypeDoc | null;
       }
     } else {
@@ -261,7 +258,6 @@ export async function POST(req: NextRequest) {
         },
         depth: 0,
         overrideAccess: true,
-        req,
       });
 
       const hasRecentPendingOrConfirmed = existingAtTime.docs.some((doc: any) => {
@@ -287,7 +283,6 @@ export async function POST(req: NextRequest) {
       data: {
         bookingCode: generateCode('CB'),
         user: user.id,
-        slot: slotId || null,
         consultationType: consultationTypeId,
         instructor: instructorId,
         bookingDate: bookingDate,
@@ -299,7 +294,6 @@ export async function POST(req: NextRequest) {
         userNotes,
       },
       overrideAccess: true,
-      req,
     })) as ConsultationBookingDoc & { id: number | string };
     rollbackBookingId = normalizeId(booking.id);
 
@@ -313,7 +307,6 @@ export async function POST(req: NextRequest) {
           transactionId: `FREE-${booking.id}-${Date.now()}`,
         },
         overrideAccess: true,
-        req,
       });
 
       return NextResponse.json({
@@ -379,7 +372,6 @@ export async function POST(req: NextRequest) {
               cancellationReason: 'Checkout initialization failed',
             },
             overrideAccess: true,
-            req: rollbackReq,
           }),
         ];
         
@@ -390,7 +382,6 @@ export async function POST(req: NextRequest) {
               id: rollbackSlotId,
               data: { status: 'available' },
               overrideAccess: true,
-              req: rollbackReq,
             })
           );
         }

@@ -24,7 +24,7 @@ export const ConsultationBookings: CollectionConfig = {
       async ({ data, req, originalDoc, operation }) => {
         // Enforce minCancelNoticeHours
         if (operation === 'update' && data.status === 'cancelled' && originalDoc?.status !== 'cancelled') {
-          const isAdmin = req.user?.roles?.includes('admin');
+          const isAdmin = req.user?.role === 'admin';
           if (!isAdmin && originalDoc?.consultationType) {
             try {
               const consultationTypeId = typeof originalDoc.consultationType === 'object' 
