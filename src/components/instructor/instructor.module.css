@@ -160,6 +160,37 @@
   color: var(--text-muted);
 }
 
+.logoutBtn {
+  background: transparent;
+  border: 1px solid var(--glass-border);
+  color: #ef4444;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-radius: var(--radius-md);
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.2s;
+  margin-left: 12px;
+}
+
+.logoutBtn:hover {
+  background-color: rgba(239, 68, 68, 0.1);
+  border-color: #ef4444;
+}
+
+.logoutLabel {
+  display: inline;
+}
+
+@media (max-width: 600px) {
+  .logoutLabel {
+    display: none;
+  }
+}
+
 .pageContainer {
   flex: 1;
   overflow-y: auto;

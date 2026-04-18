@@ -14,6 +14,52 @@ export const RefundRequests: CollectionConfig = {
     update: isAdmin,
     delete: isAdmin,
   },
+  hooks: {
+    afterChange: [
+      async ({ req, doc, previousDoc, operation }) => {
+        // Only act when status transitions TO 'processed'
+        if (operation !== 'update') return;
+        if (doc.status !== 'processed' || previousDoc?.status === 'processed') return;
+
+        const paymentId = typeof doc.payment === 'object' ? doc.payment?.id : doc.payment;
+        const bookingId = typeof doc.booking === 'object' ? doc.booking?.id : doc.booking;
+
+        // 1. Update Payment → refunded
+        if (paymentId) {
+          try {
+            await req.payload.update({
+              collection: 'payments',
+              id: paymentId,
+              data: { status: 'refunded' },
+              overrideAccess: true,
+              req,
+            });
+          } catch (err) {
+            console.error('[RefundRequests] Failed to update Payment to refunded:', err);
+          }
+        }
+
+        // 2. Update Booking → refunded + record refund details
+        if (bookingId) {
+          try {
+            await req.payload.update({
+              collection: 'bookings',
+              id: bookingId,
+              data: {
+                status: 'refunded',
+                refundAmount: doc.amount,
+                refundDate: new Date().toISOString(),
+              },
+              overrideAccess: true,
+              req,
+            });
+          } catch (err) {
+            console.error('[RefundRequests] Failed to update Booking to refunded:', err);
+          }
+        }
+      },
+    ],
+  },
   fields: [
     {
       name: 'booking',

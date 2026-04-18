@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname, useRouter, useParams } from 'next/navigation';
 import { useLocale } from 'next-intl';
 import { Home, Video, Clock, Users, ArrowLeft, LogOut, Bell, Settings, DollarSign, User, BookOpen } from 'lucide-react';
 import styles from './instructor.module.css';
@@ -174,6 +174,15 @@ export function InstructorLayout({ children }: { children: React.ReactNode }) {
               </div>
               <div className={styles.avatar}>{avatarInitial}</div>
             </div>
+
+            <button 
+              className={styles.logoutBtn} 
+              onClick={() => logout().then(() => window.location.href = '/')}
+              title="Log Out"
+            >
+              <LogOut size={18} />
+              <span className={styles.logoutLabel}>Log Out</span>
+            </button>
           </div>
         </header>
 
