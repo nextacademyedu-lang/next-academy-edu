@@ -469,6 +469,11 @@ export interface PayloadProgramSubmission {
   objectivesText?: string;
   requirementsText?: string;
   targetAudienceText?: string;
+  previousTraineesCount?: number;
+  isFirstTimeProgram?: 'yes' | 'no';
+  teachingExperienceYears?: number;
+  deliveryHistoryText?: string;
+  roundsCount?: number;
   sessionOutline?: Array<{
     sessionNumber?: number;
     title: string;

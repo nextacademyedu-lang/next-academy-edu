@@ -101,8 +101,10 @@ export interface Config {
     'announcement-bars': AnnouncementBar;
     'upcoming-events-config': UpcomingEventsConfig;
     'crm-sync-events': CrmSyncEvent;
+    'refund-requests': RefundRequest;
     partners: Partner;
     'instructor-program-submissions': InstructorProgramSubmission;
+    'instructor-agreements': InstructorAgreement;
     'company-invitations': CompanyInvitation;
     'company-groups': CompanyGroup;
     'company-group-members': CompanyGroupMember;
@@ -148,8 +150,10 @@ export interface Config {
     'announcement-bars': AnnouncementBarsSelect<false> | AnnouncementBarsSelect<true>;
     'upcoming-events-config': UpcomingEventsConfigSelect<false> | UpcomingEventsConfigSelect<true>;
     'crm-sync-events': CrmSyncEventsSelect<false> | CrmSyncEventsSelect<true>;
+    'refund-requests': RefundRequestsSelect<false> | RefundRequestsSelect<true>;
     partners: PartnersSelect<false> | PartnersSelect<true>;
     'instructor-program-submissions': InstructorProgramSubmissionsSelect<false> | InstructorProgramSubmissionsSelect<true>;
+    'instructor-agreements': InstructorAgreementsSelect<false> | InstructorAgreementsSelect<true>;
     'company-invitations': CompanyInvitationsSelect<false> | CompanyInvitationsSelect<true>;
     'company-groups': CompanyGroupsSelect<false> | CompanyGroupsSelect<true>;
     'company-group-members': CompanyGroupMembersSelect<false> | CompanyGroupMembersSelect<true>;
@@ -219,6 +223,17 @@ export interface User {
   googleId?: string | null;
   emailVerified?: boolean | null;
   lastLogin?: string | null;
+  /**
+   * User-specific Google Calendar integration refresh token
+   */
+  googleRefreshToken?: string | null;
+  googleAccessToken?: string | null;
+  googleCalendarConnectedAt?: string | null;
+  googleCalendarEmail?: string | null;
+  /**
+   * Default calendar ID used for booking creation
+   */
+  googleCalendarId?: string | null;
   updatedAt: string;
   createdAt: string;
   enableAPIKey?: boolean | null;
@@ -316,6 +331,21 @@ export interface Instructor {
   rejectedAt?: string | null;
   rejectionReason?: string | null;
   isActive?: boolean | null;
+  onboardingCompleted?: boolean | null;
+  agreementAccepted?: boolean | null;
+  agreementAcceptedAt?: string | null;
+  /**
+   * Version of agreement terms accepted
+   */
+  agreementVersion?: string | null;
+  /**
+   * Instructor's percentage from total course/workshop price (default: 33%)
+   */
+  courseRevenueShare?: number | null;
+  /**
+   * Instructor's percentage from consultation revenue (default: 50%)
+   */
+  consultationRevenueShare?: number | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -350,7 +380,7 @@ export interface UserProfile {
   user: number | User;
   title?: ('Mr' | 'Mrs' | 'Dr' | 'Eng' | 'Prof') | null;
   jobTitle?: string | null;
-  workField?: ('Marketing' | 'Sales' | 'Tech' | 'Finance' | 'Operations' | 'HR' | 'Legal' | 'Other') | null;
+  workField?: string | null;
   yearsOfExperience?: ('0-2' | '3-5' | '6-10' | '10+') | null;
   education?: ('High School' | 'Bachelor' | 'Master' | 'MBA' | 'PhD' | 'Other') | null;
   yearOfBirth?: number | null;
@@ -362,7 +392,7 @@ export interface UserProfile {
   linkedinUrl?: string | null;
   learningGoals?: string | null;
   interests?: (number | Tag)[] | null;
-  howDidYouHear?: ('website' | 'whatsapp' | 'social' | 'friend' | 'google' | 'other') | null;
+  howDidYouHear?: string | null;
   onboardingCompleted?: boolean | null;
   onboardingStep?: number | null;
   updatedAt: string;
@@ -410,6 +440,13 @@ export interface Program {
   titleAr: string;
   titleEn?: string | null;
   slug: string;
+  isFeatured?: boolean | null;
+  /**
+   * Controls whether this program is visible on the website
+   */
+  isActive?: boolean | null;
+  shortDescriptionAr?: string | null;
+  shortDescriptionEn?: string | null;
   descriptionAr?: {
     root: {
       type: string;
@@ -440,49 +477,59 @@ export interface Program {
     };
     [k: string]: unknown;
   } | null;
-  shortDescriptionAr?: string | null;
-  shortDescriptionEn?: string | null;
-  category?: (number | null) | Category;
-  instructor?: (number | null) | Instructor;
+  /**
+   * Small preview image used in cards and listings
+   */
   thumbnail?: (number | null) | Media;
+  /**
+   * Large banner image displayed on the program detail page
+   */
   coverImage?: (number | null) | Media;
-  durationHours?: number | null;
-  language?: ('ar' | 'en' | 'both') | null;
-  targetAudience?:
-    | {
-        item?: string | null;
-        id?: string | null;
-      }[]
-    | null;
-  tags?: (number | Tag)[] | null;
-  isFeatured?: boolean | null;
-  /**
-   * Controls ordering in featured cards (lower appears first)
-   */
-  featuredPriority?: number | null;
-  isActive?: boolean | null;
-  /**
-   * Total rounds planned. Missing rounds are auto-created as drafts.
-   */
-  roundsCount?: number | null;
-  sessionsCount?: number | null;
-  level?: ('beginner' | 'intermediate' | 'advanced') | null;
+  category?: (number | null) | Category;
   objectives?:
     | {
         item?: string | null;
         id?: string | null;
       }[]
     | null;
+  /**
+   * Prerequisites learners should meet before enrolling
+   */
   requirements?:
     | {
         item?: string | null;
         id?: string | null;
       }[]
     | null;
-  learnersCount?: number | null;
-  viewCount?: number | null;
-  averageRating?: number | null;
-  reviewCount?: number | null;
+  /**
+   * Total rounds planned. Missing rounds are auto-created as drafts.
+   */
+  roundsCount?: number | null;
+  /**
+   * Number of sessions per round
+   */
+  sessionsCount?: number | null;
+  /**
+   * Target skill level for the learner
+   */
+  level?: ('beginner' | 'intermediate' | 'advanced') | null;
+  /**
+   * Total duration in hours across all sessions
+   */
+  durationHours?: number | null;
+  /**
+   * Language the program is delivered in
+   */
+  language?: ('ar' | 'en' | 'both') | null;
+  /**
+   * Who this program is designed for
+   */
+  targetAudience?:
+    | {
+        item?: string | null;
+        id?: string | null;
+      }[]
+    | null;
   seoTitle?: string | null;
   seoDescription?: string | null;
   seoKeywords?:
@@ -491,6 +538,22 @@ export interface Program {
         id?: string | null;
       }[]
     | null;
+  instructor?: (number | null) | Instructor;
+  tags?: (number | Tag)[] | null;
+  /**
+   * Controls ordering in featured cards (lower appears first)
+   */
+  featuredPriority?: number | null;
+  /**
+   * Auto-calculated from enrollments
+   */
+  learnersCount?: number | null;
+  /**
+   * Auto-tracked page views
+   */
+  viewCount?: number | null;
+  averageRating?: number | null;
+  reviewCount?: number | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -504,6 +567,13 @@ export interface Event {
   titleAr: string;
   titleEn?: string | null;
   slug: string;
+  /**
+   * Controls whether this event is publicly visible
+   */
+  isActive?: boolean | null;
+  category?: (number | null) | Category;
+  shortDescriptionAr?: string | null;
+  shortDescriptionEn?: string | null;
   descriptionAr?: {
     root: {
       type: string;
@@ -534,12 +604,28 @@ export interface Event {
     };
     [k: string]: unknown;
   } | null;
-  shortDescriptionAr?: string | null;
-  shortDescriptionEn?: string | null;
-  category?: (number | null) | Category;
+  /**
+   * Small preview image used in cards and listings
+   */
   thumbnail?: (number | null) | Media;
+  /**
+   * Large banner image displayed on the event detail page
+   */
   coverImage?: (number | null) | Media;
-  tags?: (number | Tag)[] | null;
+  speakers?:
+    | {
+        name: string;
+        title?: string | null;
+        bio?: string | null;
+        photo?: (number | null) | Media;
+        role?: ('speaker' | 'host' | 'panelist' | 'moderator') | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Select partner organizations sponsoring this event
+   */
+  sponsors?: (number | Partner)[] | null;
   /**
    * Start date/time
    */
@@ -548,7 +634,13 @@ export interface Event {
    * End date/time (optional)
    */
   eventEndDate?: string | null;
+  /**
+   * Total event duration in hours
+   */
   durationHours?: number | null;
+  /**
+   * Last date to register for this event
+   */
   registrationDeadline?: string | null;
   locationType?: ('online' | 'in_person' | 'hybrid') | null;
   /**
@@ -564,41 +656,8 @@ export interface Event {
    */
   onlineLink?: string | null;
   /**
-   * Maximum attendees (0 = unlimited)
+   * Session-by-session agenda (not used for retreats)
    */
-  maxCapacity?: number | null;
-  /**
-   * 0 = Free event
-   */
-  price?: number | null;
-  currency?: ('EGP' | 'USD' | 'EUR' | 'SAR') | null;
-  language?: ('ar' | 'en' | 'both') | null;
-  /**
-   * Add custom fields to the registration form. Standard fields (name, email, phone) are always included.
-   */
-  customRegistrationFields?:
-    | {
-        fieldLabel: string;
-        fieldType?: ('text' | 'email' | 'phone' | 'textarea' | 'select' | 'checkbox') | null;
-        /**
-         * Comma-separated options (for Select type only)
-         */
-        selectOptions?: string | null;
-        isRequired?: boolean | null;
-        id?: string | null;
-      }[]
-    | null;
-  speakers?:
-    | {
-        name: string;
-        title?: string | null;
-        bio?: string | null;
-        photo?: (number | null) | Media;
-        role?: ('speaker' | 'host' | 'panelist' | 'moderator') | null;
-        id?: string | null;
-      }[]
-    | null;
-  sponsors?: (number | Partner)[] | null;
   agenda?:
     | {
         time: string;
@@ -629,6 +688,57 @@ export interface Event {
       }[]
     | null;
   /**
+   * 0 = Free event
+   */
+  price?: number | null;
+  currency?: ('EGP' | 'USD' | 'EUR' | 'SAR') | null;
+  /**
+   * Maximum attendees (0 = unlimited)
+   */
+  maxCapacity?: number | null;
+  /**
+   * Language the event is delivered in
+   */
+  language?: ('ar' | 'en' | 'both') | null;
+  /**
+   * Add custom fields to the registration form. Standard fields (name, email, phone) are always included.
+   */
+  customRegistrationFields?:
+    | {
+        fieldLabel: string;
+        fieldType?: ('text' | 'email' | 'phone' | 'textarea' | 'select' | 'checkbox') | null;
+        /**
+         * Comma-separated options (for Select type only)
+         */
+        selectOptions?: string | null;
+        isRequired?: boolean | null;
+        id?: string | null;
+      }[]
+    | null;
+  seoTitle?: string | null;
+  seoDescription?: string | null;
+  seoKeywords?:
+    | {
+        keyword?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  tags?: (number | Tag)[] | null;
+  /**
+   * Who this event is designed for
+   */
+  targetAudience?:
+    | {
+        item?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  isFeatured?: boolean | null;
+  /**
+   * Lower = appears first
+   */
+  featuredPriority?: number | null;
+  /**
    * What's included (accommodation, meals, etc.)
    */
   eventIncludes?:
@@ -646,28 +756,14 @@ export interface Event {
         id?: string | null;
       }[]
     | null;
-  targetAudience?:
-    | {
-        item?: string | null;
-        id?: string | null;
-      }[]
-    | null;
-  isFeatured?: boolean | null;
   /**
-   * Lower = appears first
+   * Auto-calculated from bookings
    */
-  featuredPriority?: number | null;
-  isActive?: boolean | null;
   attendeesCount?: number | null;
+  /**
+   * Auto-tracked page views
+   */
   viewCount?: number | null;
-  seoTitle?: string | null;
-  seoDescription?: string | null;
-  seoKeywords?:
-    | {
-        keyword?: string | null;
-        id?: string | null;
-      }[]
-    | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -832,8 +928,17 @@ export interface Booking {
   twentyCrmDealId?: string | null;
   confirmationEmailSent?: boolean | null;
   reminderEmailSent?: boolean | null;
+  reminderSent24h?: boolean | null;
+  reminderSent1h?: boolean | null;
+  cartRecovery1hSent?: boolean | null;
+  cartRecovery24hSent?: boolean | null;
+  checkoutStartedAt?: string | null;
   cancelledAt?: string | null;
   cancellationReason?: string | null;
+  /**
+   * Whether this booking is an individual or corporate enrollment
+   */
+  bookingType?: ('b2c' | 'b2b') | null;
   refundAmount?: number | null;
   refundDate?: string | null;
   updatedAt: string;
@@ -887,6 +992,19 @@ export interface Payment {
     | null;
   receiptUrl?: string | null;
   receiptNumber?: string | null;
+  /**
+   * Amount after gateway fees (= amount - gatewayFee)
+   */
+  netAmount?: number | null;
+  /**
+   * Fee charged by payment gateway (Paymob/EasyKash)
+   */
+  gatewayFee?: number | null;
+  currency?: ('EGP' | 'USD' | 'SAR') | null;
+  /**
+   * Result of daily reconciliation check against payment gateway
+   */
+  reconciliationStatus?: ('pending' | 'matched' | 'mismatch' | 'manual_fixed') | null;
   notes?: string | null;
   reminderSentCount?: number | null;
   lastReminderSent?: string | null;
@@ -981,6 +1099,34 @@ export interface ConsultationType {
   meetingPlatform?: string | null;
   maxParticipants?: number | null;
   isActive?: boolean | null;
+  /**
+   * Minutes of breathing room before a session.
+   */
+  bufferBefore?: number | null;
+  /**
+   * Minutes of breathing room after a session.
+   */
+  bufferAfter?: number | null;
+  /**
+   * Maximum allowed bookings of this specific consultation type per day.
+   */
+  maxPerDay?: number | null;
+  /**
+   * Select specific days this service is allowed to be booked.
+   */
+  availableDays?: ('Sunday' | 'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday' | 'Saturday')[] | null;
+  /**
+   * Slot start time interval (e.g., every 30 minutes).
+   */
+  startTimeIncrement?: number | null;
+  /**
+   * Minimum hours notice required before a booking can be made.
+   */
+  minNoticeHours?: number | null;
+  /**
+   * Minimum hours notice required to allow a cancellation (prevents last minute cancellations).
+   */
+  minCancelNoticeHours?: number | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1026,9 +1172,23 @@ export interface ConsultationBooking {
   id: number;
   bookingCode?: string | null;
   user: number | User;
-  slot: number | ConsultationSlot;
   consultationType: number | ConsultationType;
   instructor: number | Instructor;
+  /**
+   * The scheduled date in UTC.
+   */
+  bookingDate: string;
+  /**
+   * e.g., 14:30
+   */
+  startTime: string;
+  /**
+   * e.g., 15:00
+   */
+  endTime: string;
+  timezone: string;
+  clientName?: string | null;
+  clientEmail?: string | null;
   status: 'pending' | 'confirmed' | 'completed' | 'cancelled' | 'no_show';
   amount: number;
   paymentStatus?: ('pending' | 'paid' | 'refunded') | null;
@@ -1561,6 +1721,31 @@ export interface CrmSyncEvent {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "refund-requests".
+ */
+export interface RefundRequest {
+  id: number;
+  booking: number | Booking;
+  payment: number | Payment;
+  requestedBy: number | User;
+  amount: number;
+  reason: string;
+  status: 'pending' | 'approved' | 'rejected' | 'processed';
+  /**
+   * Admin who approved this refund request
+   */
+  approvedBy?: (number | null) | User;
+  /**
+   * ID returned from payment gateway after refund processing
+   */
+  gatewayRefundId?: string | null;
+  processedAt?: string | null;
+  adminNotes?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "instructor-program-submissions".
  */
 export interface InstructorProgramSubmission {
@@ -1573,21 +1758,25 @@ export interface InstructorProgramSubmission {
   reviewNotes?: string | null;
   type: 'workshop' | 'course' | 'webinar' | 'event' | 'camp' | 'retreat' | 'corporate_training';
   titleAr: string;
-  titleEn?: string | null;
+  titleEn: string;
   shortDescriptionAr: string;
-  shortDescriptionEn?: string | null;
+  shortDescriptionEn: string;
   descriptionAr: string;
-  descriptionEn?: string | null;
-  categoryName?: string | null;
-  durationHours?: number | null;
+  descriptionEn: string;
+  categoryName: string;
+  durationHours: number;
   sessionsCount: number;
-  language?: ('ar' | 'en' | 'both') | null;
-  level?: ('beginner' | 'intermediate' | 'advanced') | null;
-  price?: number | null;
-  currency?: ('EGP' | 'USD' | 'EUR') | null;
-  objectivesText?: string | null;
-  requirementsText?: string | null;
-  targetAudienceText?: string | null;
+  language: 'ar' | 'en' | 'both';
+  level: 'beginner' | 'intermediate' | 'advanced';
+  price: number;
+  currency: 'EGP' | 'USD' | 'EUR';
+  objectivesText: string;
+  requirementsText: string;
+  targetAudienceText: string;
+  previousTraineesCount: number;
+  isFirstTimeProgram: 'yes' | 'no';
+  teachingExperienceYears: number;
+  deliveryHistoryText: string;
   sessionOutline?:
     | {
         sessionNumber?: number | null;
@@ -1596,7 +1785,48 @@ export interface InstructorProgramSubmission {
         id?: string | null;
       }[]
     | null;
-  extraNotes?: string | null;
+  extraNotes: string;
+  /**
+   * How many rounds/cohorts planned
+   */
+  roundsCount: number;
+  /**
+   * Supporting files: syllabus, slides, sample materials
+   */
+  attachments?: (number | Media)[] | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Immutable audit trail of signed instructor agreements.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "instructor-agreements".
+ */
+export interface InstructorAgreement {
+  id: number;
+  instructor: number | Instructor;
+  /**
+   * Agreement version (e.g. "v1.0")
+   */
+  version: string;
+  acceptedAt: string;
+  /**
+   * JSON array of clause IDs the instructor accepted individually.
+   */
+  clausesAccepted?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  /**
+   * Frozen copy of the agreement terms at the time of signing (plain text).
+   */
+  termsSnapshot?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1842,12 +2072,20 @@ export interface PayloadLockedDocument {
         value: number | CrmSyncEvent;
       } | null)
     | ({
+        relationTo: 'refund-requests';
+        value: number | RefundRequest;
+      } | null)
+    | ({
         relationTo: 'partners';
         value: number | Partner;
       } | null)
     | ({
         relationTo: 'instructor-program-submissions';
         value: number | InstructorProgramSubmission;
+      } | null)
+    | ({
+        relationTo: 'instructor-agreements';
+        value: number | InstructorAgreement;
       } | null)
     | ({
         relationTo: 'company-invitations';
@@ -1929,6 +2167,11 @@ export interface UsersSelect<T extends boolean = true> {
   googleId?: T;
   emailVerified?: T;
   lastLogin?: T;
+  googleRefreshToken?: T;
+  googleAccessToken?: T;
+  googleCalendarConnectedAt?: T;
+  googleCalendarEmail?: T;
+  googleCalendarId?: T;
   updatedAt?: T;
   createdAt?: T;
   enableAPIKey?: T;
@@ -2065,6 +2308,12 @@ export interface InstructorsSelect<T extends boolean = true> {
   rejectedAt?: T;
   rejectionReason?: T;
   isActive?: T;
+  onboardingCompleted?: T;
+  agreementAccepted?: T;
+  agreementAcceptedAt?: T;
+  agreementVersion?: T;
+  courseRevenueShare?: T;
+  consultationRevenueShare?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -2077,29 +2326,15 @@ export interface ProgramsSelect<T extends boolean = true> {
   titleAr?: T;
   titleEn?: T;
   slug?: T;
-  descriptionAr?: T;
-  descriptionEn?: T;
+  isFeatured?: T;
+  isActive?: T;
   shortDescriptionAr?: T;
   shortDescriptionEn?: T;
-  category?: T;
-  instructor?: T;
+  descriptionAr?: T;
+  descriptionEn?: T;
   thumbnail?: T;
   coverImage?: T;
-  durationHours?: T;
-  language?: T;
-  targetAudience?:
-    | T
-    | {
-        item?: T;
-        id?: T;
-      };
-  tags?: T;
-  isFeatured?: T;
-  featuredPriority?: T;
-  isActive?: T;
-  roundsCount?: T;
-  sessionsCount?: T;
-  level?: T;
+  category?: T;
   objectives?:
     | T
     | {
@@ -2112,10 +2347,17 @@ export interface ProgramsSelect<T extends boolean = true> {
         item?: T;
         id?: T;
       };
-  learnersCount?: T;
-  viewCount?: T;
-  averageRating?: T;
-  reviewCount?: T;
+  roundsCount?: T;
+  sessionsCount?: T;
+  level?: T;
+  durationHours?: T;
+  language?: T;
+  targetAudience?:
+    | T
+    | {
+        item?: T;
+        id?: T;
+      };
   seoTitle?: T;
   seoDescription?: T;
   seoKeywords?:
@@ -2124,6 +2366,13 @@ export interface ProgramsSelect<T extends boolean = true> {
         keyword?: T;
         id?: T;
       };
+  instructor?: T;
+  tags?: T;
+  featuredPriority?: T;
+  learnersCount?: T;
+  viewCount?: T;
+  averageRating?: T;
+  reviewCount?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -2136,35 +2385,14 @@ export interface EventsSelect<T extends boolean = true> {
   titleAr?: T;
   titleEn?: T;
   slug?: T;
-  descriptionAr?: T;
-  descriptionEn?: T;
+  isActive?: T;
+  category?: T;
   shortDescriptionAr?: T;
   shortDescriptionEn?: T;
-  category?: T;
+  descriptionAr?: T;
+  descriptionEn?: T;
   thumbnail?: T;
   coverImage?: T;
-  tags?: T;
-  eventDate?: T;
-  eventEndDate?: T;
-  durationHours?: T;
-  registrationDeadline?: T;
-  locationType?: T;
-  venue?: T;
-  venueAddress?: T;
-  onlineLink?: T;
-  maxCapacity?: T;
-  price?: T;
-  currency?: T;
-  language?: T;
-  customRegistrationFields?:
-    | T
-    | {
-        fieldLabel?: T;
-        fieldType?: T;
-        selectOptions?: T;
-        isRequired?: T;
-        id?: T;
-      };
   speakers?:
     | T
     | {
@@ -2176,6 +2404,14 @@ export interface EventsSelect<T extends boolean = true> {
         id?: T;
       };
   sponsors?: T;
+  eventDate?: T;
+  eventEndDate?: T;
+  durationHours?: T;
+  registrationDeadline?: T;
+  locationType?: T;
+  venue?: T;
+  venueAddress?: T;
+  onlineLink?: T;
   agenda?:
     | T
     | {
@@ -2202,6 +2438,36 @@ export interface EventsSelect<T extends boolean = true> {
             };
         id?: T;
       };
+  price?: T;
+  currency?: T;
+  maxCapacity?: T;
+  language?: T;
+  customRegistrationFields?:
+    | T
+    | {
+        fieldLabel?: T;
+        fieldType?: T;
+        selectOptions?: T;
+        isRequired?: T;
+        id?: T;
+      };
+  seoTitle?: T;
+  seoDescription?: T;
+  seoKeywords?:
+    | T
+    | {
+        keyword?: T;
+        id?: T;
+      };
+  tags?: T;
+  targetAudience?:
+    | T
+    | {
+        item?: T;
+        id?: T;
+      };
+  isFeatured?: T;
+  featuredPriority?: T;
   eventIncludes?:
     | T
     | {
@@ -2214,25 +2480,8 @@ export interface EventsSelect<T extends boolean = true> {
         item?: T;
         id?: T;
       };
-  targetAudience?:
-    | T
-    | {
-        item?: T;
-        id?: T;
-      };
-  isFeatured?: T;
-  featuredPriority?: T;
-  isActive?: T;
   attendeesCount?: T;
   viewCount?: T;
-  seoTitle?: T;
-  seoDescription?: T;
-  seoKeywords?:
-    | T
-    | {
-        keyword?: T;
-        id?: T;
-      };
   updatedAt?: T;
   createdAt?: T;
 }
@@ -2356,8 +2605,14 @@ export interface BookingsSelect<T extends boolean = true> {
   twentyCrmDealId?: T;
   confirmationEmailSent?: T;
   reminderEmailSent?: T;
+  reminderSent24h?: T;
+  reminderSent1h?: T;
+  cartRecovery1hSent?: T;
+  cartRecovery24hSent?: T;
+  checkoutStartedAt?: T;
   cancelledAt?: T;
   cancellationReason?: T;
+  bookingType?: T;
   refundAmount?: T;
   refundDate?: T;
   updatedAt?: T;
@@ -2381,6 +2636,10 @@ export interface PaymentsSelect<T extends boolean = true> {
   paymentGatewayResponse?: T;
   receiptUrl?: T;
   receiptNumber?: T;
+  netAmount?: T;
+  gatewayFee?: T;
+  currency?: T;
+  reconciliationStatus?: T;
   notes?: T;
   reminderSentCount?: T;
   lastReminderSent?: T;
@@ -2462,6 +2721,13 @@ export interface ConsultationTypesSelect<T extends boolean = true> {
   meetingPlatform?: T;
   maxParticipants?: T;
   isActive?: T;
+  bufferBefore?: T;
+  bufferAfter?: T;
+  maxPerDay?: T;
+  availableDays?: T;
+  startTimeIncrement?: T;
+  minNoticeHours?: T;
+  minCancelNoticeHours?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -2501,9 +2767,14 @@ export interface ConsultationSlotsSelect<T extends boolean = true> {
 export interface ConsultationBookingsSelect<T extends boolean = true> {
   bookingCode?: T;
   user?: T;
-  slot?: T;
   consultationType?: T;
   instructor?: T;
+  bookingDate?: T;
+  startTime?: T;
+  endTime?: T;
+  timezone?: T;
+  clientName?: T;
+  clientEmail?: T;
   status?: T;
   amount?: T;
   paymentStatus?: T;
@@ -2926,6 +3197,24 @@ export interface CrmSyncEventsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "refund-requests_select".
+ */
+export interface RefundRequestsSelect<T extends boolean = true> {
+  booking?: T;
+  payment?: T;
+  requestedBy?: T;
+  amount?: T;
+  reason?: T;
+  status?: T;
+  approvedBy?: T;
+  gatewayRefundId?: T;
+  processedAt?: T;
+  adminNotes?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "partners_select".
  */
 export interface PartnersSelect<T extends boolean = true> {
@@ -2966,6 +3255,10 @@ export interface InstructorProgramSubmissionsSelect<T extends boolean = true> {
   objectivesText?: T;
   requirementsText?: T;
   targetAudienceText?: T;
+  previousTraineesCount?: T;
+  isFirstTimeProgram?: T;
+  teachingExperienceYears?: T;
+  deliveryHistoryText?: T;
   sessionOutline?:
     | T
     | {
@@ -2975,6 +3268,21 @@ export interface InstructorProgramSubmissionsSelect<T extends boolean = true> {
         id?: T;
       };
   extraNotes?: T;
+  roundsCount?: T;
+  attachments?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "instructor-agreements_select".
+ */
+export interface InstructorAgreementsSelect<T extends boolean = true> {
+  instructor?: T;
+  version?: T;
+  acceptedAt?: T;
+  clausesAccepted?: T;
+  termsSnapshot?: T;
   updatedAt?: T;
   createdAt?: T;
 }

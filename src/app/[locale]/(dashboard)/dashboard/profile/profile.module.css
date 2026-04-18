@@ -276,3 +276,33 @@
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
 }
+
+.tagsContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.tagChip {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  color: var(--text-primary);
+  padding: 6px 14px;
+  border-radius: 100px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+
+.tagChip:hover {
+  border-color: var(--border-strong);
+  background: var(--bg-elevated);
+}
+
+.tagChipSelected {
+  background: var(--accent-primary-10);
+  border-color: var(--accent-primary);
+  color: var(--accent-primary);
+}

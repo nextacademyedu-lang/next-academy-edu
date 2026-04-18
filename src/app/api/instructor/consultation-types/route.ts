@@ -154,9 +154,15 @@ export async function POST(req: NextRequest) {
             ? Math.floor(Number(body.maxParticipants))
             : 1,
         isActive: body.isActive !== false,
+        bufferBefore: Number.isFinite(Number(body.bufferBefore)) ? Number(body.bufferBefore) : 0,
+        bufferAfter: Number.isFinite(Number(body.bufferAfter)) ? Number(body.bufferAfter) : 0,
+        maxPerDay: Number.isFinite(Number(body.maxPerDay)) ? Number(body.maxPerDay) : null,
+        minNoticeHours: Number.isFinite(Number(body.minNoticeHours)) ? Number(body.minNoticeHours) : 24,
+        minCancelNoticeHours: Number.isFinite(Number(body.minCancelNoticeHours)) ? Number(body.minCancelNoticeHours) : 72,
+        startTimeIncrement: Number.isFinite(Number(body.startTimeIncrement)) ? Number(body.startTimeIncrement) : 30,
+        availableDays: Array.isArray(body.availableDays) ? body.availableDays : ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
       },
       overrideAccess: true,
-      req,
     } as any);
 
     try {
@@ -172,6 +178,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ doc: mapDoc(doc as ConsultationType) });
   } catch (error) {
     console.error('[api/instructor/consultation-types][POST]', error);
-    return NextResponse.json({ error: 'Failed to create consultation type' }, { status: 500 });
+    const msg = error instanceof Error ? error.message : 'Unknown error';
+    return NextResponse.json({ error: `Failed to create consultation type: ${msg}` }, { status: 500 });
   }
 }

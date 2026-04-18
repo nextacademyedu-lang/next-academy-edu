@@ -33,6 +33,11 @@ type FormState = {
   objectivesText: string;
   requirementsText: string;
   targetAudienceText: string;
+  previousTraineesCount: string;
+  isFirstTimeProgram: 'yes' | 'no';
+  teachingExperienceYears: string;
+  deliveryHistoryText: string;
+  roundsCount: string;
   extraNotes: string;
   sessionOutlineText: string;
 };
@@ -55,6 +60,11 @@ const INITIAL_FORM: FormState = {
   objectivesText: '',
   requirementsText: '',
   targetAudienceText: '',
+  previousTraineesCount: '',
+  isFirstTimeProgram: 'yes',
+  teachingExperienceYears: '',
+  deliveryHistoryText: '',
+  roundsCount: '1',
   extraNotes: '',
   sessionOutlineText: '',
 };
@@ -152,6 +162,11 @@ export default function InstructorProgramSubmissionsPage() {
       objectivesText: submission.objectivesText || '',
       requirementsText: submission.requirementsText || '',
       targetAudienceText: submission.targetAudienceText || '',
+      previousTraineesCount: submission.previousTraineesCount !== undefined ? String(submission.previousTraineesCount) : '',
+      isFirstTimeProgram: submission.isFirstTimeProgram || 'yes',
+      teachingExperienceYears: submission.teachingExperienceYears !== undefined ? String(submission.teachingExperienceYears) : '',
+      deliveryHistoryText: submission.deliveryHistoryText || '',
+      roundsCount: submission.roundsCount !== undefined ? String(submission.roundsCount) : '1',
       extraNotes: submission.extraNotes || '',
       sessionOutlineText: stringifySessionOutline(submission.sessionOutline),
     });
@@ -176,6 +191,15 @@ export default function InstructorProgramSubmissionsPage() {
     if (!Number.isFinite(sessionsCount) || sessionsCount <= 0) {
       return 'sessionsCount must be greater than 0';
     }
+    const rounds = Number(form.roundsCount);
+    if (!Number.isFinite(rounds) || rounds <= 0) return 'Rounds count must be greater than 0';
+    if (!form.previousTraineesCount.trim()) return 'Previous trainees count is required';
+    const previousTrainees = Number(form.previousTraineesCount);
+    if (!Number.isFinite(previousTrainees) || previousTrainees < 0) return 'Previous trainees count must be valid';
+    if (!form.teachingExperienceYears.trim()) return 'Teaching experience years are required';
+    const experienceYears = Number(form.teachingExperienceYears);
+    if (!Number.isFinite(experienceYears) || experienceYears < 0) return 'Teaching experience years must be valid';
+    if (!form.deliveryHistoryText.trim()) return 'Delivery history summary is required';
     return null;
   };
 
@@ -200,6 +224,11 @@ export default function InstructorProgramSubmissionsPage() {
     objectivesText: form.objectivesText.trim() || undefined,
     requirementsText: form.requirementsText.trim() || undefined,
     targetAudienceText: form.targetAudienceText.trim() || undefined,
+    previousTraineesCount: Math.floor(Number(form.previousTraineesCount)),
+    isFirstTimeProgram: form.isFirstTimeProgram,
+    teachingExperienceYears: Number(form.teachingExperienceYears),
+    deliveryHistoryText: form.deliveryHistoryText.trim(),
+    roundsCount: Math.floor(Number(form.roundsCount)),
     extraNotes: form.extraNotes.trim() || undefined,
     sessionOutline: parseSessionOutline(form.sessionOutlineText),
   });
@@ -339,34 +368,182 @@ export default function InstructorProgramSubmissionsPage() {
                 <Label>Price</Label>
                 <Input type="number" min={0} value={form.price} onChange={(e) => updateField('price', e.target.value)} />
               </div>
+              <div>
+                <Label>Currency</Label>
+                <select
+                  value={form.currency}
+                  onChange={(e) => updateField('currency', e.target.value as FormState['currency'])}
+                  style={{ width: '100%', marginTop: '8px', borderRadius: '10px', border: '1px solid var(--border-subtle)', background: 'var(--bg-surface)', color: 'var(--text-primary)', padding: '10px 12px' }}
+                >
+                  <option value="EGP">EGP</option>
+                  <option value="USD">USD</option>
+                  <option value="EUR">EUR</option>
+                </select>
+              </div>
+              <div>
+                <Label>Language</Label>
+                <select
+                  value={form.language}
+                  onChange={(e) => updateField('language', e.target.value as FormState['language'])}
+                  style={{ width: '100%', marginTop: '8px', borderRadius: '10px', border: '1px solid var(--border-subtle)', background: 'var(--bg-surface)', color: 'var(--text-primary)', padding: '10px 12px' }}
+                >
+                  <option value="ar">Arabic</option>
+                  <option value="en">English</option>
+                  <option value="both">Both</option>
+                </select>
+              </div>
+              <div>
+                <Label>Level</Label>
+                <select
+                  value={form.level}
+                  onChange={(e) => updateField('level', e.target.value as FormState['level'])}
+                  style={{ width: '100%', marginTop: '8px', borderRadius: '10px', border: '1px solid var(--border-subtle)', background: 'var(--bg-surface)', color: 'var(--text-primary)', padding: '10px 12px' }}
+                >
+                  <option value="beginner">Beginner</option>
+                  <option value="intermediate">Intermediate</option>
+                  <option value="advanced">Advanced</option>
+                </select>
+              </div>
+              <div>
+                <Label>Rounds Count</Label>
+                <Input type="number" min={1} value={form.roundsCount} onChange={(e) => updateField('roundsCount', e.target.value)} />
+              </div>
             </div>
 
-            <div>
-              <Label>Arabic Title</Label>
-              <Input value={form.titleAr} onChange={(e) => updateField('titleAr', e.target.value)} />
-            </div>
-            <div>
-              <Label>English Title</Label>
-              <Input value={form.titleEn} onChange={(e) => updateField('titleEn', e.target.value)} />
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))', gap: '10px' }}>
+              <div>
+                <Label>Category</Label>
+                <Input value={form.categoryName} onChange={(e) => updateField('categoryName', e.target.value)} placeholder="e.g. Technology, Business" />
+              </div>
             </div>
 
-            <div>
-              <Label>Arabic Short Description</Label>
-              <textarea
-                value={form.shortDescriptionAr}
-                onChange={(e) => updateField('shortDescriptionAr', e.target.value)}
-                rows={3}
-                style={{ width: '100%', marginTop: '8px', borderRadius: '10px', border: '1px solid var(--border-subtle)', background: 'var(--bg-surface)', color: 'var(--text-primary)', padding: '10px 12px' }}
-              />
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '10px' }}>
+              <div>
+                <Label>Arabic Title</Label>
+                <Input value={form.titleAr} onChange={(e) => updateField('titleAr', e.target.value)} />
+              </div>
+              <div>
+                <Label>English Title</Label>
+                <Input value={form.titleEn} onChange={(e) => updateField('titleEn', e.target.value)} />
+              </div>
             </div>
-            <div>
-              <Label>Arabic Full Description</Label>
-              <textarea
-                value={form.descriptionAr}
-                onChange={(e) => updateField('descriptionAr', e.target.value)}
-                rows={5}
-                style={{ width: '100%', marginTop: '8px', borderRadius: '10px', border: '1px solid var(--border-subtle)', background: 'var(--bg-surface)', color: 'var(--text-primary)', padding: '10px 12px' }}
-              />
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '10px' }}>
+              <div>
+                <Label>Arabic Short Description</Label>
+                <textarea
+                  value={form.shortDescriptionAr}
+                  onChange={(e) => updateField('shortDescriptionAr', e.target.value)}
+                  rows={3}
+                  style={{ width: '100%', marginTop: '8px', borderRadius: '10px', border: '1px solid var(--border-subtle)', background: 'var(--bg-surface)', color: 'var(--text-primary)', padding: '10px 12px' }}
+                />
+              </div>
+              <div>
+                <Label>English Short Description</Label>
+                <textarea
+                  value={form.shortDescriptionEn}
+                  onChange={(e) => updateField('shortDescriptionEn', e.target.value)}
+                  rows={3}
+                  style={{ width: '100%', marginTop: '8px', borderRadius: '10px', border: '1px solid var(--border-subtle)', background: 'var(--bg-surface)', color: 'var(--text-primary)', padding: '10px 12px' }}
+                />
+              </div>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '10px' }}>
+              <div>
+                <Label>Arabic Full Description</Label>
+                <textarea
+                  value={form.descriptionAr}
+                  onChange={(e) => updateField('descriptionAr', e.target.value)}
+                  rows={5}
+                  style={{ width: '100%', marginTop: '8px', borderRadius: '10px', border: '1px solid var(--border-subtle)', background: 'var(--bg-surface)', color: 'var(--text-primary)', padding: '10px 12px' }}
+                />
+              </div>
+              <div>
+                <Label>English Full Description</Label>
+                <textarea
+                  value={form.descriptionEn}
+                  onChange={(e) => updateField('descriptionEn', e.target.value)}
+                  rows={5}
+                  style={{ width: '100%', marginTop: '8px', borderRadius: '10px', border: '1px solid var(--border-subtle)', background: 'var(--bg-surface)', color: 'var(--text-primary)', padding: '10px 12px' }}
+                />
+              </div>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '10px' }}>
+              <div>
+                <Label>Objectives</Label>
+                <textarea
+                  value={form.objectivesText}
+                  onChange={(e) => updateField('objectivesText', e.target.value)}
+                  rows={4}
+                  style={{ width: '100%', marginTop: '8px', borderRadius: '10px', border: '1px solid var(--border-subtle)', background: 'var(--bg-surface)', color: 'var(--text-primary)', padding: '10px 12px' }}
+                />
+              </div>
+              <div>
+                <Label>Requirements</Label>
+                <textarea
+                  value={form.requirementsText}
+                  onChange={(e) => updateField('requirementsText', e.target.value)}
+                  rows={4}
+                  style={{ width: '100%', marginTop: '8px', borderRadius: '10px', border: '1px solid var(--border-subtle)', background: 'var(--bg-surface)', color: 'var(--text-primary)', padding: '10px 12px' }}
+                />
+              </div>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '10px' }}>
+              <div>
+                <Label>Target Audience</Label>
+                <textarea
+                  value={form.targetAudienceText}
+                  onChange={(e) => updateField('targetAudienceText', e.target.value)}
+                  rows={4}
+                  style={{ width: '100%', marginTop: '8px', borderRadius: '10px', border: '1px solid var(--border-subtle)', background: 'var(--bg-surface)', color: 'var(--text-primary)', padding: '10px 12px' }}
+                />
+              </div>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '10px' }}>
+              <div>
+                <Label>Previous Trainees Count</Label>
+                <Input type="number" min={0} value={form.previousTraineesCount} onChange={(e) => updateField('previousTraineesCount', e.target.value)} style={{ marginTop: '8px' }} />
+              </div>
+              <div>
+                <Label>First Time Program?</Label>
+                <select
+                  value={form.isFirstTimeProgram}
+                  onChange={(e) => updateField('isFirstTimeProgram', e.target.value as FormState['isFirstTimeProgram'])}
+                  style={{ width: '100%', marginTop: '8px', borderRadius: '10px', border: '1px solid var(--border-subtle)', background: 'var(--bg-surface)', color: 'var(--text-primary)', padding: '10px 12px' }}
+                >
+                  <option value="yes">Yes</option>
+                  <option value="no">No</option>
+                </select>
+              </div>
+              <div>
+                <Label>Teaching Exp (Years)</Label>
+                <Input type="number" min={0} value={form.teachingExperienceYears} onChange={(e) => updateField('teachingExperienceYears', e.target.value)} style={{ marginTop: '8px' }} />
+              </div>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '10px' }}>
+              <div>
+                <Label>Delivery History</Label>
+                <textarea
+                  value={form.deliveryHistoryText}
+                  onChange={(e) => updateField('deliveryHistoryText', e.target.value)}
+                  rows={4}
+                  style={{ width: '100%', marginTop: '8px', borderRadius: '10px', border: '1px solid var(--border-subtle)', background: 'var(--bg-surface)', color: 'var(--text-primary)', padding: '10px 12px' }}
+                />
+              </div>
+              <div>
+                <Label>Extra Notes</Label>
+                <textarea
+                  value={form.extraNotes}
+                  onChange={(e) => updateField('extraNotes', e.target.value)}
+                  rows={4}
+                  style={{ width: '100%', marginTop: '8px', borderRadius: '10px', border: '1px solid var(--border-subtle)', background: 'var(--bg-surface)', color: 'var(--text-primary)', padding: '10px 12px' }}
+                />
+              </div>
             </div>
 
             <div>

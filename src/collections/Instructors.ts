@@ -49,10 +49,16 @@ export const Instructors: CollectionConfig = {
             : previousStatus;
 
         if (enforceSelfServiceRules && !allowStatusSync) {
-          next.isActive = false;
+          // Allow self-service edits to remain approved so live edits reflect immediately
           if (!next.verificationStatus) next.verificationStatus = operation === 'create' ? 'draft' : previousStatus;
-          if (nextStatus === 'approved' || nextStatus === 'rejected') {
+          if (nextStatus === 'rejected') {
             next.verificationStatus = previousStatus;
+          }
+          // Do not overwrite isActive to false if it was approved and they are just updating their profile
+          if (operation === 'update' && previousStatus === 'approved') {
+             next.isActive = true;
+          } else if (operation === 'create' || previousStatus !== 'approved') {
+             next.isActive = false;
           }
           return next;
         }

@@ -123,7 +123,6 @@ export async function syncInstructorConsultationSlots(params: SyncParams) {
       where: {
         and: [{ instructor: { equals: instructorId } }, { isActive: { equals: true } }],
       },
-      req,
     }),
     findAllDocs(payload, {
       collection: 'consultation-availability',
@@ -131,14 +130,12 @@ export async function syncInstructorConsultationSlots(params: SyncParams) {
         and: [{ instructor: { equals: instructorId } }, { isActive: { equals: true } }],
       },
       sort: 'dayIndex',
-      req,
     }),
     findAllDocs(payload, {
       collection: 'instructor-blocked-dates',
       where: {
         and: [{ instructor: { equals: instructorId } }, { date: { greater_than_equal: todayIso } }],
       },
-      req,
     }),
     findAllDocs(payload, {
       collection: 'consultation-slots',
@@ -149,7 +146,6 @@ export async function syncInstructorConsultationSlots(params: SyncParams) {
           { date: { greater_than_equal: todayIso } },
         ],
       },
-      req,
     }),
   ]);
 
@@ -160,7 +156,6 @@ export async function syncInstructorConsultationSlots(params: SyncParams) {
           collection: 'consultation-slots',
           id: slot.id,
           overrideAccess: true,
-          req,
         }),
       ),
     );
@@ -255,7 +250,6 @@ export async function syncInstructorConsultationSlots(params: SyncParams) {
           collection: 'consultation-slots',
           data,
           overrideAccess: true,
-          req,
         }),
       ),
     );

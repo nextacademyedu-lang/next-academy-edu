@@ -22,6 +22,11 @@ import { DeleteAccountModal } from '@/components/dashboard/delete-account-modal'
 type Toast = { type: 'success' | 'error'; message: string } | null;
 type Tab = 'general' | 'professional' | 'company' | 'interests' | 'security' | 'integrations';
 
+interface Tag {
+  id: string;
+  name: string;
+}
+
 const WORK_FIELDS = [
   'Marketing', 'Sales', 'Tech', 'Finance', 'Operations', 'HR', 'Legal',
   'Education', 'Healthcare', 'Engineering', 'Design', 'Entrepreneurship',
@@ -81,9 +86,11 @@ export default function ProfilePage() {
   const [savingComp, setSavingComp]     = useState(false);
 
   // Interests / Learning form state
+  const [interests, setInterests]             = useState<string[]>([]);
   const [learningGoals, setLearningGoals]     = useState('');
   const [howDidYouHear, setHowDidYouHear]     = useState('');
   const [savingInterests, setSavingInterests] = useState(false);
+  const [availableTags, setAvailableTags]     = useState<Tag[]>([]);
 
   // Security form state
   const [newPassword,     setNewPassword]     = useState('');
@@ -93,6 +100,28 @@ export default function ProfilePage() {
 
   const [profileId, setProfileId] = useState<string | null>(null);
   const [toast, setToast] = useState<Toast>(null);
+
+  // Fetch available tags
+  useEffect(() => {
+    async function fetchTags() {
+      try {
+        const res = await fetch('/api/tags?limit=100&depth=0');
+        if (res.ok) {
+          const data = await res.json();
+          const tags = (data.docs || [])
+            .map((tag: { id: string | number; name?: string; title?: string }) => ({
+              id: String(tag.id),
+              name: tag.name || tag.title || '',
+            }))
+            .filter((tag: Tag) => tag.name.length > 0);
+          setAvailableTags(tags);
+        }
+      } catch (err) {
+        // Silent failure for tags
+      }
+    }
+    fetchTags();
+  }, []);
 
   // Pre-fill from auth context
   useEffect(() => {
@@ -129,6 +158,16 @@ export default function ProfilePage() {
       setCity(p.city ?? '');
       setLearningGoals(p.learningGoals ?? '');
       setHowDidYouHear(p.howDidYouHear ?? '');
+
+      if (Array.isArray(p.interests)) {
+        const mappedInterests = p.interests.map(i => {
+          if (typeof i === 'object' && i !== null && 'id' in i) return String(i.id);
+          return String(i);
+        });
+        setInterests(mappedInterests);
+      } else {
+        setInterests([]);
+      }
     }
   }, [user]);
 
@@ -204,8 +243,14 @@ export default function ProfilePage() {
   const handleSaveInterests = async (e: React.FormEvent) => {
     e.preventDefault();
     await saveExtended(
-      { learningGoals, howDidYouHear: howDidYouHear || undefined },
+      { learningGoals, howDidYouHear: howDidYouHear || undefined, interests },
       setSavingInterests,
+    );
+  };
+
+  const toggleInterest = (tagId: string) => {
+    setInterests(prev => 
+      prev.includes(tagId) ? prev.filter(id => id !== tagId) : [...prev, tagId]
     );
   };
 
@@ -470,18 +515,55 @@ export default function ProfilePage() {
               <CardContent>
                 <form onSubmit={handleSaveInterests} className={styles.formStack}>
                   <div className={styles.fieldBlock}>
+                    <Label>{t('interests')}</Label>
+                    <div className={styles.tagsContainer}>
+                      {availableTags.length > 0 ? (
+                        availableTags.map((tag) => (
+                          <button
+                            key={tag.id}
+                            type="button"
+                            className={`${styles.tagChip} ${interests.includes(tag.id) ? styles.tagChipSelected : ''}`}
+                            onClick={() => toggleInterest(tag.id)}
+                          >
+                            {tag.name}
+                          </button>
+                        ))
+                      ) : (
+                        <span style={{ color: 'var(--text-muted)', fontSize: 14 }}>
+                          Loading interests...
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className={styles.fieldBlock}>
                     <Label htmlFor="howDidYouHear">{t('howDidYouHear')}</Label>
                     <select
                       id="howDidYouHear"
                       className={styles.selectField}
-                      value={howDidYouHear}
-                      onChange={e => setHowDidYouHear(e.target.value)}
+                      value={howDidYouHear.startsWith('other:') ? 'other' : howDidYouHear}
+                      onChange={e => {
+                        if (e.target.value !== 'other') {
+                          setHowDidYouHear(e.target.value);
+                        } else {
+                          setHowDidYouHear('other:');
+                        }
+                      }}
                     >
                       <option value="">{t('selectOption')}</option>
                       {HOW_OPTIONS.map(opt => (
                         <option key={opt.value} value={opt.value}>{opt.label}</option>
                       ))}
                     </select>
+                    {howDidYouHear.startsWith('other:') && (
+                      <div style={{ marginTop: '8px' }}>
+                        <Input
+                          placeholder="Please specify"
+                          value={howDidYouHear.substring(6)}
+                          onChange={e => setHowDidYouHear(`other:${e.target.value}`)}
+                        />
+                      </div>
+                    )}
                   </div>
 
                   <div className={styles.fieldBlock}>
