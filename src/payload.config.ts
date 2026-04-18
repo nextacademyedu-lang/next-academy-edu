@@ -301,9 +301,10 @@ export default buildConfig({
   db: postgresAdapter({
     pool: {
       connectionString: process.env.DATABASE_URI,
-      max: 10, // max concurrent connections to Neon
+      max: 20,
       idleTimeoutMillis: 30000,
-      connectionTimeoutMillis: 5000,
+      connectionTimeoutMillis: 30000, // 30s — shared PG can be slow under load
+      statement_timeout: 60000, // kill queries that take >60s
     },
     // In production, postgresAdapter does not run schema push.
     // Wire generated migrations so schema evolves automatically on boot.

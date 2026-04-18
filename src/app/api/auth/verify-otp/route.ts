@@ -263,39 +263,51 @@ export async function POST(request: NextRequest) {
       req: asPayloadRequest(request),
     });
 
-    // ── Intent-based role assignment (non-blocking) ──────────────────
+    // ── Intent-based role assignment (with retry) ─────────────────────
     // Email is already verified at this point. If the instructor/b2b
-    // account provisioning fails, we still return success so the user
-    // isn't stuck with a used code and no verification feedback.
+    // account provisioning fails, we retry up to 3 times before giving up.
     let roleAssigned = true;
-    try {
-      const intentAdjustedUser = await ensureB2BManagerAccountForIntent({
-        payload,
-        req: request,
-        user: updatedUser as {
-          id: number | string;
-          role?: string | null;
-          signupIntent?: string | null;
-        },
-      });
+    const MAX_ROLE_RETRIES = 3;
+    for (let attempt = 1; attempt <= MAX_ROLE_RETRIES; attempt++) {
+      try {
+        const intentAdjustedUser = await ensureB2BManagerAccountForIntent({
+          payload,
+          req: request,
+          user: updatedUser as {
+            id: number | string;
+            role?: string | null;
+            signupIntent?: string | null;
+          },
+        });
 
-      await ensureInstructorAccountForIntent({
-        payload,
-        req: request,
-        user: intentAdjustedUser as {
-          id: number | string;
-          email?: string | null;
-          firstName?: string | null;
-          lastName?: string | null;
-          role?: string | null;
-          emailVerified?: boolean | null;
-          instructorId?: unknown;
-          signupIntent?: string | null;
-        },
-      });
-    } catch (roleErr) {
-      roleAssigned = false;
-      console.error('[verify-otp] Role assignment failed (email IS verified):', roleErr);
+        await ensureInstructorAccountForIntent({
+          payload,
+          req: request,
+          user: intentAdjustedUser as {
+            id: number | string;
+            email?: string | null;
+            firstName?: string | null;
+            lastName?: string | null;
+            role?: string | null;
+            emailVerified?: boolean | null;
+            instructorId?: unknown;
+            signupIntent?: string | null;
+          },
+        });
+        break; // success — exit retry loop
+      } catch (roleErr) {
+        console.error(
+          `[verify-otp] Role assignment attempt ${attempt}/${MAX_ROLE_RETRIES} failed:`,
+          roleErr,
+        );
+        if (attempt === MAX_ROLE_RETRIES) {
+          roleAssigned = false;
+          console.error('[verify-otp] Role assignment EXHAUSTED all retries (email IS verified)');
+        } else {
+          // Wait 1s before retrying
+          await new Promise((r) => setTimeout(r, 1000));
+        }
+      }
     }
 
     return NextResponse.json(

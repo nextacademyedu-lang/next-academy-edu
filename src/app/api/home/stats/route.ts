@@ -13,68 +13,86 @@ type StatsResponse = {
   completionRate: number;
 };
 
+// ── In-memory cache to avoid hammering DB on every homepage load ─────────────
+let memoryCache: { data: StatsResponse; expiresAt: number } | null = null;
+const MEMORY_CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
+
+async function safeCount(
+  payload: Awaited<ReturnType<typeof getPayload>>,
+  collection: string,
+  where?: Record<string, unknown>,
+): Promise<number> {
+  try {
+    const result = await payload.find({
+      collection: collection as 'bookings',
+      where: where as never,
+      depth: 0,
+      limit: 1,
+    });
+    return result.totalDocs;
+  } catch (err) {
+    console.error(`[api/home/stats] ${collection} query failed:`, err);
+    return 0;
+  }
+}
+
 export async function GET() {
   try {
+    // Return cached data if still fresh
+    if (memoryCache && Date.now() < memoryCache.expiresAt) {
+      return NextResponse.json(
+        { stats: memoryCache.data },
+        { headers: PUBLIC_CACHE_HEADERS },
+      );
+    }
+
     const payload = await getPayload({ config });
 
-    const results = await Promise.allSettled([
-      payload.find({
-        collection: 'bookings',
-        where: { status: { equals: 'completed' } },
-        depth: 0,
-        limit: 1,
-      }),
-      payload.find({
-        collection: 'bookings',
-        where: { status: { in: ['confirmed', 'completed'] } },
-        depth: 0,
-        limit: 1,
-      }),
-      payload.find({
-        collection: 'companies',
-        depth: 0,
-        limit: 1,
-      }),
-      payload.find({
-        collection: 'instructors',
-        where: { isActive: { equals: true } },
-        depth: 0,
-        limit: 1,
-      }),
-    ]);
-
-    const safeTotal = (r: PromiseSettledResult<{ totalDocs: number }>) =>
-      r.status === 'fulfilled' ? r.value.totalDocs : 0;
-
-    // Log any individual failures without breaking the whole response
-    results.forEach((r, i) => {
-      if (r.status === 'rejected') {
-        const labels = ['completedBookings', 'successfulBookings', 'companies', 'instructors'];
-        console.error(`[api/home/stats] ${labels[i]} query failed:`, r.reason);
-      }
+    // Run queries sequentially instead of in parallel to avoid pool exhaustion
+    const completedBookings = await safeCount(payload, 'bookings', {
+      status: { equals: 'completed' },
+    });
+    const successfulBookings = await safeCount(payload, 'bookings', {
+      status: { in: ['confirmed', 'completed'] },
+    });
+    const partners = await safeCount(payload, 'companies');
+    const instructors = await safeCount(payload, 'instructors', {
+      isActive: { equals: true },
     });
 
-    const professionals = safeTotal(results[1]);
-    const partners = safeTotal(results[2]);
-    const instructors = safeTotal(results[3]);
-    const completionRate = professionals > 0
-      ? Math.round((safeTotal(results[0]) / professionals) * 100)
-      : 0;
+    const completionRate =
+      successfulBookings > 0
+        ? Math.round((completedBookings / successfulBookings) * 100)
+        : 0;
 
     const stats: StatsResponse = {
-      professionals,
+      professionals: successfulBookings,
       partners,
       instructors,
       completionRate,
     };
 
+    // Cache in memory
+    memoryCache = {
+      data: stats,
+      expiresAt: Date.now() + MEMORY_CACHE_TTL_MS,
+    };
+
     return NextResponse.json({ stats }, { headers: PUBLIC_CACHE_HEADERS });
   } catch (error) {
     console.error('[api/home/stats] Failed to build home stats:', error);
+
+    // If we have stale cache, return it instead of erroring
+    if (memoryCache) {
+      return NextResponse.json(
+        { stats: memoryCache.data },
+        { headers: PUBLIC_CACHE_HEADERS },
+      );
+    }
+
     return NextResponse.json(
       { error: 'Failed to fetch home stats' },
       { status: 500 },
     );
   }
 }
-

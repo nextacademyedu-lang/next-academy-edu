@@ -155,29 +155,35 @@ export async function GET(req: NextRequest) {
       sessionPageViews: Number.isFinite(sessionPageViews) ? sessionPageViews : 1,
     };
 
-    const result = await payload.find({
-      collection: 'popups',
-      where: {
-        and: [
-          { status: { equals: 'active' } },
-          {
-            or: [
-              { startDate: { exists: false } },
-              { startDate: { less_than_equal: now } },
-            ],
-          },
-          {
-            or: [
-              { endDate: { exists: false } },
-              { endDate: { greater_than_equal: now } },
-            ],
-          },
-        ],
-      },
-      sort: '-priority',
-      depth: 1,
-      limit: 10,
-    });
+    let result;
+    try {
+      result = await payload.find({
+        collection: 'popups',
+        where: {
+          and: [
+            { status: { equals: 'active' } },
+            {
+              or: [
+                { startDate: { exists: false } },
+                { startDate: { less_than_equal: now } },
+              ],
+            },
+            {
+              or: [
+                { endDate: { exists: false } },
+                { endDate: { greater_than_equal: now } },
+              ],
+            },
+          ],
+        },
+        sort: '-priority',
+        depth: 1,
+        limit: 10,
+      });
+    } catch (dbErr) {
+      console.warn('[api/popups/active] DB query failed, returning empty:', (dbErr as Error).message);
+      return NextResponse.json({ popups: [] });
+    }
 
     // Apply full targeting filters (page + audience + behavior)
     const popups = result.docs.filter((popup) => {

@@ -51,29 +51,35 @@ export async function GET(req: NextRequest) {
 
     const now = new Date().toISOString();
 
-    const result = await payload.find({
-      collection: 'announcement-bars',
-      where: {
-        and: [
-          { status: { equals: 'active' } },
-          {
-            or: [
-              { startDate: { exists: false } },
-              { startDate: { less_than_equal: now } },
-            ],
-          },
-          {
-            or: [
-              { endDate: { exists: false } },
-              { endDate: { greater_than_equal: now } },
-            ],
-          },
-        ],
-      },
-      sort: '-priority',
-      depth: 0,
-      limit: 5,
-    });
+    let result;
+    try {
+      result = await payload.find({
+        collection: 'announcement-bars',
+        where: {
+          and: [
+            { status: { equals: 'active' } },
+            {
+              or: [
+                { startDate: { exists: false } },
+                { startDate: { less_than_equal: now } },
+              ],
+            },
+            {
+              or: [
+                { endDate: { exists: false } },
+                { endDate: { greater_than_equal: now } },
+              ],
+            },
+          ],
+        },
+        sort: '-priority',
+        depth: 0,
+        limit: 5,
+      });
+    } catch (dbErr) {
+      console.warn('[api/announcement-bars/active] DB query failed, returning empty:', (dbErr as Error).message);
+      return NextResponse.json({ bar: null }, { headers: PUBLIC_CACHE_HEADERS });
+    }
 
     // Filter by page targeting
     const bars = result.docs.filter((bar) => {

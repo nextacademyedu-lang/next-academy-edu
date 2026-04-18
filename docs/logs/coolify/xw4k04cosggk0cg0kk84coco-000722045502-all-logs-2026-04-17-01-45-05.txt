@@ -3,1264 +3,982 @@
 - Network:      http://0.0.0.0:3001
 ✓ Starting...
 [instrumentation] Attempt 1/5: Initializing Payload CMS…
-✓ Ready in 1627ms
+✓ Ready in 1106ms
 [instrumentation] ✅ Payload CMS initialized. Collections: users, media, companies, user-profiles, tags, categories, instructors, programs, events, rounds, sessions, payment-plans, bookings, payments, installment-requests, notifications, discount-codes, consultation-types, consultation-availability, consultation-slots, consultation-bookings, leads, waitlist, reviews, certificates, payment-links, instructor-blocked-dates, verification-codes, blog-posts, bulk-seat-allocations, popups, announcement-bars, upcoming-events-config, crm-sync-events, refund-requests, partners, instructor-program-submissions, instructor-agreements, company-invitations, company-groups, company-group-members, company-policies, payload-kv, payload-locked-documents, payload-preferences, payload-migrations
 [cron-scheduler] Starting 3 cron jobs (base: https://nextacademyedu.com)
 [cron-scheduler]   📅 crm-sync → every 30 min
 [cron-scheduler]   📅 check-overdue → every 360 min
 [cron-scheduler]   📅 waitlist → every 60 min
 [cron-scheduler] ✅ All cron jobs registered
-[cron/check-overdue] { overdue: 0, reminded: 0, blocked: 0 }
-[cron] ✅ check-overdue completed (200) in 366ms
-[cron] ✅ crm-sync completed (200) in 575ms
-[04:49:44] ERROR: File Untitled design (3)-3.png for collection media is missing on the disk. Expected path: /app/media/Untitled design (3)-3.png
-[04:49:44] ERROR: File Untitled design (3)-4.png for collection media is missing on the disk. Expected path: /app/media/Untitled design (3)-4.png
-[04:49:54] ERROR: Failed query: select "id", "booking_code", "user_id", "consultation_type_id", "instructor_id", "booking_date", "start_time", "end_time", "timezone", "client_name", "client_email", "status", "amount", "payment_status", "transaction_id", "meeting_url", "user_notes", "instructor_notes", "cancelled_by", "cancellation_reason", "reminder_sent", "discount_code", "discount_amount", "twenty_crm_deal_id", "updated_at", "created_at" from "consultation_bookings" "consultation_bookings" where "consultation_bookings"."instructor_id" = $1 order by "consultation_bookings"."created_at" desc limit $2
-params: 56,50
-err: {
-"type": "mx",
-"message": "Failed query: select \"id\", \"booking_code\", \"user_id\", \"consultation_type_id\", \"instructor_id\", \"booking_date\", \"start_time\", \"end_time\", \"timezone\", \"client_name\", \"client_email\", \"status\", \"amount\", \"payment_status\", \"transaction_id\", \"meeting_url\", \"user_notes\", \"instructor_notes\", \"cancelled_by\", \"cancellation_reason\", \"reminder_sent\", \"discount_code\", \"discount_amount\", \"twenty_crm_deal_id\", \"updated_at\", \"created_at\" from \"consultation_bookings\" \"consultation_bookings\" where \"consultation_bookings\".\"instructor_id\" = $1 order by \"consultation_bookings\".\"created_at\" desc limit $2\nparams: 56,50: column \"booking_date\" does not exist",
-"stack":
-Error: Failed query: select "id", "booking_code", "user_id", "consultation_type_id", "instructor_id", "booking_date", "start_time", "end_time", "timezone", "client_name", "client_email", "status", "amount", "payment_status", "transaction_id", "meeting_url", "user_notes", "instructor_notes", "cancelled_by", "cancellation_reason", "reminder_sent", "discount_code", "discount_amount", "twenty_crm_deal_id", "updated_at", "created_at" from "consultation_bookings" "consultation_bookings" where "consultation_bookings"."instructor_id" = $1 order by "consultation_bookings"."created_at" desc limit $2
-params: 56,50
-at nF.queryWithCache (/app/.next/server/chunks/6382.js:156:20011)
-at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
-at async /app/.next/server/chunks/6382.js:156:23099
-at async iS (/app/.next/server/chunks/6382.js:124:1334)
-at async w (/app/.next/server/chunks/3737.js:114:16833)
-at async c6 (/app/.next/server/chunks/6382.js:89:65321)
-at async P (/app/.next/server/app/(payload)/api/[...slug]/route.js:1:7484)
-at async /app/.next/server/app/(payload)/api/[...slug]/route.js:1:10273
-at async rb.do (/app/node_modules/.pnpm/next@15.4.11_@babel+core@7.29.0_react-dom@19.2.3_react@19.2.3__react@19.2.3_sass@1.98.0/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js:5:21059)
-at async rb.handle (/app/node_modules/.pnpm/next@15.4.11_@babel+core@7.29.0_react-dom@19.2.3_react@19.2.3__react@19.2.3_sass@1.98.0/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js:5:25902)
-caused by: error: column "booking_date" does not exist
-at /app/.next/server/chunks/6382.js:40:136596
-at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
-at async /app/.next/server/chunks/6382.js:156:23308
-at async nF.queryWithCache (/app/.next/server/chunks/6382.js:156:19986)
-at async /app/.next/server/chunks/6382.js:156:23099
-at async iS (/app/.next/server/chunks/6382.js:124:1334)
-at async w (/app/.next/server/chunks/3737.js:114:16833)
-at async c6 (/app/.next/server/chunks/6382.js:89:65321)
-at async P (/app/.next/server/app/(payload)/api/[...slug]/route.js:1:7484)
-at async /app/.next/server/app/(payload)/api/[...slug]/route.js:1:10273
-"query": "select \"id\", \"booking_code\", \"user_id\", \"consultation_type_id\", \"instructor_id\", \"booking_date\", \"start_time\", \"end_time\", \"timezone\", \"client_name\", \"client_email\", \"status\", \"amount\", \"payment_status\", \"transaction_id\", \"meeting_url\", \"user_notes\", \"instructor_notes\", \"cancelled_by\", \"cancellation_reason\", \"reminder_sent\", \"discount_code\", \"discount_amount\", \"twenty_crm_deal_id\", \"updated_at\", \"created_at\" from \"consultation_bookings\" \"consultation_bookings\" where \"consultation_bookings\".\"instructor_id\" = $1 order by \"consultation_bookings\".\"created_at\" desc limit $2",
-"params": [
-56,
-50
-]
-}
-[04:50:00] ERROR: File Untitled design (3)-4.png for collection media is missing on the disk. Expected path: /app/media/Untitled design (3)-4.png
-[04:50:00] ERROR: File Untitled design (3)-3.png for collection media is missing on the disk. Expected path: /app/media/Untitled design (3)-3.png
-[04:50:11] ERROR: File Untitled design (3)-4.png for collection media is missing on the disk. Expected path: /app/media/Untitled design (3)-4.png
-[04:50:11] ERROR: File Untitled design (3)-3.png for collection media is missing on the disk. Expected path: /app/media/Untitled design (3)-3.png
+[cron] ✅ crm-sync completed (200) in 156ms
+[cron] ✅ check-overdue completed (200) in 179ms
+[cron/waitlist] { notified: 0, expired: 0 }
+[cron] ✅ waitlist completed (200) in 287ms
+[19:08:15] ERROR: File 1 (1).webp for collection media is missing on the disk. Expected path: /app/media/1 (1).webp
+[19:08:15] ERROR: File rammah portصثrait (4).png for collection media is missing on the disk. Expected path: /app/media/rammah portصثrait (4).png
+[19:08:15] ERROR: File rammah portrait (3)-1.png for collection media is missing on the disk. Expected path: /app/media/rammah portrait (3)-1.png
+[19:08:15] ERROR: File 4 (1).webp for collection media is missing on the disk. Expected path: /app/media/4 (1).webp
+[19:08:15] ERROR: File turky.webp for collection media is missing on the disk. Expected path: /app/media/turky.webp
+[19:08:15] ERROR: File kandil.webp for collection media is missing on the disk. Expected path: /app/media/kandil.webp
+[19:08:15] ERROR: File 2.webp for collection media is missing on the disk. Expected path: /app/media/2.webp
+[19:08:15] ERROR: File 5.webp for collection media is missing on the disk. Expected path: /app/media/5.webp
+[19:12:14] ERROR: File 1 (1).webp for collection media is missing on the disk. Expected path: /app/media/1 (1).webp
+[19:12:14] ERROR: File rammah portrait (3)-1.png for collection media is missing on the disk. Expected path: /app/media/rammah portrait (3)-1.png
+[19:12:14] ERROR: File rammah portصثrait (4).png for collection media is missing on the disk. Expected path: /app/media/rammah portصثrait (4).png
+[19:12:14] ERROR: File 4 (1).webp for collection media is missing on the disk. Expected path: /app/media/4 (1).webp
+[19:12:14] ERROR: File kandil.webp for collection media is missing on the disk. Expected path: /app/media/kandil.webp
+[19:12:14] ERROR: File turky.webp for collection media is missing on the disk. Expected path: /app/media/turky.webp
+[19:12:14] ERROR: File 2.webp for collection media is missing on the disk. Expected path: /app/media/2.webp
+[19:12:14] ERROR: File 5.webp for collection media is missing on the disk. Expected path: /app/media/5.webp
+[19:14:07] ERROR: File rammah portصثrait (4).png for collection media is missing on the disk. Expected path: /app/media/rammah portصثrait (4).png
+[19:14:07] ERROR: File rammah portrait (3)-1.png for collection media is missing on the disk. Expected path: /app/media/rammah portrait (3)-1.png
+[19:14:07] ERROR: File 1 (1).webp for collection media is missing on the disk. Expected path: /app/media/1 (1).webp
+[19:14:07] ERROR: File kandil.webp for collection media is missing on the disk. Expected path: /app/media/kandil.webp
+[19:14:07] ERROR: File 2.webp for collection media is missing on the disk. Expected path: /app/media/2.webp
+[19:14:07] ERROR: File 5.webp for collection media is missing on the disk. Expected path: /app/media/5.webp
+[19:14:07] ERROR: File turky.webp for collection media is missing on the disk. Expected path: /app/media/turky.webp
+[19:14:07] ERROR: File 4 (1).webp for collection media is missing on the disk. Expected path: /app/media/4 (1).webp
+[19:15:09] ERROR: File 1 (1).webp for collection media is missing on the disk. Expected path: /app/media/1 (1).webp
+[19:15:09] ERROR: File rammah portصثrait (4).png for collection media is missing on the disk. Expected path: /app/media/rammah portصثrait (4).png
+[19:15:09] ERROR: File turky.webp for collection media is missing on the disk. Expected path: /app/media/turky.webp
+[19:15:09] ERROR: File 2.webp for collection media is missing on the disk. Expected path: /app/media/2.webp
+[19:15:09] ERROR: File rammah portrait (3)-1.png for collection media is missing on the disk. Expected path: /app/media/rammah portrait (3)-1.png
+[19:15:09] ERROR: File 4 (1).webp for collection media is missing on the disk. Expected path: /app/media/4 (1).webp
+[19:15:09] ERROR: File 5.webp for collection media is missing on the disk. Expected path: /app/media/5.webp
+[19:15:09] ERROR: File kandil.webp for collection media is missing on the disk. Expected path: /app/media/kandil.webp
 [storage] S3 upload storage is disabled. Uploaded files will be stored locally and can be lost on stateless deploys unless a persistent volume is attached to /app/media.
 [storage] S3 upload storage is disabled. Uploaded files will be stored locally and can be lost on stateless deploys unless a persistent volume is attached to /app/media.
-[cron] ❌ waitlist failed (502) in 153ms: Bad Gateway
-[api/instructor/availability][PUT] slot sync failed Error: Failed query: select "consultation_types"."id", "consultation_types"."instructor_id", "consultation_types"."title_ar", "consultation_types"."title_en", "consultation_types"."title", "consultation_types"."description_ar", "consultation_types"."description_en", "consultation_types"."description", "consultation_types"."duration_minutes", "consultation_types"."price", "consultation_types"."currency", "consultation_types"."meeting_type", "consultation_types"."meeting_platform", "consultation_types"."max_participants", "consultation_types"."is_active", "consultation_types"."buffer_before", "consultation_types"."buffer_after", "consultation_types"."max_per_day", "consultation_types"."start_time_increment", "consultation_types"."min_notice_hours", "consultation_types"."min_cancel_notice_hours", "consultation_types"."updated_at", "consultation_types"."created_at", "consultation_types_availableDays"."data" as "availableDays" from "consultation_types" "consultation_types" left join lateral (select coalesce(json_agg(json_build_array("consultation_types_availableDays"."value") order by "consultation_types_availableDays"."order" asc), '[]'::json) as "data" from (select * from "consultation_types_available_days" "consultation_types_availableDays" where "consultation_types_availableDays"."parent_id" = "consultation_types"."id" order by "consultation_types_availableDays"."order" asc) "consultation_types_availableDays") "consultation_types_availableDays" on true where ("consultation_types"."instructor_id" = $1 and "consultation_types"."is_active" = $2) order by "consultation_types"."created_at" desc limit $3
-params: 56,true,200
-at nF.queryWithCache (.next/server/chunks/6382.js:156:20011)
-at async (.next/server/chunks/6382.js:156:23099)
-at async iS (.next/server/chunks/6382.js:124:1334)
+[api/home/stats] completedBookings query failed: Error: Failed query: select count(*) from "bookings" where "bookings"."status" = $1
+params: completed
+at nF.queryWithCache (.next/server/chunks/5758.js:75:20011)
+at async (.next/server/chunks/5758.js:75:23099)
+at async Object.jC [as countDistinct] (.next/server/chunks/5758.js:52:103)
+at async iS (.next/server/chunks/5758.js:43:1200)
 at async w (.next/server/chunks/3737.js:114:16833)
-at async i (.next/server/app/api/instructor/blocked-dates/[id]/route.js:1:1699)
-at async j (.next/server/app/api/instructor/blocked-dates/[id]/route.js:1:2058)
-at async F (.next/server/app/api/instructor/availability/route.js:1:4203) {
-query: `select "consultation_types"."id", "consultation_types"."instructor_id", "consultation_types"."title_ar", "consultation_types"."title_en", "consultation_types"."title", "consultation_types"."description_ar", "consultation_types"."description_en", "consultation_types"."description", "consultation_types"."duration_minutes", "consultation_types"."price", "consultation_types"."currency", "consultation_types"."meeting_type", "consultation_types"."meeting_platform", "consultation_types"."max_participants", "consultation_types"."is_active", "consultation_types"."buffer_before", "consultation_types"."buffer_after", "consultation_types"."max_per_day", "consultation_types"."start_time_increment", "consultation_types"."min_notice_hours", "consultation_types"."min_cancel_notice_hours", "consultation_types"."updated_at", "consultation_types"."created_at", "consultation_types_availableDays"."data" as "availableDays" from "consultation_types" "consultation_types" left join lateral (select coalesce(json_agg(json_build_array("consultation_types_availableDays"."value") order by "consultation_types_availableDays"."order" asc), '[]'::json) as "data" from (select * from "consultation_types_available_days" "consultation_types_availableDays" where "consultation_types_availableDays"."parent_id" = "consultation_types"."id" order by "consultation_types_availableDays"."order" asc) "consultation_types_availableDays") "consultation_types_availableDays" on true where ("consultation_types"."instructor_id" = $1 and "consultation_types"."is_active" = $2) order by "consultation_types"."created_at" desc limit $3`,
+at async y (.next/server/app/api/home/stats/route.js:1:3658) {
+query: 'select count(*) from "bookings" where "bookings"."status" = $1',
 params: [Array],
-[cause]: error: column consultation_types_availableDays.parent_id does not exist
-at  (.next/server/chunks/6382.js:40:136596)
-[04:50:35] ERROR: File 1 (1).webp for collection media is missing on the disk. Expected path: /app/media/1 (1).webp
-[04:50:35] ERROR: File 4 (1).webp for collection media is missing on the disk. Expected path: /app/media/4 (1).webp
-[04:50:35] ERROR: File kandil.webp for collection media is missing on the disk. Expected path: /app/media/kandil.webp
-[04:50:35] ERROR: File turky.webp for collection media is missing on the disk. Expected path: /app/media/turky.webp
-[04:50:35] ERROR: File 5.webp for collection media is missing on the disk. Expected path: /app/media/5.webp
-[04:50:35] ERROR: File rammah portصثrait (4).png for collection media is missing on the disk. Expected path: /app/media/rammah portصثrait (4).png
-[04:50:35] ERROR: File rammah portrait (3)-1.png for collection media is missing on the disk. Expected path: /app/media/rammah portrait (3)-1.png
-[04:50:35] ERROR: File 2.webp for collection media is missing on the disk. Expected path: /app/media/2.webp
-[04:50:37] ERROR: File 1 (1).webp for collection media is missing on the disk. Expected path: /app/media/1 (1).webp
-[04:50:37] ERROR: File rammah portصثrait (4).png for collection media is missing on the disk. Expected path: /app/media/rammah portصثrait (4).png
-[04:50:37] ERROR: File rammah portrait (3)-1.png for collection media is missing on the disk. Expected path: /app/media/rammah portrait (3)-1.png
-[04:50:37] ERROR: File turky.webp for collection media is missing on the disk. Expected path: /app/media/turky.webp
-[04:50:37] ERROR: File 5.webp for collection media is missing on the disk. Expected path: /app/media/5.webp
-[04:50:37] ERROR: File kandil.webp for collection media is missing on the disk. Expected path: /app/media/kandil.webp
-[04:50:37] ERROR: File rammah portrait (3)-3.png for collection media is missing on the disk. Expected path: /app/media/rammah portrait (3)-3.png
-[04:50:37] ERROR: File rammah portrait (3)-2.png for collection media is missing on the disk. Expected path: /app/media/rammah portrait (3)-2.png
-[04:50:37] ERROR: File 4 (1).webp for collection media is missing on the disk. Expected path: /app/media/4 (1).webp
-[04:50:37] ERROR: File hero_poster.webp for collection media is missing on the disk. Expected path: /app/media/hero_poster.webp
-[04:50:37] ERROR: File 2.webp for collection media is missing on the disk. Expected path: /app/media/2.webp
-[04:50:41] ERROR: File 1 (1).webp for collection media is missing on the disk. Expected path: /app/media/1 (1).webp
-[04:50:41] ERROR: File rammah portrait (3)-1.png for collection media is missing on the disk. Expected path: /app/media/rammah portrait (3)-1.png
-[04:50:41] ERROR: File rammah portصثrait (4).png for collection media is missing on the disk. Expected path: /app/media/rammah portصثrait (4).png
-[04:50:41] ERROR: File 4 (1).webp for collection media is missing on the disk. Expected path: /app/media/4 (1).webp
-[04:50:41] ERROR: File turky.webp for collection media is missing on the disk. Expected path: /app/media/turky.webp
-[04:50:41] ERROR: File 5.webp for collection media is missing on the disk. Expected path: /app/media/5.webp
-[04:50:41] ERROR: File 2.webp for collection media is missing on the disk. Expected path: /app/media/2.webp
-[04:50:41] ERROR: File kandil.webp for collection media is missing on the disk. Expected path: /app/media/kandil.webp
-[04:50:41] ERROR: File rammah portrait (3)-3.png for collection media is missing on the disk. Expected path: /app/media/rammah portrait (3)-3.png
-[04:50:41] ERROR: File rammah portrait (3)-2.png for collection media is missing on the disk. Expected path: /app/media/rammah portrait (3)-2.png
-[04:50:41] ERROR: File hero_poster.webp for collection media is missing on the disk. Expected path: /app/media/hero_poster.webp
-[04:50:49] ERROR: File rammah portصثrait (4).png for collection media is missing on the disk. Expected path: /app/media/rammah portصثrait (4).png
-[04:50:49] ERROR: File 4 (1).webp for collection media is missing on the disk. Expected path: /app/media/4 (1).webp
-[04:50:49] ERROR: File 5.webp for collection media is missing on the disk. Expected path: /app/media/5.webp
-[04:50:49] ERROR: File 2.webp for collection media is missing on the disk. Expected path: /app/media/2.webp
-[04:50:49] ERROR: File kandil.webp for collection media is missing on the disk. Expected path: /app/media/kandil.webp
-[04:50:49] ERROR: File 1 (1).webp for collection media is missing on the disk. Expected path: /app/media/1 (1).webp
-[04:50:49] ERROR: File rammah portrait (3)-1.png for collection media is missing on the disk. Expected path: /app/media/rammah portrait (3)-1.png
-[04:50:49] ERROR: File hero_poster.webp for collection media is missing on the disk. Expected path: /app/media/hero_poster.webp
-[04:50:49] ERROR: File rammah portrait (3)-2.png for collection media is missing on the disk. Expected path: /app/media/rammah portrait (3)-2.png
-[04:50:49] ERROR: File turky.webp for collection media is missing on the disk. Expected path: /app/media/turky.webp
-[04:50:49] ERROR: File rammah portrait (3)-3.png for collection media is missing on the disk. Expected path: /app/media/rammah portrait (3)-3.png
-[04:51:06] ERROR: File 1 (1).webp for collection media is missing on the disk. Expected path: /app/media/1 (1).webp
-[04:51:06] ERROR: File rammah portصثrait (4).png for collection media is missing on the disk. Expected path: /app/media/rammah portصثrait (4).png
-[04:51:06] ERROR: File rammah portrait (3)-1.png for collection media is missing on the disk. Expected path: /app/media/rammah portrait (3)-1.png
-[04:51:06] ERROR: File turky.webp for collection media is missing on the disk. Expected path: /app/media/turky.webp
-[04:51:06] ERROR: File 4 (1).webp for collection media is missing on the disk. Expected path: /app/media/4 (1).webp
-[04:51:06] ERROR: File kandil.webp for collection media is missing on the disk. Expected path: /app/media/kandil.webp
-[04:51:06] ERROR: File rammah portrait (3)-3.png for collection media is missing on the disk. Expected path: /app/media/rammah portrait (3)-3.png
-[04:51:06] ERROR: File 2.webp for collection media is missing on the disk. Expected path: /app/media/2.webp
-[04:51:06] ERROR: File 5.webp for collection media is missing on the disk. Expected path: /app/media/5.webp
-[04:51:06] ERROR: File hero_poster.webp for collection media is missing on the disk. Expected path: /app/media/hero_poster.webp
-[04:51:06] ERROR: File rammah portrait (3)-2.png for collection media is missing on the disk. Expected path: /app/media/rammah portrait (3)-2.png
-[04:51:11] ERROR: Failed query: select "id", "booking_code", "user_id", "consultation_type_id", "instructor_id", "booking_date", "start_time", "end_time", "timezone", "client_name", "client_email", "status", "amount", "payment_status", "transaction_id", "meeting_url", "user_notes", "instructor_notes", "cancelled_by", "cancellation_reason", "reminder_sent", "discount_code", "discount_amount", "twenty_crm_deal_id", "updated_at", "created_at" from "consultation_bookings" "consultation_bookings" where "consultation_bookings"."user_id" = $1 order by "consultation_bookings"."created_at" desc limit $2
-params: 111,50
-err: {
-"type": "mx",
-"message": "Failed query: select \"id\", \"booking_code\", \"user_id\", \"consultation_type_id\", \"instructor_id\", \"booking_date\", \"start_time\", \"end_time\", \"timezone\", \"client_name\", \"client_email\", \"status\", \"amount\", \"payment_status\", \"transaction_id\", \"meeting_url\", \"user_notes\", \"instructor_notes\", \"cancelled_by\", \"cancellation_reason\", \"reminder_sent\", \"discount_code\", \"discount_amount\", \"twenty_crm_deal_id\", \"updated_at\", \"created_at\" from \"consultation_bookings\" \"consultation_bookings\" where \"consultation_bookings\".\"user_id\" = $1 order by \"consultation_bookings\".\"created_at\" desc limit $2\nparams: 111,50: column \"booking_date\" does not exist",
-"stack":
-Error: Failed query: select "id", "booking_code", "user_id", "consultation_type_id", "instructor_id", "booking_date", "start_time", "end_time", "timezone", "client_name", "client_email", "status", "amount", "payment_status", "transaction_id", "meeting_url", "user_notes", "instructor_notes", "cancelled_by", "cancellation_reason", "reminder_sent", "discount_code", "discount_amount", "twenty_crm_deal_id", "updated_at", "created_at" from "consultation_bookings" "consultation_bookings" where "consultation_bookings"."user_id" = $1 order by "consultation_bookings"."created_at" desc limit $2
-params: 111,50
-at nF.queryWithCache (/app/.next/server/chunks/6382.js:156:20011)
-at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
-at async /app/.next/server/chunks/6382.js:156:23099
-at async iS (/app/.next/server/chunks/6382.js:124:1334)
-at async w (/app/.next/server/chunks/3737.js:114:16833)
-at async c6 (/app/.next/server/chunks/6382.js:89:65321)
-at async P (/app/.next/server/app/(payload)/api/[...slug]/route.js:1:7484)
-at async /app/.next/server/app/(payload)/api/[...slug]/route.js:1:10273
-at async rb.do (/app/node_modules/.pnpm/next@15.4.11_@babel+core@7.29.0_react-dom@19.2.3_react@19.2.3__react@19.2.3_sass@1.98.0/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js:5:21059)
-at async rb.handle (/app/node_modules/.pnpm/next@15.4.11_@babel+core@7.29.0_react-dom@19.2.3_react@19.2.3__react@19.2.3_sass@1.98.0/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js:5:25902)
-caused by: error: column "booking_date" does not exist
-at /app/.next/server/chunks/6382.js:40:136596
-at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
-at async /app/.next/server/chunks/6382.js:156:23308
-at async nF.queryWithCache (/app/.next/server/chunks/6382.js:156:19986)
-at async /app/.next/server/chunks/6382.js:156:23099
-at async iS (/app/.next/server/chunks/6382.js:124:1334)
-at async w (/app/.next/server/chunks/3737.js:114:16833)
-at async c6 (/app/.next/server/chunks/6382.js:89:65321)
-at async P (/app/.next/server/app/(payload)/api/[...slug]/route.js:1:7484)
-at async /app/.next/server/app/(payload)/api/[...slug]/route.js:1:10273
-"query": "select \"id\", \"booking_code\", \"user_id\", \"consultation_type_id\", \"instructor_id\", \"booking_date\", \"start_time\", \"end_time\", \"timezone\", \"client_name\", \"client_email\", \"status\", \"amount\", \"payment_status\", \"transaction_id\", \"meeting_url\", \"user_notes\", \"instructor_notes\", \"cancelled_by\", \"cancellation_reason\", \"reminder_sent\", \"discount_code\", \"discount_amount\", \"twenty_crm_deal_id\", \"updated_at\", \"created_at\" from \"consultation_bookings\" \"consultation_bookings\" where \"consultation_bookings\".\"user_id\" = $1 order by \"consultation_bookings\".\"created_at\" desc limit $2",
-"params": [
-111,
-50
-]
-}
-[04:51:17] ERROR: File 1 (1).webp for collection media is missing on the disk. Expected path: /app/media/1 (1).webp
-[04:51:17] ERROR: File rammah portصثrait (4).png for collection media is missing on the disk. Expected path: /app/media/rammah portصثrait (4).png
-[04:51:17] ERROR: File kandil.webp for collection media is missing on the disk. Expected path: /app/media/kandil.webp
-[04:51:17] ERROR: File 5.webp for collection media is missing on the disk. Expected path: /app/media/5.webp
-[04:51:17] ERROR: File 2.webp for collection media is missing on the disk. Expected path: /app/media/2.webp
-[04:51:17] ERROR: File 4 (1).webp for collection media is missing on the disk. Expected path: /app/media/4 (1).webp
-[04:51:17] ERROR: File rammah portrait (3)-1.png for collection media is missing on the disk. Expected path: /app/media/rammah portrait (3)-1.png
-[04:51:17] ERROR: File turky.webp for collection media is missing on the disk. Expected path: /app/media/turky.webp
-at async (.next/server/chunks/6382.js:156:23308)
-at async nF.queryWithCache (.next/server/chunks/6382.js:156:19986)
-at async (.next/server/chunks/6382.js:156:23099)
-at async iS (.next/server/chunks/6382.js:124:1334)
+[cause]: Error: timeout exceeded when trying to connect
+at  (.next/server/chunks/5758.js:3397:136596)
+at async (.next/server/chunks/5758.js:75:23308)
+at async nF.queryWithCache (.next/server/chunks/5758.js:75:19986)
+at async (.next/server/chunks/5758.js:75:23099)
+at async Object.jC [as countDistinct] (.next/server/chunks/5758.js:52:103)
+at async iS (.next/server/chunks/5758.js:43:1200)
 at async w (.next/server/chunks/3737.js:114:16833)
-at async i (.next/server/app/api/instructor/blocked-dates/[id]/route.js:1:1699)
-at async j (.next/server/app/api/instructor/blocked-dates/[id]/route.js:1:2058) {
-length: 232,
-severity: 'ERROR',
-code: '42703',
-detail: undefined,
-hint: 'Perhaps you meant to reference the column "consultation_types_availableDays._parent_id".',
-position: '1245',
-internalPosition: undefined,
-internalQuery: undefined,
-where: undefined,
-schema: undefined,
-table: undefined,
-column: undefined,
-dataType: undefined,
-constraint: undefined,
-file: 'parse_relation.c',
-line: '3723',
-routine: 'errorMissingColumn'
 }
-}
-⨯ Error: Failed query: select "consultation_types"."id", "consultation_types"."instructor_id", "consultation_types"."title_ar", "consultation_types"."title_en", "consultation_types"."title", "consultation_types"."description_ar", "consultation_types"."description_en", "consultation_types"."description", "consultation_types"."duration_minutes", "consultation_types"."price", "consultation_types"."currency", "consultation_types"."meeting_type", "consultation_types"."meeting_platform", "consultation_types"."max_participants", "consultation_types"."is_active", "consultation_types"."buffer_before", "consultation_types"."buffer_after", "consultation_types"."max_per_day", "consultation_types"."start_time_increment", "consultation_types"."min_notice_hours", "consultation_types"."min_cancel_notice_hours", "consultation_types"."updated_at", "consultation_types"."created_at", "consultation_types_availableDays"."data" as "availableDays" from "consultation_types" "consultation_types" left join lateral (select coalesce(json_agg(json_build_array("consultation_types_availableDays"."value") order by "consultation_types_availableDays"."order" asc), '[]'::json) as "data" from (select * from "consultation_types_available_days" "consultation_types_availableDays" where "consultation_types_availableDays"."parent_id" = "consultation_types"."id" order by "consultation_types_availableDays"."order" asc) "consultation_types_availableDays") "consultation_types_availableDays" on true where ("consultation_types"."instructor_id" = $1 and "consultation_types"."is_active" = $2) order by "consultation_types"."created_at" desc limit $3
-params: 38,true,50
-at nF.queryWithCache (.next/server/chunks/6382.js:156:20011)
-at async (.next/server/chunks/6382.js:156:23099)
-at async iS (.next/server/chunks/6382.js:124:1334)
+[api/home/stats] successfulBookings query failed: Error: Failed query: select count(*) from "bookings" where "bookings"."status" in ($1, $2)
+params: confirmed,completed
+at nF.queryWithCache (.next/server/chunks/5758.js:75:20011)
+at async (.next/server/chunks/5758.js:75:23099)
+at async Object.jC [as countDistinct] (.next/server/chunks/5758.js:52:103)
+at async iS (.next/server/chunks/5758.js:43:1200)
 at async w (.next/server/chunks/3737.js:114:16833)
-at async I (.next/server/app/[locale]/instructors/[slug]/page.js:1:81031) {
-query: `select "consultation_types"."id", "consultation_types"."instructor_id", "consultation_types"."title_ar", "consultation_types"."title_en", "consultation_types"."title", "consultation_types"."description_ar", "consultation_types"."description_en", "consultation_types"."description", "consultation_types"."duration_minutes", "consultation_types"."price", "consultation_types"."currency", "consultation_types"."meeting_type", "consultation_types"."meeting_platform", "consultation_types"."max_participants", "consultation_types"."is_active", "consultation_types"."buffer_before", "consultation_types"."buffer_after", "consultation_types"."max_per_day", "consultation_types"."start_time_increment", "consultation_types"."min_notice_hours", "consultation_types"."min_cancel_notice_hours", "consultation_types"."updated_at", "consultation_types"."created_at", "consultation_types_availableDays"."data" as "availableDays" from "consultation_types" "consultation_types" left join lateral (select coalesce(json_agg(json_build_array("consultation_types_availableDays"."value") order by "consultation_types_availableDays"."order" asc), '[]'::json) as "data" from (select * from "consultation_types_available_days" "consultation_types_availableDays" where "consultation_types_availableDays"."parent_id" = "consultation_types"."id" order by "consultation_types_availableDays"."order" asc) "consultation_types_availableDays") "consultation_types_availableDays" on true where ("consultation_types"."instructor_id" = $1 and "consultation_types"."is_active" = $2) order by "consultation_types"."created_at" desc limit $3`,
+at async y (.next/server/app/api/home/stats/route.js:1:3658) {
+query: 'select count(*) from "bookings" where "bookings"."status" in ($1, $2)',
 params: [Array],
-digest: '3086638138',
-[cause]: error: column consultation_types_availableDays.parent_id does not exist
-at  (.next/server/chunks/6382.js:40:136596)
-at async (.next/server/chunks/6382.js:156:23308)
-at async nF.queryWithCache (.next/server/chunks/6382.js:156:19986)
-at async (.next/server/chunks/6382.js:156:23099)
-at async iS (.next/server/chunks/6382.js:124:1334)
+[cause]: Error: timeout exceeded when trying to connect
+at  (.next/server/chunks/5758.js:3397:136596)
+at async (.next/server/chunks/5758.js:75:23308)
+at async nF.queryWithCache (.next/server/chunks/5758.js:75:19986)
+at async (.next/server/chunks/5758.js:75:23099)
+at async Object.jC [as countDistinct] (.next/server/chunks/5758.js:52:103)
+at async iS (.next/server/chunks/5758.js:43:1200)
 at async w (.next/server/chunks/3737.js:114:16833)
-at async I (.next/server/app/[locale]/instructors/[slug]/page.js:1:81031) {
-length: 232,
-severity: 'ERROR',
-code: '42703',
-detail: undefined,
-hint: 'Perhaps you meant to reference the column "consultation_types_availableDays._parent_id".',
-position: '1245',
-internalPosition: undefined,
-internalQuery: undefined,
-where: undefined,
-schema: undefined,
-table: undefined,
-column: undefined,
-dataType: undefined,
-constraint: undefined,
-file: 'parse_relation.c',
-line: '3723',
-routine: 'errorMissingColumn'
 }
-}
-⨯ Error: Failed query: select "consultation_types"."id", "consultation_types"."instructor_id", "consultation_types"."title_ar", "consultation_types"."title_en", "consultation_types"."title", "consultation_types"."description_ar", "consultation_types"."description_en", "consultation_types"."description", "consultation_types"."duration_minutes", "consultation_types"."price", "consultation_types"."currency", "consultation_types"."meeting_type", "consultation_types"."meeting_platform", "consultation_types"."max_participants", "consultation_types"."is_active", "consultation_types"."buffer_before", "consultation_types"."buffer_after", "consultation_types"."max_per_day", "consultation_types"."start_time_increment", "consultation_types"."min_notice_hours", "consultation_types"."min_cancel_notice_hours", "consultation_types"."updated_at", "consultation_types"."created_at", "consultation_types_availableDays"."data" as "availableDays" from "consultation_types" "consultation_types" left join lateral (select coalesce(json_agg(json_build_array("consultation_types_availableDays"."value") order by "consultation_types_availableDays"."order" asc), '[]'::json) as "data" from (select * from "consultation_types_available_days" "consultation_types_availableDays" where "consultation_types_availableDays"."parent_id" = "consultation_types"."id" order by "consultation_types_availableDays"."order" asc) "consultation_types_availableDays") "consultation_types_availableDays" on true where ("consultation_types"."instructor_id" = $1 and "consultation_types"."is_active" = $2) order by "consultation_types"."created_at" desc limit $3
-params: 47,true,50
-at nF.queryWithCache (.next/server/chunks/6382.js:156:20011)
-at async (.next/server/chunks/6382.js:156:23099)
-at async iS (.next/server/chunks/6382.js:124:1334)
-at async w (.next/server/chunks/3737.js:114:16833)
-at async I (.next/server/app/[locale]/instructors/[slug]/page.js:1:81031) {
-query: `select "consultation_types"."id", "consultation_types"."instructor_id", "consultation_types"."title_ar", "consultation_types"."title_en", "consultation_types"."title", "consultation_types"."description_ar", "consultation_types"."description_en", "consultation_types"."description", "consultation_types"."duration_minutes", "consultation_types"."price", "consultation_types"."currency", "consultation_types"."meeting_type", "consultation_types"."meeting_platform", "consultation_types"."max_participants", "consultation_types"."is_active", "consultation_types"."buffer_before", "consultation_types"."buffer_after", "consultation_types"."max_per_day", "consultation_types"."start_time_increment", "consultation_types"."min_notice_hours", "consultation_types"."min_cancel_notice_hours", "consultation_types"."updated_at", "consultation_types"."created_at", "consultation_types_availableDays"."data" as "availableDays" from "consultation_types" "consultation_types" left join lateral (select coalesce(json_agg(json_build_array("consultation_types_availableDays"."value") order by "consultation_types_availableDays"."order" asc), '[]'::json) as "data" from (select * from "consultation_types_available_days" "consultation_types_availableDays" where "consultation_types_availableDays"."parent_id" = "consultation_types"."id" order by "consultation_types_availableDays"."order" asc) "consultation_types_availableDays") "consultation_types_availableDays" on true where ("consultation_types"."instructor_id" = $1 and "consultation_types"."is_active" = $2) order by "consultation_types"."created_at" desc limit $3`,
-params: [Array],
-digest: '568926010',
-[cause]: error: column consultation_types_availableDays.parent_id does not exist
-at  (.next/server/chunks/6382.js:40:136596)
-at async (.next/server/chunks/6382.js:156:23308)
-at async nF.queryWithCache (.next/server/chunks/6382.js:156:19986)
-at async (.next/server/chunks/6382.js:156:23099)
-at async iS (.next/server/chunks/6382.js:124:1334)
-at async w (.next/server/chunks/3737.js:114:16833)
-at async I (.next/server/app/[locale]/instructors/[slug]/page.js:1:81031) {
-length: 232,
-severity: 'ERROR',
-code: '42703',
-detail: undefined,
-hint: 'Perhaps you meant to reference the column "consultation_types_availableDays._parent_id".',
-position: '1245',
-internalPosition: undefined,
-internalQuery: undefined,
-where: undefined,
-schema: undefined,
-table: undefined,
-column: undefined,
-dataType: undefined,
-constraint: undefined,
-file: 'parse_relation.c',
-line: '3723',
-routine: 'errorMissingColumn'
-}
-}
-[Users.beforeDelete] Failed deleting verification-codes #71 while cleaning user #160. Error: Failed query: delete from "payload_preferences" where "payload_preferences"."key" in ($1)
-params: collection-verification-codes-71
-at nF.queryWithCache (.next/server/chunks/6382.js:156:20011)
-at async Object.jG [as deleteWhere] (.next/server/chunks/6382.js:133:1634)
-at async Object.iT [as deleteMany] (.next/server/chunks/6382.js:124:2134)
-at async e (.next/server/chunks/3737.js:121:81303)
-at async w (.next/server/chunks/3737.js:114:22946)
-at async e (.next/server/chunks/6382.js:194:39751)
-at async agD.hooks.beforeDelete (.next/server/chunks/6382.js:194:40144)
-at async (.next/server/chunks/3737.js:113:71038) {
-query: 'delete from "payload_preferences" where "payload_preferences"."key" in ($1)',
-params: [Array],
-[cause]: error: current transaction is aborted, commands ignored until end of transaction block
-at  (.next/server/chunks/6382.js:40:485197)
-at async (.next/server/chunks/6382.js:156:23071)
-at async nF.queryWithCache (.next/server/chunks/6382.js:156:19986)
-at async Object.jG [as deleteWhere] (.next/server/chunks/6382.js:133:1634)
-at async Object.iT [as deleteMany] (.next/server/chunks/6382.js:124:2134)
-at async e (.next/server/chunks/3737.js:121:81303)
-at async w (.next/server/chunks/3737.js:114:22946)
-at async e (.next/server/chunks/6382.js:194:39751)
-at async agD.hooks.beforeDelete (.next/server/chunks/6382.js:194:40144) {
-length: 145,
-severity: 'ERROR',
-code: '25P02',
-detail: undefined,
-hint: undefined,
-position: undefined,
-internalPosition: undefined,
-internalQuery: undefined,
-where: undefined,
-schema: undefined,
-table: undefined,
-column: undefined,
-dataType: undefined,
-constraint: undefined,
-file: 'postgres.c',
-line: '1498',
-routine: 'exec_parse_message'
-}
-}
-[Users.beforeDelete] Failed deleting verification-codes #70 while cleaning user #159. Error: Failed query: delete from "payload_locked_documents" where false
+[api/home/stats] companies query failed: Error: Failed query: select count(*) from "companies"
 params: 
-at nF.queryWithCache (.next/server/chunks/6382.js:156:20011)
-at async Object.jG [as deleteWhere] (.next/server/chunks/6382.js:133:1634)
-at async Object.iT [as deleteMany] (.next/server/chunks/6382.js:124:2134)
-at async h (.next/server/chunks/3737.js:121:80062)
-at async w (.next/server/chunks/3737.js:114:22391)
-at async e (.next/server/chunks/6382.js:194:39751)
-at async agD.hooks.beforeDelete (.next/server/chunks/6382.js:194:40144)
-at async (.next/server/chunks/3737.js:113:71038) {
-query: 'delete from "payload_locked_documents" where false',
+at nF.queryWithCache (.next/server/chunks/5758.js:75:20011)
+at async (.next/server/chunks/5758.js:75:23099)
+at async Object.jC [as countDistinct] (.next/server/chunks/5758.js:52:103)
+at async iS (.next/server/chunks/5758.js:43:1200)
+at async w (.next/server/chunks/3737.js:114:16833)
+at async y (.next/server/app/api/home/stats/route.js:1:3658) {
+query: 'select count(*) from "companies"',
 params: [],
-[cause]: error: current transaction is aborted, commands ignored until end of transaction block
-at  (.next/server/chunks/6382.js:40:485197)
-at async (.next/server/chunks/6382.js:156:23071)
-at async nF.queryWithCache (.next/server/chunks/6382.js:156:19986)
-at async Object.jG [as deleteWhere] (.next/server/chunks/6382.js:133:1634)
-at async Object.iT [as deleteMany] (.next/server/chunks/6382.js:124:2134)
-at async h (.next/server/chunks/3737.js:121:80062)
-at async w (.next/server/chunks/3737.js:114:22391)
-at async e (.next/server/chunks/6382.js:194:39751)
-at async agD.hooks.beforeDelete (.next/server/chunks/6382.js:194:40144) {
-length: 144,
-severity: 'ERROR',
-code: '25P02',
-detail: undefined,
-hint: undefined,
-position: undefined,
-internalPosition: undefined,
-internalQuery: undefined,
-where: undefined,
-schema: undefined,
-table: undefined,
-column: undefined,
-dataType: undefined,
-constraint: undefined,
-file: 'postgres.c',
-line: '1140',
-routine: 'exec_simple_query'
-}
-}
-[Users.beforeDelete] Skipping company-invitations cleanup by field "email" for user #158. Error: Failed query: select "id", "email", "company_id", "invited_by_id", "job_title", "title", "token", "status", "expires_at", "accepted_at", "accepted_by_id", "revoked_at", "updated_at", "created_at" from "company_invitations" "company_invitations" where "company_invitations"."email" = $1 order by "company_invitations"."created_at" desc limit $2
-params: mizotop.2013@gmail.com,1000
-at nF.queryWithCache (.next/server/chunks/6382.js:156:20011)
-at async (.next/server/chunks/6382.js:156:23099)
-at async iS (.next/server/chunks/6382.js:124:1334)
+[cause]: Error: timeout exceeded when trying to connect
+at  (.next/server/chunks/5758.js:3397:136596)
+at async (.next/server/chunks/5758.js:75:23308)
+at async nF.queryWithCache (.next/server/chunks/5758.js:75:19986)
+at async (.next/server/chunks/5758.js:75:23099)
+at async Object.jC [as countDistinct] (.next/server/chunks/5758.js:52:103)
+at async iS (.next/server/chunks/5758.js:43:1200)
 at async w (.next/server/chunks/3737.js:114:16833)
-at async e (.next/server/chunks/6382.js:194:39516)
-at async agD.hooks.beforeDelete (.next/server/chunks/6382.js:194:40184)
-at async (.next/server/chunks/3737.js:113:71038)
-at async y (.next/server/chunks/3737.js:113:72188) {
-query: 'select "id", "email", "company_id", "invited_by_id", "job_title", "title", "token", "status", "expires_at", "accepted_at", "accepted_by_id", "revoked_at", "updated_at", "created_at" from "company_invitations" "company_invitations" where "company_invitations"."email" = $1 order by "company_invitations"."created_at" desc limit $2',
+}
+[api/home/stats] instructors query failed: Error: Failed query: select count(*) from "instructors" where "instructors"."is_active" = $1
+params: true
+at nF.queryWithCache (.next/server/chunks/5758.js:75:20011)
+at async (.next/server/chunks/5758.js:75:23099)
+at async Object.jC [as countDistinct] (.next/server/chunks/5758.js:52:103)
+at async iS (.next/server/chunks/5758.js:43:1200)
+at async w (.next/server/chunks/3737.js:114:16833)
+at async y (.next/server/app/api/home/stats/route.js:1:3658)
+at async k (.next/server/app/api/home/stats/route.js:1:7130) {
+query: 'select count(*) from "instructors" where "instructors"."is_active" = $1',
 params: [Array],
-[cause]: error: current transaction is aborted, commands ignored until end of transaction block
-at  (.next/server/chunks/6382.js:40:485197)
-at async (.next/server/chunks/6382.js:156:23308)
-at async nF.queryWithCache (.next/server/chunks/6382.js:156:19986)
-at async (.next/server/chunks/6382.js:156:23099)
-at async iS (.next/server/chunks/6382.js:124:1334)
+[cause]: Error: timeout exceeded when trying to connect
+at  (.next/server/chunks/5758.js:3397:136596)
+at async (.next/server/chunks/5758.js:75:23308)
+at async nF.queryWithCache (.next/server/chunks/5758.js:75:19986)
+at async (.next/server/chunks/5758.js:75:23099)
+at async Object.jC [as countDistinct] (.next/server/chunks/5758.js:52:103)
+at async iS (.next/server/chunks/5758.js:43:1200)
 at async w (.next/server/chunks/3737.js:114:16833)
-at async e (.next/server/chunks/6382.js:194:39516)
-at async agD.hooks.beforeDelete (.next/server/chunks/6382.js:194:40184)
-at async (.next/server/chunks/3737.js:113:71038) {
-length: 145,
-severity: 'ERROR',
-code: '25P02',
-detail: undefined,
-hint: undefined,
-position: undefined,
-internalPosition: undefined,
-internalQuery: undefined,
-where: undefined,
-schema: undefined,
-table: undefined,
-column: undefined,
-dataType: undefined,
-constraint: undefined,
-file: 'postgres.c',
-line: '1498',
-routine: 'exec_parse_message'
+at async y (.next/server/app/api/home/stats/route.js:1:3658)
 }
-}
-[Users.beforeDelete] Skipping company-invitations cleanup by field "email" for user #161. Error: Failed query: select count(*) from "company_invitations" where "company_invitations"."email" = $1
-params: muhamme.dmekky4@gmail.com
-at nF.queryWithCache (.next/server/chunks/6382.js:156:20011)
-at async (.next/server/chunks/6382.js:156:23099)
-at async Object.jC [as countDistinct] (.next/server/chunks/6382.js:133:103)
-at async iS (.next/server/chunks/6382.js:124:1200)
+[api/home/featured-programs] Failed to fetch cards: Error: Failed query: select count(*) from "programs" where ("programs"."is_active" = $1 and "programs"."is_featured" = $2)
+params: true,true
+at nF.queryWithCache (.next/server/chunks/5758.js:75:20011)
+at async (.next/server/chunks/5758.js:75:23099)
+at async Object.jC [as countDistinct] (.next/server/chunks/5758.js:52:103)
+at async iS (.next/server/chunks/5758.js:43:1200)
 at async w (.next/server/chunks/3737.js:114:16833)
-at async e (.next/server/chunks/6382.js:194:39516)
-at async agD.hooks.beforeDelete (.next/server/chunks/6382.js:194:40184)
-at async (.next/server/chunks/3737.js:113:71038) {
-query: 'select count(*) from "company_invitations" where "company_invitations"."email" = $1',
+at async E.g.ttl (.next/server/app/api/home/featured-programs/route.js:1:5840)
+at async i (.next/server/chunks/2193.js:3257:7535)
+at async E (.next/server/app/api/home/featured-programs/route.js:1:5774) {
+query: 'select count(*) from "programs" where ("programs"."is_active" = $1 and "programs"."is_featured" = $2)',
 params: [Array],
-[cause]: error: current transaction is aborted, commands ignored until end of transaction block
-at  (.next/server/chunks/6382.js:40:485197)
-at async (.next/server/chunks/6382.js:156:23308)
-at async nF.queryWithCache (.next/server/chunks/6382.js:156:19986)
-at async (.next/server/chunks/6382.js:156:23099)
-at async Object.jC [as countDistinct] (.next/server/chunks/6382.js:133:103)
-at async iS (.next/server/chunks/6382.js:124:1200)
+[cause]: Error: timeout exceeded when trying to connect
+at  (.next/server/chunks/5758.js:3397:136596)
+at async (.next/server/chunks/5758.js:75:23308)
+at async nF.queryWithCache (.next/server/chunks/5758.js:75:19986)
+at async (.next/server/chunks/5758.js:75:23099)
+at async Object.jC [as countDistinct] (.next/server/chunks/5758.js:52:103)
+at async iS (.next/server/chunks/5758.js:43:1200)
 at async w (.next/server/chunks/3737.js:114:16833)
-at async e (.next/server/chunks/6382.js:194:39516)
-at async agD.hooks.beforeDelete (.next/server/chunks/6382.js:194:40184) {
-length: 145,
-severity: 'ERROR',
-code: '25P02',
-detail: undefined,
-hint: undefined,
-position: undefined,
-internalPosition: undefined,
-internalQuery: undefined,
-where: undefined,
-schema: undefined,
-table: undefined,
-column: undefined,
-dataType: undefined,
-constraint: undefined,
-file: 'postgres.c',
-line: '1498',
-routine: 'exec_parse_message'
+at async E.g.ttl (.next/server/app/api/home/featured-programs/route.js:1:5840)
+at async i (.next/server/chunks/2193.js:3257:7535)
+at async E (.next/server/app/api/home/featured-programs/route.js:1:5774)
 }
-}
-[Users.beforeDelete] Skipping consultation-bookings cleanup by field "user" for user #154. Error: Failed query: select "id", "booking_code", "user_id", "consultation_type_id", "instructor_id", "booking_date", "start_time", "end_time", "timezone", "client_name", "client_email", "status", "amount", "payment_status", "transaction_id", "meeting_url", "user_notes", "instructor_notes", "cancelled_by", "cancellation_reason", "reminder_sent", "discount_code", "discount_amount", "twenty_crm_deal_id", "updated_at", "created_at" from "consultation_bookings" "consultation_bookings" where "consultation_bookings"."user_id" = $1 order by "consultation_bookings"."created_at" desc limit $2
-params: 154,1000
-at nF.queryWithCache (.next/server/chunks/6382.js:156:20011)
-at async (.next/server/chunks/6382.js:156:23099)
-at async iS (.next/server/chunks/6382.js:124:1334)
-at async w (.next/server/chunks/3737.js:114:16833)
-at async e (.next/server/chunks/6382.js:194:39516)
-at async agD.hooks.beforeDelete (.next/server/chunks/6382.js:194:40225)
-at async (.next/server/chunks/3737.js:113:71038)
-at async y (.next/server/chunks/3737.js:113:72188) {
-query: 'select "id", "booking_code", "user_id", "consultation_type_id", "instructor_id", "booking_date", "start_time", "end_time", "timezone", "client_name", "client_email", "status", "amount", "payment_status", "transaction_id", "meeting_url", "user_notes", "instructor_notes", "cancelled_by", "cancellation_reason", "reminder_sent", "discount_code", "discount_amount", "twenty_crm_deal_id", "updated_at", "created_at" from "consultation_bookings" "consultation_bookings" where "consultation_bookings"."user_id" = $1 order by "consultation_bookings"."created_at" desc limit $2',
-params: [Array],
-[cause]: error: column "booking_date" does not exist
-at  (.next/server/chunks/6382.js:40:485197)
-at async (.next/server/chunks/6382.js:156:23308)
-at async nF.queryWithCache (.next/server/chunks/6382.js:156:19986)
-at async (.next/server/chunks/6382.js:156:23099)
-at async iS (.next/server/chunks/6382.js:124:1334)
-at async w (.next/server/chunks/3737.js:114:16833)
-at async e (.next/server/chunks/6382.js:194:39516)
-at async agD.hooks.beforeDelete (.next/server/chunks/6382.js:194:40225)
-at async (.next/server/chunks/3737.js:113:71038) {
-length: 193,
-severity: 'ERROR',
-code: '42703',
-detail: undefined,
-hint: 'Perhaps you meant to reference the column "consultation_bookings.booking_code".',
-position: '82',
-internalPosition: undefined,
-internalQuery: undefined,
-where: undefined,
-schema: undefined,
-table: undefined,
-column: undefined,
-dataType: undefined,
-constraint: undefined,
-file: 'parse_relation.c',
-line: '3723',
-routine: 'errorMissingColumn'
-}
-}
-[Users.beforeDelete] Skipping consultation-bookings cleanup by field "user" for user #158. Error: Failed query: select "id", "booking_code", "user_id", "consultation_type_id", "instructor_id", "booking_date", "start_time", "end_time", "timezone", "client_name", "client_email", "status", "amount", "payment_status", "transaction_id", "meeting_url", "user_notes", "instructor_notes", "cancelled_by", "cancellation_reason", "reminder_sent", "discount_code", "discount_amount", "twenty_crm_deal_id", "updated_at", "created_at" from "consultation_bookings" "consultation_bookings" where "consultation_bookings"."user_id" = $1 order by "consultation_bookings"."created_at" desc limit $2
-params: 158,1000
-at nF.queryWithCache (.next/server/chunks/6382.js:156:20011)
-at async (.next/server/chunks/6382.js:156:23099)
-at async iS (.next/server/chunks/6382.js:124:1334)
-at async w (.next/server/chunks/3737.js:114:16833)
-at async e (.next/server/chunks/6382.js:194:39516)
-at async agD.hooks.beforeDelete (.next/server/chunks/6382.js:194:40225)
-at async (.next/server/chunks/3737.js:113:71038)
-at async y (.next/server/chunks/3737.js:113:72188) {
-query: 'select "id", "booking_code", "user_id", "consultation_type_id", "instructor_id", "booking_date", "start_time", "end_time", "timezone", "client_name", "client_email", "status", "amount", "payment_status", "transaction_id", "meeting_url", "user_notes", "instructor_notes", "cancelled_by", "cancellation_reason", "reminder_sent", "discount_code", "discount_amount", "twenty_crm_deal_id", "updated_at", "created_at" from "consultation_bookings" "consultation_bookings" where "consultation_bookings"."user_id" = $1 order by "consultation_bookings"."created_at" desc limit $2',
-params: [Array],
-[cause]: error: column "booking_date" does not exist
-at  (.next/server/chunks/6382.js:40:136596)
-at async (.next/server/chunks/6382.js:156:23308)
-at async nF.queryWithCache (.next/server/chunks/6382.js:156:19986)
-at async (.next/server/chunks/6382.js:156:23099)
-at async iS (.next/server/chunks/6382.js:124:1334)
-at async w (.next/server/chunks/3737.js:114:16833)
-at async e (.next/server/chunks/6382.js:194:39516)
-at async agD.hooks.beforeDelete (.next/server/chunks/6382.js:194:40225)
-at async (.next/server/chunks/3737.js:113:71038) {
-length: 193,
-severity: 'ERROR',
-code: '42703',
-detail: undefined,
-hint: 'Perhaps you meant to reference the column "consultation_bookings.booking_code".',
-position: '82',
-internalPosition: undefined,
-internalQuery: undefined,
-where: undefined,
-schema: undefined,
-table: undefined,
-column: undefined,
-dataType: undefined,
-constraint: undefined,
-file: 'parse_relation.c',
-line: '3723',
-routine: 'errorMissingColumn'
-}
-}
-[Users.beforeDelete] Skipping consultation-bookings cleanup by field "user" for user #161. Error: Failed query: select "id", "booking_code", "user_id", "consultation_type_id", "instructor_id", "booking_date", "start_time", "end_time", "timezone", "client_name", "client_email", "status", "amount", "payment_status", "transaction_id", "meeting_url", "user_notes", "instructor_notes", "cancelled_by", "cancellation_reason", "reminder_sent", "discount_code", "discount_amount", "twenty_crm_deal_id", "updated_at", "created_at" from "consultation_bookings" "consultation_bookings" where "consultation_bookings"."user_id" = $1 order by "consultation_bookings"."created_at" desc limit $2
-params: 161,1000
-at nF.queryWithCache (.next/server/chunks/6382.js:156:20011)
-at async (.next/server/chunks/6382.js:156:23099)
-at async iS (.next/server/chunks/6382.js:124:1334)
-at async w (.next/server/chunks/3737.js:114:16833)
-at async e (.next/server/chunks/6382.js:194:39516)
-at async agD.hooks.beforeDelete (.next/server/chunks/6382.js:194:40225)
-at async (.next/server/chunks/3737.js:113:71038)
-at async y (.next/server/chunks/3737.js:113:72188) {
-query: 'select "id", "booking_code", "user_id", "consultation_type_id", "instructor_id", "booking_date", "start_time", "end_time", "timezone", "client_name", "client_email", "status", "amount", "payment_status", "transaction_id", "meeting_url", "user_notes", "instructor_notes", "cancelled_by", "cancellation_reason", "reminder_sent", "discount_code", "discount_amount", "twenty_crm_deal_id", "updated_at", "created_at" from "consultation_bookings" "consultation_bookings" where "consultation_bookings"."user_id" = $1 order by "consultation_bookings"."created_at" desc limit $2',
-params: [Array],
-[cause]: error: column "booking_date" does not exist
-at  (.next/server/chunks/6382.js:40:136596)
-at async (.next/server/chunks/6382.js:156:23308)
-at async nF.queryWithCache (.next/server/chunks/6382.js:156:19986)
-at async (.next/server/chunks/6382.js:156:23099)
-at async iS (.next/server/chunks/6382.js:124:1334)
-at async w (.next/server/chunks/3737.js:114:16833)
-at async e (.next/server/chunks/6382.js:194:39516)
-at async agD.hooks.beforeDelete (.next/server/chunks/6382.js:194:40225)
-at async (.next/server/chunks/3737.js:113:71038) {
-length: 193,
-severity: 'ERROR',
-code: '42703',
-detail: undefined,
-hint: 'Perhaps you meant to reference the column "consultation_bookings.booking_code".',
-position: '82',
-internalPosition: undefined,
-internalQuery: undefined,
-where: undefined,
-schema: undefined,
-table: undefined,
-column: undefined,
-dataType: undefined,
-constraint: undefined,
-file: 'parse_relation.c',
-line: '3723',
-routine: 'errorMissingColumn'
-}
-}
-[Users.beforeDelete] Skipping consultation-bookings cleanup by field "user" for user #160. Error: Failed query: select "id", "booking_code", "user_id", "consultation_type_id", "instructor_id", "booking_date", "start_time", "end_time", "timezone", "client_name", "client_email", "status", "amount", "payment_status", "transaction_id", "meeting_url", "user_notes", "instructor_notes", "cancelled_by", "cancellation_reason", "reminder_sent", "discount_code", "discount_amount", "twenty_crm_deal_id", "updated_at", "created_at" from "consultation_bookings" "consultation_bookings" where "consultation_bookings"."user_id" = $1 order by "consultation_bookings"."created_at" desc limit $2
-params: 160,1000
-at nF.queryWithCache (.next/server/chunks/6382.js:156:20011)
-at async (.next/server/chunks/6382.js:156:23099)
-at async iS (.next/server/chunks/6382.js:124:1334)
-at async w (.next/server/chunks/3737.js:114:16833)
-at async e (.next/server/chunks/6382.js:194:39516)
-at async agD.hooks.beforeDelete (.next/server/chunks/6382.js:194:40225)
-at async (.next/server/chunks/3737.js:113:71038)
-at async y (.next/server/chunks/3737.js:113:72188) {
-query: 'select "id", "booking_code", "user_id", "consultation_type_id", "instructor_id", "booking_date", "start_time", "end_time", "timezone", "client_name", "client_email", "status", "amount", "payment_status", "transaction_id", "meeting_url", "user_notes", "instructor_notes", "cancelled_by", "cancellation_reason", "reminder_sent", "discount_code", "discount_amount", "twenty_crm_deal_id", "updated_at", "created_at" from "consultation_bookings" "consultation_bookings" where "consultation_bookings"."user_id" = $1 order by "consultation_bookings"."created_at" desc limit $2',
-params: [Array],
-[cause]: error: column "booking_date" does not exist
-at  (.next/server/chunks/6382.js:40:136596)
-at async (.next/server/chunks/6382.js:156:23308)
-at async nF.queryWithCache (.next/server/chunks/6382.js:156:19986)
-at async (.next/server/chunks/6382.js:156:23099)
-at async iS (.next/server/chunks/6382.js:124:1334)
-at async w (.next/server/chunks/3737.js:114:16833)
-at async e (.next/server/chunks/6382.js:194:39516)
-at async agD.hooks.beforeDelete (.next/server/chunks/6382.js:194:40225)
-at async (.next/server/chunks/3737.js:113:71038) {
-length: 193,
-severity: 'ERROR',
-code: '42703',
-detail: undefined,
-hint: 'Perhaps you meant to reference the column "consultation_bookings.booking_code".',
-position: '82',
-internalPosition: undefined,
-internalQuery: undefined,
-where: undefined,
-schema: undefined,
-table: undefined,
-column: undefined,
-dataType: undefined,
-constraint: undefined,
-file: 'parse_relation.c',
-line: '3723',
-routine: 'errorMissingColumn'
-}
-}
-[Users.beforeDelete] Skipping consultation-bookings cleanup by field "user" for user #159. Error: Failed query: select "id", "booking_code", "user_id", "consultation_type_id", "instructor_id", "booking_date", "start_time", "end_time", "timezone", "client_name", "client_email", "status", "amount", "payment_status", "transaction_id", "meeting_url", "user_notes", "instructor_notes", "cancelled_by", "cancellation_reason", "reminder_sent", "discount_code", "discount_amount", "twenty_crm_deal_id", "updated_at", "created_at" from "consultation_bookings" "consultation_bookings" where "consultation_bookings"."user_id" = $1 order by "consultation_bookings"."created_at" desc limit $2
-params: 159,1000
-at nF.queryWithCache (.next/server/chunks/6382.js:156:20011)
-[04:52:49] ERROR: File Untitled design (3)-3.png for collection media is missing on the disk. Expected path: /app/media/Untitled design (3)-3.png
-[04:52:49] ERROR: File Untitled design (3)-4.png for collection media is missing on the disk. Expected path: /app/media/Untitled design (3)-4.png
-[verify-otp] Linked user #162 to instructor #57 via email auto-link.
-[04:56:09] ERROR: Failed query: select "id", "booking_code", "user_id", "consultation_type_id", "instructor_id", "booking_date", "start_time", "end_time", "timezone", "client_name", "client_email", "status", "amount", "payment_status", "transaction_id", "meeting_url", "user_notes", "instructor_notes", "cancelled_by", "cancellation_reason", "reminder_sent", "discount_code", "discount_amount", "twenty_crm_deal_id", "updated_at", "created_at" from "consultation_bookings" "consultation_bookings" where "consultation_bookings"."instructor_id" = $1 order by "consultation_bookings"."created_at" desc limit $2
-params: 57,50
-err: {
-"type": "mx",
-"message": "Failed query: select \"id\", \"booking_code\", \"user_id\", \"consultation_type_id\", \"instructor_id\", \"booking_date\", \"start_time\", \"end_time\", \"timezone\", \"client_name\", \"client_email\", \"status\", \"amount\", \"payment_status\", \"transaction_id\", \"meeting_url\", \"user_notes\", \"instructor_notes\", \"cancelled_by\", \"cancellation_reason\", \"reminder_sent\", \"discount_code\", \"discount_amount\", \"twenty_crm_deal_id\", \"updated_at\", \"created_at\" from \"consultation_bookings\" \"consultation_bookings\" where \"consultation_bookings\".\"instructor_id\" = $1 order by \"consultation_bookings\".\"created_at\" desc limit $2\nparams: 57,50: column \"booking_date\" does not exist",
-"stack":
-Error: Failed query: select "id", "booking_code", "user_id", "consultation_type_id", "instructor_id", "booking_date", "start_time", "end_time", "timezone", "client_name", "client_email", "status", "amount", "payment_status", "transaction_id", "meeting_url", "user_notes", "instructor_notes", "cancelled_by", "cancellation_reason", "reminder_sent", "discount_code", "discount_amount", "twenty_crm_deal_id", "updated_at", "created_at" from "consultation_bookings" "consultation_bookings" where "consultation_bookings"."instructor_id" = $1 order by "consultation_bookings"."created_at" desc limit $2
-params: 57,50
-at nF.queryWithCache (/app/.next/server/chunks/6382.js:156:20011)
-at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
-at async /app/.next/server/chunks/6382.js:156:23099
-at async iS (/app/.next/server/chunks/6382.js:124:1334)
-at async w (/app/.next/server/chunks/3737.js:114:16833)
-at async c6 (/app/.next/server/chunks/6382.js:89:65321)
-at async P (/app/.next/server/app/(payload)/api/[...slug]/route.js:1:7484)
-at async /app/.next/server/app/(payload)/api/[...slug]/route.js:1:10273
-at async rb.do (/app/node_modules/.pnpm/next@15.4.11_@babel+core@7.29.0_react-dom@19.2.3_react@19.2.3__react@19.2.3_sass@1.98.0/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js:5:21059)
-at async rb.handle (/app/node_modules/.pnpm/next@15.4.11_@babel+core@7.29.0_react-dom@19.2.3_react@19.2.3__react@19.2.3_sass@1.98.0/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js:5:25902)
-caused by: error: column "booking_date" does not exist
-at /app/.next/server/chunks/6382.js:40:136596
-at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
-at async /app/.next/server/chunks/6382.js:156:23308
-at async nF.queryWithCache (/app/.next/server/chunks/6382.js:156:19986)
-at async /app/.next/server/chunks/6382.js:156:23099
-at async iS (/app/.next/server/chunks/6382.js:124:1334)
-at async w (/app/.next/server/chunks/3737.js:114:16833)
-at async c6 (/app/.next/server/chunks/6382.js:89:65321)
-at async P (/app/.next/server/app/(payload)/api/[...slug]/route.js:1:7484)
-at async /app/.next/server/app/(payload)/api/[...slug]/route.js:1:10273
-"query": "select \"id\", \"booking_code\", \"user_id\", \"consultation_type_id\", \"instructor_id\", \"booking_date\", \"start_time\", \"end_time\", \"timezone\", \"client_name\", \"client_email\", \"status\", \"amount\", \"payment_status\", \"transaction_id\", \"meeting_url\", \"user_notes\", \"instructor_notes\", \"cancelled_by\", \"cancellation_reason\", \"reminder_sent\", \"discount_code\", \"discount_amount\", \"twenty_crm_deal_id\", \"updated_at\", \"created_at\" from \"consultation_bookings\" \"consultation_bookings\" where \"consultation_bookings\".\"instructor_id\" = $1 order by \"consultation_bookings\".\"created_at\" desc limit $2",
-"params": [
-57,
-50
-]
-}
-[04:56:14] ERROR: Failed query: select "id", "booking_code", "user_id", "consultation_type_id", "instructor_id", "booking_date", "start_time", "end_time", "timezone", "client_name", "client_email", "status", "amount", "payment_status", "transaction_id", "meeting_url", "user_notes", "instructor_notes", "cancelled_by", "cancellation_reason", "reminder_sent", "discount_code", "discount_amount", "twenty_crm_deal_id", "updated_at", "created_at" from "consultation_bookings" "consultation_bookings" where "consultation_bookings"."instructor_id" = $1 order by "consultation_bookings"."created_at" desc limit $2
-params: 57,50
-err: {
-"type": "mx",
-"message": "Failed query: select \"id\", \"booking_code\", \"user_id\", \"consultation_type_id\", \"instructor_id\", \"booking_date\", \"start_time\", \"end_time\", \"timezone\", \"client_name\", \"client_email\", \"status\", \"amount\", \"payment_status\", \"transaction_id\", \"meeting_url\", \"user_notes\", \"instructor_notes\", \"cancelled_by\", \"cancellation_reason\", \"reminder_sent\", \"discount_code\", \"discount_amount\", \"twenty_crm_deal_id\", \"updated_at\", \"created_at\" from \"consultation_bookings\" \"consultation_bookings\" where \"consultation_bookings\".\"instructor_id\" = $1 order by \"consultation_bookings\".\"created_at\" desc limit $2\nparams: 57,50: column \"booking_date\" does not exist",
-"stack":
-Error: Failed query: select "id", "booking_code", "user_id", "consultation_type_id", "instructor_id", "booking_date", "start_time", "end_time", "timezone", "client_name", "client_email", "status", "amount", "payment_status", "transaction_id", "meeting_url", "user_notes", "instructor_notes", "cancelled_by", "cancellation_reason", "reminder_sent", "discount_code", "discount_amount", "twenty_crm_deal_id", "updated_at", "created_at" from "consultation_bookings" "consultation_bookings" where "consultation_bookings"."instructor_id" = $1 order by "consultation_bookings"."created_at" desc limit $2
-params: 57,50
-at nF.queryWithCache (/app/.next/server/chunks/6382.js:156:20011)
-at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
-at async /app/.next/server/chunks/6382.js:156:23099
-at async iS (/app/.next/server/chunks/6382.js:124:1334)
-at async w (/app/.next/server/chunks/3737.js:114:16833)
-at async c6 (/app/.next/server/chunks/6382.js:89:65321)
-at async P (/app/.next/server/app/(payload)/api/[...slug]/route.js:1:7484)
-at async /app/.next/server/app/(payload)/api/[...slug]/route.js:1:10273
-at async rb.do (/app/node_modules/.pnpm/next@15.4.11_@babel+core@7.29.0_react-dom@19.2.3_react@19.2.3__react@19.2.3_sass@1.98.0/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js:5:21059)
-at async rb.handle (/app/node_modules/.pnpm/next@15.4.11_@babel+core@7.29.0_react-dom@19.2.3_react@19.2.3__react@19.2.3_sass@1.98.0/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js:5:25902)
-caused by: error: column "booking_date" does not exist
-at /app/.next/server/chunks/6382.js:40:136596
-at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
-at async /app/.next/server/chunks/6382.js:156:23308
-at async nF.queryWithCache (/app/.next/server/chunks/6382.js:156:19986)
-at async /app/.next/server/chunks/6382.js:156:23099
-at async iS (/app/.next/server/chunks/6382.js:124:1334)
-at async w (/app/.next/server/chunks/3737.js:114:16833)
-at async c6 (/app/.next/server/chunks/6382.js:89:65321)
-at async P (/app/.next/server/app/(payload)/api/[...slug]/route.js:1:7484)
-at async /app/.next/server/app/(payload)/api/[...slug]/route.js:1:10273
-"query": "select \"id\", \"booking_code\", \"user_id\", \"consultation_type_id\", \"instructor_id\", \"booking_date\", \"start_time\", \"end_time\", \"timezone\", \"client_name\", \"client_email\", \"status\", \"amount\", \"payment_status\", \"transaction_id\", \"meeting_url\", \"user_notes\", \"instructor_notes\", \"cancelled_by\", \"cancellation_reason\", \"reminder_sent\", \"discount_code\", \"discount_amount\", \"twenty_crm_deal_id\", \"updated_at\", \"created_at\" from \"consultation_bookings\" \"consultation_bookings\" where \"consultation_bookings\".\"instructor_id\" = $1 order by \"consultation_bookings\".\"created_at\" desc limit $2",
-"params": [
-57,
-50
-]
-}
-[04:56:18] ERROR: Failed query: select "id", "booking_code", "user_id", "consultation_type_id", "instructor_id", "booking_date", "start_time", "end_time", "timezone", "client_name", "client_email", "status", "amount", "payment_status", "transaction_id", "meeting_url", "user_notes", "instructor_notes", "cancelled_by", "cancellation_reason", "reminder_sent", "discount_code", "discount_amount", "twenty_crm_deal_id", "updated_at", "created_at" from "consultation_bookings" "consultation_bookings" where (("consultation_bookings"."payment_status" is null or "consultation_bookings"."payment_status" <> $1) and "consultation_bookings"."instructor_id" = $2) order by "consultation_bookings"."created_at" desc limit $3
-params: pending,57,100
-err: {
-"type": "mx",
-"message": "Failed query: select \"id\", \"booking_code\", \"user_id\", \"consultation_type_id\", \"instructor_id\", \"booking_date\", \"start_time\", \"end_time\", \"timezone\", \"client_name\", \"client_email\", \"status\", \"amount\", \"payment_status\", \"transaction_id\", \"meeting_url\", \"user_notes\", \"instructor_notes\", \"cancelled_by\", \"cancellation_reason\", \"reminder_sent\", \"discount_code\", \"discount_amount\", \"twenty_crm_deal_id\", \"updated_at\", \"created_at\" from \"consultation_bookings\" \"consultation_bookings\" where ((\"consultation_bookings\".\"payment_status\" is null or \"consultation_bookings\".\"payment_status\" <> $1) and \"consultation_bookings\".\"instructor_id\" = $2) order by \"consultation_bookings\".\"created_at\" desc limit $3\nparams: pending,57,100: column \"booking_date\" does not exist",
-"stack":
-Error: Failed query: select "id", "booking_code", "user_id", "consultation_type_id", "instructor_id", "booking_date", "start_time", "end_time", "timezone", "client_name", "client_email", "status", "amount", "payment_status", "transaction_id", "meeting_url", "user_notes", "instructor_notes", "cancelled_by", "cancellation_reason", "reminder_sent", "discount_code", "discount_amount", "twenty_crm_deal_id", "updated_at", "created_at" from "consultation_bookings" "consultation_bookings" where (("consultation_bookings"."payment_status" is null or "consultation_bookings"."payment_status" <> $1) and "consultation_bookings"."instructor_id" = $2) order by "consultation_bookings"."created_at" desc limit $3
-params: pending,57,100
-at nF.queryWithCache (/app/.next/server/chunks/6382.js:156:20011)
-at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
-at async /app/.next/server/chunks/6382.js:156:23099
-at async iS (/app/.next/server/chunks/6382.js:124:1334)
-at async w (/app/.next/server/chunks/3737.js:114:16833)
-at async c6 (/app/.next/server/chunks/6382.js:89:65321)
-at async P (/app/.next/server/app/(payload)/api/[...slug]/route.js:1:7484)
-at async /app/.next/server/app/(payload)/api/[...slug]/route.js:1:10273
-at async rb.do (/app/node_modules/.pnpm/next@15.4.11_@babel+core@7.29.0_react-dom@19.2.3_react@19.2.3__react@19.2.3_sass@1.98.0/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js:5:21059)
-at async rb.handle (/app/node_modules/.pnpm/next@15.4.11_@babel+core@7.29.0_react-dom@19.2.3_react@19.2.3__react@19.2.3_sass@1.98.0/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js:5:25902)
-caused by: error: column "booking_date" does not exist
-at /app/.next/server/chunks/6382.js:40:136596
-at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
-at async /app/.next/server/chunks/6382.js:156:23308
-at async nF.queryWithCache (/app/.next/server/chunks/6382.js:156:19986)
-at async /app/.next/server/chunks/6382.js:156:23099
-at async iS (/app/.next/server/chunks/6382.js:124:1334)
-at async w (/app/.next/server/chunks/3737.js:114:16833)
-at async c6 (/app/.next/server/chunks/6382.js:89:65321)
-at async P (/app/.next/server/app/(payload)/api/[...slug]/route.js:1:7484)
-at async /app/.next/server/app/(payload)/api/[...slug]/route.js:1:10273
-"query": "select \"id\", \"booking_code\", \"user_id\", \"consultation_type_id\", \"instructor_id\", \"booking_date\", \"start_time\", \"end_time\", \"timezone\", \"client_name\", \"client_email\", \"status\", \"amount\", \"payment_status\", \"transaction_id\", \"meeting_url\", \"user_notes\", \"instructor_notes\", \"cancelled_by\", \"cancellation_reason\", \"reminder_sent\", \"discount_code\", \"discount_amount\", \"twenty_crm_deal_id\", \"updated_at\", \"created_at\" from \"consultation_bookings\" \"consultation_bookings\" where ((\"consultation_bookings\".\"payment_status\" is null or \"consultation_bookings\".\"payment_status\" <> $1) and \"consultation_bookings\".\"instructor_id\" = $2) order by \"consultation_bookings\".\"created_at\" desc limit $3",
-"params": [
-"pending",
-57,
-100
-]
-}
-[04:57:19] ERROR: File 1 (1).webp for collection media is missing on the disk. Expected path: /app/media/1 (1).webp
-[04:57:19] ERROR: File 4 (1).webp for collection media is missing on the disk. Expected path: /app/media/4 (1).webp
-[04:57:19] ERROR: File rammah portصثrait (4).png for collection media is missing on the disk. Expected path: /app/media/rammah portصثrait (4).png
-[04:57:19] ERROR: File rammah portrait (3)-1.png for collection media is missing on the disk. Expected path: /app/media/rammah portrait (3)-1.png
-[04:57:19] ERROR: File turky.webp for collection media is missing on the disk. Expected path: /app/media/turky.webp
-[04:57:19] ERROR: File 5.webp for collection media is missing on the disk. Expected path: /app/media/5.webp
-[04:57:19] ERROR: File kandil.webp for collection media is missing on the disk. Expected path: /app/media/kandil.webp
-[04:57:19] ERROR: File 2.webp for collection media is missing on the disk. Expected path: /app/media/2.webp
-[04:57:19] ERROR: File rammah portrait (3)-2.png for collection media is missing on the disk. Expected path: /app/media/rammah portrait (3)-2.png
-[04:57:19] ERROR: File hero_poster.webp for collection media is missing on the disk. Expected path: /app/media/hero_poster.webp
-[04:57:19] ERROR: File rammah portrait (3)-3.png for collection media is missing on the disk. Expected path: /app/media/rammah portrait (3)-3.png
-[04:57:25] ERROR: File 4 (1).webp for collection media is missing on the disk. Expected path: /app/media/4 (1).webp
-[04:57:25] ERROR: File 1 (1).webp for collection media is missing on the disk. Expected path: /app/media/1 (1).webp
-[04:57:25] ERROR: File rammah portصثrait (4).png for collection media is missing on the disk. Expected path: /app/media/rammah portصثrait (4).png
-[04:57:25] ERROR: File rammah portrait (3)-1.png for collection media is missing on the disk. Expected path: /app/media/rammah portrait (3)-1.png
-[04:57:25] ERROR: File kandil.webp for collection media is missing on the disk. Expected path: /app/media/kandil.webp
-[04:57:25] ERROR: File turky.webp for collection media is missing on the disk. Expected path: /app/media/turky.webp
-[04:57:25] ERROR: File rammah portrait (3)-2.png for collection media is missing on the disk. Expected path: /app/media/rammah portrait (3)-2.png
-[04:57:25] ERROR: File 5.webp for collection media is missing on the disk. Expected path: /app/media/5.webp
-[04:57:25] ERROR: File rammah portrait (3)-3.png for collection media is missing on the disk. Expected path: /app/media/rammah portrait (3)-3.png
-[04:57:26] ERROR: File 2.webp for collection media is missing on the disk. Expected path: /app/media/2.webp
-[04:57:26] ERROR: File hero_poster.webp for collection media is missing on the disk. Expected path: /app/media/hero_poster.webp
-[04:57:30] ERROR: Failed query: select "id", "booking_code", "user_id", "consultation_type_id", "instructor_id", "booking_date", "start_time", "end_time", "timezone", "client_name", "client_email", "status", "amount", "payment_status", "transaction_id", "meeting_url", "user_notes", "instructor_notes", "cancelled_by", "cancellation_reason", "reminder_sent", "discount_code", "discount_amount", "twenty_crm_deal_id", "updated_at", "created_at" from "consultation_bookings" "consultation_bookings" where "consultation_bookings"."instructor_id" = $1 order by "consultation_bookings"."created_at" desc limit $2
-params: 57,50
-err: {
-"type": "mx",
-"message": "Failed query: select \"id\", \"booking_code\", \"user_id\", \"consultation_type_id\", \"instructor_id\", \"booking_date\", \"start_time\", \"end_time\", \"timezone\", \"client_name\", \"client_email\", \"status\", \"amount\", \"payment_status\", \"transaction_id\", \"meeting_url\", \"user_notes\", \"instructor_notes\", \"cancelled_by\", \"cancellation_reason\", \"reminder_sent\", \"discount_code\", \"discount_amount\", \"twenty_crm_deal_id\", \"updated_at\", \"created_at\" from \"consultation_bookings\" \"consultation_bookings\" where \"consultation_bookings\".\"instructor_id\" = $1 order by \"consultation_bookings\".\"created_at\" desc limit $2\nparams: 57,50: column \"booking_date\" does not exist",
-"stack":
-Error: Failed query: select "id", "booking_code", "user_id", "consultation_type_id", "instructor_id", "booking_date", "start_time", "end_time", "timezone", "client_name", "client_email", "status", "amount", "payment_status", "transaction_id", "meeting_url", "user_notes", "instructor_notes", "cancelled_by", "cancellation_reason", "reminder_sent", "discount_code", "discount_amount", "twenty_crm_deal_id", "updated_at", "created_at" from "consultation_bookings" "consultation_bookings" where "consultation_bookings"."instructor_id" = $1 order by "consultation_bookings"."created_at" desc limit $2
-at async (.next/server/chunks/6382.js:156:23099)
-at async iS (.next/server/chunks/6382.js:124:1334)
-at async w (.next/server/chunks/3737.js:114:16833)
-at async e (.next/server/chunks/6382.js:194:39516)
-at async agD.hooks.beforeDelete (.next/server/chunks/6382.js:194:40225)
-at async (.next/server/chunks/3737.js:113:71038)
-at async y (.next/server/chunks/3737.js:113:72188) {
-query: 'select "id", "booking_code", "user_id", "consultation_type_id", "instructor_id", "booking_date", "start_time", "end_time", "timezone", "client_name", "client_email", "status", "amount", "payment_status", "transaction_id", "meeting_url", "user_notes", "instructor_notes", "cancelled_by", "cancellation_reason", "reminder_sent", "discount_code", "discount_amount", "twenty_crm_deal_id", "updated_at", "created_at" from "consultation_bookings" "consultation_bookings" where "consultation_bookings"."user_id" = $1 order by "consultation_bookings"."created_at" desc limit $2',
-params: [Array],
-[cause]: error: column "booking_date" does not exist
-at  (.next/server/chunks/6382.js:40:136596)
-at async (.next/server/chunks/6382.js:156:23308)
-at async nF.queryWithCache (.next/server/chunks/6382.js:156:19986)
-at async (.next/server/chunks/6382.js:156:23099)
-at async iS (.next/server/chunks/6382.js:124:1334)
-at async w (.next/server/chunks/3737.js:114:16833)
-at async e (.next/server/chunks/6382.js:194:39516)
-at async agD.hooks.beforeDelete (.next/server/chunks/6382.js:194:40225)
-at async (.next/server/chunks/3737.js:113:71038) {
-length: 193,
-severity: 'ERROR',
-code: '42703',
-detail: undefined,
-hint: 'Perhaps you meant to reference the column "consultation_bookings.booking_code".',
-position: '82',
-internalPosition: undefined,
-internalQuery: undefined,
-where: undefined,
-schema: undefined,
-table: undefined,
-column: undefined,
-dataType: undefined,
-constraint: undefined,
-file: 'parse_relation.c',
-line: '3723',
-routine: 'errorMissingColumn'
-}
-}
-[Users.beforeDelete] Failed deleting instructor-program-submissions #13 while cleaning user #158. Error: Failed query: select "instructor_program_submissions"."id", "instructor_program_submissions"."instructor_id", "instructor_program_submissions"."submitted_by_id", "instructor_program_submissions"."status", "instructor_program_submissions"."submitted_at", "instructor_program_submissions"."reviewed_at", "instructor_program_submissions"."review_notes", "instructor_program_submissions"."type", "instructor_program_submissions"."title_ar", "instructor_program_submissions"."title_en", "instructor_program_submissions"."short_description_ar", "instructor_program_submissions"."short_description_en", "instructor_program_submissions"."description_ar", "instructor_program_submissions"."description_en", "instructor_program_submissions"."category_name", "instructor_program_submissions"."duration_hours", "instructor_program_submissions"."sessions_count", "instructor_program_submissions"."language", "instructor_program_submissions"."level", "instructor_program_submissions"."price", "instructor_program_submissions"."currency", "instructor_program_submissions"."objectives_text", "instructor_program_submissions"."requirements_text", "instructor_program_submissions"."target_audience_text", "instructor_program_submissions"."previous_trainees_count", "instructor_program_submissions"."is_first_time_program", "instructor_program_submissions"."teaching_experience_years", "instructor_program_submissions"."delivery_history_text", "instructor_program_submissions"."extra_notes", "instructor_program_submissions"."rounds_count", "instructor_program_submissions"."updated_at", "instructor_program_submissions"."created_at", "instructor_program_submissions_sessionOutline"."data" as "sessionOutline", "instructor_program_submissions__rels"."data" as "_rels" from "instructor_program_submissions" "instructor_program_submissions" left join lateral (select coalesce(json_agg(json_build_array("instructor_program_submissions_sessionOutline"."_order", "instructor_program_submissions_sessionOutline"."id", "instructor_program_submissions_sessionOutline"."session_number", "instructor_program_submissions_sessionOutline"."title", "instructor_program_submissions_sessionOutline"."summary") order by "instructor_program_submissions_sessionOutline"."_order" asc), '[]'::json) as "data" from (select * from "instructor_program_submissions_session_outline" "instructor_program_submissions_sessionOutline" where "instructor_program_submissions_sessionOutline"."_parent_id" = "instructor_program_submissions"."id" order by "instructor_program_submissions_sessionOutline"."_order" asc) "instructor_program_submissions_sessionOutline") "instructor_program_submissions_sessionOutline" on true left join lateral (select coalesce(json_agg(json_build_array("instructor_program_submissions__rels"."order", "instructor_program_submissions__rels"."path", "instructor_program_submissions__rels"."media_id") order by "instructor_program_submissions__rels"."order" asc), '[]'::json) as "data" from (select * from "instructor_program_submissions_rels" "instructor_program_submissions__rels" where "instructor_program_submissions__rels"."parent_id" = "instructor_program_submissions"."id" order by "instructor_program_submissions__rels"."order" asc) "instructor_program_submissions__rels") "instructor_program_submissions__rels" on true where "instructor_program_submissions"."id" = $1 limit $2
-params: 13,1
-at nF.queryWithCache (.next/server/chunks/6382.js:156:20011)
-at async (.next/server/chunks/6382.js:156:23099)
-at async Object.iU [as deleteOne] (.next/server/chunks/6382.js:124:2763)
-at async w (.next/server/chunks/3737.js:114:22819)
-at async e (.next/server/chunks/6382.js:194:39751)
-at async agD.hooks.beforeDelete (.next/server/chunks/6382.js:194:40267)
-at async (.next/server/chunks/3737.js:113:71038)
-at async y (.next/server/chunks/3737.js:113:72188) {
-query: `select "instructor_program_submissions"."id", "instructor_program_submissions"."instructor_id", "instructor_program_submissions"."submitted_by_id", "instructor_program_submissions"."status", "instructor_program_submissions"."submitted_at", "instructor_program_submissions"."reviewed_at", "instructor_program_submissions"."review_notes", "instructor_program_submissions"."type", "instructor_program_submissions"."title_ar", "instructor_program_submissions"."title_en", "instructor_program_submissions"."short_description_ar", "instructor_program_submissions"."short_description_en", "instructor_program_submissions"."description_ar", "instructor_program_submissions"."description_en", "instructor_program_submissions"."category_name", "instructor_program_submissions"."duration_hours", "instructor_program_submissions"."sessions_count", "instructor_program_submissions"."language", "instructor_program_submissions"."level", "instructor_program_submissions"."price", "instructor_program_submissions"."currency", "instructor_program_submissions"."objectives_text", "instructor_program_submissions"."requirements_text", "instructor_program_submissions"."target_audience_text", "instructor_program_submissions"."previous_trainees_count", "instructor_program_submissions"."is_first_time_program", "instructor_program_submissions"."teaching_experience_years", "instructor_program_submissions"."delivery_history_text", "instructor_program_submissions"."extra_notes", "instructor_program_submissions"."rounds_count", "instructor_program_submissions"."updated_at", "instructor_program_submissions"."created_at", "instructor_program_submissions_sessionOutline"."data" as "sessionOutline", "instructor_program_submissions__rels"."data" as "_rels" from "instructor_program_submissions" "instructor_program_submissions" left join lateral (select coalesce(json_agg(json_build_array("instructor_program_submissions_sessionOutline"."_order", "instructor_program_submissions_sessionOutline"."id", "instructor_program_submissions_sessionOutline"."session_number", "instructor_program_submissions_sessionOutline"."title", "instructor_program_submissions_sessionOutline"."summary") order by "instructor_program_submissions_sessionOutline"."_order" asc), '[]'::json) as "data" from (select * from "instructor_program_submissions_session_outline" "instructor_program_submissions_sessionOutline" where "instructor_program_submissions_sessionOutline"."_parent_id" = "instructor_program_submissions"."id" order by "instructor_program_submissions_sessionOutline"."_order" asc) "instructor_program_submissions_sessionOutline") "instructor_program_submissions_sessionOutline" on true left join lateral (select coalesce(json_agg(json_build_array("instructor_program_submissions__rels"."order", "instructor_program_submissions__rels"."path", "instructor_program_submissions__rels"."media_id") order by "instructor_program_submissions__rels"."order" asc), '[]'::json) as "data" from (select * from "instructor_program_submissions_rels" "instructor_program_submissions__rels" where "instructor_program_submissions__rels"."parent_id" = "instructor_program_submissions"."id" order by "instructor_program_submissions__rels"."order" asc) "instructor_program_submissions__rels") "instructor_program_submissions__rels" on true where "instructor_program_submissions"."id" = $1 limit $2`,
-params: [Array],
-[cause]: error: current transaction is aborted, commands ignored until end of transaction block
-at  (.next/server/chunks/6382.js:40:485197)
-at async (.next/server/chunks/6382.js:156:23308)
-at async nF.queryWithCache (.next/server/chunks/6382.js:156:19986)
-at async (.next/server/chunks/6382.js:156:23099)
-at async Object.iU [as deleteOne] (.next/server/chunks/6382.js:124:2763)
-at async w (.next/server/chunks/3737.js:114:22819)
-at async e (.next/server/chunks/6382.js:194:39751)
-at async agD.hooks.beforeDelete (.next/server/chunks/6382.js:194:40267)
-at async (.next/server/chunks/3737.js:113:71038) {
-length: 145,
-severity: 'ERROR',
-code: '25P02',
-detail: undefined,
-hint: undefined,
-position: undefined,
-internalPosition: undefined,
-internalQuery: undefined,
-where: undefined,
-schema: undefined,
-table: undefined,
-column: undefined,
-dataType: undefined,
-constraint: undefined,
-file: 'postgres.c',
-line: '1498',
-routine: 'exec_parse_message'
-}
-}
-[Users.beforeDelete] Failed deleting instructor-program-submissions #14 while cleaning user #160. Error: Failed query: delete from "payload_locked_documents" where false
+[api/upcoming-events] Error: Failed query: select count(*) from "upcoming_events_config"
 params: 
-at nF.queryWithCache (.next/server/chunks/6382.js:156:20011)
-at async Object.jG [as deleteWhere] (.next/server/chunks/6382.js:133:1634)
-at async Object.iT [as deleteMany] (.next/server/chunks/6382.js:124:2134)
-at async h (.next/server/chunks/3737.js:121:80062)
-at async w (.next/server/chunks/3737.js:114:22391)
-at async e (.next/server/chunks/6382.js:194:39751)
-at async agD.hooks.beforeDelete (.next/server/chunks/6382.js:194:40267)
-at async (.next/server/chunks/3737.js:113:71038) {
-query: 'delete from "payload_locked_documents" where false',
+at nF.queryWithCache (.next/server/chunks/5758.js:75:20011)
+at async (.next/server/chunks/5758.js:75:23099)
+at async Object.jC [as countDistinct] (.next/server/chunks/5758.js:52:103)
+at async iS (.next/server/chunks/5758.js:43:1200)
+at async w (.next/server/chunks/3737.js:114:16833)
+at async B.a.ttl (.next/server/app/api/upcoming-events/route.js:1:4635)
+at async i (.next/server/chunks/2193.js:3257:7535) {
+query: 'select count(*) from "upcoming_events_config"',
 params: [],
-[cause]: error: current transaction is aborted, commands ignored until end of transaction block
-at  (.next/server/chunks/6382.js:40:485197)
-at async (.next/server/chunks/6382.js:156:23071)
-at async nF.queryWithCache (.next/server/chunks/6382.js:156:19986)
-at async Object.jG [as deleteWhere] (.next/server/chunks/6382.js:133:1634)
-at async Object.iT [as deleteMany] (.next/server/chunks/6382.js:124:2134)
-at async h (.next/server/chunks/3737.js:121:80062)
-at async w (.next/server/chunks/3737.js:114:22391)
-at async e (.next/server/chunks/6382.js:194:39751)
-at async agD.hooks.beforeDelete (.next/server/chunks/6382.js:194:40267) {
-length: 144,
-severity: 'ERROR',
-code: '25P02',
-detail: undefined,
-hint: undefined,
-position: undefined,
-internalPosition: undefined,
-internalQuery: undefined,
-where: undefined,
-schema: undefined,
-table: undefined,
-column: undefined,
-dataType: undefined,
-constraint: undefined,
-file: 'postgres.c',
-line: '1140',
-routine: 'exec_simple_query'
+[cause]: Error: timeout exceeded when trying to connect
+at  (.next/server/chunks/5758.js:3397:136596)
+at async (.next/server/chunks/5758.js:75:23308)
+[19:15:17] ERROR: File 1 (1).webp for collection media is missing on the disk. Expected path: /app/media/1 (1).webp
+[19:15:17] ERROR: File rammah portصثrait (4).png for collection media is missing on the disk. Expected path: /app/media/rammah portصثrait (4).png
+[19:15:17] ERROR: File rammah portrait (3)-1.png for collection media is missing on the disk. Expected path: /app/media/rammah portrait (3)-1.png
+[19:15:17] ERROR: File 4 (1).webp for collection media is missing on the disk. Expected path: /app/media/4 (1).webp
+[19:15:17] ERROR: File 2.webp for collection media is missing on the disk. Expected path: /app/media/2.webp
+[19:15:17] ERROR: File turky.webp for collection media is missing on the disk. Expected path: /app/media/turky.webp
+[19:15:17] ERROR: File kandil.webp for collection media is missing on the disk. Expected path: /app/media/kandil.webp
+[19:15:17] ERROR: File 5.webp for collection media is missing on the disk. Expected path: /app/media/5.webp
+at async nF.queryWithCache (.next/server/chunks/5758.js:75:19986)
+at async (.next/server/chunks/5758.js:75:23099)
+at async Object.jC [as countDistinct] (.next/server/chunks/5758.js:52:103)
+at async iS (.next/server/chunks/5758.js:43:1200)
+at async w (.next/server/chunks/3737.js:114:16833)
 }
-}
-[Users.beforeDelete] Failed deleting instructor-program-submissions #12 while cleaning user #154. Error: Failed query: select "instructor_program_submissions"."id", "instructor_program_submissions"."instructor_id", "instructor_program_submissions"."submitted_by_id", "instructor_program_submissions"."status", "instructor_program_submissions"."submitted_at", "instructor_program_submissions"."reviewed_at", "instructor_program_submissions"."review_notes", "instructor_program_submissions"."type", "instructor_program_submissions"."title_ar", "instructor_program_submissions"."title_en", "instructor_program_submissions"."short_description_ar", "instructor_program_submissions"."short_description_en", "instructor_program_submissions"."description_ar", "instructor_program_submissions"."description_en", "instructor_program_submissions"."category_name", "instructor_program_submissions"."duration_hours", "instructor_program_submissions"."sessions_count", "instructor_program_submissions"."language", "instructor_program_submissions"."level", "instructor_program_submissions"."price", "instructor_program_submissions"."currency", "instructor_program_submissions"."objectives_text", "instructor_program_submissions"."requirements_text", "instructor_program_submissions"."target_audience_text", "instructor_program_submissions"."previous_trainees_count", "instructor_program_submissions"."is_first_time_program", "instructor_program_submissions"."teaching_experience_years", "instructor_program_submissions"."delivery_history_text", "instructor_program_submissions"."extra_notes", "instructor_program_submissions"."rounds_count", "instructor_program_submissions"."updated_at", "instructor_program_submissions"."created_at", "instructor_program_submissions_sessionOutline"."data" as "sessionOutline", "instructor_program_submissions__rels"."data" as "_rels" from "instructor_program_submissions" "instructor_program_submissions" left join lateral (select coalesce(json_agg(json_build_array("instructor_program_submissions_sessionOutline"."_order", "instructor_program_submissions_sessionOutline"."id", "instructor_program_submissions_sessionOutline"."session_number", "instructor_program_submissions_sessionOutline"."title", "instructor_program_submissions_sessionOutline"."summary") order by "instructor_program_submissions_sessionOutline"."_order" asc), '[]'::json) as "data" from (select * from "instructor_program_submissions_session_outline" "instructor_program_submissions_sessionOutline" where "instructor_program_submissions_sessionOutline"."_parent_id" = "instructor_program_submissions"."id" order by "instructor_program_submissions_sessionOutline"."_order" asc) "instructor_program_submissions_sessionOutline") "instructor_program_submissions_sessionOutline" on true left join lateral (select coalesce(json_agg(json_build_array("instructor_program_submissions__rels"."order", "instructor_program_submissions__rels"."path", "instructor_program_submissions__rels"."media_id") order by "instructor_program_submissions__rels"."order" asc), '[]'::json) as "data" from (select * from "instructor_program_submissions_rels" "instructor_program_submissions__rels" where "instructor_program_submissions__rels"."parent_id" = "instructor_program_submissions"."id" order by "instructor_program_submissions__rels"."order" asc) "instructor_program_submissions__rels") "instructor_program_submissions__rels" on true where "instructor_program_submissions"."id" = $1 limit $2
-params: 12,1
-at nF.queryWithCache (.next/server/chunks/6382.js:156:20011)
-at async (.next/server/chunks/6382.js:156:23099)
-at async Object.iU [as deleteOne] (.next/server/chunks/6382.js:124:2763)
-at async w (.next/server/chunks/3737.js:114:22819)
-at async e (.next/server/chunks/6382.js:194:39751)
-at async agD.hooks.beforeDelete (.next/server/chunks/6382.js:194:40267)
-at async (.next/server/chunks/3737.js:113:71038)
-at async y (.next/server/chunks/3737.js:113:72188) {
-query: `select "instructor_program_submissions"."id", "instructor_program_submissions"."instructor_id", "instructor_program_submissions"."submitted_by_id", "instructor_program_submissions"."status", "instructor_program_submissions"."submitted_at", "instructor_program_submissions"."reviewed_at", "instructor_program_submissions"."review_notes", "instructor_program_submissions"."type", "instructor_program_submissions"."title_ar", "instructor_program_submissions"."title_en", "instructor_program_submissions"."short_description_ar", "instructor_program_submissions"."short_description_en", "instructor_program_submissions"."description_ar", "instructor_program_submissions"."description_en", "instructor_program_submissions"."category_name", "instructor_program_submissions"."duration_hours", "instructor_program_submissions"."sessions_count", "instructor_program_submissions"."language", "instructor_program_submissions"."level", "instructor_program_submissions"."price", "instructor_program_submissions"."currency", "instructor_program_submissions"."objectives_text", "instructor_program_submissions"."requirements_text", "instructor_program_submissions"."target_audience_text", "instructor_program_submissions"."previous_trainees_count", "instructor_program_submissions"."is_first_time_program", "instructor_program_submissions"."teaching_experience_years", "instructor_program_submissions"."delivery_history_text", "instructor_program_submissions"."extra_notes", "instructor_program_submissions"."rounds_count", "instructor_program_submissions"."updated_at", "instructor_program_submissions"."created_at", "instructor_program_submissions_sessionOutline"."data" as "sessionOutline", "instructor_program_submissions__rels"."data" as "_rels" from "instructor_program_submissions" "instructor_program_submissions" left join lateral (select coalesce(json_agg(json_build_array("instructor_program_submissions_sessionOutline"."_order", "instructor_program_submissions_sessionOutline"."id", "instructor_program_submissions_sessionOutline"."session_number", "instructor_program_submissions_sessionOutline"."title", "instructor_program_submissions_sessionOutline"."summary") order by "instructor_program_submissions_sessionOutline"."_order" asc), '[]'::json) as "data" from (select * from "instructor_program_submissions_session_outline" "instructor_program_submissions_sessionOutline" where "instructor_program_submissions_sessionOutline"."_parent_id" = "instructor_program_submissions"."id" order by "instructor_program_submissions_sessionOutline"."_order" asc) "instructor_program_submissions_sessionOutline") "instructor_program_submissions_sessionOutline" on true left join lateral (select coalesce(json_agg(json_build_array("instructor_program_submissions__rels"."order", "instructor_program_submissions__rels"."path", "instructor_program_submissions__rels"."media_id") order by "instructor_program_submissions__rels"."order" asc), '[]'::json) as "data" from (select * from "instructor_program_submissions_rels" "instructor_program_submissions__rels" where "instructor_program_submissions__rels"."parent_id" = "instructor_program_submissions"."id" order by "instructor_program_submissions__rels"."order" asc) "instructor_program_submissions__rels") "instructor_program_submissions__rels" on true where "instructor_program_submissions"."id" = $1 limit $2`,
+[api/home/featured-programs] Failed to fetch cards: Error: Failed query: select count(*) from "programs" where ("programs"."is_active" = $1 and "programs"."is_featured" = $2)
+params: true,true
+at nF.queryWithCache (.next/server/chunks/5758.js:75:20011)
+at async (.next/server/chunks/5758.js:75:23099)
+at async Object.jC [as countDistinct] (.next/server/chunks/5758.js:52:103)
+at async iS (.next/server/chunks/5758.js:43:1200)
+at async w (.next/server/chunks/3737.js:114:16833)
+at async E.g.ttl (.next/server/app/api/home/featured-programs/route.js:1:5840)
+at async i (.next/server/chunks/2193.js:3257:7535)
+at async E (.next/server/app/api/home/featured-programs/route.js:1:5774) {
+query: 'select count(*) from "programs" where ("programs"."is_active" = $1 and "programs"."is_featured" = $2)',
 params: [Array],
-[cause]: error: current transaction is aborted, commands ignored until end of transaction block
-at  (.next/server/chunks/6382.js:40:485197)
-at async (.next/server/chunks/6382.js:156:23308)
-at async nF.queryWithCache (.next/server/chunks/6382.js:156:19986)
-at async (.next/server/chunks/6382.js:156:23099)
-at async Object.iU [as deleteOne] (.next/server/chunks/6382.js:124:2763)
-at async w (.next/server/chunks/3737.js:114:22819)
-at async e (.next/server/chunks/6382.js:194:39751)
-at async agD.hooks.beforeDelete (.next/server/chunks/6382.js:194:40267)
-at async (.next/server/chunks/3737.js:113:71038) {
-length: 145,
-severity: 'ERROR',
-code: '25P02',
-detail: undefined,
-hint: undefined,
-position: undefined,
-internalPosition: undefined,
-internalQuery: undefined,
-where: undefined,
-schema: undefined,
-table: undefined,
-column: undefined,
-dataType: undefined,
-constraint: undefined,
-file: 'postgres.c',
-line: '1498',
-routine: 'exec_parse_message'
-}
-}
-[api/instructor/consultation-types][GET] Error: Failed query: select "consultation_types"."id", "consultation_types"."instructor_id", "consultation_types"."title_ar", "consultation_types"."title_en", "consultation_types"."title", "consultation_types"."description_ar", "consultation_types"."description_en", "consultation_types"."description", "consultation_types"."duration_minutes", "consultation_types"."price", "consultation_types"."currency", "consultation_types"."meeting_type", "consultation_types"."meeting_platform", "consultation_types"."max_participants", "consultation_types"."is_active", "consultation_types"."buffer_before", "consultation_types"."buffer_after", "consultation_types"."max_per_day", "consultation_types"."start_time_increment", "consultation_types"."min_notice_hours", "consultation_types"."min_cancel_notice_hours", "consultation_types"."updated_at", "consultation_types"."created_at", "consultation_types_availableDays"."data" as "availableDays" from "consultation_types" "consultation_types" left join lateral (select coalesce(json_agg(json_build_array("consultation_types_availableDays"."value") order by "consultation_types_availableDays"."order" asc), '[]'::json) as "data" from (select * from "consultation_types_available_days" "consultation_types_availableDays" where "consultation_types_availableDays"."parent_id" = "consultation_types"."id" order by "consultation_types_availableDays"."order" asc) "consultation_types_availableDays") "consultation_types_availableDays" on true where "consultation_types"."instructor_id" = $1 order by "consultation_types"."updated_at" desc, "consultation_types"."created_at" desc limit $2
-params: 57,100
-at nF.queryWithCache (.next/server/chunks/6382.js:156:20011)
-at async (.next/server/chunks/6382.js:156:23099)
-at async iS (.next/server/chunks/6382.js:124:1334)
+[cause]: Error: timeout exceeded when trying to connect
+at  (.next/server/chunks/5758.js:3397:136596)
+at async (.next/server/chunks/5758.js:75:23308)
+at async nF.queryWithCache (.next/server/chunks/5758.js:75:19986)
+at async (.next/server/chunks/5758.js:75:23099)
+at async Object.jC [as countDistinct] (.next/server/chunks/5758.js:52:103)
+at async iS (.next/server/chunks/5758.js:43:1200)
 at async w (.next/server/chunks/3737.js:114:16833)
-at async C (.next/server/app/api/instructor/consultation-types/route.js:1:6548)
-at async k (.next/server/app/api/instructor/consultation-types/route.js:1:12029) {
-query: `select "consultation_types"."id", "consultation_types"."instructor_id", "consultation_types"."title_ar", "consultation_types"."title_en", "consultation_types"."title", "consultation_types"."description_ar", "consultation_types"."description_en", "consultation_types"."description", "consultation_types"."duration_minutes", "consultation_types"."price", "consultation_types"."currency", "consultation_types"."meeting_type", "consultation_types"."meeting_platform", "consultation_types"."max_participants", "consultation_types"."is_active", "consultation_types"."buffer_before", "consultation_types"."buffer_after", "consultation_types"."max_per_day", "consultation_types"."start_time_increment", "consultation_types"."min_notice_hours", "consultation_types"."min_cancel_notice_hours", "consultation_types"."updated_at", "consultation_types"."created_at", "consultation_types_availableDays"."data" as "availableDays" from "consultation_types" "consultation_types" left join lateral (select coalesce(json_agg(json_build_array("consultation_types_availableDays"."value") order by "consultation_types_availableDays"."order" asc), '[]'::json) as "data" from (select * from "consultation_types_available_days" "consultation_types_availableDays" where "consultation_types_availableDays"."parent_id" = "consultation_types"."id" order by "consultation_types_availableDays"."order" asc) "consultation_types_availableDays") "consultation_types_availableDays" on true where "consultation_types"."instructor_id" = $1 order by "consultation_types"."updated_at" desc, "consultation_types"."created_at" desc limit $2`,
+at async E.g.ttl (.next/server/app/api/home/featured-programs/route.js:1:5840)
+at async i (.next/server/chunks/2193.js:3257:7535)
+at async E (.next/server/app/api/home/featured-programs/route.js:1:5774)
+}
+[api/home/stats] completedBookings query failed: Error: Failed query: select count(*) from "bookings" where "bookings"."status" = $1
+params: completed
+at nF.queryWithCache (.next/server/chunks/5758.js:75:20011)
+at async (.next/server/chunks/5758.js:75:23099)
+at async Object.jC [as countDistinct] (.next/server/chunks/5758.js:52:103)
+at async iS (.next/server/chunks/5758.js:43:1200)
+at async w (.next/server/chunks/3737.js:114:16833)
+at async y (.next/server/app/api/home/stats/route.js:1:3658) {
+query: 'select count(*) from "bookings" where "bookings"."status" = $1',
 params: [Array],
-[cause]: error: column consultation_types_availableDays.parent_id does not exist
-at  (.next/server/chunks/6382.js:40:136596)
-at async (.next/server/chunks/6382.js:156:23308)
-at async nF.queryWithCache (.next/server/chunks/6382.js:156:19986)
-at async (.next/server/chunks/6382.js:156:23099)
-at async iS (.next/server/chunks/6382.js:124:1334)
+[cause]: Error: timeout exceeded when trying to connect
+at  (.next/server/chunks/5758.js:3397:136596)
+at async (.next/server/chunks/5758.js:75:23308)
+at async nF.queryWithCache (.next/server/chunks/5758.js:75:19986)
+at async (.next/server/chunks/5758.js:75:23099)
+at async Object.jC [as countDistinct] (.next/server/chunks/5758.js:52:103)
+at async iS (.next/server/chunks/5758.js:43:1200)
 at async w (.next/server/chunks/3737.js:114:16833)
-at async C (.next/server/app/api/instructor/consultation-types/route.js:1:6548) {
-length: 232,
-severity: 'ERROR',
-code: '42703',
-detail: undefined,
-hint: 'Perhaps you meant to reference the column "consultation_types_availableDays._parent_id".',
-position: '1245',
-internalPosition: undefined,
-internalQuery: undefined,
-where: undefined,
-schema: undefined,
-table: undefined,
-column: undefined,
-dataType: undefined,
-constraint: undefined,
-file: 'parse_relation.c',
-line: '3723',
-routine: 'errorMissingColumn'
 }
-}
-[api/instructor/consultation-types][GET] Error: Failed query: select "consultation_types"."id", "consultation_types"."instructor_id", "consultation_types"."title_ar", "consultation_types"."title_en", "consultation_types"."title", "consultation_types"."description_ar", "consultation_types"."description_en", "consultation_types"."description", "consultation_types"."duration_minutes", "consultation_types"."price", "consultation_types"."currency", "consultation_types"."meeting_type", "consultation_types"."meeting_platform", "consultation_types"."max_participants", "consultation_types"."is_active", "consultation_types"."buffer_before", "consultation_types"."buffer_after", "consultation_types"."max_per_day", "consultation_types"."start_time_increment", "consultation_types"."min_notice_hours", "consultation_types"."min_cancel_notice_hours", "consultation_types"."updated_at", "consultation_types"."created_at", "consultation_types_availableDays"."data" as "availableDays" from "consultation_types" "consultation_types" left join lateral (select coalesce(json_agg(json_build_array("consultation_types_availableDays"."value") order by "consultation_types_availableDays"."order" asc), '[]'::json) as "data" from (select * from "consultation_types_available_days" "consultation_types_availableDays" where "consultation_types_availableDays"."parent_id" = "consultation_types"."id" order by "consultation_types_availableDays"."order" asc) "consultation_types_availableDays") "consultation_types_availableDays" on true where "consultation_types"."instructor_id" = $1 order by "consultation_types"."updated_at" desc, "consultation_types"."created_at" desc limit $2
-params: 57,100
-at nF.queryWithCache (.next/server/chunks/6382.js:156:20011)
-at async (.next/server/chunks/6382.js:156:23099)
-at async iS (.next/server/chunks/6382.js:124:1334)
+[api/home/stats] successfulBookings query failed: Error: Failed query: select count(*) from "bookings" where "bookings"."status" in ($1, $2)
+params: confirmed,completed
+at nF.queryWithCache (.next/server/chunks/5758.js:75:20011)
+at async (.next/server/chunks/5758.js:75:23099)
+at async Object.jC [as countDistinct] (.next/server/chunks/5758.js:52:103)
+at async iS (.next/server/chunks/5758.js:43:1200)
 at async w (.next/server/chunks/3737.js:114:16833)
-at async C (.next/server/app/api/instructor/consultation-types/route.js:1:6548)
-at async k (.next/server/app/api/instructor/consultation-types/route.js:1:12029) {
-query: `select "consultation_types"."id", "consultation_types"."instructor_id", "consultation_types"."title_ar", "consultation_types"."title_en", "consultation_types"."title", "consultation_types"."description_ar", "consultation_types"."description_en", "consultation_types"."description", "consultation_types"."duration_minutes", "consultation_types"."price", "consultation_types"."currency", "consultation_types"."meeting_type", "consultation_types"."meeting_platform", "consultation_types"."max_participants", "consultation_types"."is_active", "consultation_types"."buffer_before", "consultation_types"."buffer_after", "consultation_types"."max_per_day", "consultation_types"."start_time_increment", "consultation_types"."min_notice_hours", "consultation_types"."min_cancel_notice_hours", "consultation_types"."updated_at", "consultation_types"."created_at", "consultation_types_availableDays"."data" as "availableDays" from "consultation_types" "consultation_types" left join lateral (select coalesce(json_agg(json_build_array("consultation_types_availableDays"."value") order by "consultation_types_availableDays"."order" asc), '[]'::json) as "data" from (select * from "consultation_types_available_days" "consultation_types_availableDays" where "consultation_types_availableDays"."parent_id" = "consultation_types"."id" order by "consultation_types_availableDays"."order" asc) "consultation_types_availableDays") "consultation_types_availableDays" on true where "consultation_types"."instructor_id" = $1 order by "consultation_types"."updated_at" desc, "consultation_types"."created_at" desc limit $2`,
+at async y (.next/server/app/api/home/stats/route.js:1:3658) {
+query: 'select count(*) from "bookings" where "bookings"."status" in ($1, $2)',
 params: [Array],
-[cause]: error: column consultation_types_availableDays.parent_id does not exist
-at  (.next/server/chunks/6382.js:40:136596)
-at async (.next/server/chunks/6382.js:156:23308)
-at async nF.queryWithCache (.next/server/chunks/6382.js:156:19986)
-at async (.next/server/chunks/6382.js:156:23099)
-at async iS (.next/server/chunks/6382.js:124:1334)
+[cause]: Error: timeout exceeded when trying to connect
+at  (.next/server/chunks/5758.js:3397:136596)
+at async (.next/server/chunks/5758.js:75:23308)
+at async nF.queryWithCache (.next/server/chunks/5758.js:75:19986)
+at async (.next/server/chunks/5758.js:75:23099)
+at async Object.jC [as countDistinct] (.next/server/chunks/5758.js:52:103)
+at async iS (.next/server/chunks/5758.js:43:1200)
 at async w (.next/server/chunks/3737.js:114:16833)
-at async C (.next/server/app/api/instructor/consultation-types/route.js:1:6548) {
-length: 232,
-severity: 'ERROR',
-code: '42703',
-detail: undefined,
-hint: 'Perhaps you meant to reference the column "consultation_types_availableDays._parent_id".',
-position: '1245',
-internalPosition: undefined,
-internalQuery: undefined,
-where: undefined,
-schema: undefined,
-table: undefined,
-column: undefined,
-dataType: undefined,
-constraint: undefined,
-file: 'parse_relation.c',
-line: '3723',
-routine: 'errorMissingColumn'
 }
+[api/home/stats] companies query failed: Error: Failed query: select count(*) from "companies"
+params: 
+at nF.queryWithCache (.next/server/chunks/5758.js:75:20011)
+at async (.next/server/chunks/5758.js:75:23099)
+at async Object.jC [as countDistinct] (.next/server/chunks/5758.js:52:103)
+at async iS (.next/server/chunks/5758.js:43:1200)
+at async w (.next/server/chunks/3737.js:114:16833)
+at async y (.next/server/app/api/home/stats/route.js:1:3658) {
+query: 'select count(*) from "companies"',
+params: [],
+[cause]: Error: timeout exceeded when trying to connect
+at  (.next/server/chunks/5758.js:3397:136596)
+at async (.next/server/chunks/5758.js:75:23308)
+at async nF.queryWithCache (.next/server/chunks/5758.js:75:19986)
+at async (.next/server/chunks/5758.js:75:23099)
+at async Object.jC [as countDistinct] (.next/server/chunks/5758.js:52:103)
+at async iS (.next/server/chunks/5758.js:43:1200)
+at async w (.next/server/chunks/3737.js:114:16833)
 }
-[api/instructor/consultation-types][POST] Error: Failed query: insert into "consultation_types_available_days" ("order", "parent_id", "value", "id") values ($1, $2, $3, default), ($4, $5, $6, default), ($7, $8, $9, default), ($10, $11, $12, default), ($13, $14, $15, default), ($16, $17, $18, default), ($19, $20, $21, default) returning "order", "parent_id", "value", "id"
-params: 1,10,Sunday,2,10,Monday,3,10,Tuesday,4,10,Wednesday,5,10,Thursday,6,10,Friday,7,10,Saturday
-at nF.queryWithCache (.next/server/chunks/6382.js:156:20011)
-at async (.next/server/chunks/6382.js:156:23099)
-at async Object.mm [as insert] (.next/server/chunks/6382.js:136:24052)
-at async iN (.next/server/chunks/6382.js:114:48130)
-at async Object.iO [as create] (.next/server/chunks/6382.js:114:48714)
-at async Q (.next/server/chunks/3737.js:128:18036)
-at async D (.next/server/app/api/instructor/consultation-types/route.js:1:7691) {
-query: 'insert into "consultation_types_available_days" ("order", "parent_id", "value", "id") values ($1, $2, $3, default), ($4, $5, $6, default), ($7, $8, $9, default), ($10, $11, $12, default), ($13, $14, $15, default), ($16, $17, $18, default), ($19, $20, $21, default) returning "order", "parent_id", "value", "id"',
+[api/home/stats] instructors query failed: Error: Failed query: select count(*) from "instructors" where "instructors"."is_active" = $1
+params: true
+at nF.queryWithCache (.next/server/chunks/5758.js:75:20011)
+at async (.next/server/chunks/5758.js:75:23099)
+at async Object.jC [as countDistinct] (.next/server/chunks/5758.js:52:103)
+at async iS (.next/server/chunks/5758.js:43:1200)
+at async w (.next/server/chunks/3737.js:114:16833)
+at async y (.next/server/app/api/home/stats/route.js:1:3658) {
+query: 'select count(*) from "instructors" where "instructors"."is_active" = $1',
 params: [Array],
-[cause]: error: column "order" of relation "consultation_types_available_days" does not exist
-at  (.next/server/chunks/6382.js:40:485197)
-at async (.next/server/chunks/6382.js:156:23308)
-at async nF.queryWithCache (.next/server/chunks/6382.js:156:19986)
-at async (.next/server/chunks/6382.js:156:23099)
-at async Object.mm [as insert] (.next/server/chunks/6382.js:136:24052)
-at async iN (.next/server/chunks/6382.js:114:48130)
-at async Object.iO [as create] (.next/server/chunks/6382.js:114:48714)
-at async Q (.next/server/chunks/3737.js:128:18036)
-at async D (.next/server/app/api/instructor/consultation-types/route.js:1:7691) {
-length: 151,
-severity: 'ERROR',
-code: '42703',
-detail: undefined,
-hint: undefined,
-position: '50',
-internalPosition: undefined,
-internalQuery: undefined,
-where: undefined,
-schema: undefined,
-table: undefined,
-column: undefined,
-dataType: undefined,
-constraint: undefined,
-file: 'parse_target.c',
-line: '1065',
-routine: 'checkInsertTargets'
-}
-}
-[api/instructor/availability][PUT] slot sync failed Error: Failed query: select "consultation_types"."id", "consultation_types"."instructor_id", "consultation_types"."title_ar", "consultation_types"."title_en", "consultation_types"."title", "consultation_types"."description_ar", "consultation_types"."description_en", "consultation_types"."description", "consultation_types"."duration_minutes", "consultation_types"."price", "consultation_types"."currency", "consultation_types"."meeting_type", "consultation_types"."meeting_platform", "consultation_types"."max_participants", "consultation_types"."is_active", "consultation_types"."buffer_before", "consultation_types"."buffer_after", "consultation_types"."max_per_day", "consultation_types"."start_time_increment", "consultation_types"."min_notice_hours", "consultation_types"."min_cancel_notice_hours", "consultation_types"."updated_at", "consultation_types"."created_at", "consultation_types_availableDays"."data" as "availableDays" from "consultation_types" "consultation_types" left join lateral (select coalesce(json_agg(json_build_array("consultation_types_availableDays"."value") order by "consultation_types_availableDays"."order" asc), '[]'::json) as "data" from (select * from "consultation_types_available_days" "consultation_types_availableDays" where "consultation_types_availableDays"."parent_id" = "consultation_types"."id" order by "consultation_types_availableDays"."order" asc) "consultation_types_availableDays") "consultation_types_availableDays" on true where ("consultation_types"."instructor_id" = $1 and "consultation_types"."is_active" = $2) order by "consultation_types"."created_at" desc limit $3
-params: 57,true,200
-at nF.queryWithCache (.next/server/chunks/6382.js:156:20011)
-at async (.next/server/chunks/6382.js:156:23099)
-at async iS (.next/server/chunks/6382.js:124:1334)
+[cause]: Error: timeout exceeded when trying to connect
+at  (.next/server/chunks/5758.js:3397:136596)
+at async (.next/server/chunks/5758.js:75:23308)
+at async nF.queryWithCache (.next/server/chunks/5758.js:75:19986)
+at async (.next/server/chunks/5758.js:75:23099)
+at async Object.jC [as countDistinct] (.next/server/chunks/5758.js:52:103)
+at async iS (.next/server/chunks/5758.js:43:1200)
 at async w (.next/server/chunks/3737.js:114:16833)
-at async i (.next/server/app/api/instructor/blocked-dates/[id]/route.js:1:1699)
-at async j (.next/server/app/api/instructor/blocked-dates/[id]/route.js:1:2058)
-at async F (.next/server/app/api/instructor/availability/route.js:1:4203) {
-query: `select "consultation_types"."id", "consultation_types"."instructor_id", "consultation_types"."title_ar", "consultation_types"."title_en", "consultation_types"."title", "consultation_types"."description_ar", "consultation_types"."description_en", "consultation_types"."description", "consultation_types"."duration_minutes", "consultation_types"."price", "consultation_types"."currency", "consultation_types"."meeting_type", "consultation_types"."meeting_platform", "consultation_types"."max_participants", "consultation_types"."is_active", "consultation_types"."buffer_before", "consultation_types"."buffer_after", "consultation_types"."max_per_day", "consultation_types"."start_time_increment", "consultation_types"."min_notice_hours", "consultation_types"."min_cancel_notice_hours", "consultation_types"."updated_at", "consultation_types"."created_at", "consultation_types_availableDays"."data" as "availableDays" from "consultation_types" "consultation_types" left join lateral (select coalesce(json_agg(json_build_array("consultation_types_availableDays"."value") order by "consultation_types_availableDays"."order" asc), '[]'::json) as "data" from (select * from "consultation_types_available_days" "consultation_types_availableDays" where "consultation_types_availableDays"."parent_id" = "consultation_types"."id" order by "consultation_types_availableDays"."order" asc) "consultation_types_availableDays") "consultation_types_availableDays" on true where ("consultation_types"."instructor_id" = $1 and "consultation_types"."is_active" = $2) order by "consultation_types"."created_at" desc limit $3`,
+}
+[api/upcoming-events] Error: Failed query: select count(*) from "upcoming_events_config"
+params: 
+at nF.queryWithCache (.next/server/chunks/5758.js:75:20011)
+at async (.next/server/chunks/5758.js:75:23099)
+at async Object.jC [as countDistinct] (.next/server/chunks/5758.js:52:103)
+at async iS (.next/server/chunks/5758.js:43:1200)
+at async w (.next/server/chunks/3737.js:114:16833)
+at async B.a.ttl (.next/server/app/api/upcoming-events/route.js:1:4635)
+at async i (.next/server/chunks/2193.js:3257:7535)
+at async B (.next/server/app/api/upcoming-events/route.js:1:4548) {
+query: 'select count(*) from "upcoming_events_config"',
+params: [],
+[cause]: Error: timeout exceeded when trying to connect
+at  (.next/server/chunks/5758.js:3397:136596)
+at async (.next/server/chunks/5758.js:75:23308)
+at async nF.queryWithCache (.next/server/chunks/5758.js:75:19986)
+at async (.next/server/chunks/5758.js:75:23099)
+at async Object.jC [as countDistinct] (.next/server/chunks/5758.js:52:103)
+at async iS (.next/server/chunks/5758.js:43:1200)
+at async w (.next/server/chunks/3737.js:114:16833)
+at async B.a.ttl (.next/server/app/api/upcoming-events/route.js:1:4635)
+at async i (.next/server/chunks/2193.js:3257:7535)
+at async B (.next/server/app/api/upcoming-events/route.js:1:4548)
+}
+[api/announcement-bars/active] Error: Failed query: select count(*) from "announcement_bars" where ("announcement_bars"."status" = $1 and ("announcement_bars"."start_date" is null or "announcement_bars"."start_date" <= $2) and ("announcement_bars"."end_date" is null or "announcement_bars"."end_date" >= $3))
+params: active,2026-04-18T19:15:17.685Z,2026-04-18T19:15:17.685Z
+at nF.queryWithCache (.next/server/chunks/5758.js:75:20011)
+at async (.next/server/chunks/5758.js:75:23099)
+at async Object.jC [as countDistinct] (.next/server/chunks/5758.js:52:103)
+at async iS (.next/server/chunks/5758.js:43:1200)
+at async w (.next/server/chunks/3737.js:114:16833)
+at async y (.next/server/app/api/announcement-bars/active/route.js:1:1551)
+at async k (.next/server/app/api/announcement-bars/active/route.js:1:4792) {
+query: 'select count(*) from "announcement_bars" where ("announcement_bars"."status" = $1 and ("announcement_bars"."start_date" is null or "announcement_bars"."start_date" <= $2) and ("announcement_bars"."end_date" is null or "announcement_bars"."end_date" >= $3))',
 params: [Array],
-[cause]: error: column consultation_types_availableDays.parent_id does not exist
-at  (.next/server/chunks/6382.js:40:136596)
-at async (.next/server/chunks/6382.js:156:23308)
-at async nF.queryWithCache (.next/server/chunks/6382.js:156:19986)
-at async (.next/server/chunks/6382.js:156:23099)
-at async iS (.next/server/chunks/6382.js:124:1334)
+[cause]: Error: timeout exceeded when trying to connect
+at  (.next/server/chunks/5758.js:3397:136596)
+at async (.next/server/chunks/5758.js:75:23308)
+at async nF.queryWithCache (.next/server/chunks/5758.js:75:19986)
+at async (.next/server/chunks/5758.js:75:23099)
+at async Object.jC [as countDistinct] (.next/server/chunks/5758.js:52:103)
+at async iS (.next/server/chunks/5758.js:43:1200)
 at async w (.next/server/chunks/3737.js:114:16833)
-at async i (.next/server/app/api/instructor/blocked-dates/[id]/route.js:1:1699)
-at async j (.next/server/app/api/instructor/blocked-dates/[id]/route.js:1:2058) {
-length: 232,
-severity: 'ERROR',
-code: '42703',
-detail: undefined,
-hint: 'Perhaps you meant to reference the column "consultation_types_availableDays._parent_id".',
-position: '1245',
-internalPosition: undefined,
-internalQuery: undefined,
-where: undefined,
-schema: undefined,
-table: undefined,
-column: undefined,
-dataType: undefined,
-constraint: undefined,
-file: 'parse_relation.c',
-line: '3723',
-routine: 'errorMissingColumn'
+at async y (.next/server/app/api/announcement-bars/active/route.js:1:1551)
 }
-}
-[api/instructor/consultation-types][GET] Error: Failed query: select "consultation_types"."id", "consultation_types"."instructor_id", "consultation_types"."title_ar", "consultation_types"."title_en", "consultation_types"."title", "consultation_types"."description_ar", "consultation_types"."description_en", "consultation_types"."description", "consultation_types"."duration_minutes", "consultation_types"."price", "consultation_types"."currency", "consultation_types"."meeting_type", "consultation_types"."meeting_platform", "consultation_types"."max_participants", "consultation_types"."is_active", "consultation_types"."buffer_before", "consultation_types"."buffer_after", "consultation_types"."max_per_day", "consultation_types"."start_time_increment", "consultation_types"."min_notice_hours", "consultation_types"."min_cancel_notice_hours", "consultation_types"."updated_at", "consultation_types"."created_at", "consultation_types_availableDays"."data" as "availableDays" from "consultation_types" "consultation_types" left join lateral (select coalesce(json_agg(json_build_array("consultation_types_availableDays"."value") order by "consultation_types_availableDays"."order" asc), '[]'::json) as "data" from (select * from "consultation_types_available_days" "consultation_types_availableDays" where "consultation_types_availableDays"."parent_id" = "consultation_types"."id" order by "consultation_types_availableDays"."order" asc) "consultation_types_availableDays") "consultation_types_availableDays" on true where "consultation_types"."instructor_id" = $1 order by "consultation_types"."updated_at" desc, "consultation_types"."created_at" desc limit $2
-params: 57,100
-at nF.queryWithCache (.next/server/chunks/6382.js:156:20011)
-at async (.next/server/chunks/6382.js:156:23099)
-at async iS (.next/server/chunks/6382.js:124:1334)
+[api/home/stats] completedBookings query failed: Error: Failed query: select count(*) from "bookings" where "bookings"."status" = $1
+params: completed
+at nF.queryWithCache (.next/server/chunks/5758.js:75:20011)
+at async (.next/server/chunks/5758.js:75:23099)
+at async Object.jC [as countDistinct] (.next/server/chunks/5758.js:52:103)
+at async iS (.next/server/chunks/5758.js:43:1200)
 at async w (.next/server/chunks/3737.js:114:16833)
-at async C (.next/server/app/api/instructor/consultation-types/route.js:1:6548)
-at async k (.next/server/app/api/instructor/consultation-types/route.js:1:12029) {
-query: `select "consultation_types"."id", "consultation_types"."instructor_id", "consultation_types"."title_ar", "consultation_types"."title_en", "consultation_types"."title", "consultation_types"."description_ar", "consultation_types"."description_en", "consultation_types"."description", "consultation_types"."duration_minutes", "consultation_types"."price", "consultation_types"."currency", "consultation_types"."meeting_type", "consultation_types"."meeting_platform", "consultation_types"."max_participants", "consultation_types"."is_active", "consultation_types"."buffer_before", "consultation_types"."buffer_after", "consultation_types"."max_per_day", "consultation_types"."start_time_increment", "consultation_types"."min_notice_hours", "consultation_types"."min_cancel_notice_hours", "consultation_types"."updated_at", "consultation_types"."created_at", "consultation_types_availableDays"."data" as "availableDays" from "consultation_types" "consultation_types" left join lateral (select coalesce(json_agg(json_build_array("consultation_types_availableDays"."value") order by "consultation_types_availableDays"."order" asc), '[]'::json) as "data" from (select * from "consultation_types_available_days" "consultation_types_availableDays" where "consultation_types_availableDays"."parent_id" = "consultation_types"."id" order by "consultation_types_availableDays"."order" asc) "consultation_types_availableDays") "consultation_types_availableDays" on true where "consultation_types"."instructor_id" = $1 order by "consultation_types"."updated_at" desc, "consultation_types"."created_at" desc limit $2`,
+at async y (.next/server/app/api/home/stats/route.js:1:3658) {
+query: 'select count(*) from "bookings" where "bookings"."status" = $1',
 params: [Array],
-[cause]: error: column consultation_types_availableDays.parent_id does not exist
-at  (.next/server/chunks/6382.js:40:136596)
-at async (.next/server/chunks/6382.js:156:23308)
-at async nF.queryWithCache (.next/server/chunks/6382.js:156:19986)
-at async (.next/server/chunks/6382.js:156:23099)
-at async iS (.next/server/chunks/6382.js:124:1334)
+[cause]: Error: timeout exceeded when trying to connect
+at  (.next/server/chunks/5758.js:3397:136596)
+at async (.next/server/chunks/5758.js:75:23308)
+at async nF.queryWithCache (.next/server/chunks/5758.js:75:19986)
+at async (.next/server/chunks/5758.js:75:23099)
+at async Object.jC [as countDistinct] (.next/server/chunks/5758.js:52:103)
+at async iS (.next/server/chunks/5758.js:43:1200)
 at async w (.next/server/chunks/3737.js:114:16833)
-at async C (.next/server/app/api/instructor/consultation-types/route.js:1:6548) {
-length: 232,
-severity: 'ERROR',
-code: '42703',
-detail: undefined,
-hint: 'Perhaps you meant to reference the column "consultation_types_availableDays._parent_id".',
-position: '1245',
-internalPosition: undefined,
-internalQuery: undefined,
-where: undefined,
-schema: undefined,
-table: undefined,
-column: undefined,
-dataType: undefined,
-constraint: undefined,
-file: 'parse_relation.c',
-line: '3723',
-routine: 'errorMissingColumn'
 }
-}
-[api/instructor/consultation-types][POST] Error: Failed query: insert into "consultation_types_available_days" ("order", "parent_id", "value", "id") values ($1, $2, $3, default), ($4, $5, $6, default), ($7, $8, $9, default), ($10, $11, $12, default), ($13, $14, $15, default), ($16, $17, $18, default), ($19, $20, $21, default) returning "order", "parent_id", "value", "id"
-params: 1,11,Sunday,2,11,Monday,3,11,Tuesday,4,11,Wednesday,5,11,Thursday,6,11,Friday,7,11,Saturday
-at nF.queryWithCache (.next/server/chunks/6382.js:156:20011)
-at async (.next/server/chunks/6382.js:156:23099)
-at async Object.mm [as insert] (.next/server/chunks/6382.js:136:24052)
-at async iN (.next/server/chunks/6382.js:114:48130)
-at async Object.iO [as create] (.next/server/chunks/6382.js:114:48714)
-at async Q (.next/server/chunks/3737.js:128:18036)
-at async D (.next/server/app/api/instructor/consultation-types/route.js:1:7691) {
-query: 'insert into "consultation_types_available_days" ("order", "parent_id", "value", "id") values ($1, $2, $3, default), ($4, $5, $6, default), ($7, $8, $9, default), ($10, $11, $12, default), ($13, $14, $15, default), ($16, $17, $18, default), ($19, $20, $21, default) returning "order", "parent_id", "value", "id"',
+[api/home/stats] successfulBookings query failed: Error: Failed query: select count(*) from "bookings" where "bookings"."status" in ($1, $2)
+params: confirmed,completed
+at nF.queryWithCache (.next/server/chunks/5758.js:75:20011)
+at async (.next/server/chunks/5758.js:75:23099)
+at async Object.jC [as countDistinct] (.next/server/chunks/5758.js:52:103)
+at async iS (.next/server/chunks/5758.js:43:1200)
+at async w (.next/server/chunks/3737.js:114:16833)
+at async y (.next/server/app/api/home/stats/route.js:1:3658) {
+query: 'select count(*) from "bookings" where "bookings"."status" in ($1, $2)',
 params: [Array],
-[cause]: error: column "order" of relation "consultation_types_available_days" does not exist
-at  (.next/server/chunks/6382.js:40:485197)
-at async (.next/server/chunks/6382.js:156:23308)
-at async nF.queryWithCache (.next/server/chunks/6382.js:156:19986)
-at async (.next/server/chunks/6382.js:156:23099)
-at async Object.mm [as insert] (.next/server/chunks/6382.js:136:24052)
-at async iN (.next/server/chunks/6382.js:114:48130)
-at async Object.iO [as create] (.next/server/chunks/6382.js:114:48714)
-at async Q (.next/server/chunks/3737.js:128:18036)
-at async D (.next/server/app/api/instructor/consultation-types/route.js:1:7691) {
-length: 151,
-severity: 'ERROR',
-code: '42703',
-detail: undefined,
-hint: undefined,
-position: '50',
-internalPosition: undefined,
-internalQuery: undefined,
-where: undefined,
-schema: undefined,
-table: undefined,
-column: undefined,
-dataType: undefined,
-constraint: undefined,
-file: 'parse_target.c',
-line: '1065',
-routine: 'checkInsertTargets'
-}
-}
-⨯ Error: Failed query: select "consultation_types"."id", "consultation_types"."instructor_id", "consultation_types"."title_ar", "consultation_types"."title_en", "consultation_types"."title", "consultation_types"."description_ar", "consultation_types"."description_en", "consultation_types"."description", "consultation_types"."duration_minutes", "consultation_types"."price", "consultation_types"."currency", "consultation_types"."meeting_type", "consultation_types"."meeting_platform", "consultation_types"."max_participants", "consultation_types"."is_active", "consultation_types"."buffer_before", "consultation_types"."buffer_after", "consultation_types"."max_per_day", "consultation_types"."start_time_increment", "consultation_types"."min_notice_hours", "consultation_types"."min_cancel_notice_hours", "consultation_types"."updated_at", "consultation_types"."created_at", "consultation_types_availableDays"."data" as "availableDays" from "consultation_types" "consultation_types" left join lateral (select coalesce(json_agg(json_build_array("consultation_types_availableDays"."value") order by "consultation_types_availableDays"."order" asc), '[]'::json) as "data" from (select * from "consultation_types_available_days" "consultation_types_availableDays" where "consultation_types_availableDays"."parent_id" = "consultation_types"."id" order by "consultation_types_availableDays"."order" asc) "consultation_types_availableDays") "consultation_types_availableDays" on true where ("consultation_types"."instructor_id" = $1 and "consultation_types"."is_active" = $2) order by "consultation_types"."created_at" desc limit $3
-params: 47,true,50
-at nF.queryWithCache (.next/server/chunks/6382.js:156:20011)
-at async (.next/server/chunks/6382.js:156:23099)
-at async iS (.next/server/chunks/6382.js:124:1334)
+[cause]: Error: timeout exceeded when trying to connect
+at  (.next/server/chunks/5758.js:3397:136596)
+at async (.next/server/chunks/5758.js:75:23308)
+at async nF.queryWithCache (.next/server/chunks/5758.js:75:19986)
+at async (.next/server/chunks/5758.js:75:23099)
+at async Object.jC [as countDistinct] (.next/server/chunks/5758.js:52:103)
+at async iS (.next/server/chunks/5758.js:43:1200)
 at async w (.next/server/chunks/3737.js:114:16833)
-at async I (.next/server/app/[locale]/instructors/[slug]/page.js:1:81031) {
-query: `select "consultation_types"."id", "consultation_types"."instructor_id", "consultation_types"."title_ar", "consultation_types"."title_en", "consultation_types"."title", "consultation_types"."description_ar", "consultation_types"."description_en", "consultation_types"."description", "consultation_types"."duration_minutes", "consultation_types"."price", "consultation_types"."currency", "consultation_types"."meeting_type", "consultation_types"."meeting_platform", "consultation_types"."max_participants", "consultation_types"."is_active", "consultation_types"."buffer_before", "consultation_types"."buffer_after", "consultation_types"."max_per_day", "consultation_types"."start_time_increment", "consultation_types"."min_notice_hours", "consultation_types"."min_cancel_notice_hours", "consultation_types"."updated_at", "consultation_types"."created_at", "consultation_types_availableDays"."data" as "availableDays" from "consultation_types" "consultation_types" left join lateral (select coalesce(json_agg(json_build_array("consultation_types_availableDays"."value") order by "consultation_types_availableDays"."order" asc), '[]'::json) as "data" from (select * from "consultation_types_available_days" "consultation_types_availableDays" where "consultation_types_availableDays"."parent_id" = "consultation_types"."id" order by "consultation_types_availableDays"."order" asc) "consultation_types_availableDays") "consultation_types_availableDays" on true where ("consultation_types"."instructor_id" = $1 and "consultation_types"."is_active" = $2) order by "consultation_types"."created_at" desc limit $3`,
+}
+[api/home/stats] companies query failed: Error: Failed query: select count(*) from "companies"
+params: 
+at nF.queryWithCache (.next/server/chunks/5758.js:75:20011)
+at async (.next/server/chunks/5758.js:75:23099)
+at async Object.jC [as countDistinct] (.next/server/chunks/5758.js:52:103)
+at async iS (.next/server/chunks/5758.js:43:1200)
+at async w (.next/server/chunks/3737.js:114:16833)
+at async y (.next/server/app/api/home/stats/route.js:1:3658) {
+query: 'select count(*) from "companies"',
+params: [],
+[cause]: Error: timeout exceeded when trying to connect
+at  (.next/server/chunks/5758.js:3397:136596)
+at async (.next/server/chunks/5758.js:75:23308)
+at async nF.queryWithCache (.next/server/chunks/5758.js:75:19986)
+at async (.next/server/chunks/5758.js:75:23099)
+at async Object.jC [as countDistinct] (.next/server/chunks/5758.js:52:103)
+at async iS (.next/server/chunks/5758.js:43:1200)
+at async w (.next/server/chunks/3737.js:114:16833)
+}
+[api/home/stats] instructors query failed: Error: Failed query: select count(*) from "instructors" where "instructors"."is_active" = $1
+params: true
+at nF.queryWithCache (.next/server/chunks/5758.js:75:20011)
+at async (.next/server/chunks/5758.js:75:23099)
+at async Object.jC [as countDistinct] (.next/server/chunks/5758.js:52:103)
+at async iS (.next/server/chunks/5758.js:43:1200)
+at async w (.next/server/chunks/3737.js:114:16833)
+at async y (.next/server/app/api/home/stats/route.js:1:3658)
+at async k (.next/server/app/api/home/stats/route.js:1:7130) {
+query: 'select count(*) from "instructors" where "instructors"."is_active" = $1',
 params: [Array],
-digest: '568926010',
-[cause]: error: column consultation_types_availableDays.parent_id does not exist
-at  (.next/server/chunks/6382.js:40:136596)
-at async (.next/server/chunks/6382.js:156:23308)
-at async nF.queryWithCache (.next/server/chunks/6382.js:156:19986)
-at async (.next/server/chunks/6382.js:156:23099)
-at async iS (.next/server/chunks/6382.js:124:1334)
+[cause]: Error: timeout exceeded when trying to connect
+at  (.next/server/chunks/5758.js:3397:136596)
+at async (.next/server/chunks/5758.js:75:23308)
+at async nF.queryWithCache (.next/server/chunks/5758.js:75:19986)
+at async (.next/server/chunks/5758.js:75:23099)
+at async Object.jC [as countDistinct] (.next/server/chunks/5758.js:52:103)
+at async iS (.next/server/chunks/5758.js:43:1200)
 at async w (.next/server/chunks/3737.js:114:16833)
-at async I (.next/server/app/[locale]/instructors/[slug]/page.js:1:81031) {
-length: 232,
-severity: 'ERROR',
-code: '42703',
-detail: undefined,
-hint: 'Perhaps you meant to reference the column "consultation_types_availableDays._parent_id".',
-position: '1245',
-internalPosition: undefined,
-internalQuery: undefined,
-where: undefined,
-schema: undefined,
-table: undefined,
-column: undefined,
-dataType: undefined,
-constraint: undefined,
-file: 'parse_relation.c',
-line: '3723',
-routine: 'errorMissingColumn'
+at async y (.next/server/app/api/home/stats/route.js:1:3658)
 }
+[api/home/featured-programs] Failed to fetch cards: Error: Failed query: select count(*) from "programs" where ("programs"."is_active" = $1 and "programs"."is_featured" = $2)
+params: true,true
+at nF.queryWithCache (.next/server/chunks/5758.js:75:20011)
+at async (.next/server/chunks/5758.js:75:23099)
+at async Object.jC [as countDistinct] (.next/server/chunks/5758.js:52:103)
+at async iS (.next/server/chunks/5758.js:43:1200)
+at async w (.next/server/chunks/3737.js:114:16833)
+at async E.g.ttl (.next/server/app/api/home/featured-programs/route.js:1:5840)
+at async i (.next/server/chunks/2193.js:3257:7535)
+at async E (.next/server/app/api/home/featured-programs/route.js:1:5774) {
+query: 'select count(*) from "programs" where ("programs"."is_active" = $1 and "programs"."is_featured" = $2)',
+params: [Array],
+[cause]: Error: timeout exceeded when trying to connect
+at  (.next/server/chunks/5758.js:3397:136596)
+at async (.next/server/chunks/5758.js:75:23308)
+at async nF.queryWithCache (.next/server/chunks/5758.js:75:19986)
+at async (.next/server/chunks/5758.js:75:23099)
+at async Object.jC [as countDistinct] (.next/server/chunks/5758.js:52:103)
+at async iS (.next/server/chunks/5758.js:43:1200)
+at async w (.next/server/chunks/3737.js:114:16833)
+at async E.g.ttl (.next/server/app/api/home/featured-programs/route.js:1:5840)
+at async i (.next/server/chunks/2193.js:3257:7535)
+at async E (.next/server/app/api/home/featured-programs/route.js:1:5774)
 }
-params: 57,50
-at nF.queryWithCache (/app/.next/server/chunks/6382.js:156:20011)
-at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
-at async /app/.next/server/chunks/6382.js:156:23099
-at async iS (/app/.next/server/chunks/6382.js:124:1334)
+[api/upcoming-events] Error: Failed query: select count(*) from "upcoming_events_config"
+params: 
+at nF.queryWithCache (.next/server/chunks/5758.js:75:20011)
+at async (.next/server/chunks/5758.js:75:23099)
+at async Object.jC [as countDistinct] (.next/server/chunks/5758.js:52:103)
+at async iS (.next/server/chunks/5758.js:43:1200)
+at async w (.next/server/chunks/3737.js:114:16833)
+at async B.a.ttl (.next/server/app/api/upcoming-events/route.js:1:4635)
+at async i (.next/server/chunks/2193.js:3257:7535)
+at async B (.next/server/app/api/upcoming-events/route.js:1:4548) {
+query: 'select count(*) from "upcoming_events_config"',
+params: [],
+[cause]: Error: timeout exceeded when trying to connect
+at  (.next/server/chunks/5758.js:3397:136596)
+at async (.next/server/chunks/5758.js:75:23308)
+at async nF.queryWithCache (.next/server/chunks/5758.js:75:19986)
+at async (.next/server/chunks/5758.js:75:23099)
+at async Object.jC [as countDistinct] (.next/server/chunks/5758.js:52:103)
+at async iS (.next/server/chunks/5758.js:43:1200)
+at async w (.next/server/chunks/3737.js:114:16833)
+at async B.a.ttl (.next/server/app/api/upcoming-events/route.js:1:4635)
+at async i (.next/server/chunks/2193.js:3257:7535)
+at async B (.next/server/app/api/upcoming-events/route.js:1:4548)
+}
+⨯ Error: Failed query: select count(*) from "categories" where "categories"."is_active" = $1
+params: true
+at nF.queryWithCache (.next/server/chunks/5758.js:75:20011)
+at async (.next/server/chunks/5758.js:75:23099)
+at async Object.jC [as countDistinct] (.next/server/chunks/5758.js:52:103)
+at async iS (.next/server/chunks/5758.js:43:1200)
+at async w (.next/server/chunks/3737.js:114:16833)
+at async z (.next/server/chunks/1207.js:1:4633) {
+query: 'select count(*) from "categories" where "categories"."is_active" = $1',
+params: [Array],
+digest: '4250279620',
+[cause]: Error: timeout exceeded when trying to connect
+at  (.next/server/chunks/5758.js:3397:136596)
+at async (.next/server/chunks/5758.js:75:23308)
+at async nF.queryWithCache (.next/server/chunks/5758.js:75:19986)
+at async (.next/server/chunks/5758.js:75:23099)
+at async Object.jC [as countDistinct] (.next/server/chunks/5758.js:52:103)
+at async iS (.next/server/chunks/5758.js:43:1200)
+at async w (.next/server/chunks/3737.js:114:16833)
+at async z (.next/server/chunks/1207.js:1:4633)
+}
+[api/announcement-bars/active] Error: Failed query: select count(*) from "announcement_bars" where ("announcement_bars"."status" = $1 and ("announcement_bars"."start_date" is null or "announcement_bars"."start_date" <= $2) and ("announcement_bars"."end_date" is null or "announcement_bars"."end_date" >= $3))
+params: active,2026-04-18T19:15:21.844Z,2026-04-18T19:15:21.844Z
+at nF.queryWithCache (.next/server/chunks/5758.js:75:20011)
+at async (.next/server/chunks/5758.js:75:23099)
+at async Object.jC [as countDistinct] (.next/server/chunks/5758.js:52:103)
+at async iS (.next/server/chunks/5758.js:43:1200)
+at async w (.next/server/chunks/3737.js:114:16833)
+at async y (.next/server/app/api/announcement-bars/active/route.js:1:1551)
+at async k (.next/server/app/api/announcement-bars/active/route.js:1:4792) {
+query: 'select count(*) from "announcement_bars" where ("announcement_bars"."status" = $1 and ("announcement_bars"."start_date" is null or "announcement_bars"."start_date" <= $2) and ("announcement_bars"."end_date" is null or "announcement_bars"."end_date" >= $3))',
+params: [Array],
+[cause]: Error: timeout exceeded when trying to connect
+at  (.next/server/chunks/5758.js:3397:136596)
+at async (.next/server/chunks/5758.js:75:23308)
+at async nF.queryWithCache (.next/server/chunks/5758.js:75:19986)
+at async (.next/server/chunks/5758.js:75:23099)
+at async Object.jC [as countDistinct] (.next/server/chunks/5758.js:52:103)
+at async iS (.next/server/chunks/5758.js:43:1200)
+at async w (.next/server/chunks/3737.js:114:16833)
+at async y (.next/server/app/api/announcement-bars/active/route.js:1:1551)
+}
+[api/announcement-bars/active] Error: Failed query: select count(*) from "announcement_bars" where ("announcement_bars"."status" = $1 and ("announcement_bars"."start_date" is null or "announcement_bars"."start_date" <= $2) and ("announcement_bars"."end_date" is null or "announcement_bars"."end_date" >= $3))
+params: active,2026-04-18T19:15:23.654Z,2026-04-18T19:15:23.654Z
+at nF.queryWithCache (.next/server/chunks/5758.js:75:20011)
+at async (.next/server/chunks/5758.js:75:23099)
+at async Object.jC [as countDistinct] (.next/server/chunks/5758.js:52:103)
+at async iS (.next/server/chunks/5758.js:43:1200)
+at async w (.next/server/chunks/3737.js:114:16833)
+at async y (.next/server/app/api/announcement-bars/active/route.js:1:1551)
+at async k (.next/server/app/api/announcement-bars/active/route.js:1:4792) {
+query: 'select count(*) from "announcement_bars" where ("announcement_bars"."status" = $1 and ("announcement_bars"."start_date" is null or "announcement_bars"."start_date" <= $2) and ("announcement_bars"."end_date" is null or "announcement_bars"."end_date" >= $3))',
+params: [Array],
+[cause]: Error: timeout exceeded when trying to connect
+at  (.next/server/chunks/5758.js:3397:136596)
+at async (.next/server/chunks/5758.js:75:23308)
+at async nF.queryWithCache (.next/server/chunks/5758.js:75:19986)
+at async (.next/server/chunks/5758.js:75:23099)
+at async Object.jC [as countDistinct] (.next/server/chunks/5758.js:52:103)
+at async iS (.next/server/chunks/5758.js:43:1200)
+at async w (.next/server/chunks/3737.js:114:16833)
+at async y (.next/server/app/api/announcement-bars/active/route.js:1:1551)
+}
+[api/home/featured-programs] Failed to fetch cards: Error: Failed query: select count(*) from "programs" where ("programs"."is_active" = $1 and "programs"."is_featured" = $2)
+params: true,true
+at nF.queryWithCache (.next/server/chunks/5758.js:75:20011)
+at async (.next/server/chunks/5758.js:75:23099)
+at async Object.jC [as countDistinct] (.next/server/chunks/5758.js:52:103)
+at async iS (.next/server/chunks/5758.js:43:1200)
+at async w (.next/server/chunks/3737.js:114:16833)
+at async E.g.ttl (.next/server/app/api/home/featured-programs/route.js:1:5840)
+at async i (.next/server/chunks/2193.js:3257:7535) {
+query: 'select count(*) from "programs" where ("programs"."is_active" = $1 and "programs"."is_featured" = $2)',
+params: [Array],
+[cause]: Error: timeout exceeded when trying to connect
+at  (.next/server/chunks/5758.js:3397:136596)
+at async (.next/server/chunks/5758.js:75:23308)
+at async nF.queryWithCache (.next/server/chunks/5758.js:75:19986)
+at async (.next/server/chunks/5758.js:75:23099)
+at async Object.jC [as countDistinct] (.next/server/chunks/5758.js:52:103)
+at async iS (.next/server/chunks/5758.js:43:1200)
+at async w (.next/server/chunks/3737.js:114:16833)
+}
+[api/home/stats] completedBookings query failed: Error: Failed query: select count(*) from "bookings" where "bookings"."status" = $1
+params: completed
+at nF.queryWithCache (.next/server/chunks/5758.js:75:20011)
+at async (.next/server/chunks/5758.js:75:23099)
+at async Object.jC [as countDistinct] (.next/server/chunks/5758.js:52:103)
+at async iS (.next/server/chunks/5758.js:43:1200)
+at async w (.next/server/chunks/3737.js:114:16833)
+at async y (.next/server/app/api/home/stats/route.js:1:3658) {
+query: 'select count(*) from "bookings" where "bookings"."status" = $1',
+params: [Array],
+[cause]: Error: timeout exceeded when trying to connect
+at  (.next/server/chunks/5758.js:3397:136596)
+at async (.next/server/chunks/5758.js:75:23308)
+at async nF.queryWithCache (.next/server/chunks/5758.js:75:19986)
+at async (.next/server/chunks/5758.js:75:23099)
+at async Object.jC [as countDistinct] (.next/server/chunks/5758.js:52:103)
+at async iS (.next/server/chunks/5758.js:43:1200)
+at async w (.next/server/chunks/3737.js:114:16833)
+}
+[api/home/stats] successfulBookings query failed: Error: Failed query: select count(*) from "bookings" where "bookings"."status" in ($1, $2)
+params: confirmed,completed
+at nF.queryWithCache (.next/server/chunks/5758.js:75:20011)
+at async (.next/server/chunks/5758.js:75:23099)
+at async Object.jC [as countDistinct] (.next/server/chunks/5758.js:52:103)
+at async iS (.next/server/chunks/5758.js:43:1200)
+at async w (.next/server/chunks/3737.js:114:16833)
+at async y (.next/server/app/api/home/stats/route.js:1:3658) {
+query: 'select count(*) from "bookings" where "bookings"."status" in ($1, $2)',
+params: [Array],
+[cause]: Error: timeout exceeded when trying to connect
+at  (.next/server/chunks/5758.js:3397:136596)
+at async (.next/server/chunks/5758.js:75:23308)
+at async nF.queryWithCache (.next/server/chunks/5758.js:75:19986)
+at async (.next/server/chunks/5758.js:75:23099)
+at async Object.jC [as countDistinct] (.next/server/chunks/5758.js:52:103)
+at async iS (.next/server/chunks/5758.js:43:1200)
+at async w (.next/server/chunks/3737.js:114:16833)
+}
+[api/home/stats] companies query failed: Error: Failed query: select count(*) from "companies"
+params: 
+at nF.queryWithCache (.next/server/chunks/5758.js:75:20011)
+at async (.next/server/chunks/5758.js:75:23099)
+at async Object.jC [as countDistinct] (.next/server/chunks/5758.js:52:103)
+at async iS (.next/server/chunks/5758.js:43:1200)
+at async w (.next/server/chunks/3737.js:114:16833)
+at async y (.next/server/app/api/home/stats/route.js:1:3658) {
+query: 'select count(*) from "companies"',
+params: [],
+[cause]: Error: timeout exceeded when trying to connect
+at  (.next/server/chunks/5758.js:3397:136596)
+at async (.next/server/chunks/5758.js:75:23308)
+at async nF.queryWithCache (.next/server/chunks/5758.js:75:19986)
+at async (.next/server/chunks/5758.js:75:23099)
+at async Object.jC [as countDistinct] (.next/server/chunks/5758.js:52:103)
+at async iS (.next/server/chunks/5758.js:43:1200)
+at async w (.next/server/chunks/3737.js:114:16833)
+}
+[api/home/stats] instructors query failed: Error: Failed query: select count(*) from "instructors" where "instructors"."is_active" = $1
+params: true
+at nF.queryWithCache (.next/server/chunks/5758.js:75:20011)
+at async (.next/server/chunks/5758.js:75:23099)
+at async Object.jC [as countDistinct] (.next/server/chunks/5758.js:52:103)
+at async iS (.next/server/chunks/5758.js:43:1200)
+at async w (.next/server/chunks/3737.js:114:16833)
+at async y (.next/server/app/api/home/stats/route.js:1:3658)
+at async k (.next/server/app/api/home/stats/route.js:1:7130) {
+query: 'select count(*) from "instructors" where "instructors"."is_active" = $1',
+params: [Array],
+[cause]: Error: timeout exceeded when trying to connect
+at  (.next/server/chunks/5758.js:3397:136596)
+at async (.next/server/chunks/5758.js:75:23308)
+at async nF.queryWithCache (.next/server/chunks/5758.js:75:19986)
+at async (.next/server/chunks/5758.js:75:23099)
+at async Object.jC [as countDistinct] (.next/server/chunks/5758.js:52:103)
+at async iS (.next/server/chunks/5758.js:43:1200)
+at async w (.next/server/chunks/3737.js:114:16833)
+at async y (.next/server/app/api/home/stats/route.js:1:3658)
+}
+[api/upcoming-events] Error: Failed query: select count(*) from "upcoming_events_config"
+params: 
+at nF.queryWithCache (.next/server/chunks/5758.js:75:20011)
+at async (.next/server/chunks/5758.js:75:23099)
+at async Object.jC [as countDistinct] (.next/server/chunks/5758.js:52:103)
+at async iS (.next/server/chunks/5758.js:43:1200)
+at async w (.next/server/chunks/3737.js:114:16833)
+at async B.a.ttl (.next/server/app/api/upcoming-events/route.js:1:4635)
+at async i (.next/server/chunks/2193.js:3257:7535) {
+query: 'select count(*) from "upcoming_events_config"',
+params: [],
+[cause]: Error: timeout exceeded when trying to connect
+at  (.next/server/chunks/5758.js:3397:136596)
+at async (.next/server/chunks/5758.js:75:23308)
+at async nF.queryWithCache (.next/server/chunks/5758.js:75:19986)
+at async (.next/server/chunks/5758.js:75:23099)
+at async Object.jC [as countDistinct] (.next/server/chunks/5758.js:52:103)
+at async iS (.next/server/chunks/5758.js:43:1200)
+at async w (.next/server/chunks/3737.js:114:16833)
+}
+[api/announcement-bars/active] Error: Failed query: select count(*) from "announcement_bars" where ("announcement_bars"."status" = $1 and ("announcement_bars"."start_date" is null or "announcement_bars"."start_date" <= $2) and ("announcement_bars"."end_date" is null or "announcement_bars"."end_date" >= $3))
+params: active,2026-04-18T19:15:30.193Z,2026-04-18T19:15:30.193Z
+at nF.queryWithCache (.next/server/chunks/5758.js:75:20011)
+at async (.next/server/chunks/5758.js:75:23099)
+at async Object.jC [as countDistinct] (.next/server/chunks/5758.js:52:103)
+at async iS (.next/server/chunks/5758.js:43:1200)
+at async w (.next/server/chunks/3737.js:114:16833)
+at async y (.next/server/app/api/announcement-bars/active/route.js:1:1551)
+at async k (.next/server/app/api/announcement-bars/active/route.js:1:4792) {
+query: 'select count(*) from "announcement_bars" where ("announcement_bars"."status" = $1 and ("announcement_bars"."start_date" is null or "announcement_bars"."start_date" <= $2) and ("announcement_bars"."end_date" is null or "announcement_bars"."end_date" >= $3))',
+params: [Array],
+[cause]: Error: timeout exceeded when trying to connect
+at  (.next/server/chunks/5758.js:3397:136596)
+at async (.next/server/chunks/5758.js:75:23308)
+at async nF.queryWithCache (.next/server/chunks/5758.js:75:19986)
+at async (.next/server/chunks/5758.js:75:23099)
+at async Object.jC [as countDistinct] (.next/server/chunks/5758.js:52:103)
+at async iS (.next/server/chunks/5758.js:43:1200)
+at async w (.next/server/chunks/3737.js:114:16833)
+at async y (.next/server/app/api/announcement-bars/active/route.js:1:1551)
+}
+[api/popups/active] Error: Failed query: select count(*) from "popups" where ("popups"."status" = $1 and ("popups"."start_date" is null or "popups"."start_date" <= $2) and ("popups"."end_date" is null or "popups"."end_date" >= $3))
+params: active,2026-04-18T19:15:57.765Z,2026-04-18T19:15:57.765Z
+at nF.queryWithCache (.next/server/chunks/5758.js:75:20011)
+at async (.next/server/chunks/5758.js:75:23099)
+at async Object.jC [as countDistinct] (.next/server/chunks/5758.js:52:103)
+at async iS (.next/server/chunks/5758.js:43:1200)
+at async w (.next/server/chunks/3737.js:114:16833)
+at async B (.next/server/app/api/popups/active/route.js:1:6679)
+at async k (.next/server/app/api/popups/active/route.js:1:10539) {
+query: 'select count(*) from "popups" where ("popups"."status" = $1 and ("popups"."start_date" is null or "popups"."start_date" <= $2) and ("popups"."end_date" is null or "popups"."end_date" >= $3))',
+params: [Array],
+[cause]: Error: timeout exceeded when trying to connect
+at  (.next/server/chunks/5758.js:3397:136596)
+at async (.next/server/chunks/5758.js:75:23308)
+at async nF.queryWithCache (.next/server/chunks/5758.js:75:19986)
+at async (.next/server/chunks/5758.js:75:23099)
+at async Object.jC [as countDistinct] (.next/server/chunks/5758.js:52:103)
+at async iS (.next/server/chunks/5758.js:43:1200)
+at async w (.next/server/chunks/3737.js:114:16833)
+at async B (.next/server/app/api/popups/active/route.js:1:6679)
+}
+[api/popups/active] Error: Failed query: select count(*) from "popups" where ("popups"."status" = $1 and ("popups"."start_date" is null or "popups"."start_date" <= $2) and ("popups"."end_date" is null or "popups"."end_date" >= $3))
+params: active,2026-04-18T19:16:02.005Z,2026-04-18T19:16:02.005Z
+at nF.queryWithCache (.next/server/chunks/5758.js:75:20011)
+at async (.next/server/chunks/5758.js:75:23099)
+at async Object.jC [as countDistinct] (.next/server/chunks/5758.js:52:103)
+at async iS (.next/server/chunks/5758.js:43:1200)
+at async w (.next/server/chunks/3737.js:114:16833)
+at async B (.next/server/app/api/popups/active/route.js:1:6679)
+at async k (.next/server/app/api/popups/active/route.js:1:10539) {
+query: 'select count(*) from "popups" where ("popups"."status" = $1 and ("popups"."start_date" is null or "popups"."start_date" <= $2) and ("popups"."end_date" is null or "popups"."end_date" >= $3))',
+params: [Array],
+[cause]: Error: timeout exceeded when trying to connect
+at  (.next/server/chunks/5758.js:3397:136596)
+at async (.next/server/chunks/5758.js:75:23308)
+at async nF.queryWithCache (.next/server/chunks/5758.js:75:19986)
+at async (.next/server/chunks/5758.js:75:23099)
+at async Object.jC [as countDistinct] (.next/server/chunks/5758.js:52:103)
+at async iS (.next/server/chunks/5758.js:43:1200)
+at async w (.next/server/chunks/3737.js:114:16833)
+at async B (.next/server/app/api/popups/active/route.js:1:6679)
+}
+[api/popups/active] Error: Failed query: select count(*) from "popups" where ("popups"."status" = $1 and ("popups"."start_date" is null or "popups"."start_date" <= $2) and ("popups"."end_date" is null or "popups"."end_date" >= $3))
+params: active,2026-04-18T19:16:03.783Z,2026-04-18T19:16:03.783Z
+at nF.queryWithCache (.next/server/chunks/5758.js:75:20011)
+at async (.next/server/chunks/5758.js:75:23099)
+at async Object.jC [as countDistinct] (.next/server/chunks/5758.js:52:103)
+at async iS (.next/server/chunks/5758.js:43:1200)
+at async w (.next/server/chunks/3737.js:114:16833)
+at async B (.next/server/app/api/popups/active/route.js:1:6679)
+at async k (.next/server/app/api/popups/active/route.js:1:10539) {
+query: 'select count(*) from "popups" where ("popups"."status" = $1 and ("popups"."start_date" is null or "popups"."start_date" <= $2) and ("popups"."end_date" is null or "popups"."end_date" >= $3))',
+params: [Array],
+[cause]: Error: timeout exceeded when trying to connect
+at  (.next/server/chunks/5758.js:3397:136596)
+at async (.next/server/chunks/5758.js:75:23308)
+at async nF.queryWithCache (.next/server/chunks/5758.js:75:19986)
+at async (.next/server/chunks/5758.js:75:23099)
+at async Object.jC [as countDistinct] (.next/server/chunks/5758.js:52:103)
+at async iS (.next/server/chunks/5758.js:43:1200)
+at async w (.next/server/chunks/3737.js:114:16833)
+at async B (.next/server/app/api/popups/active/route.js:1:6679)
+}
+[api/popups/active] Error: Failed query: select count(*) from "popups" where ("popups"."status" = $1 and ("popups"."start_date" is null or "popups"."start_date" <= $2) and ("popups"."end_date" is null or "popups"."end_date" >= $3))
+params: active,2026-04-18T19:16:10.296Z,2026-04-18T19:16:10.296Z
+at nF.queryWithCache (.next/server/chunks/5758.js:75:20011)
+at async (.next/server/chunks/5758.js:75:23099)
+at async Object.jC [as countDistinct] (.next/server/chunks/5758.js:52:103)
+at async iS (.next/server/chunks/5758.js:43:1200)
+at async w (.next/server/chunks/3737.js:114:16833)
+at async B (.next/server/app/api/popups/active/route.js:1:6679)
+at async k (.next/server/app/api/popups/active/route.js:1:10539) {
+query: 'select count(*) from "popups" where ("popups"."status" = $1 and ("popups"."start_date" is null or "popups"."start_date" <= $2) and ("popups"."end_date" is null or "popups"."end_date" >= $3))',
+params: [Array],
+[cause]: Error: timeout exceeded when trying to connect
+at  (.next/server/chunks/5758.js:3397:136596)
+at async (.next/server/chunks/5758.js:75:23308)
+at async nF.queryWithCache (.next/server/chunks/5758.js:75:19986)
+at async (.next/server/chunks/5758.js:75:23099)
+at async Object.jC [as countDistinct] (.next/server/chunks/5758.js:52:103)
+at async iS (.next/server/chunks/5758.js:43:1200)
+at async w (.next/server/chunks/3737.js:114:16833)
+at async B (.next/server/app/api/popups/active/route.js:1:6679)
+}
+[api/home/featured-programs] Failed to fetch cards: Error: Failed query: select count(*) from "programs" where ("programs"."is_active" = $1 and "programs"."is_featured" = $2)
+params: true,true
+at nF.queryWithCache (.next/server/chunks/5758.js:75:20011)
+at async (.next/server/chunks/5758.js:75:23099)
+at async Object.jC [as countDistinct] (.next/server/chunks/5758.js:52:103)
+at async iS (.next/server/chunks/5758.js:43:1200)
+at async w (.next/server/chunks/3737.js:114:16833)
+at async E.g.ttl (.next/server/app/api/home/featured-programs/route.js:1:5840)
+at async i (.next/server/chunks/2193.js:3257:7535)
+at async E (.next/server/app/api/home/featured-programs/route.js:1:5774) {
+query: 'select count(*) from "programs" where ("programs"."is_active" = $1 and "programs"."is_featured" = $2)',
+params: [Array],
+[cause]: Error: timeout exceeded when trying to connect
+at  (.next/server/chunks/5758.js:3397:136596)
+at async (.next/server/chunks/5758.js:75:23308)
+at async nF.queryWithCache (.next/server/chunks/5758.js:75:19986)
+at async (.next/server/chunks/5758.js:75:23099)
+at async Object.jC [as countDistinct] (.next/server/chunks/5758.js:52:103)
+at async iS (.next/server/chunks/5758.js:43:1200)
+at async w (.next/server/chunks/3737.js:114:16833)
+at async E.g.ttl (.next/server/app/api/home/featured-programs/route.js:1:5840)
+at async i (.next/server/chunks/2193.js:3257:7535)
+at async E (.next/server/app/api/home/featured-programs/route.js:1:5774)
+}
+[api/home/stats] completedBookings query failed: Error: Failed query: select count(*) from "bookings" where "bookings"."status" = $1
+params: completed
+at nF.queryWithCache (.next/server/chunks/5758.js:75:20011)
+at async (.next/server/chunks/5758.js:75:23099)
+at async Object.jC [as countDistinct] (.next/server/chunks/5758.js:52:103)
+at async iS (.next/server/chunks/5758.js:43:1200)
+at async w (.next/server/chunks/3737.js:114:16833)
+at async y (.next/server/app/api/home/stats/route.js:1:3658) {
+query: 'select count(*) from "bookings" where "bookings"."status" = $1',
+params: [Array],
+[cause]: Error: timeout exceeded when trying to connect
+at  (.next/server/chunks/5758.js:3397:136596)
+at async (.next/server/chunks/5758.js:75:23308)
+at async nF.queryWithCache (.next/server/chunks/5758.js:75:19986)
+at async (.next/server/chunks/5758.js:75:23099)
+at async Object.jC [as countDistinct] (.next/server/chunks/5758.js:52:103)
+at async iS (.next/server/chunks/5758.js:43:1200)
+at async w (.next/server/chunks/3737.js:114:16833)
+}
+[api/home/stats] successfulBookings query failed: Error: Failed query: select count(*) from "bookings" where "bookings"."status" in ($1, $2)
+params: confirmed,completed
+at nF.queryWithCache (.next/server/chunks/5758.js:75:20011)
+at async (.next/server/chunks/5758.js:75:23099)
+at async Object.jC [as countDistinct] (.next/server/chunks/5758.js:52:103)
+at async iS (.next/server/chunks/5758.js:43:1200)
+at async w (.next/server/chunks/3737.js:114:16833)
+at async y (.next/server/app/api/home/stats/route.js:1:3658) {
+query: 'select count(*) from "bookings" where "bookings"."status" in ($1, $2)',
+params: [Array],
+[cause]: Error: timeout exceeded when trying to connect
+at  (.next/server/chunks/5758.js:3397:136596)
+at async (.next/server/chunks/5758.js:75:23308)
+at async nF.queryWithCache (.next/server/chunks/5758.js:75:19986)
+at async (.next/server/chunks/5758.js:75:23099)
+at async Object.jC [as countDistinct] (.next/server/chunks/5758.js:52:103)
+at async iS (.next/server/chunks/5758.js:43:1200)
+at async w (.next/server/chunks/3737.js:114:16833)
+}
+[api/home/stats] companies query failed: Error: Failed query: select count(*) from "companies"
+params: 
+at nF.queryWithCache (.next/server/chunks/5758.js:75:20011)
+at async (.next/server/chunks/5758.js:75:23099)
+at async Object.jC [as countDistinct] (.next/server/chunks/5758.js:52:103)
+at async iS (.next/server/chunks/5758.js:43:1200)
+at async w (.next/server/chunks/3737.js:114:16833)
+at async y (.next/server/app/api/home/stats/route.js:1:3658) {
+query: 'select count(*) from "companies"',
+params: [],
+[cause]: Error: timeout exceeded when trying to connect
+at  (.next/server/chunks/5758.js:3397:136596)
+at async (.next/server/chunks/5758.js:75:23308)
+at async nF.queryWithCache (.next/server/chunks/5758.js:75:19986)
+at async (.next/server/chunks/5758.js:75:23099)
+at async Object.jC [as countDistinct] (.next/server/chunks/5758.js:52:103)
+at async iS (.next/server/chunks/5758.js:43:1200)
+at async w (.next/server/chunks/3737.js:114:16833)
+}
+[api/home/stats] instructors query failed: Error: Failed query: select count(*) from "instructors" where "instructors"."is_active" = $1
+params: true
+at nF.queryWithCache (.next/server/chunks/5758.js:75:20011)
+at async (.next/server/chunks/5758.js:75:23099)
+at async Object.jC [as countDistinct] (.next/server/chunks/5758.js:52:103)
+at async iS (.next/server/chunks/5758.js:43:1200)
+at async w (.next/server/chunks/3737.js:114:16833)
+at async y (.next/server/app/api/home/stats/route.js:1:3658)
+at async k (.next/server/app/api/home/stats/route.js:1:7130) {
+query: 'select count(*) from "instructors" where "instructors"."is_active" = $1',
+params: [Array],
+[cause]: Error: timeout exceeded when trying to connect
+at  (.next/server/chunks/5758.js:3397:136596)
+at async (.next/server/chunks/5758.js:75:23308)
+at async nF.queryWithCache (.next/server/chunks/5758.js:75:19986)
+at async (.next/server/chunks/5758.js:75:23099)
+at async Object.jC [as countDistinct] (.next/server/chunks/5758.js:52:103)
+at async iS (.next/server/chunks/5758.js:43:1200)
+at async w (.next/server/chunks/3737.js:114:16833)
+at async y (.next/server/app/api/home/stats/route.js:1:3658)
+}
+[api/upcoming-events] Error: Failed query: select count(*) from "upcoming_events_config"
+params: 
+at nF.queryWithCache (.next/server/chunks/5758.js:75:20011)
+at async (.next/server/chunks/5758.js:75:23099)
+at async Object.jC [as countDistinct] (.next/server/chunks/5758.js:52:103)
+at async iS (.next/server/chunks/5758.js:43:1200)
+at async w (.next/server/chunks/3737.js:114:16833)
+at async B.a.ttl (.next/server/app/api/upcoming-events/route.js:1:4635)
+at async i (.next/server/chunks/2193.js:3257:7535)
+at async B (.next/server/app/api/upcoming-events/route.js:1:4548) {
+query: 'select count(*) from "upcoming_events_config"',
+params: [],
+[cause]: Error: timeout exceeded when trying to connect
+at  (.next/server/chunks/5758.js:3397:136596)
+at async (.next/server/chunks/5758.js:75:23308)
+at async nF.queryWithCache (.next/server/chunks/5758.js:75:19986)
+at async (.next/server/chunks/5758.js:75:23099)
+at async Object.jC [as countDistinct] (.next/server/chunks/5758.js:52:103)
+at async iS (.next/server/chunks/5758.js:43:1200)
+at async w (.next/server/chunks/3737.js:114:16833)
+at async B.a.ttl (.next/server/app/api/upcoming-events/route.js:1:4635)
+at async i (.next/server/chunks/2193.js:3257:7535)
+at async B (.next/server/app/api/upcoming-events/route.js:1:4548)
+}
+[api/announcement-bars/active] Error: Failed query: select count(*) from "announcement_bars" where ("announcement_bars"."status" = $1 and ("announcement_bars"."start_date" is null or "announcement_bars"."start_date" <= $2) and ("announcement_bars"."end_date" is null or "announcement_bars"."end_date" >= $3))
+params: active,2026-04-18T19:17:52.589Z,2026-04-18T19:17:52.589Z
+at nF.queryWithCache (.next/server/chunks/5758.js:75:20011)
+at async (.next/server/chunks/5758.js:75:23099)
+at async Object.jC [as countDistinct] (.next/server/chunks/5758.js:52:103)
+at async iS (.next/server/chunks/5758.js:43:1200)
+at async w (.next/server/chunks/3737.js:114:16833)
+at async y (.next/server/app/api/announcement-bars/active/route.js:1:1551)
+at async k (.next/server/app/api/announcement-bars/active/route.js:1:4792) {
+query: 'select count(*) from "announcement_bars" where ("announcement_bars"."status" = $1 and ("announcement_bars"."start_date" is null or "announcement_bars"."start_date" <= $2) and ("announcement_bars"."end_date" is null or "announcement_bars"."end_date" >= $3))',
+params: [Array],
+[cause]: Error: timeout exceeded when trying to connect
+at  (.next/server/chunks/5758.js:3397:136596)
+at async (.next/server/chunks/5758.js:75:23308)
+at async nF.queryWithCache (.next/server/chunks/5758.js:75:19986)
+at async (.next/server/chunks/5758.js:75:23099)
+at async Object.jC [as countDistinct] (.next/server/chunks/5758.js:52:103)
+at async iS (.next/server/chunks/5758.js:43:1200)
+at async w (.next/server/chunks/3737.js:114:16833)
+at async y (.next/server/app/api/announcement-bars/active/route.js:1:1551)
+}
+[login] Unexpected error: Error: Failed query: select "users"."id", "users"."first_name", "users"."last_name", "users"."phone", "users"."gender", "users"."picture_id", "users"."role", "users"."instructor_id_id", "users"."signup_intent", "users"."preferred_language", "users"."newsletter_opt_in", "users"."whatsapp_opt_in", "users"."lifecycle_stage", "users"."contact_source", "users"."twenty_crm_contact_id", "users"."google_id", "users"."email_verified", "users"."last_login", "users"."google_refresh_token", "users"."google_access_token", "users"."google_calendar_connected_at", "users"."google_calendar_email", "users"."google_calendar_id", "users"."updated_at", "users"."created_at", "users"."enable_a_p_i_key", "users"."api_key", "users"."api_key_index", "users"."email", "users"."reset_password_token", "users"."reset_password_expiration", "users"."salt", "users"."hash", "users"."login_attempts", "users"."lock_until", "users_sessions"."data" as "sessions" from "users" "users" left join lateral (select coalesce(json_agg(json_build_array("users_sessions"."_order", "users_sessions"."id", "users_sessions"."created_at", "users_sessions"."expires_at") order by "users_sessions"."_order" asc), '[]'::json) as "data" from (select * from "users_sessions" "users_sessions" where "users_sessions"."_parent_id" = "users"."id" order by "users_sessions"."_order" asc) "users_sessions") "users_sessions" on true where "users"."email" = $1 order by "users"."created_at" desc limit $2
+params: muhammed.mekky4@gmail.com,1
+at nF.queryWithCache (.next/server/chunks/5758.js:75:20011)
+at async (.next/server/chunks/5758.js:75:23099)
+at async iS (.next/server/chunks/5758.js:43:1334)
+at async Object.i$ [as findOne] (.next/server/chunks/5758.js:43:5272)
+at async C (.next/server/chunks/3737.js:121:97063)
+at async m (.next/server/chunks/3744.js:1:21920)
+at async C (.next/server/app/api/users/login/route.js:1:7598)
+at async k (.next/server/app/api/users/login/route.js:1:11127) {
+query: `select "users"."id", "users"."first_name", "users"."last_name", "users"."phone", "users"."gender", "users"."picture_id", "users"."role", "users"."instructor_id_id", "users"."signup_intent", "users"."preferred_language", "users"."newsletter_opt_in", "users"."whatsapp_opt_in", "users"."lifecycle_stage", "users"."contact_source", "users"."twenty_crm_contact_id", "users"."google_id", "users"."email_verified", "users"."last_login", "users"."google_refresh_token", "users"."google_access_token", "users"."google_calendar_connected_at", "users"."google_calendar_email", "users"."google_calendar_id", "users"."updated_at", "users"."created_at", "users"."enable_a_p_i_key", "users"."api_key", "users"."api_key_index", "users"."email", "users"."reset_password_token", "users"."reset_password_expiration", "users"."salt", "users"."hash", "users"."login_attempts", "users"."lock_until", "users_sessions"."data" as "sessions" from "users" "users" left join lateral (select coalesce(json_agg(json_build_array("users_sessions"."_order", "users_sessions"."id", "users_sessions"."created_at", "users_sessions"."expires_at") order by "users_sessions"."_order" asc), '[]'::json) as "data" from (select * from "users_sessions" "users_sessions" where "users_sessions"."_parent_id" = "users"."id" order by "users_sessions"."_order" asc) "users_sessions") "users_sessions" on true where "users"."email" = $1 order by "users"."created_at" desc limit $2`,
+[19:18:36] ERROR: There was an error building form state
+err: {
+"type": "mx",
+"message": "Failed query: select \"users\".\"id\", \"users\".\"first_name\", \"users\".\"last_name\", \"users\".\"phone\", \"users\".\"gender\", \"users\".\"picture_id\", \"users\".\"role\", \"users\".\"instructor_id_id\", \"users\".\"signup_intent\", \"users\".\"preferred_language\", \"users\".\"newsletter_opt_in\", \"users\".\"whatsapp_opt_in\", \"users\".\"lifecycle_stage\", \"users\".\"contact_source\", \"users\".\"twenty_crm_contact_id\", \"users\".\"google_id\", \"users\".\"email_verified\", \"users\".\"last_login\", \"users\".\"google_refresh_token\", \"users\".\"google_access_token\", \"users\".\"google_calendar_connected_at\", \"users\".\"google_calendar_email\", \"users\".\"google_calendar_id\", \"users\".\"updated_at\", \"users\".\"created_at\", \"users\".\"enable_a_p_i_key\", \"users\".\"api_key\", \"users\".\"api_key_index\", \"users\".\"email\", \"users\".\"reset_password_token\", \"users\".\"reset_password_expiration\", \"users\".\"salt\", \"users\".\"hash\", \"users\".\"login_attempts\", \"users\".\"lock_until\", \"users_sessions\".\"data\" as \"sessions\" from \"users\" \"users\" left join lateral (select coalesce(json_agg(json_build_array(\"users_sessions\".\"_order\", \"users_sessions\".\"id\", \"users_sessions\".\"created_at\", \"users_sessions\".\"expires_at\") order by \"users_sessions\".\"_order\" asc), '[]'::json) as \"data\" from (select * from \"users_sessions\" \"users_sessions\" where \"users_sessions\".\"_parent_id\" = \"users\".\"id\" order by \"users_sessions\".\"_order\" asc) \"users_sessions\") \"users_sessions\" on true order by \"users\".\"created_at\" desc limit $1\nparams: 1: timeout exceeded when trying to connect",
+"stack":
+Error: Failed query: select "users"."id", "users"."first_name", "users"."last_name", "users"."phone", "users"."gender", "users"."picture_id", "users"."role", "users"."instructor_id_id", "users"."signup_intent", "users"."preferred_language", "users"."newsletter_opt_in", "users"."whatsapp_opt_in", "users"."lifecycle_stage", "users"."contact_source", "users"."twenty_crm_contact_id", "users"."google_id", "users"."email_verified", "users"."last_login", "users"."google_refresh_token", "users"."google_access_token", "users"."google_calendar_connected_at", "users"."google_calendar_email", "users"."google_calendar_id", "users"."updated_at", "users"."created_at", "users"."enable_a_p_i_key", "users"."api_key", "users"."api_key_index", "users"."email", "users"."reset_password_token", "users"."reset_password_expiration", "users"."salt", "users"."hash", "users"."login_attempts", "users"."lock_until", "users_sessions"."data" as "sessions" from "users" "users" left join lateral (select coalesce(json_agg(json_build_array("users_sessions"."_order", "users_sessions"."id", "users_sessions"."created_at", "users_sessions"."expires_at") order by "users_sessions"."_order" asc), '[]'::json) as "data" from (select * from "users_sessions" "users_sessions" where "users_sessions"."_parent_id" = "users"."id" order by "users_sessions"."_order" asc) "users_sessions") "users_sessions" on true order by "users"."created_at" desc limit $1
+params: 1
+at nF.queryWithCache (/app/.next/server/chunks/5758.js:75:20011)
+at async /app/.next/server/chunks/5758.js:75:23099
+at async iS (/app/.next/server/chunks/5758.js:43:1334)
 at async w (/app/.next/server/chunks/3737.js:114:16833)
-at async c6 (/app/.next/server/chunks/6382.js:89:65321)
-at async P (/app/.next/server/app/(payload)/api/[...slug]/route.js:1:7484)
-at async /app/.next/server/app/(payload)/api/[...slug]/route.js:1:10273
-at async rb.do (/app/node_modules/.pnpm/next@15.4.11_@babel+core@7.29.0_react-dom@19.2.3_react@19.2.3__react@19.2.3_sass@1.98.0/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js:5:21059)
-at async rb.handle (/app/node_modules/.pnpm/next@15.4.11_@babel+core@7.29.0_react-dom@19.2.3_react@19.2.3__react@19.2.3_sass@1.98.0/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js:5:25902)
-caused by: error: column "booking_date" does not exist
-at /app/.next/server/chunks/6382.js:40:136596
-at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
-at async /app/.next/server/chunks/6382.js:156:23308
-at async nF.queryWithCache (/app/.next/server/chunks/6382.js:156:19986)
-at async /app/.next/server/chunks/6382.js:156:23099
-at async iS (/app/.next/server/chunks/6382.js:124:1334)
+at async e (/app/.next/server/app/(payload)/admin/[[...segments]]/page.js:212:130262)
+at async u (/app/.next/server/app/(payload)/admin/[[...segments]]/page.js:1:76604)
+at async tQ (/app/node_modules/.pnpm/next@15.4.11_@babel+core@7.29.0_react-dom@19.2.3_react@19.2.3__react@19.2.3_sass@1.98.0/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:16:1725)
+at async /app/node_modules/.pnpm/next@15.4.11_@babel+core@7.29.0_react-dom@19.2.3_react@19.2.3__react@19.2.3_sass@1.98.0/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:16:533
+at async tY (/app/node_modules/.pnpm/next@15.4.11_@babel+core@7.29.0_react-dom@19.2.3_react@19.2.3__react@19.2.3_sass@1.98.0/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:14:14659)
+at async nF (/app/node_modules/.pnpm/next@15.4.11_@babel+core@7.29.0_react-dom@19.2.3_react@19.2.3__react@19.2.3_sass@1.98.0/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:21:18781)
+caused by: Error: timeout exceeded when trying to connect
+at /app/.next/server/chunks/5758.js:3397:136596
+at async /app/.next/server/chunks/5758.js:75:23308
+at async nF.queryWithCache (/app/.next/server/chunks/5758.js:75:19986)
+at async /app/.next/server/chunks/5758.js:75:23099
+at async iS (/app/.next/server/chunks/5758.js:43:1334)
 at async w (/app/.next/server/chunks/3737.js:114:16833)
-at async c6 (/app/.next/server/chunks/6382.js:89:65321)
-at async P (/app/.next/server/app/(payload)/api/[...slug]/route.js:1:7484)
-at async /app/.next/server/app/(payload)/api/[...slug]/route.js:1:10273
-"query": "select \"id\", \"booking_code\", \"user_id\", \"consultation_type_id\", \"instructor_id\", \"booking_date\", \"start_time\", \"end_time\", \"timezone\", \"client_name\", \"client_email\", \"status\", \"amount\", \"payment_status\", \"transaction_id\", \"meeting_url\", \"user_notes\", \"instructor_notes\", \"cancelled_by\", \"cancellation_reason\", \"reminder_sent\", \"discount_code\", \"discount_amount\", \"twenty_crm_deal_id\", \"updated_at\", \"created_at\" from \"consultation_bookings\" \"consultation_bookings\" where \"consultation_bookings\".\"instructor_id\" = $1 order by \"consultation_bookings\".\"created_at\" desc limit $2",
+at async e (/app/.next/server/app/(payload)/admin/[[...segments]]/page.js:212:130262)
+at async u (/app/.next/server/app/(payload)/admin/[[...segments]]/page.js:1:76604)
+at async tQ (/app/node_modules/.pnpm/next@15.4.11_@babel+core@7.29.0_react-dom@19.2.3_react@19.2.3__react@19.2.3_sass@1.98.0/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:16:1725)
+at async /app/node_modules/.pnpm/next@15.4.11_@babel+core@7.29.0_react-dom@19.2.3_react@19.2.3__react@19.2.3_sass@1.98.0/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:16:533
+"query": "select \"users\".\"id\", \"users\".\"first_name\", \"users\".\"last_name\", \"users\".\"phone\", \"users\".\"gender\", \"users\".\"picture_id\", \"users\".\"role\", \"users\".\"instructor_id_id\", \"users\".\"signup_intent\", \"users\".\"preferred_language\", \"users\".\"newsletter_opt_in\", \"users\".\"whatsapp_opt_in\", \"users\".\"lifecycle_stage\", \"users\".\"contact_source\", \"users\".\"twenty_crm_contact_id\", \"users\".\"google_id\", \"users\".\"email_verified\", \"users\".\"last_login\", \"users\".\"google_refresh_token\", \"users\".\"google_access_token\", \"users\".\"google_calendar_connected_at\", \"users\".\"google_calendar_email\", \"users\".\"google_calendar_id\", \"users\".\"updated_at\", \"users\".\"created_at\", \"users\".\"enable_a_p_i_key\", \"users\".\"api_key\", \"users\".\"api_key_index\", \"users\".\"email\", \"users\".\"reset_password_token\", \"users\".\"reset_password_expiration\", \"users\".\"salt\", \"users\".\"hash\", \"users\".\"login_attempts\", \"users\".\"lock_until\", \"users_sessions\".\"data\" as \"sessions\" from \"users\" \"users\" left join lateral (select coalesce(json_agg(json_build_array(\"users_sessions\".\"_order\", \"users_sessions\".\"id\", \"users_sessions\".\"created_at\", \"users_sessions\".\"expires_at\") order by \"users_sessions\".\"_order\" asc), '[]'::json) as \"data\" from (select * from \"users_sessions\" \"users_sessions\" where \"users_sessions\".\"_parent_id\" = \"users\".\"id\" order by \"users_sessions\".\"_order\" asc) \"users_sessions\") \"users_sessions\" on true order by \"users\".\"created_at\" desc limit $1",
 "params": [
-57,
-50
+1
 ]
 }
-⨯ Error: Failed query: select "consultation_types"."id", "consultation_types"."instructor_id", "consultation_types"."title_ar", "consultation_types"."title_en", "consultation_types"."title", "consultation_types"."description_ar", "consultation_types"."description_en", "consultation_types"."description", "consultation_types"."duration_minutes", "consultation_types"."price", "consultation_types"."currency", "consultation_types"."meeting_type", "consultation_types"."meeting_platform", "consultation_types"."max_participants", "consultation_types"."is_active", "consultation_types"."buffer_before", "consultation_types"."buffer_after", "consultation_types"."max_per_day", "consultation_types"."start_time_increment", "consultation_types"."min_notice_hours", "consultation_types"."min_cancel_notice_hours", "consultation_types"."updated_at", "consultation_types"."created_at", "consultation_types_availableDays"."data" as "availableDays" from "consultation_types" "consultation_types" left join lateral (select coalesce(json_agg(json_build_array("consultation_types_availableDays"."value") order by "consultation_types_availableDays"."order" asc), '[]'::json) as "data" from (select * from "consultation_types_available_days" "consultation_types_availableDays" where "consultation_types_availableDays"."parent_id" = "consultation_types"."id" order by "consultation_types_availableDays"."order" asc) "consultation_types_availableDays") "consultation_types_availableDays" on true where ("consultation_types"."instructor_id" = $1 and "consultation_types"."is_active" = $2) order by "consultation_types"."created_at" desc limit $3
-params: 47,true,50
-at nF.queryWithCache (.next/server/chunks/6382.js:156:20011)
-at async (.next/server/chunks/6382.js:156:23099)
-at async iS (.next/server/chunks/6382.js:124:1334)
-at async w (.next/server/chunks/3737.js:114:16833)
-at async I (.next/server/app/[locale]/instructors/[slug]/page.js:1:81031) {
-query: `select "consultation_types"."id", "consultation_types"."instructor_id", "consultation_types"."title_ar", "consultation_types"."title_en", "consultation_types"."title", "consultation_types"."description_ar", "consultation_types"."description_en", "consultation_types"."description", "consultation_types"."duration_minutes", "consultation_types"."price", "consultation_types"."currency", "consultation_types"."meeting_type", "consultation_types"."meeting_platform", "consultation_types"."max_participants", "consultation_types"."is_active", "consultation_types"."buffer_before", "consultation_types"."buffer_after", "consultation_types"."max_per_day", "consultation_types"."start_time_increment", "consultation_types"."min_notice_hours", "consultation_types"."min_cancel_notice_hours", "consultation_types"."updated_at", "consultation_types"."created_at", "consultation_types_availableDays"."data" as "availableDays" from "consultation_types" "consultation_types" left join lateral (select coalesce(json_agg(json_build_array("consultation_types_availableDays"."value") order by "consultation_types_availableDays"."order" asc), '[]'::json) as "data" from (select * from "consultation_types_available_days" "consultation_types_availableDays" where "consultation_types_availableDays"."parent_id" = "consultation_types"."id" order by "consultation_types_availableDays"."order" asc) "consultation_types_availableDays") "consultation_types_availableDays" on true where ("consultation_types"."instructor_id" = $1 and "consultation_types"."is_active" = $2) order by "consultation_types"."created_at" desc limit $3`,
 params: [Array],
-digest: '568926010',
-[cause]: error: column consultation_types_availableDays.parent_id does not exist
-at  (.next/server/chunks/6382.js:40:136596)
-at async (.next/server/chunks/6382.js:156:23308)
-at async nF.queryWithCache (.next/server/chunks/6382.js:156:19986)
-at async (.next/server/chunks/6382.js:156:23099)
-at async iS (.next/server/chunks/6382.js:124:1334)
-at async w (.next/server/chunks/3737.js:114:16833)
-at async I (.next/server/app/[locale]/instructors/[slug]/page.js:1:81031) {
-length: 232,
-severity: 'ERROR',
-code: '42703',
-detail: undefined,
-hint: 'Perhaps you meant to reference the column "consultation_types_availableDays._parent_id".',
-position: '1245',
-internalPosition: undefined,
-internalQuery: undefined,
-where: undefined,
-schema: undefined,
-table: undefined,
-column: undefined,
-dataType: undefined,
-constraint: undefined,
-file: 'parse_relation.c',
-line: '3723',
-routine: 'errorMissingColumn'
+[cause]: Error: timeout exceeded when trying to connect
+at  (.next/server/chunks/5758.js:3397:136596)
+at async (.next/server/chunks/5758.js:75:23308)
+at async nF.queryWithCache (.next/server/chunks/5758.js:75:19986)
+at async (.next/server/chunks/5758.js:75:23099)
+at async iS (.next/server/chunks/5758.js:43:1334)
+at async Object.i$ [as findOne] (.next/server/chunks/5758.js:43:5272)
+at async C (.next/server/chunks/3737.js:121:97063)
+at async m (.next/server/chunks/3744.js:1:21920)
+at async C (.next/server/app/api/users/login/route.js:1:7598)
 }
-}
-⨯ Error: Failed query: select "consultation_types"."id", "consultation_types"."instructor_id", "consultation_types"."title_ar", "consultation_types"."title_en", "consultation_types"."title", "consultation_types"."description_ar", "consultation_types"."description_en", "consultation_types"."description", "consultation_types"."duration_minutes", "consultation_types"."price", "consultation_types"."currency", "consultation_types"."meeting_type", "consultation_types"."meeting_platform", "consultation_types"."max_participants", "consultation_types"."is_active", "consultation_types"."buffer_before", "consultation_types"."buffer_after", "consultation_types"."max_per_day", "consultation_types"."start_time_increment", "consultation_types"."min_notice_hours", "consultation_types"."min_cancel_notice_hours", "consultation_types"."updated_at", "consultation_types"."created_at", "consultation_types_availableDays"."data" as "availableDays" from "consultation_types" "consultation_types" left join lateral (select coalesce(json_agg(json_build_array("consultation_types_availableDays"."value") order by "consultation_types_availableDays"."order" asc), '[]'::json) as "data" from (select * from "consultation_types_available_days" "consultation_types_availableDays" where "consultation_types_availableDays"."parent_id" = "consultation_types"."id" order by "consultation_types_availableDays"."order" asc) "consultation_types_availableDays") "consultation_types_availableDays" on true where ("consultation_types"."instructor_id" = $1 and "consultation_types"."is_active" = $2) order by "consultation_types"."created_at" desc limit $3
-params: 57,true,50
-at nF.queryWithCache (.next/server/chunks/6382.js:156:20011)
-at async (.next/server/chunks/6382.js:156:23099)
-at async iS (.next/server/chunks/6382.js:124:1334)
-at async w (.next/server/chunks/3737.js:114:16833)
-at async I (.next/server/app/[locale]/instructors/[slug]/page.js:1:81031) {
-query: `select "consultation_types"."id", "consultation_types"."instructor_id", "consultation_types"."title_ar", "consultation_types"."title_en", "consultation_types"."title", "consultation_types"."description_ar", "consultation_types"."description_en", "consultation_types"."description", "consultation_types"."duration_minutes", "consultation_types"."price", "consultation_types"."currency", "consultation_types"."meeting_type", "consultation_types"."meeting_platform", "consultation_types"."max_participants", "consultation_types"."is_active", "consultation_types"."buffer_before", "consultation_types"."buffer_after", "consultation_types"."max_per_day", "consultation_types"."start_time_increment", "consultation_types"."min_notice_hours", "consultation_types"."min_cancel_notice_hours", "consultation_types"."updated_at", "consultation_types"."created_at", "consultation_types_availableDays"."data" as "availableDays" from "consultation_types" "consultation_types" left join lateral (select coalesce(json_agg(json_build_array("consultation_types_availableDays"."value") order by "consultation_types_availableDays"."order" asc), '[]'::json) as "data" from (select * from "consultation_types_available_days" "consultation_types_availableDays" where "consultation_types_availableDays"."parent_id" = "consultation_types"."id" order by "consultation_types_availableDays"."order" asc) "consultation_types_availableDays") "consultation_types_availableDays" on true where ("consultation_types"."instructor_id" = $1 and "consultation_types"."is_active" = $2) order by "consultation_types"."created_at" desc limit $3`,
+[login] Unexpected error: Error: Failed query: select "users"."id", "users"."first_name", "users"."last_name", "users"."phone", "users"."gender", "users"."picture_id", "users"."role", "users"."instructor_id_id", "users"."signup_intent", "users"."preferred_language", "users"."newsletter_opt_in", "users"."whatsapp_opt_in", "users"."lifecycle_stage", "users"."contact_source", "users"."twenty_crm_contact_id", "users"."google_id", "users"."email_verified", "users"."last_login", "users"."google_refresh_token", "users"."google_access_token", "users"."google_calendar_connected_at", "users"."google_calendar_email", "users"."google_calendar_id", "users"."updated_at", "users"."created_at", "users"."enable_a_p_i_key", "users"."api_key", "users"."api_key_index", "users"."email", "users"."reset_password_token", "users"."reset_password_expiration", "users"."salt", "users"."hash", "users"."login_attempts", "users"."lock_until", "users_sessions"."data" as "sessions" from "users" "users" left join lateral (select coalesce(json_agg(json_build_array("users_sessions"."_order", "users_sessions"."id", "users_sessions"."created_at", "users_sessions"."expires_at") order by "users_sessions"."_order" asc), '[]'::json) as "data" from (select * from "users_sessions" "users_sessions" where "users_sessions"."_parent_id" = "users"."id" order by "users_sessions"."_order" asc) "users_sessions") "users_sessions" on true where "users"."email" = $1 order by "users"."created_at" desc limit $2
+params: muhammed.mekky4@gmail.com,1
+at nF.queryWithCache (.next/server/chunks/5758.js:75:20011)
+at async (.next/server/chunks/5758.js:75:23099)
+at async iS (.next/server/chunks/5758.js:43:1334)
+at async Object.i$ [as findOne] (.next/server/chunks/5758.js:43:5272)
+at async C (.next/server/chunks/3737.js:121:97063)
+at async m (.next/server/chunks/3744.js:1:21920)
+at async C (.next/server/app/api/users/login/route.js:1:7598)
+at async k (.next/server/app/api/users/login/route.js:1:11127) {
+query: `select "users"."id", "users"."first_name", "users"."last_name", "users"."phone", "users"."gender", "users"."picture_id", "users"."role", "users"."instructor_id_id", "users"."signup_intent", "users"."preferred_language", "users"."newsletter_opt_in", "users"."whatsapp_opt_in", "users"."lifecycle_stage", "users"."contact_source", "users"."twenty_crm_contact_id", "users"."google_id", "users"."email_verified", "users"."last_login", "users"."google_refresh_token", "users"."google_access_token", "users"."google_calendar_connected_at", "users"."google_calendar_email", "users"."google_calendar_id", "users"."updated_at", "users"."created_at", "users"."enable_a_p_i_key", "users"."api_key", "users"."api_key_index", "users"."email", "users"."reset_password_token", "users"."reset_password_expiration", "users"."salt", "users"."hash", "users"."login_attempts", "users"."lock_until", "users_sessions"."data" as "sessions" from "users" "users" left join lateral (select coalesce(json_agg(json_build_array("users_sessions"."_order", "users_sessions"."id", "users_sessions"."created_at", "users_sessions"."expires_at") order by "users_sessions"."_order" asc), '[]'::json) as "data" from (select * from "users_sessions" "users_sessions" where "users_sessions"."_parent_id" = "users"."id" order by "users_sessions"."_order" asc) "users_sessions") "users_sessions" on true where "users"."email" = $1 order by "users"."created_at" desc limit $2`,
 params: [Array],
-digest: '3163501338',
-[cause]: error: column consultation_types_availableDays.parent_id does not exist
-at  (.next/server/chunks/6382.js:40:136596)
-at async (.next/server/chunks/6382.js:156:23308)
-at async nF.queryWithCache (.next/server/chunks/6382.js:156:19986)
-at async (.next/server/chunks/6382.js:156:23099)
-at async iS (.next/server/chunks/6382.js:124:1334)
-at async w (.next/server/chunks/3737.js:114:16833)
-at async I (.next/server/app/[locale]/instructors/[slug]/page.js:1:81031) {
-length: 232,
-severity: 'ERROR',
-code: '42703',
-detail: undefined,
-hint: 'Perhaps you meant to reference the column "consultation_types_availableDays._parent_id".',
-position: '1245',
-internalPosition: undefined,
-internalQuery: undefined,
-where: undefined,
-schema: undefined,
-table: undefined,
-column: undefined,
-dataType: undefined,
-constraint: undefined,
-file: 'parse_relation.c',
-line: '3723',
-routine: 'errorMissingColumn'
+[cause]: Error: timeout exceeded when trying to connect
+at  (.next/server/chunks/5758.js:3397:136596)
+at async (.next/server/chunks/5758.js:75:23308)
+at async nF.queryWithCache (.next/server/chunks/5758.js:75:19986)
+at async (.next/server/chunks/5758.js:75:23099)
+at async iS (.next/server/chunks/5758.js:43:1334)
+at async Object.i$ [as findOne] (.next/server/chunks/5758.js:43:5272)
+at async C (.next/server/chunks/3737.js:121:97063)
+at async m (.next/server/chunks/3744.js:1:21920)
+at async C (.next/server/app/api/users/login/route.js:1:7598)
 }
+[api/popups/active] Error: Failed query: select count(*) from "popups" where ("popups"."status" = $1 and ("popups"."start_date" is null or "popups"."start_date" <= $2) and ("popups"."end_date" is null or "popups"."end_date" >= $3))
+params: active,2026-04-18T19:18:32.741Z,2026-04-18T19:18:32.741Z
+at nF.queryWithCache (.next/server/chunks/5758.js:75:20011)
+at async (.next/server/chunks/5758.js:75:23099)
+at async Object.jC [as countDistinct] (.next/server/chunks/5758.js:52:103)
+at async iS (.next/server/chunks/5758.js:43:1200)
+at async w (.next/server/chunks/3737.js:114:16833)
+at async B (.next/server/app/api/popups/active/route.js:1:6679)
+at async k (.next/server/app/api/popups/active/route.js:1:10539) {
+query: 'select count(*) from "popups" where ("popups"."status" = $1 and ("popups"."start_date" is null or "popups"."start_date" <= $2) and ("popups"."end_date" is null or "popups"."end_date" >= $3))',
+params: [Array],
+[cause]: Error: timeout exceeded when trying to connect
+at  (.next/server/chunks/5758.js:3397:136596)
+at async (.next/server/chunks/5758.js:75:23308)
+at async nF.queryWithCache (.next/server/chunks/5758.js:75:19986)
+at async (.next/server/chunks/5758.js:75:23099)
+at async Object.jC [as countDistinct] (.next/server/chunks/5758.js:52:103)
+at async iS (.next/server/chunks/5758.js:43:1200)
+at async w (.next/server/chunks/3737.js:114:16833)
+at async B (.next/server/app/api/popups/active/route.js:1:6679)
 }
