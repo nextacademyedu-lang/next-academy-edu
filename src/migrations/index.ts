@@ -23,6 +23,7 @@ import * as migration_20260412_150000_add_instructor_program_submissions_rels fr
 import * as migration_20260417_010000_add_financial_lifecycle_fields from './20260417_010000_add_financial_lifecycle_fields';
 import * as migration_20260418_010000_schema_sync from './20260418_010000_schema_sync';
 import * as migration_20260418_070000_fix_consultation_schema_drift from './20260418_070000_fix_consultation_schema_drift';
+import * as migration_20260503_230000_add_events_banner_and_times from './20260503_230000_add_events_banner_and_times';
 
 export const migrations = [
   {
@@ -150,4 +151,9 @@ export const migrations = [
     down: migration_20260418_070000_fix_consultation_schema_drift.down,
     name: '20260418_070000_fix_consultation_schema_drift',
   },
+  {
+    up: migration_20260503_230000_add_events_banner_and_times.up,
+    down: migration_20260503_230000_add_events_banner_and_times.down,
+    name: '20260503_230000_add_events_banner_and_times',
+  }
 ];
