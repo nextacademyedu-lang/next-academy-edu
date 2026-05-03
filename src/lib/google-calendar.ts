@@ -26,6 +26,8 @@ export interface CreateEventParams {
   endTime: string;       // "12:00"
   timezone?: string;     // "Africa/Cairo"
   attendeeEmails?: string[];
+  location?: string;     // Venue name + address
+  googleMapsUrl?: string; // Google Maps link
   refreshToken?: string | null; // Pass to use specific user's calendar, otherwise uses Admin
 }
 
@@ -89,6 +91,7 @@ export async function createSessionEvent(params: CreateEventParams): Promise<Eve
     requestBody: {
       summary: params.title,
       description: params.description || '',
+      location: params.location || undefined,
       start: { dateTime: startDateTime, timeZone: tz },
       end: { dateTime: endDateTime, timeZone: tz },
       attendees,

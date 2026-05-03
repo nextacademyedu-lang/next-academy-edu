@@ -137,8 +137,8 @@ export default async function RetreatsPage() {
                     <div className={styles.eventBody}>
                       <h3>{title}</h3>
                       <div className={styles.meta}>
-                        <span>📅 {dateRange}</span>
-                        <span>📍 {event.venue || (locale === 'ar' ? 'يُحدد لاحقاً' : 'TBA')}</span>
+                        <span>{dateRange}</span>
+                        <span>{event.venue || (locale === 'ar' ? 'يُحدد لاحقاً' : 'TBA')}</span>
                       </div>
                     </div>
                     <div className={styles.eventFooter}>

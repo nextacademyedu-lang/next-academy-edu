@@ -16,7 +16,7 @@ export default function CheckoutSuccessPage() {
         <CheckCircle size={64} color="#00e397" style={{ margin: '0 auto 24px' }} />
 
         <h1 style={{ fontSize: '28px', fontWeight: 700, marginBottom: '12px', color: 'var(--text-primary)' }}>
-          تم الدفع بنجاح! 🎉
+          تم الدفع بنجاح!
         </h1>
         <p style={{ color: 'var(--text-secondary)', fontSize: '16px', marginBottom: '32px', lineHeight: 1.6 }}>
           تم تأكيد حجزك. هتوصلك رسالة تأكيد على إيميلك دلوقتي.

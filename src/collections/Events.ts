@@ -105,8 +105,10 @@ export const Events: CollectionConfig = {
         {
           label: 'Schedule',
           fields: [
-            { name: 'eventDate', type: 'date', required: true, admin: { description: 'Start date/time' } },
-            { name: 'eventEndDate', type: 'date', admin: { description: 'End date/time (optional)' } },
+            { name: 'eventDate', type: 'date', required: true, admin: { description: 'Event start date' } },
+            { name: 'eventEndDate', type: 'date', admin: { description: 'Event end date (optional, for multi-day events)' } },
+            { name: 'startTime', type: 'text', admin: { description: 'Start time in 24h format e.g. "10:00" or 12h e.g. "2:00 PM"' } },
+            { name: 'endTime', type: 'text', admin: { description: 'End time in 24h format e.g. "14:00" or 12h e.g. "4:00 PM"' } },
             { name: 'durationHours', type: 'number', admin: { description: 'Total event duration in hours' } },
             { name: 'registrationDeadline', type: 'date', admin: { description: 'Last date to register for this event' } },
             {
@@ -121,6 +123,7 @@ export const Events: CollectionConfig = {
             },
             { name: 'venue', type: 'text', admin: { description: 'Venue / Location name' } },
             { name: 'venueAddress', type: 'textarea', admin: { description: 'Full address' } },
+            { name: 'googleMapsUrl', type: 'text', admin: { description: 'Google Maps link for the venue (paste the share link from Google Maps)' } },
             { name: 'onlineLink', type: 'text', admin: { description: 'Zoom / Meet / etc. link' } },
             {
               name: 'agenda',

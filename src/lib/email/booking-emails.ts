@@ -18,10 +18,13 @@ export async function sendBookingConfirmation(data: {
   amountPaid: number;
   startDate: string;
   locale?: Locale;
+  startTime?: string | null;
+  endTime?: string | null;
   location?: {
     type?: string;
     name?: string;
     address?: string;
+    googleMapsUrl?: string;
   } | null;
 }): Promise<void> {
   const locale = data.locale ?? 'ar';
@@ -35,6 +38,13 @@ export async function sendBookingConfirmation(data: {
     [s.labelStartDate, data.startDate],
   ];
 
+  // Add time info when available
+  if (data.startTime) {
+    const timeLabel = locale === 'ar' ? 'الوقت' : 'Time';
+    const timeStr = data.endTime ? `${data.startTime} - ${data.endTime}` : data.startTime;
+    infoRows.push([timeLabel, timeStr]);
+  }
+
   // Add location info for in-person / hybrid programs
   if (data.location && data.location.type && data.location.type !== 'online') {
     const formatLabel =
@@ -47,6 +57,10 @@ export async function sendBookingConfirmation(data: {
     }
     if (data.location.address) {
       infoRows.push([s.labelAddress, data.location.address]);
+    }
+    if (data.location.googleMapsUrl) {
+      const mapLabel = locale === 'ar' ? '📍 الموقع على الخريطة' : '📍 View on Map';
+      infoRows.push([mapLabel, data.location.googleMapsUrl]);
     }
   }
 

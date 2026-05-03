@@ -145,7 +145,7 @@ export default async function CorporateTrainingPage() {
                       <div className={styles.meta}>
                         {description && <span>{description.slice(0, 100)}{description.length > 100 ? '...' : ''}</span>}
                         {event.eventDate && (
-                          <span>📅 {new Date(event.eventDate).toLocaleDateString(locale === 'ar' ? 'ar-EG' : 'en-US')}</span>
+                          <span>{new Date(event.eventDate).toLocaleDateString(locale === 'ar' ? 'ar-EG' : 'en-US')}</span>
                         )}
                       </div>
                     </div>

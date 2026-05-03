@@ -168,6 +168,7 @@ export async function processSuccessfulPayment(opts: {
       });
       const program = round?.program as unknown as Record<string, string> | undefined;
 
+      const roundData = round as unknown as Record<string, unknown>;
       await sendBookingConfirmation({
         to: user.email,
         userName: `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.email,
@@ -177,11 +178,14 @@ export async function processSuccessfulPayment(opts: {
         startDate: round?.startDate
           ? new Date(round.startDate).toLocaleDateString('ar-EG')
           : '',
+        startTime: (roundData.sessionPlan as Array<{ startTime?: string }> | undefined)?.[0]?.startTime || null,
+        endTime: (roundData.sessionPlan as Array<{ endTime?: string }> | undefined)?.[0]?.endTime || null,
         location: round?.locationType
           ? {
               type: round.locationType as string,
-              name: (round as { locationName?: string }).locationName || undefined,
-              address: (round as { locationAddress?: string }).locationAddress || undefined,
+              name: (roundData.locationName as string) || undefined,
+              address: (roundData.locationAddress as string) || undefined,
+              googleMapsUrl: (roundData.locationMapUrl as string) || undefined,
             }
           : null,
       });

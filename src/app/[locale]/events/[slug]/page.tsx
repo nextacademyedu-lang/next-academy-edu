@@ -178,22 +178,22 @@ export default async function EventDetailPage({
 
             <div className={styles.heroInfoGrid}>
               <div className={styles.heroInfoItem}>
-                <span className={styles.heroInfoIcon}>📅</span>
+                <span className={styles.heroInfoDot} />
                 <span className={styles.heroInfoLabel}>{dateRange}</span>
               </div>
               <div className={styles.heroInfoItem}>
-                <span className={styles.heroInfoIcon}>📍</span>
+                <span className={styles.heroInfoDot} />
                 <span className={styles.heroInfoLabel}>{venue}</span>
               </div>
               {event.durationHours && (
                 <div className={styles.heroInfoItem}>
-                  <span className={styles.heroInfoIcon}>⏱</span>
+                  <span className={styles.heroInfoDot} />
                   <span>{event.durationHours} {isAr ? 'ساعة' : 'hours'}</span>
                 </div>
               )}
               {event.language && (
                 <div className={styles.heroInfoItem}>
-                  <span className={styles.heroInfoIcon}>🗣</span>
+                  <span className={styles.heroInfoDot} />
                   <span>{event.language === 'ar' ? 'العربية' : event.language === 'en' ? 'English' : isAr ? 'عربي وإنجليزي' : 'Arabic & English'}</span>
                 </div>
               )}
@@ -214,20 +214,25 @@ export default async function EventDetailPage({
                     const photoUrl = speaker.photo && typeof speaker.photo === 'object'
                       ? (speaker.photo as Media).url
                       : null;
+                    const roleClass = speaker.role ? styles[`role_${speaker.role}`] || styles.role_speaker : styles.role_speaker;
                     return (
                       <div key={speaker.id ?? i} className={styles.speakerCard}>
-                        {photoUrl ? (
-                          <Image src={photoUrl} alt={speaker.name} width={64} height={64} className={styles.speakerAvatar} />
-                        ) : (
-                          <div className={styles.speakerAvatarFallback}>
-                            {speaker.name[0]?.toUpperCase() || '?'}
-                          </div>
-                        )}
+                        <div className={styles.speakerAvatarWrap}>
+                          {photoUrl ? (
+                            <Image src={photoUrl} alt={speaker.name} width={80} height={80} className={styles.speakerAvatar} unoptimized />
+                          ) : (
+                            <div className={styles.speakerAvatarFallback}>
+                              {speaker.name[0]?.toUpperCase() || '?'}
+                            </div>
+                          )}
+                        </div>
                         <div className={styles.speakerInfo}>
                           <p className={styles.speakerName}>{speaker.name}</p>
                           {speaker.title && <p className={styles.speakerTitle}>{speaker.title}</p>}
                           {speaker.role && (
-                            <Badge variant="outline">{ROLE_LABELS[locale]?.[speaker.role] || speaker.role}</Badge>
+                            <span className={`${styles.roleBadge} ${roleClass}`}>
+                              {ROLE_LABELS[locale]?.[speaker.role] || speaker.role}
+                            </span>
                           )}
                           {speaker.bio && <p className={styles.speakerBio}>{speaker.bio}</p>}
                         </div>
@@ -254,7 +259,7 @@ export default async function EventDetailPage({
                           <p className={styles.agendaDesc}>{slot.descriptionAr}</p>
                         )}
                         {slot.speaker && (
-                          <span className={styles.agendaSpeaker}>👤 {slot.speaker}</span>
+                          <span className={styles.agendaSpeaker}>{slot.speaker}</span>
                         )}
                       </div>
                     </div>
@@ -301,7 +306,7 @@ export default async function EventDetailPage({
                 <div className={styles.includesExcludesGrid}>
                   {includes.length > 0 && (
                     <div className={styles.includesColumn}>
-                      <h3>{isAr ? '✅ يشمل' : '✅ Includes'}</h3>
+                      <h3>{isAr ? 'يشمل' : 'Includes'}</h3>
                       <ul className={styles.includesList}>
                         {includes.map((inc, i) => (
                           <li key={inc.id ?? i} className={styles.includeItem}>{inc.item}</li>
@@ -311,7 +316,7 @@ export default async function EventDetailPage({
                   )}
                   {excludes.length > 0 && (
                     <div className={styles.excludesColumn}>
-                      <h3>{isAr ? '❌ لا يشمل' : '❌ Not Included'}</h3>
+                      <h3>{isAr ? 'لا يشمل' : 'Not Included'}</h3>
                       <ul className={styles.excludesList}>
                         {excludes.map((exc, i) => (
                           <li key={exc.id ?? i} className={styles.excludeItem}>{exc.item}</li>
@@ -353,7 +358,7 @@ export default async function EventDetailPage({
                         className={styles.sponsorCard}
                       >
                         {logoUrl ? (
-                          <Image src={logoUrl} alt={partner.name} width={120} height={48} className={styles.sponsorLogo} />
+                          <Image src={logoUrl} alt={partner.name} width={120} height={48} className={styles.sponsorLogo} unoptimized />
                         ) : (
                           <span className={styles.sponsorName}>{partner.name}</span>
                         )}
@@ -382,16 +387,16 @@ export default async function EventDetailPage({
 
                 <div className={styles.registrationInfo}>
                   <div className={styles.registrationInfoItem}>
-                    <span className={styles.registrationInfoIcon}>📅</span>
+                    <span className={styles.registrationInfoDot} />
                     <span>{dateRange}</span>
                   </div>
                   <div className={styles.registrationInfoItem}>
-                    <span className={styles.registrationInfoIcon}>📍</span>
+                    <span className={styles.registrationInfoDot} />
                     <span>{venue}</span>
                   </div>
                   {event.maxCapacity && event.maxCapacity > 0 && (
                     <div className={styles.registrationInfoItem}>
-                      <span className={styles.registrationInfoIcon}>👥</span>
+                      <span className={styles.registrationInfoDot} />
                       <span>{event.maxCapacity} {isAr ? 'مقعد' : 'seats'}</span>
                     </div>
                   )}
@@ -399,7 +404,7 @@ export default async function EventDetailPage({
 
                 {deadline && (
                   <p className={styles.deadlineNotice}>
-                    ⏰ {isAr ? `آخر موعد للتسجيل: ${deadline}` : `Registration deadline: ${deadline}`}
+                    {isAr ? `آخر موعد للتسجيل: ${deadline}` : `Registration deadline: ${deadline}`}
                   </p>
                 )}
 

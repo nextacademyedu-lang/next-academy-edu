@@ -290,7 +290,7 @@ export default async function ProgramDetailsPage({
                             <span className={styles.value}>
                               {round.locationMapUrl ? (
                                 <a href={round.locationMapUrl} target="_blank" rel="noreferrer" className={styles.mapLink}>
-                                  {round.locationAddress} 📍
+                                  {round.locationAddress}
                                 </a>
                               ) : (
                                 round.locationAddress
