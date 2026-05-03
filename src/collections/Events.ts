@@ -177,6 +177,7 @@ export const Events: CollectionConfig = {
               defaultValue: 'EGP',
             },
             { name: 'maxCapacity', type: 'number', admin: { description: 'Maximum attendees (0 = unlimited)' } },
+            { name: 'currentEnrollments', type: 'number', defaultValue: 0, admin: { readOnly: true } },
             {
               name: 'language',
               type: 'select',

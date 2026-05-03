@@ -29,6 +29,16 @@ export interface PayloadRound {
   program: PayloadProgram | string;
 }
 
+export interface PayloadEvent {
+  id: string;
+  titleAr: string;
+  titleEn?: string;
+  eventDate: string;
+  locationType?: 'online' | 'in_person' | 'hybrid';
+  onlineLink?: string;
+  currency?: 'EGP' | 'USD' | 'EUR' | 'SAR';
+}
+
 export interface PayloadBooking {
   id: string;
   bookingCode: string;
@@ -38,7 +48,8 @@ export interface PayloadBooking {
   remainingAmount: number;
   finalAmount: number;
   discountAmount: number;
-  round: PayloadRound | string;
+  round?: PayloadRound | string;
+  event?: PayloadEvent | string;
   paymentPlan?: { id: string; name: string } | string | null;
   createdAt: string;
 }
@@ -243,8 +254,13 @@ export async function changeUserPassword(
 // Helpers
 // ─────────────────────────────────────────────
 
-/** Extract program title preferring English, fallback to Arabic */
+/** Extract program/event title preferring English, fallback to Arabic */
 export function getProgramTitle(booking: PayloadBooking): string {
+  if (booking.event) {
+    const event = booking.event as PayloadEvent;
+    if (typeof event === 'string') return 'Event';
+    return event.titleEn || event.titleAr || 'Event';
+  }
   const round = booking.round as PayloadRound;
   if (!round || typeof round === 'string') return 'Program';
   const program = round.program as PayloadProgram;
@@ -252,8 +268,13 @@ export function getProgramTitle(booking: PayloadBooking): string {
   return program.titleEn || program.titleAr || 'Program';
 }
 
-/** Extract round display name */
+/** Extract round/event display name */
 export function getRoundTitle(booking: PayloadBooking): string {
+  if (booking.event) {
+    const event = booking.event as PayloadEvent;
+    if (typeof event === 'string') return '';
+    return new Date(event.eventDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  }
   const round = booking.round as PayloadRound;
   if (!round || typeof round === 'string') return '';
   return round.title || new Date(round.startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
@@ -261,13 +282,19 @@ export function getRoundTitle(booking: PayloadBooking): string {
 
 /** Extract meeting URL from booking */
 export function getMeetingUrl(booking: PayloadBooking): string | null {
+  if (booking.event) {
+    const event = booking.event as PayloadEvent;
+    if (typeof event === 'string') return null;
+    return event.onlineLink || null;
+  }
   const round = booking.round as PayloadRound;
   if (!round || typeof round === 'string') return null;
   return round.meetingUrl || null;
 }
 
-/** Get program type label */
+/** Get program/event type label */
 export function getProgramType(booking: PayloadBooking): string {
+  if (booking.event) return 'Event';
   const round = booking.round as PayloadRound;
   if (!round || typeof round === 'string') return 'Program';
   const program = round.program as PayloadProgram;

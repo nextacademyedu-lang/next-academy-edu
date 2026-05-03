@@ -31,15 +31,17 @@ export async function POST(req: NextRequest) {
     if (csrfError) return csrfError;
 
     stage = 'parse_request';
-    const { roundId, paymentPlanId, discountCode } = await req.json() as {
-      roundId: string | number;
+    const { roundId, eventId, paymentPlanId, discountCode } = await req.json() as {
+      roundId?: string | number;
+      eventId?: string | number;
       paymentPlanId?: string | number;
       discountCode?: string;
     };
 
     const normalizedRoundId = normalizeNumericId(roundId);
-    if (normalizedRoundId == null) {
-      return NextResponse.json({ error: 'roundId مطلوب' }, { status: 400 });
+    const normalizedEventId = normalizeNumericId(eventId);
+    if (normalizedRoundId == null && normalizedEventId == null) {
+      return NextResponse.json({ error: 'roundId أو eventId مطلوب' }, { status: 400 });
     }
 
     const normalizedPaymentPlanId = normalizeNumericId(paymentPlanId ?? null);
@@ -52,41 +54,70 @@ export async function POST(req: NextRequest) {
     const user = await authenticateRequestUser(payload, req);
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-    // ── Fetch round ───────────────────────────────────────────────────────
-    stage = 'find_round';
-    const round = await payload.findByID({
-      collection: 'rounds',
-      id: normalizedRoundId,
-      depth: 1,
-    });
-    if (!round) return NextResponse.json({ error: 'الراوند مش موجود' }, { status: 404 });
-    if (!['open', 'upcoming'].includes(round.status ?? '')) {
-      return NextResponse.json({ error: 'الراوند مش متاح للحجز' }, { status: 400 });
-    }
-    if ((round.currentEnrollments ?? 0) >= round.maxCapacity) {
-      return NextResponse.json({ error: 'الراوند ممتلئ' }, { status: 400 });
+    // ── Fetch target (Round or Event) ──────────────────────────────────────
+    stage = 'find_target';
+    let targetObj: { price: number; earlyBirdPrice?: number; earlyBirdDeadline?: string | null };
+    
+    if (normalizedRoundId != null) {
+      const round = await payload.findByID({
+        collection: 'rounds',
+        id: normalizedRoundId,
+        depth: 1,
+      });
+      if (!round) return NextResponse.json({ error: 'الراوند مش موجود' }, { status: 404 });
+      if (!['open', 'upcoming'].includes(round.status ?? '')) {
+        return NextResponse.json({ error: 'الراوند مش متاح للحجز' }, { status: 400 });
+      }
+      if ((round.currentEnrollments ?? 0) >= round.maxCapacity) {
+        return NextResponse.json({ error: 'الراوند ممتلئ' }, { status: 400 });
+      }
+      targetObj = { 
+        price: round.price, 
+        earlyBirdPrice: round.earlyBirdPrice ?? undefined, 
+        earlyBirdDeadline: round.earlyBirdDeadline ?? undefined 
+      };
+    } else {
+      const event = await payload.findByID({
+        collection: 'events',
+        id: normalizedEventId as number,
+        depth: 1,
+      });
+      if (!event) return NextResponse.json({ error: 'الحدث غير موجود' }, { status: 404 });
+      if (!(event as any).isActive) {
+        return NextResponse.json({ error: 'الحدث غير متاح للحجز حالياً' }, { status: 400 });
+      }
+      if ((event as any).maxCapacity && (event as any).maxCapacity > 0 && ((event as any).currentEnrollments ?? 0) >= (event as any).maxCapacity) {
+        return NextResponse.json({ error: 'الحدث مكتمل العدد' }, { status: 400 });
+      }
+      targetObj = { price: Number(event.price ?? 0) };
     }
 
     // ── Check duplicate booking ───────────────────────────────────────────
     stage = 'check_duplicate';
+    const whereClause: any = {
+      user: { equals: user.id },
+      status: { not_in: ['cancelled', 'refunded'] },
+    };
+    if (normalizedRoundId != null) {
+      whereClause.round = { equals: normalizedRoundId };
+    } else if (normalizedEventId != null) {
+      whereClause.event = { equals: normalizedEventId };
+    }
+    
     const existing = await payload.find({
       collection: 'bookings',
-      where: {
-        user: { equals: user.id },
-        round: { equals: normalizedRoundId },
-        status: { not_in: ['cancelled', 'refunded'] },
-      },
+      where: whereClause,
       limit: 1,
     });
     if (existing.totalDocs > 0) {
-      return NextResponse.json({ error: 'لديك حجز مسبق في هذا الراوند' }, { status: 400 });
+      return NextResponse.json({ error: 'لديك حجز مسبق في هذا الحدث أو الراوند' }, { status: 400 });
     }
 
     // ── Calculate amount ──────────────────────────────────────────────────
     stage = 'calculate_amount';
-    let basePrice = round.price;
-    if (round.earlyBirdPrice && round.earlyBirdDeadline && new Date(round.earlyBirdDeadline) > new Date()) {
-      basePrice = round.earlyBirdPrice;
+    let basePrice = targetObj.price;
+    if (targetObj.earlyBirdPrice && targetObj.earlyBirdDeadline && new Date(targetObj.earlyBirdDeadline) > new Date()) {
+      basePrice = targetObj.earlyBirdPrice;
     }
 
     let discountAmount = 0;
@@ -130,13 +161,15 @@ export async function POST(req: NextRequest) {
     const isFreeBooking = finalAmount <= 0;
 
     // ── Create booking ────────────────────────────────────────────────────
+    // ── Create booking ────────────────────────────────────────────────────
     stage = 'create_booking';
     const booking = await payload.create({
       collection: 'bookings',
       data: {
         bookingCode: generateCode('BK'),
         user: user.id,
-        round: normalizedRoundId,
+        round: normalizedRoundId ?? undefined,
+        event: normalizedEventId ?? undefined,
         paymentPlan: normalizedPaymentPlanId,
         status: 'pending' as const,
         totalAmount: basePrice,
@@ -217,10 +250,18 @@ export async function POST(req: NextRequest) {
 
     // ── Atomically increment enrollments (single SQL statement) ────────────
     // Returns null if current_enrollments + 1 would exceed max_capacity.
-    stage = 'increment_round_enrollments';
-    const newEnrollments = await atomicIncrementWithCeiling(
-      'rounds', normalizedRoundId, 'current_enrollments', 1, 'max_capacity',
-    );
+    stage = 'increment_enrollments';
+    let newEnrollments: number | null = null;
+    
+    if (normalizedRoundId != null) {
+      newEnrollments = await atomicIncrementWithCeiling(
+        'rounds', normalizedRoundId, 'current_enrollments', 1, 'max_capacity',
+      );
+    } else if (normalizedEventId != null) {
+      newEnrollments = await atomicIncrementWithCeiling(
+        'events', normalizedEventId, 'current_enrollments', 1, 'max_capacity',
+      );
+    }
 
     if (newEnrollments === null) {
       // Capacity filled by a concurrent request — abort gracefully
@@ -245,18 +286,21 @@ export async function POST(req: NextRequest) {
         overrideAccess: true,
         req: req as any,
       });
-      return NextResponse.json({ error: 'الراوند ممتلئ' }, { status: 400 });
+      return NextResponse.json({ error: 'الحدث أو الراوند ممتلئ' }, { status: 400 });
     }
 
     // Auto-close round if now full
-    if (round.autoCloseOnFull && newEnrollments >= round.maxCapacity) {
-      await payload.update({
-        collection: 'rounds',
-        id: normalizedRoundId,
-        data: { status: 'full' },
-        overrideAccess: true,
-        req: req as any,
-      });
+    if (normalizedRoundId != null) {
+      const currentRound = await payload.findByID({ collection: 'rounds', id: normalizedRoundId, depth: 0 });
+      if (currentRound && currentRound.autoCloseOnFull && newEnrollments >= currentRound.maxCapacity) {
+        await payload.update({
+          collection: 'rounds',
+          id: normalizedRoundId,
+          data: { status: 'full' },
+          overrideAccess: true,
+          req: req as any,
+        });
+      }
     }
 
     if (isFreeBooking && freePaymentId != null) {

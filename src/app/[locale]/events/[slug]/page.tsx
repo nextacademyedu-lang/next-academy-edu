@@ -10,6 +10,7 @@ import type { Event, Partner, Media } from '@/payload-types';
 import { Navbar } from '@/components/layout/navbar';
 import { Footer } from '@/components/layout/footer';
 import { Badge } from '@/components/ui/badge';
+import { BookEventButton } from '@/components/checkout/book-event-button';
 import styles from './page.module.css';
 import { buildPageMetadata } from '@/lib/seo/metadata';
 
@@ -133,6 +134,13 @@ export default async function EventDetailPage({
   const priceText = event.price
     ? `${event.price.toLocaleString()} ${event.currency || 'EGP'}`
     : isAr ? 'مجاني' : 'Free';
+
+  let timeString = '';
+  if (event.startTime && event.endTime) {
+    timeString = `${event.startTime} - ${event.endTime}`;
+  } else if (event.startTime) {
+    timeString = event.startTime;
+  }
 
   const deadline = event.registrationDeadline
     ? new Date(event.registrationDeadline).toLocaleDateString(dateLocale, { month: 'long', day: 'numeric', year: 'numeric' })
@@ -357,11 +365,12 @@ export default async function EventDetailPage({
                         rel="noreferrer"
                         className={styles.sponsorCard}
                       >
-                        {logoUrl ? (
-                          <Image src={logoUrl} alt={partner.name} width={120} height={48} className={styles.sponsorLogo} unoptimized />
-                        ) : (
-                          <span className={styles.sponsorName}>{partner.name}</span>
+                        {logoUrl && (
+                          <div className={styles.sponsorLogoWrapper}>
+                            <Image src={logoUrl} alt={partner.name} width={160} height={80} className={styles.sponsorLogo} unoptimized />
+                          </div>
                         )}
+                        <span className={styles.sponsorName}>{partner.name}</span>
                       </a>
                     );
                   })}
@@ -390,6 +399,12 @@ export default async function EventDetailPage({
                     <span className={styles.registrationInfoDot} />
                     <span>{dateRange}</span>
                   </div>
+                  {timeString && (
+                    <div className={styles.registrationInfoItem}>
+                      <span className={styles.registrationInfoDot} />
+                      <span dir="auto">{timeString}</span>
+                    </div>
+                  )}
                   <div className={styles.registrationInfoItem}>
                     <span className={styles.registrationInfoDot} />
                     <span>{venue}</span>
@@ -409,12 +424,13 @@ export default async function EventDetailPage({
                 )}
 
                 {isRegistrationOpen ? (
-                  <Link
-                    href={`/${locale}/contact?event=${encodeURIComponent(title)}`}
+                  <BookEventButton
+                    locale={locale}
+                    eventId={event.id}
+                    eventSlug={event.slug}
+                    label={isAr ? 'سجّل الآن' : 'Register Now'}
                     className={styles.registerButton}
-                  >
-                    {isAr ? 'سجّل الآن' : 'Register Now'}
-                  </Link>
+                  />
                 ) : (
                   <p className={styles.capacityNotice}>
                     {isAr ? 'التسجيل مغلق' : 'Registration closed'}

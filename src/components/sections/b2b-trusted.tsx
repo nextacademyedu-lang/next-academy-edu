@@ -68,6 +68,7 @@ export async function B2BTrustedSection() {
                       width={120}
                       height={48}
                       className={styles.logoImage}
+                      unoptimized
                     />
                   ) : (
                     <span>{partner.name}</span>
@@ -87,6 +88,7 @@ export async function B2BTrustedSection() {
                       width={120}
                       height={48}
                       className={styles.logoImage}
+                      unoptimized
                     />
                   ) : (
                     <span>{partner.name}</span>
@@ -106,6 +108,7 @@ export async function B2BTrustedSection() {
                       width={120}
                       height={48}
                       className={styles.logoImage}
+                      unoptimized
                     />
                   ) : (
                     <span>{partner.name}</span>

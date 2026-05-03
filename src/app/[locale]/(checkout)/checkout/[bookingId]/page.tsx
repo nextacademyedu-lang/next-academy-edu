@@ -253,10 +253,12 @@ export default function CheckoutPage() {
   const programTitle = getProgramTitleFromBooking(booking);
   const hasPersistedDiscount = (booking.discountAmount ?? 0) > 0;
   const amount = discountApplied ? discountApplied.newTotal : booking.finalAmount;
-  const bookingCurrency =
-    booking.round && typeof booking.round === 'object'
-      ? String((booking.round as { currency?: string | null }).currency || 'EGP')
-      : 'EGP';
+  let bookingCurrency = 'EGP';
+  if (booking.round && typeof booking.round === 'object') {
+    bookingCurrency = String((booking.round as { currency?: string | null }).currency || 'EGP');
+  } else if (booking.event && typeof booking.event === 'object') {
+    bookingCurrency = String((booking.event as { currency?: string | null }).currency || 'EGP');
+  }
 
   return (
     <div className={styles.container}>

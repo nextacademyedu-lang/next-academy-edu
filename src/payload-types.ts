@@ -712,6 +712,7 @@ export interface Event {
    * Maximum attendees (0 = unlimited)
    */
   maxCapacity?: number | null;
+  currentEnrollments?: number | null;
   /**
    * Language the event is delivered in
    */
@@ -2462,6 +2463,7 @@ export interface EventsSelect<T extends boolean = true> {
   price?: T;
   currency?: T;
   maxCapacity?: T;
+  currentEnrollments?: T;
   language?: T;
   customRegistrationFields?:
     | T
