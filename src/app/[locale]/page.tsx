@@ -12,6 +12,7 @@ import { TextTestimonialsSection } from '@/components/sections/text-testimonials
 import { InstructorsPreview } from '@/components/sections/instructors-preview';
 import { VideoTestimonialsSection } from '@/components/sections/video-testimonials';
 import { BlogsPreviewSection } from '@/components/sections/blogs-preview';
+import { PromotionalBanner } from '@/components/sections/promotional-banner';
 import { buildPageMetadata } from '@/lib/seo/metadata';
 
 export async function generateMetadata({
@@ -48,6 +49,7 @@ export default async function HomePage({
         <FeaturedPrograms />
         <WhyChooseUs />
         <UpcomingEvents locale={locale} />
+        <PromotionalBanner locale={locale} />
         <TextTestimonialsSection />
         <InstructorsPreview />
         <B2BTrustedSection />

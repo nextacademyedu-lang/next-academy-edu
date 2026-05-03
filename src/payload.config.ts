@@ -97,6 +97,7 @@ import { AnnouncementBars } from './collections/AnnouncementBars.ts';
 import { UpcomingEventsConfig } from './collections/UpcomingEventsConfig.ts';
 import { CrmSyncEvents } from './collections/CrmSyncEvents.ts';
 import { RefundRequests } from './collections/RefundRequests.ts';
+import { PromotionalBanner } from './collections/PromotionalBanner.ts';
 import { Partners } from './collections/Partners.ts';
 import { InstructorProgramSubmissions } from './collections/InstructorProgramSubmissions.ts';
 import { InstructorAgreements } from './collections/InstructorAgreements.ts';
@@ -295,6 +296,9 @@ export default buildConfig({
     CompanyGroups,
     CompanyGroupMembers,
     CompanyPolicies,
+  ],
+  globals: [
+    PromotionalBanner,
   ],
   editor: lexicalEditor({}),
   plugins: storagePlugins,

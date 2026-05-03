@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { getPayload } from 'payload';
 import type { Where } from 'payload';
 import config from '@payload-config';
-import type { Media, Program, Round } from '@/payload-types';
+import type { Media, Program, Round, Event as PayloadEvent } from '@/payload-types';
 
 const PUBLIC_CACHE_HEADERS = {
   'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=60',
@@ -29,12 +29,33 @@ function extractMediaUrl(value: unknown): string | undefined {
 }
 
 function buildEventCard(input: {
-  program: Program;
-  round: Round | null;
+  program?: Program;
+  round?: Round | null;
+  event?: PayloadEvent;
   customImage?: unknown;
   customUrl?: string;
 }): EventCard {
+  if (input.event) {
+    const ev = input.event;
+    return {
+      id: ev.id,
+      titleAr: ev.titleAr,
+      titleEn: ev.titleEn || ev.titleAr,
+      startDate: ev.eventDate,
+      endDate: ev.eventEndDate || undefined,
+      location: ev.venue || undefined,
+      isOnline: ev.locationType === 'online',
+      price: ev.price ?? undefined,
+      currency: ev.currency || 'EGP',
+      isFree: (ev.price ?? 0) <= 0,
+      registrationUrl: input.customUrl || `/events/${ev.slug || ev.id}`,
+      image: extractMediaUrl(input.customImage) || extractMediaUrl(ev.coverImage) || extractMediaUrl(ev.thumbnail),
+    };
+  }
+
   const { program, round, customImage, customUrl } = input;
+  if (!program) throw new Error('Program or Event required');
+
   const location = round?.locationName || round?.locationAddress || undefined;
   const image = extractMediaUrl(customImage)
     || extractMediaUrl(program.coverImage)
@@ -102,9 +123,28 @@ export async function GET() {
           // Sort by sortOrder
           const sorted = [...manualItems].sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
 
-          // Populate program data
           const events = await Promise.all(
             sorted.slice(0, maxItems).map(async (item) => {
+              const itemType = (item as any).type || 'program';
+
+              if (itemType === 'event') {
+                const eventId = typeof (item as any).event === 'object'
+                  ? (item as any).event.id
+                  : (item as any).event;
+
+                const eventDoc = (await payload.findByID({
+                  collection: 'events',
+                  id: eventId,
+                  depth: 1,
+                })) as PayloadEvent;
+
+                return buildEventCard({
+                  event: eventDoc,
+                  customImage: item.customImage,
+                  customUrl: item.customUrl || undefined,
+                });
+              }
+
               const programId =
                 typeof item.program === 'object'
                   ? (item.program as unknown as { id: string | number }).id
@@ -152,40 +192,66 @@ export async function GET() {
           };
         }
 
-        // Automatic mode: query rounds starting in the future
+        // Automatic mode: query rounds AND events starting in the future
         const filterType = eventsConfig.filterType as string;
 
-        const whereClause: Where = {
+        const roundsWhereClause: Where = {
           and: [
             { status: { in: ['open', 'upcoming'] } },
             { startDate: { greater_than: now } },
           ],
         };
 
-        if (filterType && filterType !== 'all' && whereClause.and) {
-          whereClause.and.push({ type: { equals: filterType } });
+        const eventsWhereClause: Where = {
+          and: [
+            { isActive: { equals: true } },
+            { eventDate: { greater_than: now } },
+          ],
+        };
+
+        if (filterType && filterType !== 'all') {
+          if (roundsWhereClause.and) {
+            roundsWhereClause.and.push({ type: { equals: filterType } });
+          }
+          if (eventsWhereClause.and) {
+            eventsWhereClause.and.push({ type: { equals: filterType } });
+          }
         }
 
-        const sortOrder = eventsConfig.sortOrder === 'date_asc' ? 'startDate' : 'sortOrder';
-
-        const rounds = await payload.find({
+        const roundsPromise = payload.find({
           collection: 'rounds',
-          where: whereClause,
-          sort: sortOrder,
+          where: roundsWhereClause,
+          sort: 'startDate',
           limit: maxItems,
-          depth: 2, // populate program + instructor
+          depth: 2,
         });
 
-        const events = rounds.docs
+        const eventsPromise = payload.find({
+          collection: 'events',
+          where: eventsWhereClause,
+          sort: 'eventDate',
+          limit: maxItems,
+          depth: 2,
+        });
+
+        const [roundsRes, eventsRes] = await Promise.all([roundsPromise, eventsPromise]);
+
+        const upcomingRounds = roundsRes.docs
           .map((round) => {
             const program = typeof round.program === 'object' ? (round.program as Program) : null;
             if (!program) return null;
-            return buildEventCard({
-              program,
-              round: round as Round,
-            });
+            return buildEventCard({ program, round: round as Round });
           })
-          .filter(Boolean);
+          .filter(Boolean) as EventCard[];
+
+        const upcomingStandaloneEvents = eventsRes.docs
+          .map((ev) => buildEventCard({ event: ev as PayloadEvent }))
+          .filter(Boolean) as EventCard[];
+
+        // Combine, sort by date, and take top maxItems
+        const events = [...upcomingRounds, ...upcomingStandaloneEvents]
+          .sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime())
+          .slice(0, maxItems);
 
         return {
           events,

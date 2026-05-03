@@ -123,15 +123,38 @@ export const UpcomingEventsConfig: CollectionConfig = {
       },
       fields: [
         {
+          name: 'type',
+          type: 'radio',
+          options: [
+            { label: 'Program/Round', value: 'program' },
+            { label: 'Event', value: 'event' },
+          ],
+          defaultValue: 'program',
+          admin: { layout: 'horizontal' },
+        },
+        {
           name: 'program',
           type: 'relationship',
           relationTo: 'programs',
-          required: true,
+          admin: {
+            condition: (data, siblingData) => siblingData?.type === 'program',
+          },
         },
         {
           name: 'round',
           type: 'relationship',
           relationTo: 'rounds',
+          admin: {
+            condition: (data, siblingData) => siblingData?.type === 'program',
+          },
+        },
+        {
+          name: 'event',
+          type: 'relationship',
+          relationTo: 'events',
+          admin: {
+            condition: (data, siblingData) => siblingData?.type === 'event',
+          },
         },
         {
           name: 'customImage',

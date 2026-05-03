@@ -167,8 +167,12 @@ export interface Config {
     defaultIDType: number;
   };
   fallbackLocale: null;
-  globals: {};
-  globalsSelect: {};
+  globals: {
+    'promotional-banner': PromotionalBanner;
+  };
+  globalsSelect: {
+    'promotional-banner': PromotionalBannerSelect<false> | PromotionalBannerSelect<true>;
+  };
   locale: null;
   widgets: {
     collections: CollectionsWidget;
@@ -627,13 +631,21 @@ export interface Event {
    */
   sponsors?: (number | Partner)[] | null;
   /**
-   * Start date/time
+   * Event start date
    */
   eventDate: string;
   /**
-   * End date/time (optional)
+   * Event end date (optional, for multi-day events)
    */
   eventEndDate?: string | null;
+  /**
+   * Start time in 24h format e.g. "10:00" or 12h e.g. "2:00 PM"
+   */
+  startTime?: string | null;
+  /**
+   * End time in 24h format e.g. "14:00" or 12h e.g. "4:00 PM"
+   */
+  endTime?: string | null;
   /**
    * Total event duration in hours
    */
@@ -651,6 +663,10 @@ export interface Event {
    * Full address
    */
   venueAddress?: string | null;
+  /**
+   * Google Maps link for the venue (paste the share link from Google Maps)
+   */
+  googleMapsUrl?: string | null;
   /**
    * Zoom / Meet / etc. link
    */
@@ -1657,8 +1673,10 @@ export interface UpcomingEventsConfig {
   emptyMessageEn?: string | null;
   manualItems?:
     | {
-        program: number | Program;
+        type?: ('program' | 'event') | null;
+        program?: (number | null) | Program;
         round?: (number | null) | Round;
+        event?: (number | null) | Event;
         customImage?: (number | null) | Media;
         customUrl?: string | null;
         /**
@@ -2406,11 +2424,14 @@ export interface EventsSelect<T extends boolean = true> {
   sponsors?: T;
   eventDate?: T;
   eventEndDate?: T;
+  startTime?: T;
+  endTime?: T;
   durationHours?: T;
   registrationDeadline?: T;
   locationType?: T;
   venue?: T;
   venueAddress?: T;
+  googleMapsUrl?: T;
   onlineLink?: T;
   agenda?:
     | T
@@ -3163,8 +3184,10 @@ export interface UpcomingEventsConfigSelect<T extends boolean = true> {
   manualItems?:
     | T
     | {
+        type?: T;
         program?: T;
         round?: T;
+        event?: T;
         customImage?: T;
         customUrl?: T;
         sortOrder?: T;
@@ -3384,6 +3407,53 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
   batch?: T;
   updatedAt?: T;
   createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "promotional-banner".
+ */
+export interface PromotionalBanner {
+  id: number;
+  isActive?: boolean | null;
+  titleAr: string;
+  titleEn?: string | null;
+  subtitleAr?: string | null;
+  subtitleEn?: string | null;
+  /**
+   * Recommended size: 1200x400 or similar wide ratio.
+   */
+  image?: (number | null) | Media;
+  buttonTextAr?: string | null;
+  buttonTextEn?: string | null;
+  /**
+   * e.g. /events/my-event or https://example.com
+   */
+  buttonLink?: string | null;
+  /**
+   * Background color (e.g. #1a2e4a or rgb(26, 46, 74))
+   */
+  backgroundColor?: string | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "promotional-banner_select".
+ */
+export interface PromotionalBannerSelect<T extends boolean = true> {
+  isActive?: T;
+  titleAr?: T;
+  titleEn?: T;
+  subtitleAr?: T;
+  subtitleEn?: T;
+  image?: T;
+  buttonTextAr?: T;
+  buttonTextEn?: T;
+  buttonLink?: T;
+  backgroundColor?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
