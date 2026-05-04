@@ -460,8 +460,8 @@ export default async function EventDetailPage({
                 {event.maxCapacity && event.maxCapacity > 0 && (
                   <p className={styles.capacityNotice}>
                     {isAr
-                      ? `${event.attendeesCount || 0} من ${event.maxCapacity} مسجل`
-                      : `${event.attendeesCount || 0} of ${event.maxCapacity} registered`}
+                      ? `${event.currentEnrollments || event.attendeesCount || 0} من ${event.maxCapacity} مسجل`
+                      : `${event.currentEnrollments || event.attendeesCount || 0} of ${event.maxCapacity} registered`}
                   </p>
                 )}
               </div>
