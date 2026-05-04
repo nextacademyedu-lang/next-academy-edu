@@ -4,6 +4,41 @@
 
 ---
 
+### 🔧 [2026-05-04 05:30] - HOTFIX: Payload Locked Documents Relation Crash
+
+| File | Change |
+|---|---|
+| `src/migrations/20260504_024000_fix_promo_banners_rels.ts` | Added missing `promo_banners_id` column to `payload_locked_documents_rels` |
+
+**Issue:** Deployment in Coolify failed due to `column 6efbaa3c_9e91_4878_9449_0ba7b837deee.promo_banners_id does not exist`. The new PromoBanners collection lacked the relation columns in Payload's internal versions/drafts table.
+**Fix:** Created an emergency SQL migration to safely append the column and foreign key to `payload_locked_documents_rels`.
+
+---
+
+### [2026-05-04 05:20] - Booking UX, Upcoming Events API, & Onboarding Validations
+
+**Files updated:**
+- `src/app/api/upcoming-events/route.ts`
+- `src/lib/profile-check.ts` (NEW)
+- `src/components/checkout/book-event-button.tsx`
+- `src/components/checkout/book-round-button.tsx`
+- `src/app/api/bookings/create/route.ts`
+- `src/app/[locale]/(auth)/onboarding/page.tsx`
+- `src/lib/dashboard-api.ts`
+- `src/app/[locale]/(dashboard)/dashboard/bookings/page.tsx`
+- `src/components/sections/promotional-banner.module.css`
+- `src/migrations/20260504_014200_create_promo_banners.ts`
+
+**What changed technically:**
+1. **Upcoming Events Fallback:** Removed the hard requirement for `isEnabled` and configuration documents in the `/api/upcoming-events/route.ts`. The API now natively fetches future events and rounds and returns them perfectly structured if no manual configuration is provided by the admin.
+2. **Profile Completeness Guard:** Added client-side and server-side checks. `src/lib/profile-check.ts` verifies that `firstName`, `lastName`, and `phone` are present before a booking begins. If missing, users are redirected to `/dashboard/profile?incomplete=1`. The `bookings/create` API was updated to reject incomplete profiles with a 400 error.
+3. **Onboarding Enforcement:** Made `gender` a mandatory field in step 1 of the onboarding component logic (`onboarding/page.tsx`).
+4. **Enhanced Booking Dashboard:** Rewrote `dashboard/bookings/page.tsx` cards. Added `getBookingEventDetails` helper to `dashboard-api.ts`. Cards now display accurate Time, Date, and Venue, a "Free Event" badge for free events (fixing the "Payment 0%" confusion), and dynamically generated "Add to Calendar" links for Google Calendar.
+5. **Styling and DB Fixes:** Fixed a CSS purity error regarding `:root` selectors in `promotional-banner.module.css` and removed a crashing try/catch query from the promotion banner Postgres migration to ensure deployments succeed without transaction abort errors.
+
+**Reason:** 
+To protect data integrity across all bookings (preventing bookings with missing profile names/numbers), ensure the homepage events are always populated, and improve the user experience for users reviewing their upcoming bookings.
+
 ### [2026-03-29 22:40] - Phase 2.1 Security Hotfixes (RBAC + Endpoint Guards)
 
 **Files updated (this pass):**

@@ -66,7 +66,7 @@ function buildEventCard(input: {
       currency: ev.currency || 'EGP',
       isFree: (ev.price ?? 0) <= 0,
       registrationUrl: input.customUrl || `/events/${ev.slug || ev.id}`,
-      image: extractMediaUrl(input.customImage) || extractMediaUrl(ev.coverImage) || extractMediaUrl(ev.thumbnail),
+      image: extractMediaUrl(input.customImage) || extractMediaUrl(ev.thumbnail) || extractMediaUrl(ev.coverImage),
       brand: brandData,
     };
   }

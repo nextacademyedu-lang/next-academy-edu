@@ -70,7 +70,7 @@ export function UpcomingEvents({ locale }: UpcomingEventsProps) {
   };
 
   const formatPrice = (evt: EventData) => {
-    if (evt.isFree) return t('free');
+    if (evt.isFree) return t('freeEntry');
     if (!evt.price) return null;
     const currency = evt.currency || 'SAR';
     return new Intl.NumberFormat(isAr ? 'ar-SA' : 'en-SA', {

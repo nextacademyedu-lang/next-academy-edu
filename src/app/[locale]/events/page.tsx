@@ -154,7 +154,7 @@ export default async function EventsPage() {
               )}
 
               {upcomingEvents.slice(0, 8).map((event, index) => {
-                const imageUrl = getMediaUrl(event.coverImage) || getMediaUrl(event.thumbnail) || fallbackImages[index % fallbackImages.length];
+                const imageUrl = getMediaUrl(event.thumbnail) || getMediaUrl(event.coverImage) || fallbackImages[index % fallbackImages.length];
                 const title =
                   locale === 'ar'
                     ? event.titleAr || event.titleEn || 'فعالية'
@@ -190,9 +190,8 @@ export default async function EventsPage() {
                     <div className={styles.eventBody}>
                       <h3>{title}</h3>
                       <div className={styles.meta}>
-                        <span>{new Date(event.eventDate).toLocaleDateString(locale === 'ar' ? 'ar-EG' : 'en-US')}</span>
+                        <span>{new Date(event.eventDate).toLocaleDateString(locale === 'ar' ? 'ar-EG' : 'en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
                         <span>{locationLabel}</span>
-                        <span>{event.price === 0 ? (locale === 'ar' ? 'مجاني' : 'Free') : `${(event.price || 0).toLocaleString()} ${event.currency || 'EGP'}`}</span>
                       </div>
                     </div>
 
