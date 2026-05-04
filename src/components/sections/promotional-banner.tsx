@@ -60,7 +60,7 @@ export function PromoBannerSlot({ locale, page, position }: PromoBannerSlotProps
   useEffect(() => {
     const load = async () => {
       try {
-        const res = await fetch(`/api/promo-banners?page=${page}&position=${position}`);
+        const res = await fetch(`/api/frontend/promo-banners?page=${page}&position=${position}`);
         if (!res.ok) return;
         const data = await res.json();
         setBanners(data.banners || []);
