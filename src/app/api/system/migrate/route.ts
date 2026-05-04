@@ -20,13 +20,13 @@ export async function GET(req: Request) {
     const { sql } = require('@payloadcms/db-postgres');
 
     // 1. Fix user_profiles work_field enum
-    await adapter.execute(sql`
+    await adapter.drizzle.execute(sql`
       ALTER TABLE "user_profiles" ALTER COLUMN "work_field" TYPE varchar USING "work_field"::varchar;
       DROP TYPE IF EXISTS enum_user_profiles_work_field;
     `);
 
     // 2. Fix promo_banners_rels in payload_locked_documents_rels
-    await adapter.execute(sql`
+    await adapter.drizzle.execute(sql`
       ALTER TABLE "payload_locked_documents_rels" ADD COLUMN IF NOT EXISTS "promo_banners_id" integer;
       
       DO $$ 
