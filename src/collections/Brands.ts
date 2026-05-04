@@ -38,13 +38,23 @@ export const Brands: CollectionConfig = {
       name: 'themeColor',
       type: 'text',
       defaultValue: '#3b82f6',
-      admin: { description: 'Hex code for the primary brand color (e.g. #FF0000)' }
+      admin: { description: 'Primary brand color (e.g. #FF0000)' }
+    },
+    {
+      name: 'secondaryColor',
+      type: 'text',
+      admin: { description: 'Secondary brand color — used for section accents and gradients' }
+    },
+    {
+      name: 'accentColor',
+      type: 'text',
+      admin: { description: 'Accent/CTA color — used for buttons and highlights (defaults to themeColor)' }
     },
     {
       name: 'textColor',
       type: 'text',
       defaultValue: '#ffffff',
-      admin: { description: 'Hex code for the text color displayed on top of the primary color (e.g. #FFFFFF)' }
+      admin: { description: 'Text color on top of the primary color (e.g. #FFFFFF)' }
     },
     {
       name: 'isActive',

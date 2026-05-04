@@ -20,6 +20,18 @@ export const Tags: CollectionConfig = {
       options: ['interest', 'skill', 'industry', 'topic'],
       required: true,
     },
+    { 
+      name: 'color', 
+      type: 'text', 
+      defaultValue: '#3b82f6',
+      admin: { description: 'Background color (hex), e.g. #3b82f6' }
+    },
+    { 
+      name: 'textColor', 
+      type: 'text', 
+      defaultValue: '#ffffff',
+      admin: { description: 'Text color on badge (hex), e.g. #ffffff' }
+    },
     { name: 'usageCount', type: 'number', defaultValue: 0, admin: { readOnly: true } },
   ],
 };

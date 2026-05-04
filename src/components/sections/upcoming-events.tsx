@@ -218,7 +218,7 @@ function EventCardContent({
           <div className={styles.cardImagePlaceholder}>📅</div>
         )}
         {brand && (
-          <div className={styles.cardBrandBadge} style={{ '--brand-color': brand.themeColor } as React.CSSProperties}>
+          <div className={styles.cardBrandBadge} style={{ '--brand-color': brand.themeColor, background: brand.themeColor, color: '#fff' } as React.CSSProperties}>
             {brand.logoUrl && <img src={brand.logoUrl} alt={brand.name} className={styles.cardBrandIcon} />}
             <span>{brand.name}</span>
           </div>

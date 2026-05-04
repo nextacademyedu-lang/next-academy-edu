@@ -167,10 +167,14 @@ export default async function EventDetailPage({
   const brand = event.brand && typeof event.brand === 'object' ? (event.brand as Brand) : null;
   const brandLogoUrl = brand?.logo && typeof brand.logo === 'object' ? (brand.logo as Media).url : null;
   const brandThemeColor = brand?.themeColor || undefined;
+  const brandSecondaryColor = (brand as any)?.secondaryColor || undefined;
+  const brandAccentColor = (brand as any)?.accentColor || brandThemeColor || undefined;
   const brandTextColor = brand?.textColor || undefined;
 
   const mainStyle: React.CSSProperties = {
     ...(brandThemeColor ? { '--accent-primary': brandThemeColor } as any : {}),
+    ...(brandSecondaryColor ? { '--accent-secondary': brandSecondaryColor } as any : {}),
+    ...(brandAccentColor ? { '--accent-cta': brandAccentColor } as any : {}),
     ...(brandTextColor ? { '--text-on-accent': brandTextColor } as any : {}),
   };
 
@@ -191,8 +195,8 @@ export default async function EventDetailPage({
               <Badge variant="default">{typeLabel}</Badge>
               <Badge variant="outline">{locationLabel}</Badge>
               {brand && (
-                <Badge variant="outline" className={styles.brandBadge}>
-                  {brandLogoUrl && <Image src={brandLogoUrl} alt={brand.name} width={24} height={24} className={styles.brandIcon} unoptimized />}
+                <Badge variant="outline" className={styles.brandBadge} style={{ '--brand-theme': brandThemeColor, '--brand-text': brandTextColor } as React.CSSProperties}>
+                  {brandLogoUrl && <Image src={brandLogoUrl} alt={brand.name} width={32} height={32} className={styles.brandIcon} unoptimized />}
                   <span>{brand.name}</span>
                 </Badge>
               )}

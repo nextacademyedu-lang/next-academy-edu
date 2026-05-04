@@ -64,16 +64,20 @@
 .brandBadge {
   display: flex;
   align-items: center;
-  gap: 6px;
-  background: var(--bg-surface);
-  border-color: var(--accent-primary);
-  color: var(--text-primary);
-  padding-left: 6px;
+  gap: 8px;
+  background: var(--brand-theme, var(--bg-surface));
+  border-color: var(--brand-theme, var(--accent-primary));
+  color: var(--brand-text, var(--text-primary));
+  padding: 6px 14px 6px 8px;
+  font-size: 14px;
+  font-weight: 700;
 }
 
 .brandIcon {
-  border-radius: 4px;
+  border-radius: 6px;
   object-fit: contain;
+  background: rgba(255,255,255,0.15);
+  padding: 2px;
 }
 
 .title {
@@ -551,6 +555,7 @@
 .registrationCard {
   background: var(--card-bg);
   border: 1px solid var(--border-subtle);
+  border-top: 4px solid var(--accent-cta, var(--accent-primary));
   border-radius: var(--radius-lg, 16px);
   padding: var(--space-xl, 32px);
   display: flex;
@@ -610,13 +615,14 @@
   font-weight: 700;
   border: none;
   border-radius: var(--radius-md, 12px);
-  background: var(--accent-primary);
-  color: var(--text-on-accent);
+  background: var(--accent-cta, var(--accent-primary));
+  color: var(--text-on-accent, #fff);
   cursor: pointer;
-  transition: opacity 0.2s ease, transform 0.15s ease;
+  transition: opacity 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
   text-align: center;
   text-decoration: none;
   display: block;
+  box-shadow: 0 4px 14px color-mix(in srgb, var(--accent-cta, var(--accent-primary)) 30%, transparent);
 }
 
 .registerButton:hover {

@@ -5,7 +5,7 @@ import type { Metadata } from 'next';
 import { getLocale } from 'next-intl/server';
 import { getPayload } from 'payload';
 import config from '@payload-config';
-import type { Event, Media } from '@/payload-types';
+import type { Event, Media, Brand } from '@/payload-types';
 import { Navbar } from '@/components/layout/navbar';
 import { Footer } from '@/components/layout/footer';
 import { Button } from '@/components/ui/button';
@@ -59,12 +59,11 @@ export default async function EventsPage() {
   try {
     const result = await payload.find({
       collection: 'events',
-      depth: 1,
+      depth: 2,
       limit: 100,
       sort: '-eventDate',
       where: {
         isActive: { equals: true },
-        type: { equals: 'event' },
       },
     });
     events = result.docs as Event[];
@@ -176,6 +175,16 @@ export default async function EventsPage() {
                         sizes="(max-width: 768px) 100vw, 33vw"
                       />
                       <span className={styles.typeBadge}>{buildTypeLabel(event.type, locale)}</span>
+                      {event.brand && typeof event.brand === 'object' && (() => {
+                        const b = event.brand as Brand;
+                        const bLogoUrl = b.logo && typeof b.logo === 'object' ? (b.logo as Media).url : null;
+                        return (
+                          <span className={styles.brandTag} style={{ background: b.themeColor || '#3b82f6' }}>
+                            {bLogoUrl && <img src={bLogoUrl} alt={b.name} width={20} height={20} style={{ borderRadius: 4, objectFit: 'contain' }} />}
+                            <span>{b.name}</span>
+                          </span>
+                        );
+                      })()}
                     </div>
 
                     <div className={styles.eventBody}>
