@@ -31,6 +31,7 @@ import * as migration_20260504_014000_add_tag_colors_and_brand_extras from './20
 import * as migration_20260504_014200_create_promo_banners from './20260504_014200_create_promo_banners';
 import * as migration_20260504_024000_fix_promo_banners_rels from './20260504_024000_fix_promo_banners_rels';
 import * as migration_20260504_030000_fix_user_profiles_work_field from './20260504_030000_fix_user_profiles_work_field';
+import * as migration_20260504_034500_fix_promo_banners_buttons_id from './20260504_034500_fix_promo_banners_buttons_id';
 
 export const migrations = [
   {
