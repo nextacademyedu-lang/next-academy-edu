@@ -4,6 +4,25 @@
 
 ---
 
+### 🔧 [2026-05-04 19:15] - HOTFIX: Onboarding Schema & Event Booking Emails
+
+| File | Change |
+|---|---|
+| `src/app/api/system/migrate/route.ts` | Created standalone migration runner for production |
+| `src/lib/payment-helper.ts` | Added `eventId` support for standalone event booking emails |
+| `src/migrations/index.ts` | Registered `work_field` schema fix migration |
+| `src/migrations/20260504_030000_fix_user_profiles_work_field.ts` | Created migration to fix postgres enum constraint |
+
+**Issue:** 
+1. The `payment-helper` skipped sending confirmation emails for standalone events.
+2. The `onboarding` step was crashing with a 500 DB error due to an outdated enum type on `work_field`, and schema changes were blocked since Payload `push` is disabled in production.
+
+**Fix:** 
+1. Updated `payment-helper.ts` to properly retrieve Event metadata and dispatch emails if `eventId` is present.
+2. Created a manual SQL migration for the enum fix, and provided a safe `/api/system/migrate` REST endpoint to execute it in production without wiping the container.
+
+---
+
 ### 🔧 [2026-05-04 05:30] - HOTFIX: Payload Locked Documents Relation Crash
 
 | File | Change |

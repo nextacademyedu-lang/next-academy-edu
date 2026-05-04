@@ -147,9 +147,10 @@ export async function processSuccessfulPayment(opts: {
     try {
       const userId = typeof booking.user === 'object' ? (booking.user as unknown as { id: string | number })?.id : booking.user;
       const roundId = typeof booking.round === 'object' ? (booking.round as unknown as { id: string | number })?.id : booking.round;
+      const eventId = typeof booking.event === 'object' ? (booking.event as unknown as { id: string | number })?.id : booking.event;
 
-      if (!userId || !roundId) {
-        console.warn('[payment-helper] Missing userId or roundId for confirmation email', { userId, roundId });
+      if (!userId || (!roundId && !eventId)) {
+        console.warn('[payment-helper] Missing userId or (roundId and eventId) for confirmation email', { userId, roundId, eventId });
         return true;
       }
 
@@ -159,35 +160,65 @@ export async function processSuccessfulPayment(opts: {
         overrideAccess: true,
         req: reqForHooks,
       });
-      const round = await payload.findByID({
-        collection: 'rounds',
-        id: roundId,
-        depth: 1,
-        overrideAccess: true,
-        req: reqForHooks,
-      });
-      const program = round?.program as unknown as Record<string, string> | undefined;
 
-      const roundData = round as unknown as Record<string, unknown>;
+      let emailTitle = '';
+      let emailStartDate = '';
+      let emailStartTime: string | null = null;
+      let emailEndTime: string | null = null;
+      let emailLocation: any = null;
+
+      if (roundId) {
+        const round = await payload.findByID({
+          collection: 'rounds',
+          id: roundId,
+          depth: 1,
+          overrideAccess: true,
+          req: reqForHooks,
+        });
+        const program = round?.program as unknown as Record<string, string> | undefined;
+        const roundData = round as unknown as Record<string, unknown>;
+
+        emailTitle = program?.titleAr || program?.titleEn || '\u0627\u0644\u0628\u0631\u0646\u0627\u0645\u062c';
+        emailStartDate = round?.startDate ? new Date(round.startDate).toLocaleDateString('ar-EG') : '';
+        emailStartTime = (roundData.sessionPlan as Array<{ startTime?: string }> | undefined)?.[0]?.startTime || null;
+        emailEndTime = (roundData.sessionPlan as Array<{ endTime?: string }> | undefined)?.[0]?.endTime || null;
+        emailLocation = round?.locationType ? {
+          type: round.locationType as string,
+          name: (roundData.locationName as string) || undefined,
+          address: (roundData.locationAddress as string) || undefined,
+          googleMapsUrl: (roundData.locationMapUrl as string) || undefined,
+        } : null;
+      } else if (eventId) {
+        const event = await payload.findByID({
+          collection: 'events',
+          id: eventId as number,
+          depth: 1,
+          overrideAccess: true,
+          req: reqForHooks,
+        });
+
+        emailTitle = event.titleAr || event.titleEn || '\u0627\u0644\u062d\u062f\u062b';
+        emailStartDate = event.eventDate ? new Date(event.eventDate).toLocaleDateString('ar-EG') : '';
+        emailStartTime = event.startTime || null;
+        emailEndTime = event.endTime || null;
+        emailLocation = event.locationType ? {
+          type: event.locationType as string,
+          name: event.venue || undefined,
+          address: event.venueAddress || undefined,
+          googleMapsUrl: event.googleMapsUrl || undefined,
+        } : null;
+      }
+
       await sendBookingConfirmation({
         to: user.email,
         userName: `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.email,
-        programTitle: program?.titleAr || program?.titleEn || '\u0627\u0644\u0628\u0631\u0646\u0627\u0645\u062c',
+        programTitle: emailTitle,
         bookingCode: booking.bookingCode || String(booking.id),
         amountPaid: booking.finalAmount,
-        startDate: round?.startDate
-          ? new Date(round.startDate).toLocaleDateString('ar-EG')
-          : '',
-        startTime: (roundData.sessionPlan as Array<{ startTime?: string }> | undefined)?.[0]?.startTime || null,
-        endTime: (roundData.sessionPlan as Array<{ endTime?: string }> | undefined)?.[0]?.endTime || null,
-        location: round?.locationType
-          ? {
-              type: round.locationType as string,
-              name: (roundData.locationName as string) || undefined,
-              address: (roundData.locationAddress as string) || undefined,
-              googleMapsUrl: (roundData.locationMapUrl as string) || undefined,
-            }
-          : null,
+        startDate: emailStartDate,
+        startTime: emailStartTime,
+        endTime: emailEndTime,
+        location: emailLocation,
       });
 
       await payload.update({

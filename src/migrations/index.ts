@@ -30,6 +30,7 @@ import * as migration_20260504_012400_make_bookings_round_nullable from './20260
 import * as migration_20260504_014000_add_tag_colors_and_brand_extras from './20260504_014000_add_tag_colors_and_brand_extras';
 import * as migration_20260504_014200_create_promo_banners from './20260504_014200_create_promo_banners';
 import * as migration_20260504_024000_fix_promo_banners_rels from './20260504_024000_fix_promo_banners_rels';
+import * as migration_20260504_030000_fix_user_profiles_work_field from './20260504_030000_fix_user_profiles_work_field';
 
 export const migrations = [
   {
@@ -192,5 +193,11 @@ export const migrations = [
     down: migration_20260504_024000_fix_promo_banners_rels.down,
     name: '20260504_024000_fix_promo_banners_rels',
   },
+  {
+    up: migration_20260504_030000_fix_user_profiles_work_field.up,
+    down: migration_20260504_030000_fix_user_profiles_work_field.down,
+    name: '20260504_030000_fix_user_profiles_work_field',
+  },
+
 ];
 
