@@ -32,6 +32,7 @@ import * as migration_20260504_014200_create_promo_banners from './20260504_0142
 import * as migration_20260504_024000_fix_promo_banners_rels from './20260504_024000_fix_promo_banners_rels';
 import * as migration_20260504_030000_fix_user_profiles_work_field from './20260504_030000_fix_user_profiles_work_field';
 import * as migration_20260504_034500_fix_promo_banners_buttons_id from './20260504_034500_fix_promo_banners_buttons_id';
+import * as migration_20260504_040500_fix_user_profiles_how_did_you_hear from './20260504_040500_fix_user_profiles_how_did_you_hear';
 
 export const migrations = [
   {
@@ -203,5 +204,10 @@ export const migrations = [
     up: migration_20260504_034500_fix_promo_banners_buttons_id.up,
     down: migration_20260504_034500_fix_promo_banners_buttons_id.down,
     name: '20260504_034500_fix_promo_banners_buttons_id',
+  },
+  {
+    up: migration_20260504_040500_fix_user_profiles_how_did_you_hear.up,
+    down: migration_20260504_040500_fix_user_profiles_how_did_you_hear.down,
+    name: '20260504_040500_fix_user_profiles_how_did_you_hear',
   },
 ];
