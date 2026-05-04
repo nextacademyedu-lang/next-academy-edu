@@ -110,6 +110,7 @@ export interface Config {
     'company-groups': CompanyGroup;
     'company-group-members': CompanyGroupMember;
     'company-policies': CompanyPolicy;
+    'promo-banners': PromoBanner;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -160,6 +161,7 @@ export interface Config {
     'company-groups': CompanyGroupsSelect<false> | CompanyGroupsSelect<true>;
     'company-group-members': CompanyGroupMembersSelect<false> | CompanyGroupMembersSelect<true>;
     'company-policies': CompanyPoliciesSelect<false> | CompanyPoliciesSelect<true>;
+    'promo-banners': PromoBannersSelect<false> | PromoBannersSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -169,12 +171,8 @@ export interface Config {
     defaultIDType: number;
   };
   fallbackLocale: null;
-  globals: {
-    'promotional-banner': PromotionalBanner;
-  };
-  globalsSelect: {
-    'promotional-banner': PromotionalBannerSelect<false> | PromotionalBannerSelect<true>;
-  };
+  globals: {};
+  globalsSelect: {};
   locale: null;
   widgets: {
     collections: CollectionsWidget;
@@ -374,11 +372,19 @@ export interface Brand {
    */
   logo: number | Media;
   /**
-   * Hex code for the primary brand color (e.g. #FF0000)
+   * Primary brand color (e.g. #FF0000)
    */
   themeColor?: string | null;
   /**
-   * Hex code for the text color displayed on top of the primary color (e.g. #FFFFFF)
+   * Secondary brand color — used for section accents and gradients
+   */
+  secondaryColor?: string | null;
+  /**
+   * Accent/CTA color — used for buttons and highlights (defaults to themeColor)
+   */
+  accentColor?: string | null;
+  /**
+   * Text color on top of the primary color (e.g. #FFFFFF)
    */
   textColor?: string | null;
   isActive?: boolean | null;
@@ -444,6 +450,14 @@ export interface Tag {
   nameEn?: string | null;
   slug: string;
   type: 'interest' | 'skill' | 'industry' | 'topic';
+  /**
+   * Background color (hex), e.g. #3b82f6
+   */
+  color?: string | null;
+  /**
+   * Text color on badge (hex), e.g. #ffffff
+   */
+  textColor?: string | null;
   usageCount?: number | null;
   updatedAt: string;
   createdAt: string;
@@ -1968,6 +1982,99 @@ export interface CompanyPolicy {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "promo-banners".
+ */
+export interface PromoBanner {
+  id: number;
+  /**
+   * Internal name (for dashboard only)
+   */
+  name: string;
+  isActive?: boolean | null;
+  /**
+   * Which page this banner appears on
+   */
+  page: 'home' | 'events' | 'programs' | 'courses' | 'about' | 'all';
+  /**
+   * Where on the page it should appear
+   */
+  position: 'after_hero' | 'after_featured' | 'after_events' | 'after_testimonials' | 'before_footer';
+  /**
+   * Banners in the same group + page + position = slideshow. Use a unique name per slideshow.
+   */
+  group?: string | null;
+  /**
+   * Order within slideshow (lower = first)
+   */
+  sortOrder?: number | null;
+  titleAr: string;
+  titleEn?: string | null;
+  subtitleAr?: string | null;
+  subtitleEn?: string | null;
+  /**
+   * Banner image (used based on layout choice)
+   */
+  image?: (number | null) | Media;
+  /**
+   * Add up to 4 buttons per banner
+   */
+  buttons?:
+    | {
+        labelAr: string;
+        labelEn?: string | null;
+        /**
+         * URL path or full link
+         */
+        link: string;
+        variant?: ('solid' | 'outline' | 'ghost') | null;
+        /**
+         * Button color (hex)
+         */
+        color?: string | null;
+        openInNewTab?: boolean | null;
+        id?: string | null;
+      }[]
+    | null;
+  layout?: ('image_right' | 'image_left' | 'image_bg' | 'text_only') | null;
+  height?: ('auto' | 'sm' | 'md' | 'lg' | 'xl') | null;
+  /**
+   * Background color (hex)
+   */
+  backgroundColor?: string | null;
+  /**
+   * Optional CSS gradient, e.g. linear-gradient(135deg, #1a2e4a 0%, #2d4a7c 100%)
+   */
+  backgroundGradient?: string | null;
+  /**
+   * Text color (hex)
+   */
+  textColor?: string | null;
+  textAlign?: ('start' | 'center' | 'end') | null;
+  /**
+   * Vertical alignment of content
+   */
+  contentAlign?: ('start' | 'center' | 'end') | null;
+  /**
+   * Overlay darkness on image_bg layout (0-100)
+   */
+  overlayOpacity?: number | null;
+  /**
+   * Corner rounding in px (0 = sharp corners)
+   */
+  borderRadius?: number | null;
+  /**
+   * Slideshow auto-play speed (ms). 0 = manual only. Only used on the first banner in the group.
+   */
+  autoPlaySpeed?: number | null;
+  /**
+   * Slideshow transition (first banner in group)
+   */
+  transition?: ('fade' | 'slide') | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -2161,6 +2268,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'company-policies';
         value: number | CompanyPolicy;
+      } | null)
+    | ({
+        relationTo: 'promo-banners';
+        value: number | PromoBanner;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -2278,6 +2389,8 @@ export interface BrandsSelect<T extends boolean = true> {
   slug?: T;
   logo?: T;
   themeColor?: T;
+  secondaryColor?: T;
+  accentColor?: T;
   textColor?: T;
   isActive?: T;
   updatedAt?: T;
@@ -2336,6 +2449,8 @@ export interface TagsSelect<T extends boolean = true> {
   nameEn?: T;
   slug?: T;
   type?: T;
+  color?: T;
+  textColor?: T;
   usageCount?: T;
   updatedAt?: T;
   createdAt?: T;
@@ -3427,6 +3542,47 @@ export interface CompanyPoliciesSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "promo-banners_select".
+ */
+export interface PromoBannersSelect<T extends boolean = true> {
+  name?: T;
+  isActive?: T;
+  page?: T;
+  position?: T;
+  group?: T;
+  sortOrder?: T;
+  titleAr?: T;
+  titleEn?: T;
+  subtitleAr?: T;
+  subtitleEn?: T;
+  image?: T;
+  buttons?:
+    | T
+    | {
+        labelAr?: T;
+        labelEn?: T;
+        link?: T;
+        variant?: T;
+        color?: T;
+        openInNewTab?: T;
+        id?: T;
+      };
+  layout?: T;
+  height?: T;
+  backgroundColor?: T;
+  backgroundGradient?: T;
+  textColor?: T;
+  textAlign?: T;
+  contentAlign?: T;
+  overlayOpacity?: T;
+  borderRadius?: T;
+  autoPlaySpeed?: T;
+  transition?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv_select".
  */
 export interface PayloadKvSelect<T extends boolean = true> {
@@ -3464,53 +3620,6 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
   batch?: T;
   updatedAt?: T;
   createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "promotional-banner".
- */
-export interface PromotionalBanner {
-  id: number;
-  isActive?: boolean | null;
-  titleAr: string;
-  titleEn?: string | null;
-  subtitleAr?: string | null;
-  subtitleEn?: string | null;
-  /**
-   * Recommended size: 1200x400 or similar wide ratio.
-   */
-  image?: (number | null) | Media;
-  buttonTextAr?: string | null;
-  buttonTextEn?: string | null;
-  /**
-   * e.g. /events/my-event or https://example.com
-   */
-  buttonLink?: string | null;
-  /**
-   * Background color (e.g. #1a2e4a or rgb(26, 46, 74))
-   */
-  backgroundColor?: string | null;
-  updatedAt?: string | null;
-  createdAt?: string | null;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "promotional-banner_select".
- */
-export interface PromotionalBannerSelect<T extends boolean = true> {
-  isActive?: T;
-  titleAr?: T;
-  titleEn?: T;
-  subtitleAr?: T;
-  subtitleEn?: T;
-  image?: T;
-  buttonTextAr?: T;
-  buttonTextEn?: T;
-  buttonLink?: T;
-  backgroundColor?: T;
-  updatedAt?: T;
-  createdAt?: T;
-  globalType?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

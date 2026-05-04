@@ -105,9 +105,9 @@ export default function OnboardingPage() {
         if (tagsRes.ok) {
           const tagsData = await tagsRes.json();
           const tags = (tagsData.docs || [])
-            .map((tag: { id: string; name?: string; title?: string }) => ({
+            .map((tag: { id: string; nameAr?: string; nameEn?: string }) => ({
               id: String(tag.id),
-              name: tag.name || tag.title || '',
+              name: tag.nameAr || tag.nameEn || '',
             }))
             .filter((tag: Tag) => tag.name.length > 0); // skip unnamed tags
           setAvailableTags(tags);
@@ -219,6 +219,7 @@ export default function OnboardingPage() {
       // Find or create user profile
       const profileRes = await fetch(
         `/api/user-profiles?where[user][equals]=${user?.id}&depth=0`,
+        { credentials: 'include' }
       );
       const profileData = await profileRes.json();
       const existingProfile = profileData.docs?.[0];
