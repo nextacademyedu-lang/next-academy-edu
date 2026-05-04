@@ -28,6 +28,7 @@ import * as migration_20260503_234228_add_current_enrollments_to_events from './
 import * as migration_20260504_001412_add_brands_collection from './20260504_001412_add_brands_collection';
 import * as migration_20260504_012400_make_bookings_round_nullable from './20260504_012400_make_bookings_round_nullable';
 import * as migration_20260504_014000_add_tag_colors_and_brand_extras from './20260504_014000_add_tag_colors_and_brand_extras';
+import * as migration_20260504_014200_create_promo_banners from './20260504_014200_create_promo_banners';
 
 export const migrations = [
   {
@@ -179,6 +180,11 @@ export const migrations = [
     up: migration_20260504_014000_add_tag_colors_and_brand_extras.up,
     down: migration_20260504_014000_add_tag_colors_and_brand_extras.down,
     name: '20260504_014000_add_tag_colors_and_brand_extras',
+  },
+  {
+    up: migration_20260504_014200_create_promo_banners.up,
+    down: migration_20260504_014200_create_promo_banners.down,
+    name: '20260504_014200_create_promo_banners',
   },
 ];
 

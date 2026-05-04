@@ -12,7 +12,7 @@ import { TextTestimonialsSection } from '@/components/sections/text-testimonials
 import { InstructorsPreview } from '@/components/sections/instructors-preview';
 import { VideoTestimonialsSection } from '@/components/sections/video-testimonials';
 import { BlogsPreviewSection } from '@/components/sections/blogs-preview';
-import { PromotionalBanner } from '@/components/sections/promotional-banner';
+import { PromoBannerSlot } from '@/components/sections/promotional-banner';
 import { buildPageMetadata } from '@/lib/seo/metadata';
 
 export async function generateMetadata({
@@ -45,19 +45,24 @@ export default async function HomePage({
       
       <main style={{ flex: 1 }}>
         <HeroSection />
+        <PromoBannerSlot locale={locale} page="home" position="after_hero" />
         <StatsSection />
         <FeaturedPrograms />
+        <PromoBannerSlot locale={locale} page="home" position="after_featured" />
         <WhyChooseUs />
         <UpcomingEvents locale={locale} />
-        <PromotionalBanner locale={locale} />
+        <PromoBannerSlot locale={locale} page="home" position="after_events" />
         <TextTestimonialsSection />
+        <PromoBannerSlot locale={locale} page="home" position="after_testimonials" />
         <InstructorsPreview />
         <B2BTrustedSection />
         <VideoTestimonialsSection />
         <BlogsPreviewSection />
+        <PromoBannerSlot locale={locale} page="home" position="before_footer" />
       </main>
 
       <Footer />
     </div>
   );
 }
+
