@@ -28,6 +28,7 @@ const cinzel = Cinzel({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SERVER_URL || 'https://nextacademyedu.com'),
   title: 'Next Academy',
   description: 'B2B Educational Platform for Entrepreneurs',
   other: {

@@ -34,7 +34,7 @@ export async function sendBookingConfirmation(data: {
   const infoRows: [string, string][] = [
     [s.labelProgram, data.programTitle],
     [s.labelBookingCode, data.bookingCode],
-    [s.labelAmountPaid, `${data.amountPaid} ${cur}`],
+    [s.labelAmountPaid, data.amountPaid <= 0 ? (locale === 'ar' ? 'مجاني' : 'Free') : `${data.amountPaid} ${cur}`],
     [s.labelStartDate, data.startDate],
   ];
 
@@ -59,7 +59,7 @@ export async function sendBookingConfirmation(data: {
       infoRows.push([s.labelAddress, data.location.address]);
     }
     if (data.location.googleMapsUrl) {
-      const mapLabel = locale === 'ar' ? '📍 الموقع على الخريطة' : '📍 View on Map';
+      const mapLabel = locale === 'ar' ? 'الموقع على الخريطة' : 'View on Map';
       infoRows.push([mapLabel, data.location.googleMapsUrl]);
     }
   }
