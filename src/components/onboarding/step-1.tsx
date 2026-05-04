@@ -110,10 +110,12 @@ export function OnboardingStep1({ data, onChange }: Step1Props) {
           className={styles.select}
           value={data.workField}
           onChange={(e) => {
-            update('workField', e.target.value);
-            if (e.target.value !== 'Other') {
-              update('workFieldOther', '');
-            }
+            const newField = e.target.value;
+            onChange({
+              ...data,
+              workField: newField,
+              workFieldOther: newField !== 'Other' ? '' : data.workFieldOther,
+            });
           }}
         >
           {WORK_FIELD_OPTIONS.map((opt) => (

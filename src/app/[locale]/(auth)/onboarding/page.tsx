@@ -275,7 +275,7 @@ export default function OnboardingPage() {
         companyType: step2.companyType || undefined,
         country: step2.country || undefined,
         city: step2.city || undefined,
-        interests: step3.interests.length > 0 ? step3.interests : undefined,
+        interests: step3.interests.length > 0 ? step3.interests.map(Number).filter(n => !isNaN(n)) : undefined,
         learningGoals: combinedLearningGoals || undefined,
         howDidYouHear: resolvedHowDidYouHear,
         onboardingCompleted: true,
