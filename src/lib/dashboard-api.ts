@@ -34,9 +34,15 @@ export interface PayloadEvent {
   titleAr: string;
   titleEn?: string;
   eventDate: string;
+  eventEndDate?: string;
+  startTime?: string;
+  endTime?: string;
+  venue?: string;
+  locationAddress?: string;
   locationType?: 'online' | 'in_person' | 'hybrid';
   onlineLink?: string;
   currency?: 'EGP' | 'USD' | 'EUR' | 'SAR';
+  slug?: string;
 }
 
 export interface PayloadBooking {
@@ -366,4 +372,100 @@ export async function getBookingsForCourses(): Promise<AuthResponse<PayloadListR
     { credentials: 'include' },
   );
   return handleResponse<PayloadListResponse<PayloadBooking>>(response);
+}
+
+// ─────────────────────────────────────────────
+// Event Detail Helpers for Booking Cards
+// ─────────────────────────────────────────────
+
+export interface BookingEventDetails {
+  date: string;
+  time?: string;
+  venue?: string;
+  locationType: 'online' | 'in_person' | 'hybrid' | 'unknown';
+  calendarUrl?: string;
+  isFree: boolean;
+}
+
+/** Extract detailed event/round info from a booking */
+export function getBookingEventDetails(booking: PayloadBooking): BookingEventDetails {
+  const isFree = booking.totalAmount <= 0 && ['confirmed', 'completed'].includes(booking.status);
+
+  if (booking.event && typeof booking.event === 'object') {
+    const ev = booking.event as PayloadEvent;
+    const dateStr = new Date(ev.eventDate).toLocaleDateString('en-US', {
+      weekday: 'short', month: 'short', day: 'numeric', year: 'numeric',
+    });
+    const time = ev.startTime
+      ? `${ev.startTime}${ev.endTime ? ` - ${ev.endTime}` : ''}`
+      : undefined;
+
+    return {
+      date: dateStr,
+      time,
+      venue: ev.venue || ev.locationAddress || undefined,
+      locationType: ev.locationType || 'unknown',
+      calendarUrl: buildGoogleCalendarUrl(
+        ev.titleEn || ev.titleAr,
+        ev.eventDate,
+        ev.eventEndDate || ev.eventDate,
+        ev.venue || ev.locationAddress || (ev.locationType === 'online' ? 'Online' : ''),
+      ),
+      isFree,
+    };
+  }
+
+  const round = booking.round as PayloadRound;
+  if (round && typeof round === 'object') {
+    const dateStr = new Date(round.startDate).toLocaleDateString('en-US', {
+      weekday: 'short', month: 'short', day: 'numeric', year: 'numeric',
+    });
+    const program = round.program as PayloadProgram;
+    const title = program && typeof program === 'object'
+      ? (program.titleEn || program.titleAr)
+      : 'Program';
+
+    return {
+      date: dateStr,
+      venue: round.locationType === 'online' ? 'Online' : undefined,
+      locationType: (round.locationType === 'in-person' ? 'in_person' : round.locationType) as BookingEventDetails['locationType'] || 'unknown',
+      calendarUrl: buildGoogleCalendarUrl(
+        title,
+        round.startDate,
+        round.endDate || round.startDate,
+        round.locationType === 'online' ? 'Online' : '',
+      ),
+      isFree,
+    };
+  }
+
+  return {
+    date: new Date(booking.createdAt).toLocaleDateString('en-US', {
+      month: 'short', day: 'numeric', year: 'numeric',
+    }),
+    locationType: 'unknown',
+    isFree,
+  };
+}
+
+/** Build a Google Calendar add-event URL */
+function buildGoogleCalendarUrl(
+  title: string,
+  startDate: string,
+  endDate: string,
+  location: string,
+): string {
+  const formatDate = (d: string) => new Date(d).toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+  const start = formatDate(startDate);
+  const end = formatDate(endDate || startDate);
+
+  const params = new URLSearchParams({
+    action: 'TEMPLATE',
+    text: title,
+    dates: `${start}/${end}`,
+    location: location || '',
+    details: `Booked via Next Academy`,
+  });
+
+  return `https://www.google.com/calendar/render?${params.toString()}`;
 }

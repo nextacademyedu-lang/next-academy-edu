@@ -56,25 +56,7 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
     CREATE INDEX IF NOT EXISTS "promo_banners_buttons_parent_idx" ON "promo_banners_buttons" ("_parent_id");
   `);
 
-  // Migrate existing global data if it exists
-  try {
-    const result = await db.execute(sql`
-      SELECT * FROM "_promo_banners_v" LIMIT 0
-    `);
-  } catch {
-    // Old global table doesn't exist in new format, try legacy table name
-  }
 
-  // Try to migrate from the old promotional-banner global
-  try {
-    const oldData = await db.execute(sql`
-      SELECT * FROM "payload_globals" WHERE "global_slug" = 'promotional-banner' LIMIT 1
-    `);
-    // If there's old data, we could migrate it, but since globals store data differently
-    // it's safer to let the user re-create the banner from the dashboard
-  } catch {
-    // No old data to migrate, that's fine
-  }
 }
 
 export async function down({ db }: MigrateDownArgs): Promise<void> {

@@ -3,6 +3,11 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
+import {
+  checkProfileCompleteness,
+  buildProfileRedirectUrl,
+  getMissingFieldsMessage,
+} from '@/lib/profile-check';
 
 type ExistingBookingDoc = {
   id: string | number;
@@ -66,6 +71,26 @@ export function BookRoundButton({
     const loginPath = `/${locale}/login?redirect=${encodeURIComponent(intentPath)}`;
 
     try {
+      // ── Profile completeness check ───────────────────────
+      const profileCheck = await checkProfileCompleteness();
+
+      if (profileCheck.missing.includes('auth')) {
+        if (typeof window !== 'undefined') {
+          window.sessionStorage.setItem(autoSkipKey(roundId), '1');
+        }
+        router.push(loginPath);
+        return;
+      }
+
+      if (!profileCheck.complete) {
+        setError(getMissingFieldsMessage(profileCheck.missing, locale));
+        setTimeout(() => {
+          router.push(buildProfileRedirectUrl(locale, intentPath));
+        }, 2000);
+        return;
+      }
+
+      // ── Create booking ───────────────────────────────────
       const createRes = await fetch('/api/bookings/create', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

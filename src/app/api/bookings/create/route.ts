@@ -54,6 +54,21 @@ export async function POST(req: NextRequest) {
     const user = await authenticateRequestUser(payload, req);
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
+    // ── Profile completeness check ─────────────────────────────────────
+    stage = 'profile_check';
+    const missingFields: string[] = [];
+    if (!user.firstName || !String(user.firstName).trim()) missingFields.push('firstName');
+    if (!user.lastName || !String(user.lastName).trim()) missingFields.push('lastName');
+    if (!user.phone || !String(user.phone).trim()) missingFields.push('phone');
+    
+    if (missingFields.length > 0) {
+      return NextResponse.json({
+        error: 'INCOMPLETE_PROFILE',
+        missingFields,
+        message: 'برجاء إكمال بياناتك قبل الحجز',
+      }, { status: 400 });
+    }
+
     // ── Fetch target (Round or Event) ──────────────────────────────────────
     stage = 'find_target';
     let targetObj: { price: number; earlyBirdPrice?: number; earlyBirdDeadline?: string | null };

@@ -25,7 +25,7 @@ interface CompanyOption {
 }
 
 const REQUIRED_STEP_FIELDS: Record<number, string[]> = {
-  1: ['title', 'jobTitle', 'workField', 'yearsOfExperience', 'phone'],
+  1: ['title', 'jobTitle', 'workField', 'yearsOfExperience', 'phone', 'gender'],
   2: ['company', 'companySize', 'companyType', 'country', 'city'],
   3: ['howDidYouHear'],
 };

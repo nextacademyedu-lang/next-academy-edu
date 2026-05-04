@@ -119,12 +119,24 @@ export async function GET() {
 
         const eventsConfig = configResult.docs[0];
 
-        if (!eventsConfig || !eventsConfig.isEnabled) {
-          return { events: [], config: null };
+        // Default config values when no config document exists
+        const maxItems = (eventsConfig?.maxItems as number) || 6;
+        const defaultConfig = {
+          sectionTitleAr: eventsConfig?.sectionTitleAr || 'الفعاليات القادمة',
+          sectionTitleEn: eventsConfig?.sectionTitleEn || 'Upcoming Events',
+          autoPlaySpeed: eventsConfig?.autoPlaySpeed || 5000,
+          cardDisplay: eventsConfig?.cardDisplay || { showPrice: true, showDate: true, showInstructor: true, showLocation: false },
+          viewAllLink: eventsConfig?.viewAllLink || '/events',
+          emptyMessageAr: eventsConfig?.emptyMessageAr || 'لا توجد فعاليات قادمة حالياً',
+          emptyMessageEn: eventsConfig?.emptyMessageEn || 'No upcoming events at this time',
+        };
+
+        // If explicitly disabled, return empty
+        if (eventsConfig && eventsConfig.isEnabled === false) {
+          return { events: [], config: defaultConfig };
         }
 
-        const maxItems = (eventsConfig.maxItems as number) || 6;
-        const mode = eventsConfig.mode as string;
+        const mode = eventsConfig?.mode as string || 'automatic';
         const now = new Date().toISOString();
 
         if (mode === 'manual') {
@@ -198,20 +210,12 @@ export async function GET() {
 
           return {
             events,
-            config: {
-              sectionTitleAr: eventsConfig.sectionTitleAr,
-              sectionTitleEn: eventsConfig.sectionTitleEn,
-              autoPlaySpeed: eventsConfig.autoPlaySpeed,
-              cardDisplay: eventsConfig.cardDisplay,
-              viewAllLink: eventsConfig.viewAllLink,
-              emptyMessageAr: eventsConfig.emptyMessageAr,
-              emptyMessageEn: eventsConfig.emptyMessageEn,
-            },
+            config: defaultConfig,
           };
         }
 
         // Automatic mode: query rounds AND events starting in the future
-        const filterType = eventsConfig.filterType as string;
+        const filterType = eventsConfig?.filterType as string;
 
         const roundsWhereClause: Where = {
           and: [
@@ -273,15 +277,7 @@ export async function GET() {
 
         return {
           events,
-          config: {
-            sectionTitleAr: eventsConfig.sectionTitleAr,
-            sectionTitleEn: eventsConfig.sectionTitleEn,
-            autoPlaySpeed: eventsConfig.autoPlaySpeed,
-            cardDisplay: eventsConfig.cardDisplay,
-            viewAllLink: eventsConfig.viewAllLink,
-            emptyMessageAr: eventsConfig.emptyMessageAr,
-            emptyMessageEn: eventsConfig.emptyMessageEn,
-          },
+          config: defaultConfig,
         };
       },
       { ttl: CACHE_TTL.HOMEPAGE }

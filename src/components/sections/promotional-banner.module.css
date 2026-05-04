@@ -2,15 +2,13 @@
    PROMO BANNER — Slot & Slideshow
    ═══════════════════════════════════════════════════════ */
 
-/* Height tokens */
-:root {
+.slot {
+  /* Height tokens */
   --banner-h-sm: 200px;
   --banner-h-md: 320px;
   --banner-h-lg: 420px;
   --banner-h-xl: 520px;
-}
 
-.slot {
   width: 100%;
   padding: var(--space-2xl, 64px) var(--space-md, 20px);
   position: relative;
