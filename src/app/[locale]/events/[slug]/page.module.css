@@ -61,6 +61,21 @@
   margin-bottom: var(--space-md);
 }
 
+.brandBadge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--bg-surface);
+  border-color: var(--accent-primary);
+  color: var(--text-primary);
+  padding-left: 6px;
+}
+
+.brandIcon {
+  border-radius: 4px;
+  object-fit: contain;
+}
+
 .title {
   font-size: clamp(32px, 7vw, 48px);
   font-family: var(--font-heading-en), var(--font-heading-ar);

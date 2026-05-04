@@ -69,6 +69,7 @@ export interface Config {
   collections: {
     users: User;
     media: Media;
+    brands: Brand;
     companies: Company;
     'user-profiles': UserProfile;
     tags: Tag;
@@ -118,6 +119,7 @@ export interface Config {
   collectionsSelect: {
     users: UsersSelect<false> | UsersSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
+    brands: BrandsSelect<false> | BrandsSelect<true>;
     companies: CompaniesSelect<false> | CompaniesSelect<true>;
     'user-profiles': UserProfilesSelect<false> | UserProfilesSelect<true>;
     tags: TagsSelect<false> | TagsSelect<true>;
@@ -355,6 +357,36 @@ export interface Instructor {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "brands".
+ */
+export interface Brand {
+  id: number;
+  /**
+   * The brand or identity name (e.g., BLS, AHA, etc.)
+   */
+  name: string;
+  /**
+   * URL friendly string, e.g. bls
+   */
+  slug: string;
+  /**
+   * The brand logo
+   */
+  logo: number | Media;
+  /**
+   * Hex code for the primary brand color (e.g. #FF0000)
+   */
+  themeColor?: string | null;
+  /**
+   * Hex code for the text color displayed on top of the primary color (e.g. #FFFFFF)
+   */
+  textColor?: string | null;
+  isActive?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "companies".
  */
 export interface Company {
@@ -576,6 +608,10 @@ export interface Event {
    */
   isActive?: boolean | null;
   category?: (number | null) | Category;
+  /**
+   * Select a brand to apply its colors and logo to the event page
+   */
+  brand?: (number | null) | Brand;
   shortDescriptionAr?: string | null;
   shortDescriptionEn?: string | null;
   descriptionAr?: {
@@ -1963,6 +1999,10 @@ export interface PayloadLockedDocument {
         value: number | Media;
       } | null)
     | ({
+        relationTo: 'brands';
+        value: number | Brand;
+      } | null)
+    | ({
         relationTo: 'companies';
         value: number | Company;
       } | null)
@@ -2231,6 +2271,20 @@ export interface MediaSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "brands_select".
+ */
+export interface BrandsSelect<T extends boolean = true> {
+  name?: T;
+  slug?: T;
+  logo?: T;
+  themeColor?: T;
+  textColor?: T;
+  isActive?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "companies_select".
  */
 export interface CompaniesSelect<T extends boolean = true> {
@@ -2406,6 +2460,7 @@ export interface EventsSelect<T extends boolean = true> {
   slug?: T;
   isActive?: T;
   category?: T;
+  brand?: T;
   shortDescriptionAr?: T;
   shortDescriptionEn?: T;
   descriptionAr?: T;

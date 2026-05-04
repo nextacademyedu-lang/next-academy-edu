@@ -21,6 +21,11 @@ type EventCard = {
   isFree?: boolean;
   registrationUrl?: string;
   image?: string;
+  brand?: {
+    name: string;
+    logoUrl?: string;
+    themeColor?: string;
+  } | null;
 };
 
 function extractMediaUrl(value: unknown): string | undefined {
@@ -37,6 +42,18 @@ function buildEventCard(input: {
 }): EventCard {
   if (input.event) {
     const ev = input.event;
+    
+    // Extract brand data if present
+    let brandData = null;
+    if (ev.brand && typeof ev.brand === 'object') {
+      const b = ev.brand as any;
+      brandData = {
+        name: b.name,
+        logoUrl: extractMediaUrl(b.logo),
+        themeColor: b.themeColor,
+      };
+    }
+
     return {
       id: ev.id,
       titleAr: ev.titleAr,
@@ -50,6 +67,7 @@ function buildEventCard(input: {
       isFree: (ev.price ?? 0) <= 0,
       registrationUrl: input.customUrl || `/events/${ev.slug || ev.id}`,
       image: extractMediaUrl(input.customImage) || extractMediaUrl(ev.coverImage) || extractMediaUrl(ev.thumbnail),
+      brand: brandData,
     };
   }
 

@@ -25,7 +25,7 @@ import * as migration_20260418_010000_schema_sync from './20260418_010000_schema
 import * as migration_20260418_070000_fix_consultation_schema_drift from './20260418_070000_fix_consultation_schema_drift';
 import * as migration_20260503_230000_add_events_banner_and_times from './20260503_230000_add_events_banner_and_times';
 import * as migration_20260503_234228_add_current_enrollments_to_events from './20260503_234228_add_current_enrollments_to_events';
-
+import * as migration_20260504_001412_add_brands_collection from './20260504_001412_add_brands_collection';
 
 export const migrations = [
   {
@@ -161,7 +161,11 @@ export const migrations = [
   {
     up: migration_20260503_234228_add_current_enrollments_to_events.up,
     down: migration_20260503_234228_add_current_enrollments_to_events.down,
-    name: '20260503_234228_add_current_enrollments_to_events'
+    name: '20260503_234228_add_current_enrollments_to_events',
+  },
+  {
+    up: migration_20260504_001412_add_brands_collection.up,
+    down: migration_20260504_001412_add_brands_collection.down,
+    name: '20260504_001412_add_brands_collection'
   },
 ];
-

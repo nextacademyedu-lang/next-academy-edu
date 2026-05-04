@@ -64,6 +64,7 @@ const storagePlugins = getStoragePlugins();
 
 import { Users } from './collections/Users.ts';
 import { Media } from './collections/Media.ts';
+import { Brands } from './collections/Brands.ts';
 import { Companies } from './collections/Companies.ts';
 import { UserProfiles } from './collections/UserProfiles.ts';
 import { Tags } from './collections/Tags.ts';
@@ -256,6 +257,7 @@ export default buildConfig({
   collections: [
     Users,
     Media,
+    Brands,
     Companies,
     UserProfiles,
     Tags,

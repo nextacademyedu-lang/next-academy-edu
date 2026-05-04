@@ -57,6 +57,7 @@ export const Events: CollectionConfig = {
             { name: 'slug', type: 'text', required: true, unique: true },
             { name: 'isActive', type: 'checkbox', defaultValue: true, admin: { description: 'Controls whether this event is publicly visible' } },
             { name: 'category', type: 'relationship', relationTo: 'categories' },
+            { name: 'brand', type: 'relationship', relationTo: 'brands', admin: { description: 'Select a brand to apply its colors and logo to the event page' } },
           ],
         },
 

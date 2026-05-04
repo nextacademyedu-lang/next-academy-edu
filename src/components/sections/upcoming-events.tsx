@@ -156,6 +156,7 @@ export function UpcomingEvents({ locale }: UpcomingEventsProps) {
                         price={price}
                         isFree={evt.isFree}
                         t={t}
+                        brand={(evt as any).brand}
                       />
                     </a>
                   ) : (
@@ -168,6 +169,7 @@ export function UpcomingEvents({ locale }: UpcomingEventsProps) {
                       price={price}
                       isFree={evt.isFree}
                       t={t}
+                      brand={(evt as any).brand}
                     />
                   )}
                 </motion.div>
@@ -189,6 +191,11 @@ interface EventCardContentProps {
   price: string | null;
   isFree?: boolean;
   t: ReturnType<typeof useTranslations>;
+  brand?: {
+    name: string;
+    logoUrl?: string;
+    themeColor?: string;
+  } | null;
 }
 
 function EventCardContent({
@@ -200,14 +207,23 @@ function EventCardContent({
   price,
   isFree,
   t,
+  brand,
 }: EventCardContentProps) {
   return (
     <>
-      {imageUrl ? (
-        <img src={imageUrl} alt={title} className={styles.cardImage} loading="lazy" />
-      ) : (
-        <div className={styles.cardImagePlaceholder}>📅</div>
-      )}
+      <div className={styles.cardImageContainer}>
+        {imageUrl ? (
+          <img src={imageUrl} alt={title} className={styles.cardImage} loading="lazy" />
+        ) : (
+          <div className={styles.cardImagePlaceholder}>📅</div>
+        )}
+        {brand && (
+          <div className={styles.cardBrandBadge} style={{ '--brand-color': brand.themeColor } as React.CSSProperties}>
+            {brand.logoUrl && <img src={brand.logoUrl} alt={brand.name} className={styles.cardBrandIcon} />}
+            <span>{brand.name}</span>
+          </div>
+        )}
+      </div>
       <div className={styles.cardBody}>
         <span className={styles.cardDate}>📅 {date}</span>
         <h3 className={styles.cardTitle}>{title}</h3>

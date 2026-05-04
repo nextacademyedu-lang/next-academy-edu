@@ -6,7 +6,7 @@ import type { Metadata } from 'next';
 import { getLocale } from 'next-intl/server';
 import { getPayload } from 'payload';
 import config from '@payload-config';
-import type { Event, Partner, Media } from '@/payload-types';
+import type { Event, Partner, Media, Brand } from '@/payload-types';
 import { Navbar } from '@/components/layout/navbar';
 import { Footer } from '@/components/layout/footer';
 import { Badge } from '@/components/ui/badge';
@@ -164,10 +164,20 @@ export default async function EventDetailPage({
     }
   }
 
+  const brand = event.brand && typeof event.brand === 'object' ? (event.brand as Brand) : null;
+  const brandLogoUrl = brand?.logo && typeof brand.logo === 'object' ? (brand.logo as Media).url : null;
+  const brandThemeColor = brand?.themeColor || undefined;
+  const brandTextColor = brand?.textColor || undefined;
+
+  const mainStyle: React.CSSProperties = {
+    ...(brandThemeColor ? { '--accent-primary': brandThemeColor } as any : {}),
+    ...(brandTextColor ? { '--text-on-accent': brandTextColor } as any : {}),
+  };
+
   return (
     <div className={styles.wrapper}>
       <Navbar />
-      <main className={styles.main}>
+      <main className={styles.main} style={mainStyle}>
         {/* ──── HERO ──── */}
         <section className={styles.heroSection}>
           {coverImageUrl && (
@@ -180,6 +190,12 @@ export default async function EventDetailPage({
             <div className={styles.heroMeta}>
               <Badge variant="default">{typeLabel}</Badge>
               <Badge variant="outline">{locationLabel}</Badge>
+              {brand && (
+                <Badge variant="outline" className={styles.brandBadge}>
+                  {brandLogoUrl && <Image src={brandLogoUrl} alt={brand.name} width={24} height={24} className={styles.brandIcon} unoptimized />}
+                  <span>{brand.name}</span>
+                </Badge>
+              )}
             </div>
             <h1 className={styles.title}>{title}</h1>
             {description && <p className={styles.heroDescription}>{description}</p>}
