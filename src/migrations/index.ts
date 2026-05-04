@@ -198,6 +198,9 @@ export const migrations = [
     down: migration_20260504_030000_fix_user_profiles_work_field.down,
     name: '20260504_030000_fix_user_profiles_work_field',
   },
-
+  {
+    up: migration_20260504_034500_fix_promo_banners_buttons_id.up,
+    down: migration_20260504_034500_fix_promo_banners_buttons_id.down,
+    name: '20260504_034500_fix_promo_banners_buttons_id',
+  },
 ];
-
