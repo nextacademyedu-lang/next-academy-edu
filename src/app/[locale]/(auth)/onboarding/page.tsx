@@ -25,9 +25,9 @@ interface CompanyOption {
 }
 
 const REQUIRED_STEP_FIELDS: Record<number, string[]> = {
-  1: ['title', 'jobTitle', 'workField', 'yearsOfExperience', 'phone', 'gender'],
-  2: ['company', 'companySize', 'companyType', 'country', 'city'],
-  3: ['howDidYouHear'],
+  1: ['phone', 'country', 'city', 'jobTitle', 'workField'],
+  2: [],
+  3: [],
 };
 
 function relationToId(value: unknown): number | undefined {
@@ -74,6 +74,8 @@ export default function OnboardingPage() {
     yearsOfExperience: '',
     phone: '',
     gender: '',
+    country: '',
+    city: '',
   });
 
   const [step2, setStep2] = useState<Step2Data>({
@@ -81,8 +83,6 @@ export default function OnboardingPage() {
     company: '',
     companySize: '',
     companyType: '',
-    country: '',
-    city: '',
   });
 
   const [step3, setStep3] = useState<Step3Data>({
@@ -204,8 +204,6 @@ export default function OnboardingPage() {
             name: companyName,
             size: step2.companySize || undefined,
             type: step2.companyType || undefined,
-            country: step2.country || undefined,
-            city: step2.city || undefined,
           }),
         });
 
@@ -274,8 +272,8 @@ export default function OnboardingPage() {
         company: companyId || undefined,
         companySize: step2.companySize || undefined,
         companyType: step2.companyType || undefined,
-        country: step2.country || undefined,
-        city: step2.city || undefined,
+        country: step1.country || undefined,
+        city: step1.city || undefined,
         interests: step3.interests.length > 0 ? step3.interests.map(Number).filter(n => !isNaN(n)) : undefined,
         learningGoals: combinedLearningGoals || undefined,
         howDidYouHear: resolvedHowDidYouHear,
@@ -396,6 +394,17 @@ export default function OnboardingPage() {
             onClick={handleBack}
           >
             {t('back')}
+          </button>
+        )}
+
+        {(!REQUIRED_STEP_FIELDS[currentStep] || REQUIRED_STEP_FIELDS[currentStep].length === 0) && (
+          <button
+            type="button"
+            className={styles.backBtn}
+            onClick={currentStep < TOTAL_STEPS ? handleNext : handleComplete}
+            disabled={isLoading}
+          >
+            {locale === 'ar' ? 'تخطي' : 'Skip'}
           </button>
         )}
 

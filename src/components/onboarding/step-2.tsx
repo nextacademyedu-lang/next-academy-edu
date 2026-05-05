@@ -8,8 +8,6 @@ export interface Step2Data {
   company: string;
   companySize: string;
   companyType: string;
-  country: string;
-  city: string;
 }
 
 interface Step2Props {
@@ -103,36 +101,6 @@ export function OnboardingStep2({ data, onChange, companyOptions }: Step2Props) 
               </option>
             ))}
           </select>
-        </div>
-      </div>
-
-      <div className={styles.row}>
-        <div className={styles.inputGroup}>
-          <label className={styles.label} htmlFor="ob-country">
-            {t('country')}
-          </label>
-          <input
-            id="ob-country"
-            className={styles.input}
-            type="text"
-            placeholder={t('countryPlaceholder')}
-            value={data.country}
-            onChange={(e) => update('country', e.target.value)}
-          />
-        </div>
-
-        <div className={styles.inputGroup}>
-          <label className={styles.label} htmlFor="ob-city">
-            {t('city')}
-          </label>
-          <input
-            id="ob-city"
-            className={styles.input}
-            type="text"
-            placeholder={t('cityPlaceholder')}
-            value={data.city}
-            onChange={(e) => update('city', e.target.value)}
-          />
         </div>
       </div>
     </div>

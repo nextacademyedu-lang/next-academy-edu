@@ -11,6 +11,8 @@ interface Step1Data {
   yearsOfExperience: string;
   phone: string;
   gender: string;
+  country: string;
+  city: string;
 }
 
 interface Step1Props {
@@ -165,6 +167,36 @@ export function OnboardingStep1({ data, onChange }: Step1Props) {
             <option value="male">{t('genderMale')}</option>
             <option value="female">{t('genderFemale')}</option>
           </select>
+        </div>
+      </div>
+
+      <div className={styles.row}>
+        <div className={styles.inputGroup}>
+          <label className={styles.label} htmlFor="ob-country">
+            {t('country')}
+          </label>
+          <input
+            id="ob-country"
+            className={styles.input}
+            type="text"
+            placeholder={t('countryPlaceholder')}
+            value={data.country}
+            onChange={(e) => update('country', e.target.value)}
+          />
+        </div>
+
+        <div className={styles.inputGroup}>
+          <label className={styles.label} htmlFor="ob-city">
+            {t('city')}
+          </label>
+          <input
+            id="ob-city"
+            className={styles.input}
+            type="text"
+            placeholder={t('cityPlaceholder')}
+            value={data.city}
+            onChange={(e) => update('city', e.target.value)}
+          />
         </div>
       </div>
     </div>
