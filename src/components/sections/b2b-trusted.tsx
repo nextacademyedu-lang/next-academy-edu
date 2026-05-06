@@ -65,8 +65,9 @@ export async function B2BTrustedSection() {
                     <Image
                       src={partner.logo.url}
                       alt={partner.logo.alt || partner.name || 'Partner'}
-                      width={120}
-                      height={48}
+                      fill
+                      style={{ objectFit: 'contain' }}
+                      sizes="(max-width: 768px) 120px, 160px"
                       className={styles.logoImage}
                       unoptimized
                     />
@@ -85,8 +86,9 @@ export async function B2BTrustedSection() {
                     <Image
                       src={partner.logo.url}
                       alt={partner.logo.alt || partner.name || 'Partner'}
-                      width={120}
-                      height={48}
+                      fill
+                      style={{ objectFit: 'contain' }}
+                      sizes="(max-width: 768px) 120px, 160px"
                       className={styles.logoImage}
                       unoptimized
                     />
@@ -105,8 +107,9 @@ export async function B2BTrustedSection() {
                     <Image
                       src={partner.logo.url}
                       alt={partner.logo.alt || partner.name || 'Partner'}
-                      width={120}
-                      height={48}
+                      fill
+                      style={{ objectFit: 'contain' }}
+                      sizes="(max-width: 768px) 120px, 160px"
                       className={styles.logoImage}
                       unoptimized
                     />
