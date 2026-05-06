@@ -25,9 +25,7 @@ export function InstructorLayout({ children }: { children: React.ReactNode }) {
   const locale   = useLocale();
   const { user, isLoading, isAuthenticated, logout } = useAuth();
 
-  React.useEffect(() => {
-    if (!isLoading && !isAuthenticated) router.push(`/${locale}/login`);
-  }, [isLoading, isAuthenticated, router, locale]);
+  // Client-side redirect removed: Next.js middleware handles all auth protection.
 
   React.useEffect(() => {
     if (!isLoading && isAuthenticated && user && user.role !== 'instructor') {

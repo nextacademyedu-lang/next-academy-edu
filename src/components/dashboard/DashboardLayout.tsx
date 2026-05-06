@@ -29,12 +29,8 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const locale   = useLocale();
   const { user, logout, isLoading, isAuthenticated } = useAuth();
 
-  // Redirect unauthenticated users
-  React.useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
-      router.push(`/${locale}/login`);
-    }
-  }, [isLoading, isAuthenticated, router, locale]);
+  // Client-side redirect removed: Next.js middleware handles all auth protection.
+  // This prevents infinite redirect loops between Clerk SignIn and the layout.
 
   const displayName   = user ? `${user.firstName} ${user.lastName}`.trim() : '…';
   const displayRole   = user ? (ROLE_LABELS[user.role] ?? user.role) : '';

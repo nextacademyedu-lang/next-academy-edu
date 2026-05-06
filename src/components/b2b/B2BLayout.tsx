@@ -22,9 +22,7 @@ export default function B2BLayout({ children }: { children: React.ReactNode }) {
   const router   = useRouter();
   const locale   = useLocale();
 
-  useEffect(() => {
-    if (!isLoading && !isAuthenticated) router.replace(`/${locale}/login`);
-  }, [isLoading, isAuthenticated, router, locale]);
+  // Client-side redirect removed: Next.js middleware handles all auth protection.
 
   useEffect(() => {
     if (!isLoading && isAuthenticated && user) {
