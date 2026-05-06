@@ -4,6 +4,7 @@ import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { ClerkProvider } from '@clerk/nextjs';
+import { dark } from '@clerk/themes';
 import { routing } from '@/i18n/routing';
 import { AuthProvider } from '@/context/auth-context';
 import { ThemeProvider } from '@/context/theme-context';
@@ -73,6 +74,7 @@ export default async function LocaleLayout({
       <body className={`${cairo.variable} ${montserrat.variable} ${cinzel.variable}`} suppressHydrationWarning>
         <ClerkProvider
           appearance={{
+            baseTheme: dark,
             variables: {
               colorPrimary: '#c9a96e',
               colorBackground: '#0a0a0a',

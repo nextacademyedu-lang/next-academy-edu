@@ -6,6 +6,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useLocale } from 'next-intl';
 import { LayoutDashboard, Users, BookOpen, Package, LogOut, Building2, ArrowLeft } from 'lucide-react';
 import { useAuth } from '@/context/auth-context';
+import { useClerk, UserButton } from '@clerk/nextjs';
 import { getDashboardPath } from '@/lib/role-redirect';
 import styles from './b2b-layout.module.css';
 
@@ -21,6 +22,12 @@ export default function B2BLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router   = useRouter();
   const locale   = useLocale();
+  const { signOut } = useClerk();
+
+  const handleLogout = async () => {
+    await logout();
+    await signOut({ redirectUrl: `/${locale}/login` });
+  };
 
   // Client-side redirect removed: Next.js middleware handles all auth protection.
 
@@ -81,7 +88,7 @@ export default function B2BLayout({ children }: { children: React.ReactNode }) {
         </nav>
 
         <div className={styles.sidebarFooter}>
-          <button onClick={logout} className={styles.logoutBtn}>
+          <button onClick={handleLogout} className={styles.logoutBtn}>
             <LogOut size={18} />
             Sign Out
           </button>
@@ -93,12 +100,12 @@ export default function B2BLayout({ children }: { children: React.ReactNode }) {
           <Link href={`/${locale}`} className={styles.siteLink}>
             Next Academy
           </Link>
-          <div className={styles.userProfile}>
-            <div className={styles.userInfo}>
+          <div className={styles.userProfile} style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div className={styles.userInfo} style={{ textAlign: 'right' }}>
               <span className={styles.userName}>{displayName}</span>
               <span className={styles.userRole}>B2B Manager</span>
             </div>
-            <div className={styles.avatar}>{avatarInitial}</div>
+            <UserButton />
           </div>
         </header>
 

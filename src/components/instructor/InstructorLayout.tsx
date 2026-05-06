@@ -7,6 +7,7 @@ import { useLocale } from 'next-intl';
 import { Home, Video, Clock, Users, ArrowLeft, LogOut, Bell, Settings, DollarSign, User, BookOpen } from 'lucide-react';
 import styles from './instructor.module.css';
 import { useAuth } from '@/context/auth-context';
+import { useClerk, UserButton } from '@clerk/nextjs';
 
 const INSTRUCTOR_NAV_LINKS = [
   { name: 'Overview',      mobileLabel: 'Home',      href: '/instructor',                    icon: Home       },
@@ -24,6 +25,7 @@ export function InstructorLayout({ children }: { children: React.ReactNode }) {
   const router   = useRouter();
   const locale   = useLocale();
   const { user, isLoading, isAuthenticated, logout } = useAuth();
+  const { signOut } = useClerk();
 
   // Client-side redirect removed: Next.js middleware handles all auth protection.
 
@@ -95,7 +97,7 @@ export function InstructorLayout({ children }: { children: React.ReactNode }) {
 
   const handleLogout = async () => {
     await logout();
-    router.push(`/${locale}/login`);
+    await signOut({ redirectUrl: `/${locale}/login` });
   };
 
   const isActive = (href: string) => pathname.includes(href);
@@ -165,22 +167,13 @@ export function InstructorLayout({ children }: { children: React.ReactNode }) {
               <span className={styles.badge}></span>
             </button>
 
-            <div className={styles.userProfile}>
+            <div className={styles.userProfile} style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
               <div className={styles.userInfo} style={{ textAlign: 'right' }}>
                 <span className={styles.userName}>{displayName}</span>
                 <span className={styles.userRole}>Instructor</span>
               </div>
-              <div className={styles.avatar}>{avatarInitial}</div>
+              <UserButton />
             </div>
-
-            <button 
-              className={styles.logoutBtn} 
-              onClick={() => logout().then(() => window.location.href = '/')}
-              title="Log Out"
-            >
-              <LogOut size={18} />
-              <span className={styles.logoutLabel}>Log Out</span>
-            </button>
           </div>
         </header>
 

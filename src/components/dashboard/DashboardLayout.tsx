@@ -7,6 +7,7 @@ import { Home, BookOpen, CreditCard, User, LogOut, Bell, ArrowLeft, GraduationCa
 import styles from './dashboard.module.css';
 import { useAuth } from '@/context/auth-context';
 import { useLocale } from 'next-intl';
+import { useClerk, UserButton } from '@clerk/nextjs';
 
 const ROLE_LABELS: Record<string, string> = {
   user: 'Student',
@@ -28,6 +29,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const router   = useRouter();
   const locale   = useLocale();
   const { user, logout, isLoading, isAuthenticated } = useAuth();
+  const { signOut } = useClerk();
 
   // Client-side redirect removed: Next.js middleware handles all auth protection.
   // This prevents infinite redirect loops between Clerk SignIn and the layout.
@@ -38,7 +40,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
 
   const handleLogout = async () => {
     await logout();
-    router.push(`/${locale}/login`);
+    await signOut({ redirectUrl: `/${locale}/login` });
   };
 
   const isActive = (href: string) => pathname.includes(href);
@@ -108,12 +110,12 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
               <Bell size={20} />
             </Link>
 
-            <div className={styles.userProfile}>
+            <div className={styles.userProfile} style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
               <div className={styles.userInfo} style={{ textAlign: 'right' }}>
                 <span className={styles.userName}>{displayName}</span>
                 <span className={styles.userRole}>{displayRole}</span>
               </div>
-              <div className={styles.avatar}>{avatarInitial}</div>
+              <UserButton />
             </div>
           </div>
         </header>
