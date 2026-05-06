@@ -64,7 +64,7 @@ export async function sendBookingConfirmation(data: {
     }
   }
 
-  const html = buildEmailLayout({
+  const html = await buildEmailLayout({
     title: s.title,
     body: `${greeting(data.userName, locale)}\n\n${s.body}`,
     infoBox: infoRows,
@@ -85,7 +85,7 @@ export async function sendBookingCancelled(data: {
 }): Promise<void> {
   const locale = data.locale ?? 'ar';
   const s = t(locale).bookingCancelled;
-  const html = buildEmailLayout({
+  const html = await buildEmailLayout({
     title: s.title,
     body: `${greeting(data.userName, locale)}\n\n${s.body(data.programTitle)}`,
     infoBox: [
@@ -109,7 +109,7 @@ export async function sendRoundCancelled(data: {
 }): Promise<void> {
   const locale = data.locale ?? 'ar';
   const s = t(locale).roundCancelled;
-  const html = buildEmailLayout({
+  const html = await buildEmailLayout({
     title: s.title,
     body: `${greeting(data.userName, locale)}\n\n${s.body(data.programTitle, data.date)}\n\n${s.alternatives}`,
     cta: { text: s.cta, url: `${APP_URL()}/programs` },
@@ -128,7 +128,7 @@ export async function sendReviewRequest(data: {
 }): Promise<void> {
   const locale = data.locale ?? 'ar';
   const s = t(locale).reviewRequest;
-  const html = buildEmailLayout({
+  const html = await buildEmailLayout({
     title: s.title,
     body: `${greeting(data.userName, locale)}\n\n${s.body(data.programTitle)}`,
     cta: { text: s.cta, url: data.reviewUrl },
@@ -147,7 +147,7 @@ export async function sendReviewReminder(data: {
 }): Promise<void> {
   const locale = data.locale ?? 'ar';
   const s = t(locale).reviewReminder;
-  const html = buildEmailLayout({
+  const html = await buildEmailLayout({
     title: s.title,
     body: `${greeting(data.userName, locale)}\n\n${s.body(data.programTitle)}`,
     cta: { text: s.cta, url: data.reviewUrl },
@@ -167,7 +167,7 @@ export async function sendWaitlistSpotAvailable(data: {
 }): Promise<void> {
   const locale = data.locale ?? 'ar';
   const s = t(locale).waitlistSpotAvailable;
-  const html = buildEmailLayout({
+  const html = await buildEmailLayout({
     title: s.title,
     body: `${greeting(data.userName, locale)}\n\n${s.body(data.programTitle)}`,
     infoBox: [
@@ -191,7 +191,7 @@ export async function sendCertificateReady(data: {
 }): Promise<void> {
   const locale = data.locale ?? 'ar';
   const s = t(locale).certificateReady;
-  const html = buildEmailLayout({
+  const html = await buildEmailLayout({
     title: s.title,
     body: `${greeting(data.userName, locale)}\n\n${s.body(data.programTitle)}`,
     cta: { text: s.cta, url: data.certificateUrl },
@@ -210,7 +210,7 @@ export async function sendRoundReminder3d(data: {
 }): Promise<void> {
   const locale = data.locale ?? 'ar';
   const s = t(locale).roundReminder3d;
-  const html = buildEmailLayout({
+  const html = await buildEmailLayout({
     title: s.title,
     body: `${greeting(data.userName, locale)}\n\n${s.body(data.programTitle, data.startDate)}`,
     cta: { text: s.cta, url: `${APP_URL()}/dashboard` },
@@ -228,7 +228,7 @@ export async function sendRoundReminder1d(data: {
 }): Promise<void> {
   const locale = data.locale ?? 'ar';
   const s = t(locale).roundReminder1d;
-  const html = buildEmailLayout({
+  const html = await buildEmailLayout({
     title: s.title,
     body: `${greeting(data.userName, locale)}\n\n${s.body(data.programTitle)}`,
     cta: { text: s.cta, url: `${APP_URL()}/dashboard` },

@@ -45,7 +45,7 @@ export async function sendCrmSyncFailureAlert(data: {
     en: `Threshold of ${data.failureCount} consecutive CRM sync failures has been reached for the user below.`,
   });
 
-  const html = buildEmailLayout(
+  const html = await buildEmailLayout(
     {
       title,
       body,
@@ -113,7 +113,7 @@ export async function sendReconciliationAlert(data: {
     </table>
   `;
 
-  const html = buildEmailLayout({
+  const html = await buildEmailLayout({
     title: 'Payment Reconciliation Alert',
     body,
     alert: 'Financial mismatch detected! Immediate review required.',

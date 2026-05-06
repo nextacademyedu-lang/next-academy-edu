@@ -40,7 +40,7 @@ export async function sendSessionReminder(data: {
     en: `Reminder for your session in "${data.programName}" with instructor ${data.instructorName}.\n\nThe session starts at: ${data.sessionDate}.\n\nWe wish you an enjoyable and productive session!`,
   });
 
-  const html = buildEmailLayout(
+  const html = await buildEmailLayout(
     {
       title,
       body: `${greeting(data.studentName, locale)}\n\n${body}`,

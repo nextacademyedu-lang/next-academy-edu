@@ -77,7 +77,7 @@ export async function sendContactTeamNotification(data: {
   const safeSubject = escapeHtml(subject);
   const safeMessage = escapeHtml(data.message).replace(/\n/g, '<br />');
 
-  const html = buildEmailLayout(
+  const html = await buildEmailLayout(
     {
       title: pick(locale, {
         ar: 'رسالة تواصل جديدة',
@@ -121,7 +121,7 @@ export async function sendContactAutoReply(data: {
     en: '✅ We received your message',
   });
 
-  const html = buildEmailLayout(
+  const html = await buildEmailLayout(
     {
       title: pick(locale, {
         ar: 'تم استلام طلبك',

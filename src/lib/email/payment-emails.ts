@@ -22,7 +22,7 @@ export async function sendPaymentReceipt(data: {
   const locale = data.locale ?? 'ar';
   const s = t(locale).paymentReceipt;
   const cur = t(locale).currency;
-  const html = buildEmailLayout({
+  const html = await buildEmailLayout({
     title: s.title,
     body: `${greeting(data.userName, locale)}\n\n${s.body}`,
     infoBox: [
@@ -45,7 +45,7 @@ export async function sendInstallmentRequestReceived(data: {
 }): Promise<void> {
   const locale = data.locale ?? 'ar';
   const s = t(locale).installmentRequestReceived;
-  const html = buildEmailLayout({
+  const html = await buildEmailLayout({
     title: s.title,
     body: `${greeting(data.userName, locale)}\n\n${s.body(data.programTitle)}`,
     infoBox: [
@@ -65,7 +65,7 @@ export async function sendInstallmentApproved(data: {
 }): Promise<void> {
   const locale = data.locale ?? 'ar';
   const s = t(locale).installmentApproved;
-  const html = buildEmailLayout({
+  const html = await buildEmailLayout({
     title: s.title,
     body: `${greeting(data.userName, locale)}\n\n${s.body(data.programTitle)}`,
     cta: { text: s.cta, url: `${APP_URL()}/dashboard/bookings` },
@@ -84,7 +84,7 @@ export async function sendInstallmentRejected(data: {
 }): Promise<void> {
   const locale = data.locale ?? 'ar';
   const s = t(locale).installmentRejected;
-  const html = buildEmailLayout({
+  const html = await buildEmailLayout({
     title: s.title,
     body: `${greeting(data.userName, locale)}\n\n${s.body(data.programTitle)}\n\n${s.fullPayNote}`,
     infoBox: [
@@ -108,7 +108,7 @@ export async function sendPaymentReminder(data: {
   const locale = data.locale ?? 'ar';
   const s = t(locale).paymentReminder;
   const cur = t(locale).currency;
-  const html = buildEmailLayout({
+  const html = await buildEmailLayout({
     title: s.title,
     body: `${greeting(data.userName, locale)}\n\n${s.body}`,
     infoBox: [
@@ -134,7 +134,7 @@ export async function sendPaymentOverdue(data: {
   const locale = data.locale ?? 'ar';
   const s = t(locale).paymentOverdue;
   const cur = t(locale).currency;
-  const html = buildEmailLayout({
+  const html = await buildEmailLayout({
     title: s.title,
     body: `${greeting(data.userName, locale)}\n\n${s.body}`,
     infoBox: [
@@ -159,7 +159,7 @@ export async function sendRefundApproved(data: {
   const locale = data.locale ?? 'ar';
   const s = t(locale).refundApproved;
   const cur = t(locale).currency;
-  const html = buildEmailLayout({
+  const html = await buildEmailLayout({
     title: s.title,
     body: `${greeting(data.userName, locale)}\n\n${s.body(data.amount, cur, data.programTitle)}\n\n${s.transfer}`,
     infoBox: [
@@ -181,7 +181,7 @@ export async function sendRefundRejected(data: {
 }): Promise<void> {
   const locale = data.locale ?? 'ar';
   const s = t(locale).refundRejected;
-  const html = buildEmailLayout({
+  const html = await buildEmailLayout({
     title: s.title,
     body: `${greeting(data.userName, locale)}\n\n${s.body(data.programTitle)}`,
     infoBox: [
@@ -202,7 +202,7 @@ export async function sendInstallmentApprovalExpiring(data: {
 }): Promise<void> {
   const locale = data.locale ?? 'ar';
   const s = t(locale).installmentApprovalExpiring;
-  const html = buildEmailLayout({
+  const html = await buildEmailLayout({
     title: s.title,
     body: `${greeting(data.userName, locale)}\n\n${s.body(data.programTitle)}`,
     alert: s.alert,

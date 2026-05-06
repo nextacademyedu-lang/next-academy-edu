@@ -27,7 +27,7 @@ export async function sendOtpVerificationCode(data: {
     ? `${greeting(data.userName, locale)}\n\nاستخدم الرمز التالي لإكمال تأكيد البريد الإلكتروني:`
     : `${greeting(data.userName, locale)}\n\nUse this code to complete email verification:`;
 
-  const html = buildEmailLayout(
+  const html = await buildEmailLayout(
     {
       title,
       body,
@@ -51,7 +51,7 @@ export async function sendWelcome(data: {
 }): Promise<void> {
   const locale = data.locale ?? 'ar';
   const s = t(locale).welcome;
-  const html = buildEmailLayout({
+  const html = await buildEmailLayout({
     title: s.title,
     body: `${greeting(data.userName, locale)}\n\n${s.body}`,
     cta: { text: s.cta, url: `${APP_URL()}/programs` },
@@ -69,7 +69,7 @@ export async function sendEmailVerification(data: {
 }): Promise<void> {
   const locale = data.locale ?? 'ar';
   const s = t(locale).emailVerification;
-  const html = buildEmailLayout({
+  const html = await buildEmailLayout({
     title: s.title,
     body: `${greeting(data.userName, locale)}\n\n${s.body}`,
     cta: { text: s.cta, url: data.verificationUrl },
@@ -88,7 +88,7 @@ export async function sendPasswordReset(data: {
 }): Promise<void> {
   const locale = data.locale ?? 'ar';
   const s = t(locale).passwordReset;
-  const html = buildEmailLayout({
+  const html = await buildEmailLayout({
     title: s.title,
     body: `${greeting(data.userName, locale)}\n\n${s.body}\n\n${s.ignore}`,
     cta: { text: s.cta, url: data.resetUrl },
@@ -107,7 +107,7 @@ export async function sendAccountDeletionConfirm(data: {
 }): Promise<void> {
   const locale = data.locale ?? 'ar';
   const s = t(locale).accountDeletionConfirm;
-  const html = buildEmailLayout({
+  const html = await buildEmailLayout({
     title: s.title,
     body: `${greeting(data.userName, locale)}\n\n${s.body}\n\n${s.ignore}`,
     cta: { text: s.cta, url: data.confirmUrl },
@@ -125,7 +125,7 @@ export async function sendAccountDeleted(data: {
 }): Promise<void> {
   const locale = data.locale ?? 'ar';
   const s = t(locale).accountDeleted;
-  const html = buildEmailLayout({
+  const html = await buildEmailLayout({
     title: s.title,
     body: `${greeting(data.userName, locale)}\n\n${s.body}\n\n${s.contact}`,
     cta: { text: s.cta, url: APP_URL() },
@@ -143,7 +143,7 @@ export async function sendEmailChanged(data: {
 }): Promise<void> {
   const locale = data.locale ?? 'ar';
   const s = t(locale).emailChanged;
-  const html = buildEmailLayout({
+  const html = await buildEmailLayout({
     title: s.title,
     body: `${greeting(data.userName, locale)}\n\n${s.body(data.newEmail)}\n\n${s.notYou}`,
     cta: { text: s.cta, url: `${APP_URL()}/settings` },
@@ -164,7 +164,7 @@ export async function sendSecurityAlert(data: {
 }): Promise<void> {
   const locale = data.locale ?? 'ar';
   const s = t(locale).securityAlert;
-  const html = buildEmailLayout({
+  const html = await buildEmailLayout({
     title: s.title,
     body: `${greeting(data.userName, locale)}\n\n${s.body}\n\n${s.notYou}`,
     infoBox: [

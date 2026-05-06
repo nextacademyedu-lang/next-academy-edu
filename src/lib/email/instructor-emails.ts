@@ -34,7 +34,7 @@ export async function sendInstructorOnboardingSubmitted(data: {
     en: `We received your profile and proposed program "${data.programTitle}".\nThe Next Academy team will review it and email you as soon as there is a decision.`,
   });
 
-  const html = buildEmailLayout(
+  const html = await buildEmailLayout(
     {
       title,
       body: `${greeting(data.userName, locale)}\n\n${body}`,
@@ -71,7 +71,7 @@ export async function sendInstructorProfileApproved(data: {
     en: 'You can now access all instructor dashboard sections and start managing your sessions and programs.',
   });
 
-  const html = buildEmailLayout(
+  const html = await buildEmailLayout(
     {
       title,
       body: `${greeting(data.userName, locale)}\n\n${body}`,
@@ -109,7 +109,7 @@ export async function sendInstructorProfileRejected(data: {
     en: 'Please review the notes, update your details, then submit again for review.',
   });
 
-  const html = buildEmailLayout(
+  const html = await buildEmailLayout(
     {
       title,
       body: `${greeting(data.userName, locale)}\n\n${body}`,
@@ -155,7 +155,7 @@ export async function sendInstructorProgramApproved(data: {
     en: `Great news! "${data.programTitle}" has been approved, and we will coordinate with you on the next steps.`,
   });
 
-  const html = buildEmailLayout(
+  const html = await buildEmailLayout(
     {
       title,
       body: `${greeting(data.userName, locale)}\n\n${body}`,
@@ -194,7 +194,7 @@ export async function sendInstructorProgramRejected(data: {
     en: `We reviewed "${data.programTitle}" and need a few updates before re-submission.`,
   });
 
-  const html = buildEmailLayout(
+  const html = await buildEmailLayout(
     {
       title,
       body: `${greeting(data.userName, locale)}\n\n${body}`,
@@ -242,7 +242,7 @@ export async function sendInstructorConsultationCancelled(data: {
     en: `Your consultation scheduled on ${data.date} with ${data.clientName} has been cancelled.`,
   });
 
-  const html = buildEmailLayout(
+  const html = await buildEmailLayout(
     {
       title,
       body: `${greeting(data.userName, locale)}\n\n${body}`,

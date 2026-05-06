@@ -21,7 +21,7 @@ export async function sendConsultationConfirmed(data: {
 }): Promise<void> {
   const locale = data.locale ?? 'ar';
   const s = t(locale).consultationConfirmed;
-  const html = buildEmailLayout({
+  const html = await buildEmailLayout({
     title: s.title,
     body: `${greeting(data.userName, locale)}\n\n${s.body(data.instructor)}`,
     infoBox: [
@@ -46,7 +46,7 @@ export async function sendConsultationReminder24h(data: {
 }): Promise<void> {
   const locale = data.locale ?? 'ar';
   const s = t(locale).consultationReminder24h;
-  const html = buildEmailLayout({
+  const html = await buildEmailLayout({
     title: s.title,
     body: `${greeting(data.userName, locale)}\n\n${s.body(data.instructor, data.time)}`,
     cta: { text: s.cta, url: `${APP_URL()}/dashboard/consultations` },
@@ -63,7 +63,7 @@ export async function sendConsultationReminder1h(data: {
 }): Promise<void> {
   const locale = data.locale ?? 'ar';
   const s = t(locale).consultationReminder1h;
-  const html = buildEmailLayout({
+  const html = await buildEmailLayout({
     title: s.title,
     body: `${greeting(data.userName, locale)}\n\n${s.body}`,
     cta: { text: s.cta, url: `${APP_URL()}/dashboard/consultations` },
@@ -83,7 +83,7 @@ export async function sendConsultationCancelled(data: {
 }): Promise<void> {
   const locale = data.locale ?? 'ar';
   const s = t(locale).consultationCancelled;
-  const html = buildEmailLayout({
+  const html = await buildEmailLayout({
     title: s.title,
     body: `${greeting(data.userName, locale)}\n\n${s.body(data.instructor, data.date)}`,
     infoBox: [
@@ -103,7 +103,7 @@ export async function sendInactiveUser(data: {
 }): Promise<void> {
   const locale = data.locale ?? 'ar';
   const s = t(locale).inactiveUser;
-  const html = buildEmailLayout({
+  const html = await buildEmailLayout({
     title: s.title,
     body: `${greeting(data.userName, locale)}\n\n${s.body}`,
     cta: { text: s.cta, url: `${APP_URL()}/programs` },
@@ -121,7 +121,7 @@ export async function sendNewProgramAnnouncement(data: {
 }): Promise<void> {
   const locale = data.locale ?? 'ar';
   const s = t(locale).newProgramAnnouncement;
-  const html = buildEmailLayout({
+  const html = await buildEmailLayout({
     title: s.title(data.programTitle),
     body: `${greeting(data.userName, locale)}\n\n${s.body(data.programTitle)}`,
     cta: { text: s.cta, url: `${APP_URL()}/programs` },

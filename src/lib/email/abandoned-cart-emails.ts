@@ -54,7 +54,7 @@ export async function sendAbandonedCartEmail(data: {
         en: `It looks like you started enrolling in "${data.programName}" but didn't finish. Did you run into any trouble? You can pick up right where you left off.`,
       });
 
-  const html = buildEmailLayout(
+  const html = await buildEmailLayout(
     {
       title,
       body: `${greeting(data.studentName, locale)}\n\n${body}`,
