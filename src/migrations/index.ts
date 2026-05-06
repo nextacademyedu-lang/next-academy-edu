@@ -33,6 +33,7 @@ import * as migration_20260504_024000_fix_promo_banners_rels from './20260504_02
 import * as migration_20260504_030000_fix_user_profiles_work_field from './20260504_030000_fix_user_profiles_work_field';
 import * as migration_20260504_034500_fix_promo_banners_buttons_id from './20260504_034500_fix_promo_banners_buttons_id';
 import * as migration_20260504_040500_fix_user_profiles_how_did_you_hear from './20260504_040500_fix_user_profiles_how_did_you_hear';
+import * as migration_20260506_230000_add_clerk_id_and_learning_paths from './20260506_230000_add_clerk_id_and_learning_paths';
 
 export const migrations = [
   {
@@ -209,5 +210,10 @@ export const migrations = [
     up: migration_20260504_040500_fix_user_profiles_how_did_you_hear.up,
     down: migration_20260504_040500_fix_user_profiles_how_did_you_hear.down,
     name: '20260504_040500_fix_user_profiles_how_did_you_hear',
+  },
+  {
+    up: migration_20260506_230000_add_clerk_id_and_learning_paths.up,
+    down: migration_20260506_230000_add_clerk_id_and_learning_paths.down,
+    name: '20260506_230000_add_clerk_id_and_learning_paths',
   },
 ];
