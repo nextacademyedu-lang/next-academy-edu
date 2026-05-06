@@ -199,27 +199,31 @@ export const Users: CollectionConfig = {
               needsInstructorBinding);
 
           if (shouldAttemptAutoLink && normalizedEmail) {
-            const instructorLookup = await findInstructorIdByEmail({
-              payload: req.payload,
-              req,
-              normalizedEmail,
-              source: 'Users.afterChange',
-            });
-
-            if (instructorLookup.status === 'found') {
-              await linkUserToInstructor({
+            try {
+              const instructorLookup = await findInstructorIdByEmail({
                 payload: req.payload,
                 req,
-                user: {
-                  id: doc.id,
-                  email: doc.email,
-                  role: doc.role,
-                  emailVerified: doc.emailVerified,
-                  instructorId: doc.instructorId,
-                },
-                instructorId: instructorLookup.instructorId,
+                normalizedEmail,
                 source: 'Users.afterChange',
               });
+
+              if (instructorLookup.status === 'found') {
+                await linkUserToInstructor({
+                  payload: req.payload,
+                  req,
+                  user: {
+                    id: doc.id,
+                    email: doc.email,
+                    role: doc.role,
+                    emailVerified: doc.emailVerified,
+                    instructorId: doc.instructorId,
+                  },
+                  instructorId: instructorLookup.instructorId,
+                  source: 'Users.afterChange',
+                });
+              }
+            } catch (err) {
+              console.error('[Users] afterChange instructor auto-link failed (non-blocking):', err);
             }
           }
 
@@ -230,16 +234,20 @@ export const Users: CollectionConfig = {
             (operation === 'create' || justVerified || emailChanged);
 
           if (shouldAttemptCompanyAutoLink) {
-            await autoAcceptInvitationByEmail({
-              payload: req.payload,
-              req: req as any,
-              user: {
-                id: doc.id,
-                email: doc.email,
-                role: doc.role,
-                emailVerified: doc.emailVerified,
-              },
-            });
+            try {
+              await autoAcceptInvitationByEmail({
+                payload: req.payload,
+                req: req as any,
+                user: {
+                  id: doc.id,
+                  email: doc.email,
+                  role: doc.role,
+                  emailVerified: doc.emailVerified,
+                },
+              });
+            } catch (err) {
+              console.error('[Users] afterChange company auto-link failed (non-blocking):', err);
+            }
           }
 
           if (doc.role === 'admin') return;
@@ -342,6 +350,7 @@ export const Users: CollectionConfig = {
     { name: 'googleId', type: 'text', admin: { readOnly: true, description: 'Google OAuth sub ID' } },
     { name: 'emailVerified', type: 'checkbox', defaultValue: false },
     { name: 'lastLogin', type: 'date', admin: { readOnly: true } },
+    { name: 'clerkId', type: 'text', unique: true, index: true, admin: { readOnly: true, description: 'Clerk User ID' } },
     
     /* ── Native Google Calendar Sync ────────────────────────────── */
     { 

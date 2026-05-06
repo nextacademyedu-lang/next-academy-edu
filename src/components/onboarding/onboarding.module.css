@@ -348,6 +348,10 @@
     padding: 12px 14px;
   }
 
+  .form {
+    padding-bottom: 60px;
+  }
+
   .stepDot {
     width: 28px;
     height: 28px;

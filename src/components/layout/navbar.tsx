@@ -9,6 +9,7 @@ import { ThemeToggle } from '../ui/theme-toggle';
 import { useAuth } from '@/context/auth-context';
 import { GlobalSearch } from '@/components/search/GlobalSearch';
 import { getDashboardPath } from '@/lib/role-redirect';
+import { useAuth as useClerkAuth, UserButton, SignInButton, SignUpButton } from '@clerk/nextjs';
 import styles from './navbar.module.css';
 
 type NavItem = {
@@ -22,6 +23,7 @@ export function Navbar() {
   const router = useRouter();
   const pathname = usePathname();
   const { isAuthenticated, isLoading, user, logout } = useAuth();
+  const { isLoaded: isClerkLoaded, isSignedIn: isClerkSignedIn } = useClerkAuth();
 
   const [searchOpen, setSearchOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -52,17 +54,17 @@ export function Navbar() {
     { slug: 'tech', label: 'Technology' },
   ];
 
-  const desktopPrimaryLinks: NavItem[] = [
-    { href: `/${locale}/instructors`, label: t('instructors') },
-    { href: `/${locale}/for-business`, label: t('forBusiness') },
-  ];
 
   const exploreLinks: NavItem[] = [
     { href: `/${locale}/workshops`, label: t('workshops') },
     { href: `/${locale}/events`, label: t('events') },
     { href: `/${locale}/webinars`, label: t('webinars') },
     { href: `/${locale}/retreats`, label: t('retreats') },
-    { href: `/${locale}/corporate-training`, label: t('corporateTraining') },
+  ];
+
+  const desktopPrimaryLinks: NavItem[] = [
+    { href: `/${locale}/instructors`, label: t('instructors') },
+    { href: `/${locale}/for-business`, label: t('forBusiness') },
   ];
 
   const resourceLinks: NavItem[] = [
@@ -72,15 +74,9 @@ export function Navbar() {
     { href: `/${locale}/contact`, label: t('contact') },
   ];
 
-  const moreLinks: NavItem[] = [...exploreLinks, ...resourceLinks];
   const mobileMainLinks: NavItem[] = [
-    { href: `/${locale}/workshops`, label: t('workshops') },
-    { href: `/${locale}/events`, label: t('events') },
-    { href: `/${locale}/webinars`, label: t('webinars') },
-    { href: `/${locale}/retreats`, label: t('retreats') },
-    { href: `/${locale}/corporate-training`, label: t('corporateTraining') },
-    { href: `/${locale}/instructors`, label: t('instructors') },
-    { href: `/${locale}/for-business`, label: t('forBusiness') },
+    ...exploreLinks,
+    ...desktopPrimaryLinks,
   ];
 
   const closeAllMenus = useCallback(() => {
@@ -143,45 +139,24 @@ export function Navbar() {
                 </button>
 
                 {desktopCoursesOpen && (
-                  <div className={styles.megaPanel}>
-                    <div className={styles.panelGrid}>
-                      <div className={styles.panelSection}>
-                        <p className={styles.panelTitle}>{t('courses')}</p>
-                        {courseCategories.map((cat) => (
-                          <NextLink
-                            key={cat.slug}
-                            href={`/${locale}/courses?category=${cat.slug}`}
-                            className={styles.panelLink}
-                            onClick={() => setDesktopCoursesOpen(false)}
-                          >
-                            <span>{cat.label}</span>
-                            <span className={styles.linkPill}>Explore</span>
-                          </NextLink>
-                        ))}
-                      </div>
-
-                      <div className={styles.panelSection}>
-                        <p className={styles.panelTitle}>{t('quickAccess')}</p>
-                        <NextLink href={`/${locale}/courses`} className={styles.panelLink} onClick={() => setDesktopCoursesOpen(false)}>
-                          <span>{t('allCourses')}</span>
-                        </NextLink>
-                        <NextLink href={`/${locale}/workshops`} className={styles.panelLink} onClick={() => setDesktopCoursesOpen(false)}>
-                          <span>{t('workshops')}</span>
-                        </NextLink>
-                        <NextLink href={`/${locale}/for-business`} className={styles.panelLink} onClick={() => setDesktopCoursesOpen(false)}>
-                          <span>{t('forTeams')}</span>
-                        </NextLink>
-                      </div>
-                    </div>
+                  <div className={styles.dropdownPanel}>
+                    <NextLink href={`/${locale}/courses`} className={styles.dropdownLink} onClick={() => setDesktopCoursesOpen(false)}>
+                      <strong>{t('allCourses')}</strong>
+                    </NextLink>
+                    <div style={{ height: 1, background: 'var(--border-subtle)', margin: '4px 0' }} />
+                    {courseCategories.map((cat) => (
+                      <NextLink
+                        key={cat.slug}
+                        href={`/${locale}/courses?category=${cat.slug}`}
+                        className={styles.dropdownLink}
+                        onClick={() => setDesktopCoursesOpen(false)}
+                      >
+                        {cat.label}
+                      </NextLink>
+                    ))}
                   </div>
                 )}
               </div>
-
-              {desktopPrimaryLinks.map((item) => (
-                <NextLink key={item.href} href={item.href} className={styles.navLink}>
-                  {item.label}
-                </NextLink>
-              ))}
 
               <div
                 className={styles.navItemWithPanel}
@@ -194,13 +169,13 @@ export function Navbar() {
                   aria-expanded={desktopMoreOpen}
                   onClick={() => setDesktopMoreOpen((v) => !v)}
                 >
-                  {t('more')}
+                  {t('programs')}
                   <ChevronDown />
                 </button>
 
                 {desktopMoreOpen && (
                   <div className={styles.dropdownPanel}>
-                    {moreLinks.map((item) => (
+                    {exploreLinks.map((item) => (
                       <NextLink
                         key={item.href}
                         href={item.href}
@@ -213,16 +188,24 @@ export function Navbar() {
                   </div>
                 )}
               </div>
+
+              {desktopPrimaryLinks.map((item) => (
+                <NextLink key={item.href} href={item.href} className={styles.navLink}>
+                  {item.label}
+                </NextLink>
+              ))}
             </nav>
           </div>
 
           <div className={styles.actions}>
             <div className={styles.desktopActions}>
-              <button className={styles.searchTrigger} onClick={() => setSearchOpen(true)} aria-label="Search">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <button className={styles.searchBarButton} onClick={() => setSearchOpen(true)} aria-label="Search">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <circle cx="11" cy="11" r="8" />
                   <line x1="21" y1="21" x2="16.65" y2="16.65" />
                 </svg>
+                <span className={styles.searchBarText}>{t('search')}...</span>
+                <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>⌘K</span>
               </button>
 
               <ThemeToggle />
@@ -231,31 +214,40 @@ export function Navbar() {
                 {t('langToggle')}
               </button>
 
-              {!isLoading && (
-                isAuthenticated ? (
+              {isClerkLoaded && (
+                isClerkSignedIn ? (
                   <>
-                    <NextLink href={accountHref} className={styles.authLink}>
-                      <Button variant="secondary" size="sm" className={styles.accountButton}>
-                        <span className={styles.accountAvatar} aria-hidden="true">
-                          {accountImageUrl ? (
-                            <img src={accountImageUrl} alt="" className={styles.accountAvatarImage} />
-                          ) : accountInitial}
-                        </span>
-                        {accountName}
-                      </Button>
-                    </NextLink>
-                    <Button variant="outline" size="sm" onClick={() => logout()}>
-                      {t('logout')}
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      onClick={() => router.push('/dashboard')}
+                    >
+                      {locale === 'ar' ? 'لوحة التحكم' : 'Dashboard'}
                     </Button>
+                    <UserButton>
+                      <UserButton.MenuItems>
+                        <UserButton.Link
+                          label={locale === 'ar' ? 'لوحة التحكم' : 'Dashboard'}
+                          labelIcon={
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="7" height="9" x="3" y="3" rx="1" /><rect width="7" height="5" x="14" y="3" rx="1" /><rect width="7" height="9" x="14" y="12" rx="1" /><rect width="7" height="5" x="3" y="16" rx="1" /></svg>
+                          }
+                          href={`/${locale}/dashboard`}
+                        />
+                      </UserButton.MenuItems>
+                    </UserButton>
                   </>
                 ) : (
                   <>
-                    <NextLink href={`/${locale}/login`} className={styles.authLink}>
-                      <Button variant="secondary" size="sm">{t('login')}</Button>
-                    </NextLink>
-                    <NextLink href={`/${locale}/register`} className={styles.authLink}>
-                      <Button variant="primary" size="sm">{t('register')}</Button>
-                    </NextLink>
+                    <SignInButton mode="modal" fallbackRedirectUrl={`/${locale}/dashboard`}>
+                      <Button variant="secondary" size="sm">
+                        {t('login')}
+                      </Button>
+                    </SignInButton>
+                    <SignUpButton mode="modal" forceRedirectUrl={`/${locale}/onboarding`}>
+                      <Button variant="primary" size="sm">
+                        {t('register')}
+                      </Button>
+                    </SignUpButton>
                   </>
                 )
               )}
@@ -342,31 +334,33 @@ export function Navbar() {
               </button>
             </div>
 
-            {!isLoading && (
-              isAuthenticated ? (
+            {isClerkLoaded && (
+              isClerkSignedIn ? (
                 <div className={styles.mobileAuth}>
-                  <NextLink href={accountHref} onClick={closeAllMenus}>
-                    <Button variant="secondary" fullWidth className={styles.accountButton}>
-                      <span className={styles.accountAvatar} aria-hidden="true">
-                        {accountImageUrl ? (
-                          <img src={accountImageUrl} alt="" className={styles.accountAvatarImage} />
-                        ) : accountInitial}
-                      </span>
-                      {accountName}
-                    </Button>
-                  </NextLink>
-                  <Button variant="outline" fullWidth onClick={() => { logout(); closeAllMenus(); }}>
-                    {t('logout')}
+                  <Button 
+                    variant="outline" 
+                    fullWidth 
+                    onClick={() => {
+                      closeAllMenus();
+                      router.push('/dashboard');
+                    }}
+                  >
+                    {locale === 'ar' ? 'لوحة التحكم' : 'Dashboard'}
                   </Button>
+                  <UserButton />
                 </div>
               ) : (
                 <div className={styles.mobileAuth}>
-                  <NextLink href={`/${locale}/login`} onClick={closeAllMenus}>
-                    <Button variant="secondary" fullWidth>{t('login')}</Button>
-                  </NextLink>
-                  <NextLink href={`/${locale}/register`} onClick={closeAllMenus}>
-                    <Button variant="primary" fullWidth>{t('register')}</Button>
-                  </NextLink>
+                  <SignInButton mode="modal" fallbackRedirectUrl={`/${locale}/dashboard`}>
+                    <Button variant="secondary" fullWidth onClick={closeAllMenus}>
+                      {t('login')}
+                    </Button>
+                  </SignInButton>
+                  <SignUpButton mode="modal" forceRedirectUrl={`/${locale}/onboarding`}>
+                    <Button variant="primary" fullWidth onClick={closeAllMenus}>
+                      {t('register')}
+                    </Button>
+                  </SignUpButton>
                 </div>
               )
             )}

@@ -198,7 +198,7 @@ export async function updateUserProfile(
   userId: string,
   data: ProfileUpdatePayload,
 ): Promise<AuthResponse<{ doc: Record<string, unknown> }>> {
-  const response = await fetch(`/api/users/${userId}`, {
+  const response = await fetch('/api/auth/profile/user', {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },
     credentials: 'include',
@@ -210,10 +210,7 @@ export async function updateUserProfile(
 export async function getUserExtendedProfile(
   userId: string,
 ): Promise<AuthResponse<PayloadListResponse<ExtendedProfileData>>> {
-  const response = await fetch(
-    `/api/user-profiles?where[user][equals]=${userId}&depth=1&limit=1`,
-    { credentials: 'include' },
-  );
+  const response = await fetch('/api/auth/profile/extended', { credentials: 'include' });
   return handleResponse<PayloadListResponse<ExtendedProfileData>>(response);
 }
 
@@ -221,7 +218,7 @@ export async function updateUserExtendedProfile(
   profileId: string,
   data: ExtendedProfilePayload,
 ): Promise<AuthResponse<{ doc: Record<string, unknown> }>> {
-  const response = await fetch(`/api/user-profiles/${profileId}`, {
+  const response = await fetch('/api/auth/profile/extended', {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },
     credentials: 'include',
@@ -234,11 +231,11 @@ export async function createUserExtendedProfile(
   userId: string,
   data: ExtendedProfilePayload,
 ): Promise<AuthResponse<{ doc: Record<string, unknown> }>> {
-  const response = await fetch('/api/user-profiles', {
+  const response = await fetch('/api/auth/profile/extended', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     credentials: 'include',
-    body: JSON.stringify({ user: userId, ...data }),
+    body: JSON.stringify(data), // userId is already fetched server-side from clerk session
   });
   return handleResponse<{ doc: Record<string, unknown> }>(response);
 }
@@ -247,7 +244,7 @@ export async function changeUserPassword(
   userId: string,
   password: string,
 ): Promise<AuthResponse<{ doc: Record<string, unknown> }>> {
-  const response = await fetch(`/api/users/${userId}`, {
+  const response = await fetch('/api/auth/profile/user', {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },
     credentials: 'include',

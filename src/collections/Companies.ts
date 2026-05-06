@@ -7,8 +7,8 @@ export const Companies: CollectionConfig = {
   slug: 'companies',
   admin: { useAsTitle: 'name' },
   access: {
-    read: isAuthenticated,
-    create: isAuthenticated,
+    read: isPublic,
+    create: isPublic, // Allow anyone to create their company during onboarding
     update: isAdmin,
     delete: isAdmin,
   },

@@ -111,6 +111,7 @@ export interface Config {
     'company-group-members': CompanyGroupMember;
     'company-policies': CompanyPolicy;
     'promo-banners': PromoBanner;
+    'learning-paths': LearningPath;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -162,6 +163,7 @@ export interface Config {
     'company-group-members': CompanyGroupMembersSelect<false> | CompanyGroupMembersSelect<true>;
     'company-policies': CompanyPoliciesSelect<false> | CompanyPoliciesSelect<true>;
     'promo-banners': PromoBannersSelect<false> | PromoBannersSelect<true>;
+    'learning-paths': LearningPathsSelect<false> | LearningPathsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -227,6 +229,10 @@ export interface User {
   googleId?: string | null;
   emailVerified?: boolean | null;
   lastLogin?: string | null;
+  /**
+   * Clerk User ID
+   */
+  clerkId?: string | null;
   /**
    * User-specific Google Calendar integration refresh token
    */
@@ -477,6 +483,10 @@ export interface Category {
   parent?: (number | null) | Category;
   order?: number | null;
   isActive?: boolean | null;
+  /**
+   * Show this category as a distinct row on the homepage
+   */
+  showOnHome?: boolean | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -2075,6 +2085,31 @@ export interface PromoBanner {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "learning-paths".
+ */
+export interface LearningPath {
+  id: number;
+  titleAr: string;
+  titleEn?: string | null;
+  slug: string;
+  descriptionAr?: string | null;
+  descriptionEn?: string | null;
+  thumbnail?: (number | null) | Media;
+  coverImage?: (number | null) | Media;
+  programs: (number | Program)[];
+  /**
+   * Override price for the entire bundle. If left empty, it might be calculated dynamically.
+   */
+  price?: number | null;
+  currency?: string | null;
+  isActive?: boolean | null;
+  isFeatured?: boolean | null;
+  order?: number | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -2272,6 +2307,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'promo-banners';
         value: number | PromoBanner;
+      } | null)
+    | ({
+        relationTo: 'learning-paths';
+        value: number | LearningPath;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -2337,6 +2376,7 @@ export interface UsersSelect<T extends boolean = true> {
   googleId?: T;
   emailVerified?: T;
   lastLogin?: T;
+  clerkId?: T;
   googleRefreshToken?: T;
   googleAccessToken?: T;
   googleCalendarConnectedAt?: T;
@@ -2469,6 +2509,7 @@ export interface CategoriesSelect<T extends boolean = true> {
   parent?: T;
   order?: T;
   isActive?: T;
+  showOnHome?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -3578,6 +3619,27 @@ export interface PromoBannersSelect<T extends boolean = true> {
   borderRadius?: T;
   autoPlaySpeed?: T;
   transition?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "learning-paths_select".
+ */
+export interface LearningPathsSelect<T extends boolean = true> {
+  titleAr?: T;
+  titleEn?: T;
+  slug?: T;
+  descriptionAr?: T;
+  descriptionEn?: T;
+  thumbnail?: T;
+  coverImage?: T;
+  programs?: T;
+  price?: T;
+  currency?: T;
+  isActive?: T;
+  isFeatured?: T;
+  order?: T;
   updatedAt?: T;
   createdAt?: T;
 }

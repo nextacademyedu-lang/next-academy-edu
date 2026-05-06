@@ -9,6 +9,7 @@ import type { Instructor, Program, Round, Media } from '@/payload-types';
 import { Navbar } from '@/components/layout/navbar';
 import { Footer } from '@/components/layout/footer';
 import { Button } from '@/components/ui/button';
+import { SignUpButton } from '@clerk/nextjs';
 import styles from './page.module.css';
 import { getInstructorIds } from '@/lib/instructor-helpers';
 import { buildPageMetadata } from '@/lib/seo/metadata';
@@ -200,11 +201,11 @@ export default async function InstructorsPage() {
                   ? 'شارك خبرتك مع آلاف المتعلمين عبر برامج وورش عملية.'
                   : 'Share your expertise through practical courses and workshops.'}
               </p>
-              <Link href={`/${locale}/register?intent=instructor`}>
+              <SignUpButton mode="modal" forceRedirectUrl={`/${locale}/onboarding?role=instructor`}>
                 <Button variant="secondary" size="lg">
                   {locale === 'ar' ? 'قدّم الآن' : 'Apply Now'}
                 </Button>
-              </Link>
+              </SignUpButton>
             </div>
           </div>
         </section>

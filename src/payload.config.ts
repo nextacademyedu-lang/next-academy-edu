@@ -106,6 +106,7 @@ import { CompanyInvitations } from './collections/CompanyInvitations.ts';
 import { CompanyGroups } from './collections/CompanyGroups.ts';
 import { CompanyGroupMembers } from './collections/CompanyGroupMembers.ts';
 import { CompanyPolicies } from './collections/CompanyPolicies.ts';
+import { LearningPaths } from './collections/LearningPaths.ts';
 import { migrations } from './migrations/index.ts';
 
 if (!process.env.DATABASE_URI) {
@@ -299,6 +300,7 @@ export default buildConfig({
     CompanyGroupMembers,
     CompanyPolicies,
     PromoBanners,
+    LearningPaths,
   ],
   globals: [],
   editor: lexicalEditor({}),

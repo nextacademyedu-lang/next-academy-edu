@@ -3,6 +3,7 @@ import { Montserrat, Cairo, Cinzel } from 'next/font/google';
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
 import { notFound } from 'next/navigation';
+import { ClerkProvider } from '@clerk/nextjs';
 import { routing } from '@/i18n/routing';
 import { AuthProvider } from '@/context/auth-context';
 import { ThemeProvider } from '@/context/theme-context';
@@ -70,16 +71,77 @@ export default async function LocaleLayout({
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
       </head>
       <body className={`${cairo.variable} ${montserrat.variable} ${cinzel.variable}`} suppressHydrationWarning>
-        <NextIntlClientProvider messages={messages}>
-          <AuthProvider>
-            <ThemeProvider>
-              {children}
-              <PopupManager />
-              <CookieConsent />
-              <SourceTracker />
-            </ThemeProvider>
-          </AuthProvider>
-        </NextIntlClientProvider>
+        <ClerkProvider
+          appearance={{
+            variables: {
+              colorPrimary: '#c9a96e',
+              colorBackground: '#0a0a0a',
+              colorText: '#ffffff',
+              colorInputBackground: '#141414',
+              colorInputText: '#ffffff',
+              colorShimmer: 'rgba(255,255,255,0.05)',
+              borderRadius: '8px',
+              fontFamily: locale === 'ar' ? 'var(--font-cairo)' : 'var(--font-montserrat)',
+            },
+            elements: {
+              card: {
+                border: '1px solid rgba(255, 255, 255, 0.08)',
+                boxShadow: '0 8px 30px rgba(0,0,0,0.5)',
+              },
+              formButtonPrimary: {
+                backgroundColor: '#c9a96e',
+                color: '#000000',
+                fontWeight: '600',
+                '&:hover': {
+                  backgroundColor: '#b09460',
+                }
+              },
+              footerActionLink: {
+                color: '#c9a96e',
+                '&:hover': {
+                  color: '#b09460',
+                }
+              },
+              headerTitle: {
+                color: '#ffffff',
+              },
+              headerSubtitle: {
+                color: '#999999',
+              },
+              formFieldLabel: {
+                color: '#cccccc',
+              },
+              dividerLine: {
+                backgroundColor: 'rgba(255,255,255,0.1)',
+              },
+              dividerText: {
+                color: '#888888',
+              },
+              socialButtonsBlockButton: {
+                border: '1px solid rgba(255, 255, 255, 0.08)',
+                backgroundColor: '#141414',
+                color: '#ffffff',
+                '&:hover': {
+                  backgroundColor: '#1f1f1f',
+                }
+              },
+              identityPreviewEditButtonIcon: {
+                color: '#c9a96e',
+              }
+            }
+          }}
+        >
+          <NextIntlClientProvider messages={messages}>
+            <AuthProvider>
+              <ThemeProvider>
+                {children}
+                <PopupManager />
+                <CookieConsent />
+                <SourceTracker />
+              </ThemeProvider>
+            </AuthProvider>
+          </NextIntlClientProvider>
+        </ClerkProvider>
       </body>
     </html>
   );

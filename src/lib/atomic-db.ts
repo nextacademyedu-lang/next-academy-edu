@@ -1,19 +1,18 @@
 import { getPayload } from 'payload';
 import config from '@payload-config';
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type PayloadDbPool = { query: (text: string, values?: any[]) => Promise<{ rows: any[] }> };
+import { sql } from 'drizzle-orm';
 
 /**
- * Get the raw pg Pool from Payload's db adapter for atomic SQL operations.
+ * Get the raw Drizzle DB instance from Payload's db adapter for atomic SQL operations.
  *
  * Use this ONLY when you need atomic increments / decrements that cannot
  * have TOCTOU races (e.g. `paidAmount`, `currentUses`, `currentEnrollments`).
  */
-async function getPool(): Promise<PayloadDbPool> {
+async function getDrizzle() {
   const payload = await getPayload({ config });
-  // Payload CMS v3 with @payloadcms/db-postgres exposes payload.db.pool
-  return (payload.db as unknown as { pool: PayloadDbPool }).pool;
+  // Payload CMS v3 with @payloadcms/db-postgres exposes payload.db.drizzle
+  return (payload.db as any).drizzle;
 }
 
 /**
@@ -34,11 +33,9 @@ export async function atomicIncrement(
   column: string,
   delta: number,
 ): Promise<number | null> {
-  const pool = await getPool();
-  const result = await pool.query(
-    `UPDATE "${table}" SET "${column}" = COALESCE("${column}", 0) + $1 WHERE id = $2 RETURNING "${column}"`,
-    [delta, Number(id)],
-  );
+  const db = await getDrizzle();
+  const query = sql.raw(`UPDATE "${table}" SET "${column}" = COALESCE("${column}", 0) + ${Number(delta)} WHERE id = ${Number(id)} RETURNING "${column}"`);
+  const result = await db.execute(query);
   if (!result.rows || result.rows.length === 0) return null;
   return result.rows[0][column] ?? null;
 }
@@ -59,11 +56,9 @@ export async function atomicIncrementWithCeiling(
   delta: number,
   ceilingColumn: string,
 ): Promise<number | null> {
-  const pool = await getPool();
-  const result = await pool.query(
-    `UPDATE "${table}" SET "${column}" = COALESCE("${column}", 0) + $1 WHERE id = $2 AND COALESCE("${column}", 0) + $1 <= "${ceilingColumn}" RETURNING "${column}"`,
-    [delta, Number(id)],
-  );
+  const db = await getDrizzle();
+  const query = sql.raw(`UPDATE "${table}" SET "${column}" = COALESCE("${column}", 0) + ${Number(delta)} WHERE id = ${Number(id)} AND ("${ceilingColumn}" IS NULL OR "${ceilingColumn}" = 0 OR COALESCE("${column}", 0) + ${Number(delta)} <= "${ceilingColumn}") RETURNING "${column}"`);
+  const result = await db.execute(query);
   if (!result.rows || result.rows.length === 0) return null;
   return result.rows[0][column] ?? null;
 }
@@ -83,11 +78,9 @@ export async function atomicIncrementWithLimit(
   delta: number,
   maxValue: number,
 ): Promise<number | null> {
-  const pool = await getPool();
-  const result = await pool.query(
-    `UPDATE "${table}" SET "${column}" = COALESCE("${column}", 0) + $1 WHERE id = $2 AND COALESCE("${column}", 0) + $1 <= $3 RETURNING "${column}"`,
-    [delta, Number(id), maxValue],
-  );
+  const db = await getDrizzle();
+  const query = sql.raw(`UPDATE "${table}" SET "${column}" = COALESCE("${column}", 0) + ${Number(delta)} WHERE id = ${Number(id)} AND COALESCE("${column}", 0) + ${Number(delta)} <= ${Number(maxValue)} RETURNING "${column}"`);
+  const result = await db.execute(query);
   if (!result.rows || result.rows.length === 0) return null;
   return result.rows[0][column] ?? null;
 }

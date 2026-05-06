@@ -8,7 +8,7 @@ import { useLocale, useTranslations } from 'next-intl';
 import useEmblaCarousel from 'embla-carousel-react';
 import styles from './featured.module.css';
 
-type FeaturedProgram = {
+export type FeaturedProgram = {
   id: string;
   title: string;
   kind: string;
@@ -28,18 +28,20 @@ type FeaturedResponse = {
   recordedPrograms: FeaturedProgram[];
 };
 
-type CarouselProps = {
+export type CarouselProps = {
   title: string;
-  subtitle: string;
+  subtitle?: string;
   ctaLabel: string;
   programs: FeaturedProgram[];
   instructorLabel: string;
   dateLabel: string;
   audienceLabel: string;
   noRatingLabel: string;
+  viewAllHref?: string;
+  viewAllLabel?: string;
 };
 
-function ProgramsCarousel({
+export function ProgramsCarousel({
   title,
   subtitle,
   ctaLabel,
@@ -48,6 +50,8 @@ function ProgramsCarousel({
   dateLabel,
   audienceLabel,
   noRatingLabel,
+  viewAllHref,
+  viewAllLabel,
 }: CarouselProps) {
   const [emblaRef, emblaApi] = useEmblaCarousel({ align: 'start', loop: true, dragFree: true });
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -75,8 +79,15 @@ function ProgramsCarousel({
   return (
     <div className={styles.groupBlock}>
       <div className={styles.groupHeader}>
-        <h3>{title}</h3>
-        <p>{subtitle}</p>
+        <div className={styles.groupHeaderLeft}>
+          <h3>{title}</h3>
+          {subtitle && <p>{subtitle}</p>}
+        </div>
+        {viewAllHref && viewAllLabel && (
+          <Link href={viewAllHref} className={styles.viewAllBtn}>
+            {viewAllLabel}
+          </Link>
+        )}
       </div>
 
       <div className={styles.carouselWrap}>

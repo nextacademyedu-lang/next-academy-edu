@@ -1,0 +1,122 @@
+2026-May-04 22:05:17.667005 Starting deployment of nextacademyedu-lang/next-academy-edu:main to localhost.
+2026-May-04 22:05:18.839841 Preparing container with helper image: ghcr.io/coollabsio/coolify-helper:1.0.12
+2026-May-04 22:05:19.391489 [DEBUG] [CMD]: docker stop -t 30 hcgg04kk08s0k8go4484w88s
+2026-May-04 22:05:19.391489 [DEBUG] Error response from daemon: No such container: hcgg04kk08s0k8go4484w88s
+2026-May-04 22:05:19.921825 [DEBUG] [CMD]: docker run -d --network coolify --name hcgg04kk08s0k8go4484w88s  --rm -v /var/run/docker.sock:/var/run/docker.sock ghcr.io/coollabsio/coolify-helper:1.0.12
+2026-May-04 22:05:19.921825 [DEBUG] 76b7969903c80d1496c2e0c7331d9ff1a50c5e77b8281320e45eb2fdc31af2e6
+2026-May-04 22:05:22.604430 [DEBUG] [CMD]: docker exec hcgg04kk08s0k8go4484w88s bash -c 'GIT_SSH_COMMAND="ssh -o ConnectTimeout=30 -p 22 -o Port=22 -o LogLevel=ERROR -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" git ls-remote https://x-access-token:<REDACTED>@github.com/nextacademyedu-lang/next-academy-edu.git refs/heads/main'
+2026-May-04 22:05:22.604430 [DEBUG] c31ce6e3d255eafe4baabb3814c5ba21aa79525a	refs/heads/main
+2026-May-04 22:05:22.873928 ----------------------------------------
+2026-May-04 22:05:22.879429 Importing nextacademyedu-lang/next-academy-edu:main (commit sha c31ce6e3d255eafe4baabb3814c5ba21aa79525a) to /artifacts/hcgg04kk08s0k8go4484w88s.
+2026-May-04 22:05:23.281904 [DEBUG] [CMD]: docker exec hcgg04kk08s0k8go4484w88s bash -c 'git clone --depth=1 --recurse-submodules --shallow-submodules -b 'main' 'https://x-access-token:<REDACTED>@github.com/nextacademyedu-lang/next-academy-edu.git' '/artifacts/hcgg04kk08s0k8go4484w88s' && cd '/artifacts/hcgg04kk08s0k8go4484w88s' && if [ -f .gitmodules ]; then git submodule sync && GIT_SSH_COMMAND="ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" git submodule update --init --recursive --depth=1; fi && cd '/artifacts/hcgg04kk08s0k8go4484w88s' && GIT_SSH_COMMAND="ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" git lfs pull'
+2026-May-04 22:05:23.281904 [DEBUG] Cloning into '/artifacts/hcgg04kk08s0k8go4484w88s'...
+2026-May-04 22:05:27.158084 [DEBUG] [CMD]: docker exec hcgg04kk08s0k8go4484w88s bash -c 'cd /artifacts/hcgg04kk08s0k8go4484w88s && git log -1 c31ce6e3d255eafe4baabb3814c5ba21aa79525a --pretty=%B'
+2026-May-04 22:05:27.158084 [DEBUG] feat: add opengraph images and fix accidental paste in booking emails
+2026-May-04 22:05:27.551000 [DEBUG] [CMD]: docker images -q xw4k04cosggk0cg0kk84coco:c31ce6e3d255eafe4baabb3814c5ba21aa79525a 2>/dev/null
+2026-May-04 22:05:27.551000 [DEBUG] b8bc8f6e656c
+2026-May-04 22:05:27.570803 No configuration changed & image found (xw4k04cosggk0cg0kk84coco:c31ce6e3d255eafe4baabb3814c5ba21aa79525a) with the same Git Commit SHA. Build step skipped.
+2026-May-04 22:05:28.872903 [DEBUG] [CMD]: docker exec hcgg04kk08s0k8go4484w88s bash -c 'cat /artifacts/hcgg04kk08s0k8go4484w88s/Dockerfile'
+2026-May-04 22:05:28.872903 [DEBUG] # To use this Dockerfile, you have to set `output: 'standalone'` in next.config.ts
+2026-May-04 22:05:28.872903 [DEBUG] # Based on: https://github.com/payloadcms/payload/blob/main/templates/blank/Dockerfile
+2026-May-04 22:05:28.872903 [DEBUG] 
+2026-May-04 22:05:28.872903 [DEBUG] FROM node:22-alpine AS base
+2026-May-04 22:05:28.872903 [DEBUG] RUN npm install -g pnpm
+2026-May-04 22:05:28.872903 [DEBUG] 
+2026-May-04 22:05:28.872903 [DEBUG] # ── Stage 1: Install dependencies ─────────────────────────────────────────────
+2026-May-04 22:05:28.872903 [DEBUG] FROM base AS deps
+2026-May-04 22:05:28.872903 [DEBUG] # libc6-compat is needed for native modules on Alpine
+2026-May-04 22:05:28.872903 [DEBUG] RUN apk add --no-cache libc6-compat
+2026-May-04 22:05:28.872903 [DEBUG] WORKDIR /app
+2026-May-04 22:05:28.872903 [DEBUG] COPY package.json pnpm-lock.yaml ./
+2026-May-04 22:05:28.872903 [DEBUG] RUN pnpm install --frozen-lockfile
+2026-May-04 22:05:28.872903 [DEBUG] 
+2026-May-04 22:05:28.872903 [DEBUG] # ── Stage 2: Build ────────────────────────────────────────────────────────────
+2026-May-04 22:05:28.872903 [DEBUG] FROM base AS builder
+2026-May-04 22:05:28.872903 [DEBUG] WORKDIR /app
+2026-May-04 22:05:28.872903 [DEBUG] COPY --from=deps /app/node_modules ./node_modules
+2026-May-04 22:05:28.872903 [DEBUG] COPY . .
+2026-May-04 22:05:28.872903 [DEBUG] 
+2026-May-04 22:05:28.872903 [DEBUG] ARG NEXT_PUBLIC_APP_URL=https://nextacademyedu.com
+2026-May-04 22:05:28.872903 [DEBUG] ARG NEXT_PUBLIC_SERVER_URL
+2026-May-04 22:05:28.872903 [DEBUG] # Build-time placeholders are intentionally non-secret. Runtime env values override them.
+2026-May-04 22:05:28.872903 [DEBUG] ARG PAYLOAD_SECRET=build_placeholder_payload_secret_please_override_in_runtime
+2026-May-04 22:05:28.872903 [DEBUG] ARG DATABASE_URI=postgresql://placeholder:placeholder@127.0.0.1:5432/placeholder
+2026-May-04 22:05:28.872903 [DEBUG] 
+2026-May-04 22:05:28.872903 [DEBUG] ENV NEXT_PUBLIC_APP_URL=$NEXT_PUBLIC_APP_URL
+2026-May-04 22:05:28.872903 [DEBUG] ENV NEXT_PUBLIC_SERVER_URL=${NEXT_PUBLIC_SERVER_URL:-$NEXT_PUBLIC_APP_URL}
+2026-May-04 22:05:28.872903 [DEBUG] ENV PAYLOAD_SECRET=$PAYLOAD_SECRET
+2026-May-04 22:05:28.872903 [DEBUG] ENV DATABASE_URI=$DATABASE_URI
+2026-May-04 22:05:28.872903 [DEBUG] ENV NODE_OPTIONS=--max-old-space-size=4096
+2026-May-04 22:05:28.872903 [DEBUG] ENV NEXT_TELEMETRY_DISABLED=1
+2026-May-04 22:05:28.872903 [DEBUG] 
+2026-May-04 22:05:28.872903 [DEBUG] # type-check is already run in GitHub Actions CI, skipping here to avoid Coolify timeout
+2026-May-04 22:05:28.872903 [DEBUG] RUN sh -c '(while sleep 20; do echo "[build] next.js build is still running..."; done) & HEARTBEAT_PID=$!; pnpm build; BUILD_EXIT=$?; kill $HEARTBEAT_PID; exit $BUILD_EXIT'
+2026-May-04 22:05:28.872903 [DEBUG] 
+2026-May-04 22:05:28.872903 [DEBUG] # ── Stage 3: Runner ───────────────────────────────────────────────────────────
+2026-May-04 22:05:28.872903 [DEBUG] FROM node:22-alpine AS runner
+2026-May-04 22:05:28.872903 [DEBUG] WORKDIR /app
+2026-May-04 22:05:28.872903 [DEBUG] 
+2026-May-04 22:05:28.872903 [DEBUG] ENV NODE_ENV=production
+2026-May-04 22:05:28.872903 [DEBUG] ENV NEXT_TELEMETRY_DISABLED=1
+2026-May-04 22:05:28.872903 [DEBUG] ENV PAYLOAD_UPLOAD_DIR=/app/media
+2026-May-04 22:05:28.872903 [DEBUG] ENV PAYLOAD_MEDIA_BASE_URL=/media
+2026-May-04 22:05:28.872903 [DEBUG] 
+2026-May-04 22:05:28.872903 [DEBUG] # Coolify overrides the Dockerfile HEALTHCHECK with its own curl-based probe
+2026-May-04 22:05:28.872903 [DEBUG] RUN apk add --no-cache curl
+2026-May-04 22:05:28.872903 [DEBUG] RUN addgroup -g 1001 -S nodejs && adduser -S nextjs -u 1001
+2026-May-04 22:05:28.872903 [DEBUG] 
+2026-May-04 22:05:28.872903 [DEBUG] COPY --from=builder /app/public ./public
+2026-May-04 22:05:28.872903 [DEBUG] 
+2026-May-04 22:05:28.872903 [DEBUG] # Set the correct permission for prerender cache
+2026-May-04 22:05:28.872903 [DEBUG] RUN mkdir .next
+2026-May-04 22:05:28.872903 [DEBUG] RUN chown nextjs:nodejs .next
+2026-May-04 22:05:28.872903 [DEBUG] RUN mkdir -p /app/media
+2026-May-04 22:05:28.872903 [DEBUG] RUN chown -R nextjs:nodejs /app/media
+2026-May-04 22:05:28.872903 [DEBUG] 
+2026-May-04 22:05:28.872903 [DEBUG] # Automatically leverage output traces to reduce image size
+2026-May-04 22:05:28.872903 [DEBUG] COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
+2026-May-04 22:05:28.872903 [DEBUG] COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+2026-May-04 22:05:28.872903 [DEBUG] 
+2026-May-04 22:05:28.872903 [DEBUG] # Payload needs i18n message files at runtime for next-intl
+2026-May-04 22:05:28.872903 [DEBUG] COPY --from=builder --chown=nextjs:nodejs /app/src/messages ./src/messages
+2026-May-04 22:05:28.872903 [DEBUG] 
+2026-May-04 22:05:28.872903 [DEBUG] USER nextjs
+2026-May-04 22:05:28.872903 [DEBUG] 
+2026-May-04 22:05:28.872903 [DEBUG] EXPOSE 3001
+2026-May-04 22:05:28.872903 [DEBUG] ENV PORT=3001
+2026-May-04 22:05:28.872903 [DEBUG] ENV HOSTNAME=0.0.0.0
+2026-May-04 22:05:28.872903 [DEBUG] 
+2026-May-04 22:05:28.872903 [DEBUG] # Fast healthcheck since Payload schema push is disabled in production
+2026-May-04 22:05:28.872903 [DEBUG] HEALTHCHECK --interval=15s --timeout=10s --start-period=10s --retries=5 \
+2026-May-04 22:05:28.872903 [DEBUG] CMD node -e "const http = require('http'); const req = http.get('http://localhost:3001/api/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1); }); req.on('error', () => process.exit(1)); req.setTimeout(5000, () => { req.destroy(); process.exit(1); });"
+2026-May-04 22:05:28.872903 [DEBUG] 
+2026-May-04 22:05:28.872903 [DEBUG] CMD ["node", "server.js"]
+2026-May-04 22:05:29.459877 [DEBUG] Creating .env file with runtime variables for container.
+2026-May-04 22:05:30.264224 ----------------------------------------
+2026-May-04 22:05:30.276898 Rolling update started.
+2026-May-04 22:05:31.273969 [DEBUG] [CMD]: docker exec hcgg04kk08s0k8go4484w88s bash -c 'COOLIFY_URL=https://nextacademyedu.com,https//www.nextacademyedu.com COOLIFY_FQDN=nextacademyedu.com,https COOLIFY_BRANCH=main COOLIFY_RESOURCE_UUID=xw4k04cosggk0cg0kk84coco  docker compose --project-name xw4k04cosggk0cg0kk84coco --project-directory /artifacts/hcgg04kk08s0k8go4484w88s -f /artifacts/hcgg04kk08s0k8go4484w88s/docker-compose.yaml up --build -d'
+2026-May-04 22:05:31.273969 [DEBUG] validating /artifacts/hcgg04kk08s0k8go4484w88s/docker-compose.yaml: volumes additional properties 'xw4k04cosggk0cg0kk84coco-media_volume ' not allowed
+2026-May-04 22:05:31.282855 [DEBUG] exit status 1
+2026-May-04 22:05:31.364061 ========================================
+2026-May-04 22:05:31.369955 Deployment failed: Rolling update failed (App\Exceptions\DeploymentException): Failed to start container: Command execution failed (exit code 1): docker exec hcgg04kk08s0k8go4484w88s bash -c 'COOLIFY_URL=https://nextacademyedu.com,https//www.nextacademyedu.com COOLIFY_FQDN=nextacademyedu.com,https COOLIFY_BRANCH=main COOLIFY_RESOURCE_UUID=xw4k04cosggk0cg0kk84coco  docker compose --project-name xw4k04cosggk0cg0kk84coco --project-directory /artifacts/hcgg04kk08s0k8go4484w88s -f /artifacts/hcgg04kk08s0k8go4484w88s/docker-compose.yaml up --build -d'
+2026-May-04 22:05:31.369955 Error: validating /artifacts/hcgg04kk08s0k8go4484w88s/docker-compose.yaml: volumes additional properties 'xw4k04cosggk0cg0kk84coco-media_volume ' not allowed
+2026-May-04 22:05:31.369955 exit status 1
+2026-May-04 22:05:31.376402 [DEBUG] Error type: App\Exceptions\DeploymentException
+2026-May-04 22:05:31.381498 [DEBUG] Error code: 0
+2026-May-04 22:05:31.386421 [DEBUG] Location: /var/www/html/app/Jobs/ApplicationDeploymentJob.php:1781
+2026-May-04 22:05:31.391614 [DEBUG] Caused by:
+2026-May-04 22:05:31.396815 [DEBUG] App\Exceptions\DeploymentException: Failed to start container: Command execution failed (exit code 1): docker exec hcgg04kk08s0k8go4484w88s bash -c 'COOLIFY_URL=https://nextacademyedu.com,https//www.nextacademyedu.com COOLIFY_FQDN=nextacademyedu.com,https COOLIFY_BRANCH=main COOLIFY_RESOURCE_UUID=xw4k04cosggk0cg0kk84coco  docker compose --project-name xw4k04cosggk0cg0kk84coco --project-directory /artifacts/hcgg04kk08s0k8go4484w88s -f /artifacts/hcgg04kk08s0k8go4484w88s/docker-compose.yaml up --build -d'
+2026-May-04 22:05:31.396815 [DEBUG] Error: validating /artifacts/hcgg04kk08s0k8go4484w88s/docker-compose.yaml: volumes additional properties 'xw4k04cosggk0cg0kk84coco-media_volume ' not allowed
+2026-May-04 22:05:31.396815 [DEBUG] exit status 1
+2026-May-04 22:05:31.402332 [DEBUG] at /var/www/html/app/Jobs/ApplicationDeploymentJob.php:3274
+2026-May-04 22:05:31.413129 [DEBUG] Stack trace (first 5 lines):
+2026-May-04 22:05:31.420542 [DEBUG] #0 /var/www/html/app/Jobs/ApplicationDeploymentJob.php(1122): App\Jobs\ApplicationDeploymentJob->rolling_update()
+2026-May-04 22:05:31.426560 [DEBUG] #1 /var/www/html/app/Jobs/ApplicationDeploymentJob.php(842): App\Jobs\ApplicationDeploymentJob->should_skip_build()
+2026-May-04 22:05:31.432306 [DEBUG] #2 /var/www/html/app/Jobs/ApplicationDeploymentJob.php(471): App\Jobs\ApplicationDeploymentJob->deploy_dockerfile_buildpack()
+2026-May-04 22:05:31.437998 [DEBUG] #3 /var/www/html/app/Jobs/ApplicationDeploymentJob.php(335): App\Jobs\ApplicationDeploymentJob->decide_what_to_do()
+2026-May-04 22:05:31.445048 [DEBUG] #4 /var/www/html/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php(36): App\Jobs\ApplicationDeploymentJob->handle()
+2026-May-04 22:05:31.450883 ========================================
+2026-May-04 22:05:31.456410 Deployment failed. Removing the new version of your application.
+2026-May-04 22:05:32.888060 Gracefully shutting down build container: hcgg04kk08s0k8go4484w88s
+2026-May-04 22:05:33.458359 [DEBUG] [CMD]: docker stop -t 30 hcgg04kk08s0k8go4484w88s
+2026-May-04 22:05:33.458359 [DEBUG] hcgg04kk08s0k8go4484w88s

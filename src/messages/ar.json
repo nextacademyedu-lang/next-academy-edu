@@ -60,12 +60,12 @@
     "completion": "معدل الإتمام"
   },
   "Featured": {
-    "title": "البرامج المميزة",
-    "subtitle": "الأحدث أولاً، ثم التسجيلات الجاهزة للمشاهدة.",
-    "upcomingTitle": "البرامج القادمة",
-    "upcomingSubtitle": "الدورات والويبنارات التي لديها جولات قادمة.",
-    "recordedTitle": "التسجيلات المتاحة",
-    "recordedSubtitle": "الويبنارات المكتملة وبها تسجيل جاهز للمشاهدة.",
+    "title": "أفضل الكورسات هذا الأسبوع",
+    "subtitle": "استكشف الكورسات والبرامج الأكثر طلباً حالياً.",
+    "upcomingTitle": "أفضل الكورسات هذا الأسبوع",
+    "upcomingSubtitle": "",
+    "recordedTitle": "الكورسات المسجلة",
+    "recordedSubtitle": "",
     "viewAll": "عرض جميع البرامج",
     "instructor": "المدرب",
     "learners": "متعلم",

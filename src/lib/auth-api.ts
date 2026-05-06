@@ -89,7 +89,7 @@ export async function registerUser(
 }
 
 export async function getCurrentUser(): Promise<AuthResponse<{ user: UserData | null }>> {
-  const response = await fetch('/api/users/me?depth=1', {
+  const response = await fetch('/api/auth/me', {
     method: 'GET',
     credentials: 'include',
   });

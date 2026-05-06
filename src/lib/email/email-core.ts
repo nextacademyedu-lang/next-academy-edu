@@ -52,7 +52,7 @@ export function buildEmailLayout(content: EmailContent, options: LayoutOptions =
 
   const alertHtml = content.alert
     ? `<div style="background:#2a1a1a;border:1px solid #C51B1B;border-radius:8px;padding:14px;margin:20px 0">
-        <p style="margin:0;color:#ff6b6b;font-size:14px"><strong>⚠️ ${content.alert}</strong></p>
+        <p style="margin:0;color:#ff6b6b;font-size:14px"><strong>${content.alert}</strong></p>
        </div>`
     : '';
 

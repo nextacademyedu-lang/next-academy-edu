@@ -60,12 +60,12 @@
     "completion": "Completion Rate"
   },
   "Featured": {
-    "title": "Featured Programs",
-    "subtitle": "Upcoming first, then recorded sessions you can watch anytime.",
-    "upcomingTitle": "Upcoming Programs",
-    "upcomingSubtitle": "Programs and webinars that still have upcoming rounds.",
-    "recordedTitle": "Recorded Sessions",
-    "recordedSubtitle": "Completed webinars with available recordings.",
+    "title": "Top Courses This Week",
+    "subtitle": "Explore the most demanded courses and programs right now.",
+    "upcomingTitle": "Top Courses This Week",
+    "upcomingSubtitle": "",
+    "recordedTitle": "Recorded Courses",
+    "recordedSubtitle": "",
     "viewAll": "View All Programs",
     "instructor": "Instructor",
     "learners": "learners",

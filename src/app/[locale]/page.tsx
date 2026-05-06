@@ -3,10 +3,10 @@ import { Navbar } from '@/components/layout/navbar';
 import { Footer } from '@/components/layout/footer';
 import { AnnouncementBar } from '@/components/layout/announcement-bar';
 import { HeroSection } from '@/components/sections/hero';
-import { StatsSection } from '@/components/sections/stats';
 import { B2BTrustedSection } from '@/components/sections/b2b-trusted';
 import { FeaturedPrograms } from '@/components/sections/featured';
-import { WhyChooseUs } from '@/components/sections/why-choose-us';
+import { CategoriesSection } from '@/components/sections/categories-section';
+import { LearningPathsSection } from '@/components/sections/learning-paths-section';
 import { UpcomingEvents } from '@/components/sections/upcoming-events';
 import { TextTestimonialsSection } from '@/components/sections/text-testimonials';
 import { InstructorsPreview } from '@/components/sections/instructors-preview';
@@ -45,18 +45,22 @@ export default async function HomePage({
       
       <main style={{ flex: 1 }}>
         <HeroSection />
-        <PromoBannerSlot locale={locale} page="home" position="after_hero" />
-        <StatsSection />
-        <FeaturedPrograms />
-        <PromoBannerSlot locale={locale} page="home" position="after_featured" />
-        <WhyChooseUs />
-        <UpcomingEvents locale={locale} />
-        <PromoBannerSlot locale={locale} page="home" position="after_events" />
-        <TextTestimonialsSection />
-        <PromoBannerSlot locale={locale} page="home" position="after_testimonials" />
-        <InstructorsPreview />
         <B2BTrustedSection />
-        <VideoTestimonialsSection />
+        
+        <FeaturedPrograms />
+        <LearningPathsSection locale={locale} />
+        <CategoriesSection locale={locale} />
+        
+        <PromoBannerSlot locale={locale} page="home" position="after_featured" />
+        
+        <UpcomingEvents locale={locale} />
+        <InstructorsPreview />
+        
+        <div style={{ background: 'var(--bg-secondary)', paddingBottom: '2rem' }}>
+          <TextTestimonialsSection />
+          <VideoTestimonialsSection />
+        </div>
+        
         <BlogsPreviewSection />
         <PromoBannerSlot locale={locale} page="home" position="before_footer" />
       </main>

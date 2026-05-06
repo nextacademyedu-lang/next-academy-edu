@@ -74,7 +74,7 @@ export function WhyChooseUs() {
               </span>
             ))}
           </h2>
-          <p className={styles.manifestoSubtitle} dangerouslySetInnerHTML={{ __html: t('subtitle') }} />
+          <p className={styles.manifestoSubtitle} dangerouslySetInnerHTML={{ __html: t.raw('subtitle') }} />
         </div>
 
         {/* Framer Motion Fade-up Grid for Services */}

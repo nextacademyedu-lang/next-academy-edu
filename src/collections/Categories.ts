@@ -20,5 +20,6 @@ export const Categories: CollectionConfig = {
     { name: 'parent', type: 'relationship', relationTo: 'categories' },
     { name: 'order', type: 'number', defaultValue: 0 },
     { name: 'isActive', type: 'checkbox', defaultValue: true },
+    { name: 'showOnHome', type: 'checkbox', defaultValue: false, admin: { description: 'Show this category as a distinct row on the homepage' } },
   ],
 };
