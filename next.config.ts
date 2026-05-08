@@ -52,6 +52,11 @@ const nextConfig: NextConfig = {
   // Type-check runs in CI — skip during build for speed
   typescript: { ignoreBuildErrors: true },
   // Required by Payload CMS for proper .ts/.tsx resolution
+  experimental: {
+    // Single-threaded build to reduce RAM usage on low-memory VPS
+    webpackBuildWorker: false,
+    workerThreads: false,
+  },
   webpack: (webpackConfig) => {
     webpackConfig.resolve.extensionAlias = {
       '.cjs': ['.cts', '.cjs'],
