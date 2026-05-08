@@ -189,7 +189,7 @@ const resendAdapter: EmailAdapter = () => {
 };
 
 export default buildConfig({
-  serverURL: process.env.NEXT_PUBLIC_SERVER_URL || '',
+  serverURL: process.env.NEXT_PUBLIC_SERVER_URL || process.env.NEXT_PUBLIC_APP_URL || '',
   admin: {
     user: Users.slug,
     importMap: {
