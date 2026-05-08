@@ -2,7 +2,7 @@
 # Based on: https://github.com/payloadcms/payload/blob/main/templates/blank/Dockerfile
 
 FROM node:22-alpine AS base
-RUN npm install -g pnpm
+RUN npm install -g pnpm@9
 
 # ── Stage 1: Install dependencies ─────────────────────────────────────────────
 FROM base AS deps
@@ -10,7 +10,7 @@ FROM base AS deps
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
 COPY package.json pnpm-lock.yaml ./
-RUN pnpm config set onlyBuiltDependencies '*' && pnpm install --frozen-lockfile
+RUN pnpm install --frozen-lockfile
 
 # ── Stage 2: Build ────────────────────────────────────────────────────────────
 FROM base AS builder
