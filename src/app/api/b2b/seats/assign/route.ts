@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { resolveB2BScope, relationToId } from '../../_scope.ts';
+import { atomicIncrement } from '@/lib/atomic-db';
 
 type AllocationEntry = {
   user?: unknown;
@@ -157,6 +158,9 @@ export async function POST(req: NextRequest) {
           },
           overrideAccess: true,
         });
+
+        // Keep the round's currentEnrollments counter in sync
+        await atomicIncrement('rounds', roundId, 'current_enrollments', 1);
       }
     }
 
@@ -269,6 +273,9 @@ export async function DELETE(req: NextRequest) {
           },
           overrideAccess: true,
         });
+
+        // Decrement the round's currentEnrollments counter
+        await atomicIncrement('rounds', roundId, 'current_enrollments', -1);
       }
     }
 

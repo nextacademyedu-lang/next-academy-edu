@@ -37,6 +37,7 @@ export default clerkMiddleware(async (auth, req) => {
     if (!onboardingComplete) {
       const locale = pathname.split('/')[1] || 'ar';
       const url = new URL(`/${locale}/onboarding`, req.url);
+      url.searchParams.set('returnTo', pathname);
       return NextResponse.redirect(url);
     }
   }

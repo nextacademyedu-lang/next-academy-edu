@@ -9,7 +9,7 @@ import { useUser } from '@clerk/nextjs';
 import { OnboardingStep1, type Step1Data } from '@/components/onboarding/step-1';
 import { OnboardingStep2, type Step2Data } from '@/components/onboarding/step-2';
 import { OnboardingStep3, type Step3Data } from '@/components/onboarding/step-3';
-import { getDashboardPath } from '@/lib/role-redirect';
+import { getDashboardPath, getSafeRedirectPath } from '@/lib/role-redirect';
 import styles from '@/components/onboarding/onboarding.module.css';
 
 const TOTAL_STEPS = 3;
@@ -172,8 +172,11 @@ export default function OnboardingPage() {
 
       await user?.reload(); // Refresh clerk user data
       
+      // Redirect to the page the user was on before signup, or to dashboard
+      const returnTo = searchParams.get('returnTo');
       const dashboardPath = getDashboardPath(role as any, locale);
-      router.push(dashboardPath);
+      const redirectTo = getSafeRedirectPath(returnTo, dashboardPath);
+      router.push(redirectTo);
     } catch (err) {
       setError(err instanceof Error ? err.message : t('somethingWentWrong'));
     } finally {

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getPayload } from 'payload';
 import config from '@payload-config';
 import { authenticateRequestUser } from '@/lib/server-auth';
+import { atomicIncrement } from '@/lib/atomic-db';
 
 type AllocationEntry = {
   user?: unknown;
@@ -190,6 +191,9 @@ export async function POST(req: NextRequest) {
           },
           overrideAccess: true,
         });
+
+        // Keep the round's currentEnrollments counter in sync
+        await atomicIncrement('rounds', roundId, 'current_enrollments', 1);
       }
     }
 

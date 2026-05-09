@@ -243,7 +243,7 @@ export function Navbar() {
                         {t('login')}
                       </Button>
                     </SignInButton>
-                    <SignUpButton mode="modal" forceRedirectUrl={`/${locale}/onboarding`}>
+                    <SignUpButton mode="modal" forceRedirectUrl={`/${locale}/onboarding?returnTo=${encodeURIComponent(`/${locale}${pathname}`)}`}>
                       <Button variant="primary" size="sm">
                         {t('register')}
                       </Button>
@@ -356,7 +356,7 @@ export function Navbar() {
                       {t('login')}
                     </Button>
                   </SignInButton>
-                  <SignUpButton mode="modal" forceRedirectUrl={`/${locale}/onboarding`}>
+                  <SignUpButton mode="modal" forceRedirectUrl={`/${locale}/onboarding?returnTo=${encodeURIComponent(`/${locale}${pathname}`)}`}>
                     <Button variant="primary" fullWidth onClick={closeAllMenus}>
                       {t('register')}
                     </Button>

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getPayload } from 'payload';
 import configPromise from '@payload-config';
 import { assertTrustedWriteRequest } from '@/lib/csrf';
+import { atomicIncrement } from '@/lib/atomic-db';
 
 type AuthUser = {
   id?: number | string;
@@ -231,6 +232,10 @@ export async function POST(req: NextRequest) {
         },
         overrideAccess: true,
               });
+
+      // Increment the round's currentEnrollments counter so the
+      // "seats remaining" display on program pages stays accurate.
+      await atomicIncrement('rounds', roundId, 'current_enrollments', 1);
     }
 
     return NextResponse.json({
