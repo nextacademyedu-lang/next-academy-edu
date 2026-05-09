@@ -35,7 +35,7 @@ export default function CheckoutFailedPage() {
             </Link>
           )}
           <a
-            href="https://wa.me/201000000000"
+            href="https://wa.me/201505822735"
             target="_blank"
             rel="noreferrer"
             style={{ textDecoration: 'none' }}

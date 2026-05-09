@@ -1,6 +1,7 @@
 import crypto from 'node:crypto';
 import type { NextRequest } from 'next/server';
 import type { Payload } from 'payload';
+import { auth, currentUser } from '@clerk/nextjs/server';
 
 type AuthCandidateHeaders = Record<string, string>;
 
@@ -135,6 +136,44 @@ async function resolveUserFromVerifiedToken(payload: Payload, token: string): Pr
  * so we try all token candidates and include a cryptographic fallback verifier.
  */
 export async function authenticateRequestUser(payload: Payload, req: NextRequest): Promise<any | null> {
+  // Try Clerk authentication first (modern frontend session)
+  try {
+    const { userId } = await auth();
+    if (userId) {
+      let usersRes = await payload.find({
+        collection: 'users',
+        where: { clerkId: { equals: userId } },
+        depth: 0,
+        limit: 1,
+        overrideAccess: true,
+      });
+
+      if (usersRes.docs.length > 0) return usersRes.docs[0];
+
+      // Fallback for older users
+      const clerkUser = await currentUser();
+      const primaryEmail = clerkUser?.emailAddresses.find(
+        (email) => email.id === clerkUser.primaryEmailAddressId
+      )?.emailAddress;
+
+      if (primaryEmail) {
+        usersRes = await payload.find({
+          collection: 'users',
+          where: { email: { equals: primaryEmail.toLowerCase() } },
+          depth: 0,
+          limit: 1,
+          overrideAccess: true,
+        });
+
+        if (usersRes.docs.length > 0) {
+           return usersRes.docs[0];
+        }
+      }
+    }
+  } catch (e) {
+    // Ignore and fallback to Payload local token if Clerk fails or is not available
+  }
+
   // Fast path: let Payload parse the original request headers first.
   try {
     const { user } = await payload.auth({ headers: req.headers });

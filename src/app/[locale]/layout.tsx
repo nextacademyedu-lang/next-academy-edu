@@ -79,10 +79,10 @@ export default async function LocaleLayout({
             variables: {
               colorPrimary: '#c9a96e',
               colorBackground: '#0a0a0a',
-              colorText: '#ffffff',
               colorInputBackground: '#141414',
-              colorInputText: '#ffffff',
               colorShimmer: 'rgba(255,255,255,0.05)',
+              colorText: '#ffffff',
+              colorTextSecondary: '#a3a3a3',
               borderRadius: '8px',
               fontFamily: locale === 'ar' ? 'var(--font-cairo)' : 'var(--font-montserrat)',
             },
@@ -109,10 +109,10 @@ export default async function LocaleLayout({
                 color: '#ffffff',
               },
               headerSubtitle: {
-                color: '#999999',
+                color: '#a3a3a3',
               },
               formFieldLabel: {
-                color: '#cccccc',
+                color: '#d4d4d4',
               },
               dividerLine: {
                 backgroundColor: 'rgba(255,255,255,0.1)',

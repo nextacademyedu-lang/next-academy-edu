@@ -8,7 +8,7 @@ import styles from './about-cta.module.css';
 export function AboutCta() {
   const t = useTranslations('About');
   const locale = useLocale();
-  const whatsappLink = 'https://wa.me/201000000000';
+  const whatsappLink = 'https://wa.me/201505822735';
 
   return (
     <section className={styles.section}>

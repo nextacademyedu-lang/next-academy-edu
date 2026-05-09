@@ -23,6 +23,20 @@ export function MediaPlayer({ src, title, thumbnailUrl }: MediaPlayerProps) {
 
   const isYouTube = src.includes('youtube.com') || src.includes('youtu.be');
 
+  const getEmbedUrl = (url: string) => {
+    if (url.includes('youtube.com/watch?v=')) {
+      const videoId = url.split('v=')[1].split('&')[0];
+      return `https://www.youtube.com/embed/${videoId}`;
+    }
+    if (url.includes('youtu.be/')) {
+      const videoId = url.split('youtu.be/')[1].split('?')[0];
+      return `https://www.youtube.com/embed/${videoId}`;
+    }
+    return url;
+  };
+
+  const embedSrc = isYouTube ? getEmbedUrl(src) : src;
+
   const handlePlay = useCallback(() => {
     setIsPlaying(true);
   }, []);
@@ -33,7 +47,7 @@ export function MediaPlayer({ src, title, thumbnailUrl }: MediaPlayerProps) {
       <div className={styles.playerContainer}>
         {isYouTube ? (
           <iframe
-            src={`${src}${src.includes('?') ? '&' : '?'}autoplay=1`}
+            src={`${embedSrc}${embedSrc.includes('?') ? '&' : '?'}autoplay=1`}
             title={title}
             className={styles.iframe}
             loading="lazy"

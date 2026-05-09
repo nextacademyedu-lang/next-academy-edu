@@ -94,7 +94,7 @@ export default function ContactPage() {
   const consultationBookingId = searchParams.get('consultationBookingId');
   const isConsultationMode = intent === 'consultation' && Boolean(instructorSlug);
   const whatsappUrl =
-    process.env.NEXT_PUBLIC_WHATSAPP_URL || 'https://wa.me/97141234567';
+    process.env.NEXT_PUBLIC_WHATSAPP_URL || 'https://wa.me/201505822735';
 
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -781,7 +781,7 @@ export default function ContactPage() {
                 <h3 className={styles.infoTitle}>{contactCopy.directContactTitle}</h3>
                 <p className={styles.infoText}>
                   <strong>Email:</strong> support@nextacademyedu.com<br />
-                  <strong>Phone:</strong> +971 4 123 4567
+                  <strong>Phone:</strong> +20 150 582 2735
                 </p>
               </div>
 
