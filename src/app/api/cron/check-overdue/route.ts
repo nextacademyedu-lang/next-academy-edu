@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getPayload } from 'payload';
 import config from '@payload-config';
 import { sendOverdueNotification, sendPaymentReminder } from '@/lib/email';
+import { atomicIncrement } from '@/lib/atomic-db';
 
 // Called daily via cron: GET /api/cron/check-overdue
 // Authorization: Bearer <CRON_SECRET>
@@ -44,6 +45,15 @@ export async function GET(req: NextRequest) {
         data: { accessBlocked: true, status: 'payment_failed' },
       });
       results.blocked++;
+
+      const roundId = typeof booking.round === 'object' ? booking.round?.id : booking.round;
+      const eventId = typeof booking.event === 'object' ? booking.event?.id : booking.event;
+
+      if (roundId) {
+        await atomicIncrement('rounds', roundId, 'current_enrollments', -1);
+      } else if (eventId) {
+        await atomicIncrement('events', eventId, 'current_enrollments', -1);
+      }
 
       // Notify user
       const user = await payload.findByID({

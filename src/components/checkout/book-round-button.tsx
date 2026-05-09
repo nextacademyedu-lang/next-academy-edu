@@ -38,7 +38,7 @@ function buildIntentPath(locale: string, programSlug: string, roundId: string | 
 
 function findActiveBookingId(payload: ExistingBookingsResponse): string | null {
   const docs = Array.isArray(payload.docs) ? payload.docs : [];
-  const active = docs.find((doc) => !['cancelled', 'refunded'].includes(String(doc.status || '')));
+  const active = docs.find((doc) => !['cancelled', 'refunded', 'payment_failed', 'cancelled_overdue'].includes(String(doc.status || '')));
   if (!active?.id) return null;
   return String(active.id);
 }

@@ -111,7 +111,7 @@ export async function POST(req: NextRequest) {
     stage = 'check_duplicate';
     const whereClause: any = {
       user: { equals: user.id },
-      status: { not_in: ['cancelled', 'refunded'] },
+      status: { not_in: ['cancelled', 'refunded', 'payment_failed', 'cancelled_overdue'] },
     };
     if (normalizedRoundId != null) {
       whereClause.round = { equals: normalizedRoundId };

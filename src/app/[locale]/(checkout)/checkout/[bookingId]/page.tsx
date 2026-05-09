@@ -381,14 +381,35 @@ export default function CheckoutPage() {
             </p>
           )}
 
-          <button
-            className={styles.proceedBtn}
-            onClick={handleProceed}
-            disabled={submitting}
-            style={{ opacity: submitting ? 0.7 : 1, cursor: submitting ? 'not-allowed' : 'pointer' }}
-          >
-            {submitting ? 'جاري التحويل…' : selectedOptionId === 'fawry' ? 'احصل على رقم الدفع' : 'انتقل للدفع الآمن'}
-          </button>
+          {['pending', 'reserved'].includes(booking.status) ? (
+            <button
+              className={styles.proceedBtn}
+              onClick={handleProceed}
+              disabled={submitting}
+              style={{ opacity: submitting ? 0.7 : 1, cursor: submitting ? 'not-allowed' : 'pointer' }}
+            >
+              {submitting ? 'جاري التحويل…' : selectedOptionId === 'fawry' ? 'احصل على رقم الدفع' : 'انتقل للدفع الآمن'}
+            </button>
+          ) : (
+            <div className={styles.installmentNotice} style={{ textAlign: 'center', marginTop: '16px' }}>
+              <p style={{ fontWeight: 'bold', color: 'var(--text-primary)' }}>
+                {booking.status === 'confirmed' || booking.status === 'completed'
+                  ? 'هذا الحجز مؤكد ومكتمل.'
+                  : booking.status === 'payment_failed'
+                  ? 'فشلت عملية الدفع لهذا الحجز مسبقاً. يرجى التواصل مع الدعم.'
+                  : booking.status === 'pending_approval'
+                  ? 'هذا الحجز في انتظار موافقة شركتك.'
+                  : 'لا يمكن الدفع لهذا الحجز في الوقت الحالي.'}
+              </p>
+              <button
+                className={styles.secondaryBtn}
+                style={{ marginTop: '16px', width: '100%' }}
+                onClick={() => router.push(`/${locale}/dashboard/bookings`)}
+              >
+                الذهاب لحجوزاتي
+              </button>
+            </div>
+          )}
 
           <div className={styles.securityBadge}>
             <ShieldCheck size={16} color="#00e397" />

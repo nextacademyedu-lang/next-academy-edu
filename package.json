@@ -8,6 +8,7 @@
     "build": "payload generate:importmap && next build",
     "check:env": "node scripts/check-coolify-env.mjs",
     "generate:importmap": "payload generate:importmap",
+    "payload": "payload",
     "start": "next start",
     "type-check": "tsc --noEmit",
     "lint": "eslint src/",
