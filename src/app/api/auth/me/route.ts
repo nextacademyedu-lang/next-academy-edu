@@ -3,6 +3,8 @@ import { getPayload } from 'payload';
 import configPromise from '@/payload.config';
 import { auth } from '@clerk/nextjs/server';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET() {
   try {
     const { userId } = await auth();

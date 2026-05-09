@@ -10,7 +10,12 @@ export interface ProfileCheckResult {
 
 export async function checkProfileCompleteness(): Promise<ProfileCheckResult> {
   try {
-    const res = await fetch('/api/auth/me', { credentials: 'include' });
+    const timestamp = Date.now();
+    const res = await fetch(`/api/auth/me?t=${timestamp}`, { 
+      credentials: 'include',
+      cache: 'no-store',
+      headers: { 'Cache-Control': 'no-cache' }
+    });
     if (!res.ok) return { complete: false, missing: ['auth'] };
 
     const data = await res.json();
