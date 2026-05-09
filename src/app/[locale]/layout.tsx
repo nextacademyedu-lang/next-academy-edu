@@ -130,6 +130,27 @@ export default async function LocaleLayout({
               },
               identityPreviewEditButtonIcon: {
                 color: '#c9a96e',
+              },
+              userButtonPopoverCard: {
+                backgroundColor: '#141414',
+                border: '1px solid rgba(255, 255, 255, 0.08)',
+              },
+              userPreviewMainIdentifier: {
+                color: '#ffffff',
+              },
+              userPreviewSecondaryIdentifier: {
+                color: '#a3a3a3',
+              },
+              userButtonPopoverActionButton: {
+                '&:hover': {
+                  backgroundColor: 'rgba(255,255,255,0.05)',
+                }
+              },
+              userButtonPopoverActionButtonText: {
+                color: '#ffffff',
+              },
+              userButtonPopoverActionButtonIcon: {
+                color: '#a3a3a3',
               }
             }
           }}
