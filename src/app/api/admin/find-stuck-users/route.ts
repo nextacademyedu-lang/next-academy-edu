@@ -20,6 +20,7 @@ export async function GET(req: Request) {
         status: { in: ['payment_failed', 'cancelled_overdue', 'pending'] },
         updatedAt: { greater_than_equal: sevenDaysAgo.toISOString() },
       },
+      overrideAccess: true,
       limit: 1000,
       depth: 2,
     });
