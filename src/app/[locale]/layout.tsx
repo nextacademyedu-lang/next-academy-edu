@@ -11,6 +11,7 @@ import { ThemeProvider } from '@/context/theme-context';
 import { PopupManager } from '@/components/marketing/popup-manager';
 import { CookieConsent } from '@/components/cookie-consent';
 import { SourceTracker } from '@/components/source-tracker';
+import { WhatsAppFloat } from '@/components/ui/whatsapp-float';
 import '../globals.css';
 
 const montserrat = Montserrat({
@@ -140,6 +141,7 @@ export default async function LocaleLayout({
                 <PopupManager />
                 <CookieConsent />
                 <SourceTracker />
+                <WhatsAppFloat />
               </ThemeProvider>
             </AuthProvider>
           </NextIntlClientProvider>
