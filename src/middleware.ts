@@ -37,7 +37,8 @@ export default clerkMiddleware(async (auth, req) => {
     if (!onboardingComplete) {
       const locale = pathname.split('/')[1] || 'ar';
       const url = new URL(`/${locale}/onboarding`, req.url);
-      url.searchParams.set('returnTo', pathname);
+      const fullPath = req.nextUrl.pathname + req.nextUrl.search;
+      url.searchParams.set('returnTo', fullPath);
       return NextResponse.redirect(url);
     }
   }
@@ -46,6 +47,11 @@ export default clerkMiddleware(async (auth, req) => {
     if (!userId) return redirectToSignIn();
 
     if (onboardingComplete) {
+      const returnTo = req.nextUrl.searchParams.get('returnTo');
+      if (returnTo) {
+        return NextResponse.redirect(new URL(returnTo, req.url));
+      }
+
       const locale = pathname.split('/')[1] || 'ar';
       const dashboardPath = metadata?.role === 'instructor' 
         ? `/${locale}/dashboard/instructor` 
